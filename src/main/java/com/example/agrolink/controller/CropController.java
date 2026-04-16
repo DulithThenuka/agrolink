@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.agrolink.entity.Crop;
 import com.example.agrolink.entity.User;
 import com.example.agrolink.service.CropService;
+import com.example.agrolink.service.FileStorageService;
 import com.example.agrolink.service.UserService;
 
 @Controller
@@ -24,11 +25,13 @@ public class CropController {
 
     private final CropService cropService;
     private final UserService userService;
+    private final FileStorageService fileStorageService;
 
-    public CropController(CropService cropService, UserService userService) {
-        this.cropService = cropService;
-        this.userService = userService;
-    }
+    public CropController(CropService cropService,UserService userService,FileStorageService fileStorageService) {
+    this.cropService = cropService;
+    this.userService = userService;
+    this.fileStorageService = fileStorageService;
+}
 
     @GetMapping
     public String listCrops(Model model,
