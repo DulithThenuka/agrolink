@@ -1,0 +1,11 @@
+<h2>Add Crop</h2>
+
+<form th:action="@{/crops/add}" method="post">
+    <input type="text" name="name" placeholder="Crop Name" required/>
+    <input type="text" name="description" placeholder="Description"/>
+    <input type="number" name="price" placeholder="Price"/>
+    <input type="number" name="quantity" placeholder="Quantity"/>
+    <input type="text" name="category" placeholder="Category"/>
+
+    <button type="submit">Save</button>
+</form>

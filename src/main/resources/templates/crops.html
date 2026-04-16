@@ -1,0 +1,14 @@
+<h2>Available Crops</h2>
+
+<div th:each="crop : ${crops.content}">
+    <h3 th:text="${crop.name}"></h3>
+    <p th:text="${crop.description}"></p>
+    <p>Price: <span th:text="${crop.price}"></span></p>
+
+    <a th:href="@{'/crops/delete/' + ${crop.id}}">Delete</a>
+</div>
+
+<div>
+    <a th:if="${crops.hasPrevious()}" th:href="@{/crops(page=${crops.number - 1})}">Prev</a>
+    <a th:if="${crops.hasNext()}" th:href="@{/crops(page=${crops.number + 1})}">Next</a>
+</div>
