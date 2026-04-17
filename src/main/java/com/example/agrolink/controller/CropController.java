@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.agrolink.entity.Crop;
 import com.example.agrolink.entity.User;
@@ -65,4 +66,20 @@ public class CropController {
         cropService.softDelete(id);
         return "redirect:/crops";
     }
+
+    @PostMapping("/add")
+public String addCrop(@ModelAttribute Crop crop,
+                     @RequestParam("image") MultipartFile file,
+                     Principal principal) {
+
+    User farmer = userService.findByEmail(principal.getName());
+    crop.setFarmer(farmer);
+
+    String fileName = fileStorageService.saveFile(file);
+    crop.setImageUrl(fileName);
+
+    cropService.save(crop);
+
+    return "redirect:/crops";
+}
 }
