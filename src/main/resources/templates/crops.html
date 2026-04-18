@@ -27,3 +27,25 @@
     <a th:if="${crops.hasNext()}" 
        th:href="@{/crops(page=${crops.number + 1})}">Next</a>
 </div>
+
+<h2>Search Crops</h2>
+
+<form method="get" th:action="@{/crops}">
+    
+    <input type="text" name="keyword" placeholder="Search by name"
+           th:value="${keyword}" />
+
+    <input type="text" name="category" placeholder="Category"
+           th:value="${category}" />
+
+    <input type="text" name="location" placeholder="Location"
+           th:value="${location}" />
+
+    <input type="number" name="minPrice" placeholder="Min Price"
+           th:value="${minPrice}" />
+
+    <input type="number" name="maxPrice" placeholder="Max Price"
+           th:value="${maxPrice}" />
+
+    <button type="submit">Search</button>
+</form>
