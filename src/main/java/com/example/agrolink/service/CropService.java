@@ -24,15 +24,46 @@ public class CropService {
         return cropRepository.findByActiveTrue(pageable);
     }
 
-    public Crop getById(Long id) {
-        return cropRepository.findById(id).orElse(null);
+    public Page<Crop> searchCrops(String keyword,
+                                 String category,
+                                 String location,
+                                 Double minPrice,
+                                 Double maxPrice,
+                                 Pageable pageable) {
+
+        String safeKeyword = (keyword == null) ? "" : keyword;
+        String safeCategory = (category == null) ? "" : category;
+        String safeLocation = (location == null) ? "" : location;
+
+        double min = (minPrice == null) ? 0 : minPrice;
+        double max = (maxPrice == null) ? Double.MAX_VALUE : maxPrice;
+
+        return cropRepository
+                .findByActiveTrueAndNameContainingIgnoreCaseAndCategoryContainingIgnoreCaseAndFarmer_LocationContainingIgnoreCaseAndPriceBetween(
+                        safeKeyword,
+                        safeCategory,
+                        safeLocation,
+                        min,
+                        max,
+                        pageable
+                );
     }
 
+    public Crop getById(Long id) {
+        return cropRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Crop not found with id: " + id));
+    }
+
+    // 🔥 FIXED: safer soft delete flow
     public void softDelete(Long id) {
         Crop crop = getById(id);
-        if (crop != null) {
-            crop.setActive(false);
-            cropRepository.save(crop);
-        }
+        crop.setActive(false);
+        cropRepository.save(crop);
+    }
+
+    public void restore(Long id) {
+        Crop crop = getById(id);
+        crop.setActive(true);
+        cropRepository.save(crop);
     }
 }
