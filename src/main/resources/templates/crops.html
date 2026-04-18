@@ -21,11 +21,25 @@
 </div>
 
 <div>
-    <a th:if="${crops.hasPrevious()}" 
-       th:href="@{/crops(page=${crops.number - 1})}">Prev</a>
+    <a th:if="${crops.hasPrevious()}"
+       th:href="@{/crops(page=${crops.number - 1},
+                        keyword=${keyword},
+                        category=${category},
+                        location=${location},
+                        minPrice=${minPrice},
+                        maxPrice=${maxPrice})}">
+        Prev
+    </a>
 
-    <a th:if="${crops.hasNext()}" 
-       th:href="@{/crops(page=${crops.number + 1})}">Next</a>
+    <a th:if="${crops.hasNext()}"
+       th:href="@{/crops(page=${crops.number + 1},
+                        keyword=${keyword},
+                        category=${category},
+                        location=${location},
+                        minPrice=${minPrice},
+                        maxPrice=${maxPrice})}">
+        Next
+    </a>
 </div>
 
 <h2>Search Crops</h2>
