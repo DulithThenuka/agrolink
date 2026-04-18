@@ -8,10 +8,22 @@
     <img th:src="@{'/uploads/' + ${crop.imageUrl}}" width="150"/>
 
     <br>
+
     <a th:href="@{'/crops/delete/' + ${crop.id}}">Delete</a>
+
+    <form th:action="@{/orders/place}" method="post">
+        <input type="hidden" name="cropId" th:value="${crop.id}" />
+        <input type="number" name="quantity" min="1" required />
+        <button type="submit">Buy</button>
+    </form>
+
+    <hr>
 </div>
 
 <div>
-    <a th:if="${crops.hasPrevious()}" th:href="@{/crops(page=${crops.number - 1})}">Prev</a>
-    <a th:if="${crops.hasNext()}" th:href="@{/crops(page=${crops.number + 1})}">Next</a>
+    <a th:if="${crops.hasPrevious()}" 
+       th:href="@{/crops(page=${crops.number - 1})}">Prev</a>
+
+    <a th:if="${crops.hasNext()}" 
+       th:href="@{/crops(page=${crops.number + 1})}">Next</a>
 </div>
