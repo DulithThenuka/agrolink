@@ -35,14 +35,35 @@ public class CropController {
 }
 
     @GetMapping
-    public String listCrops(Model model,
-                           @RequestParam(defaultValue = "0") int page) {
+    public String listCrops(
+        Model model,
+        @RequestParam(defaultValue = "") String keyword,
+        @RequestParam(defaultValue = "") String category,
+        @RequestParam(defaultValue = "") String location,
+        @RequestParam(defaultValue = "0") double minPrice,
+        @RequestParam(defaultValue = "100000") double maxPrice,
+        @RequestParam(defaultValue = "0") int page
+) {
 
-        Page<Crop> cropPage = cropService.getAllActiveCrops(PageRequest.of(page, 5));
+    Page<Crop> cropPage = cropService.searchCrops(
+            keyword,
+            category,
+            location,
+            minPrice,
+            maxPrice,
+            PageRequest.of(page, 5)
+    );
 
-        model.addAttribute("crops", cropPage);
-        return "crops";
-    }
+    model.addAttribute("crops", cropPage);
+
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("category", category);
+    model.addAttribute("location", location);
+    model.addAttribute("minPrice", minPrice);
+    model.addAttribute("maxPrice", maxPrice);
+
+    return "crops";
+}
 
     @GetMapping("/add")
     public String addCropPage(Model model) {
