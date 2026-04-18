@@ -8,6 +8,12 @@ import com.example.agrolink.entity.Crop;
 
 public interface CropRepository extends JpaRepository<Crop, Long> {
 
-    Page<Crop> findByActiveTrue(Pageable pageable);
-
+    Page<Crop> findByActiveTrueAndNameContainingIgnoreCaseAndCategoryContainingIgnoreCaseAndFarmer_LocationContainingIgnoreCaseAndPriceBetween(
+            String name,
+            String category,
+            String location,
+            double minPrice,
+            double maxPrice,
+            Pageable pageable
+    );
 }
