@@ -1,0 +1,42 @@
+<h1>Admin Dashboard</h1>
+
+<div style="display:flex; gap:20px;">
+
+    <div>
+        <h3>Total Users</h3>
+        <p th:text="${totalUsers}"></p>
+    </div>
+
+    <div>
+        <h3>Total Crops</h3>
+        <p th:text="${totalCrops}"></p>
+    </div>
+
+    <div>
+        <h3>Total Orders</h3>
+        <p th:text="${totalOrders}"></p>
+    </div>
+
+</div>
+
+<h2>Recent Orders</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Buyer</th>
+        <th>Crop</th>
+        <th>Quantity</th>
+        <th>Total</th>
+        <th>Status</th>
+    </tr>
+
+    <tr th:each="order : ${recentOrders}">
+        <td th:text="${order.id}"></td>
+        <td th:text="${order.buyer.name}"></td>
+        <td th:text="${order.crop.name}"></td>
+        <td th:text="${order.quantity}"></td>
+        <td th:text="${order.totalPrice}"></td>
+        <td th:text="${order.status}"></td>
+    </tr>
+</table>
