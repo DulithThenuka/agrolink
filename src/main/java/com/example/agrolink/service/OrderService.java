@@ -16,10 +16,12 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final CropService cropService;
+    private final EmailService emailService;
 
-    public OrderService(OrderRepository orderRepository, CropService cropService) {
+    public OrderService(OrderRepository orderRepository, CropService cropService, EmailService emailService) {
         this.orderRepository = orderRepository;
         this.cropService = cropService;
+        this.emailService = emailService;
     }
 
     public Order placeOrder(User buyer, Long cropId, int quantity) {
