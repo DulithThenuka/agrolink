@@ -1,6 +1,5 @@
 package com.example.agrolink.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -26,31 +25,39 @@ public class OrderService {
 
     public Order placeOrder(User buyer, Long cropId, int quantity) {
 
-        Crop crop = cropService.getById(cropId);
+    Crop crop = cropService.getById(cropId);
 
-        if (crop == null || !crop.isActive()) {
-            throw new RuntimeException("Crop not available");
-        }
-
-        if (quantity > crop.getQuantity()) {
-            throw new RuntimeException("Not enough stock");
-        }
-
-        double total = crop.getPrice() * quantity;
-
-        Order order = new Order();
-        order.setBuyer(buyer);
-        order.setCrop(crop);
-        order.setQuantity(quantity);
-        order.setTotalPrice(total);
-        order.setStatus(OrderStatus.PENDING);
-        order.setCreatedAt(LocalDateTime.now());
-
-        // Reduce stock
-        crop.setQuantity(crop.getQuantity() - quantity);
-
-        return orderRepository.save(order);
+    if (crop == null || !crop.isActive()) {
+        throw new RuntimeException("Crop not available");
     }
+
+    if (quantity > crop.getQuantity()) {
+        throw new RuntimeException("Not enough stock");
+    }
+
+    double total = crop.getPrice() * quantity;
+
+    Order order = new Order();
+    order.setBuyer(buyer);
+    order.setCrop(crop);
+    order.setQuantity(quantity);
+    order.setTotalPrice(total);
+    order.setStatus(OrderStatus.PENDING);
+    order.setCreatedAt(java.time.LocalDateTime.now());
+
+    crop.setQuantity(crop.getQuantity() - quantity);
+
+    Order savedOrder = orderRepository.save(order);
+
+    emailService.sendOrderConfirmation(
+            buyer.getEmail(),
+            crop.getName(),
+            quantity,
+            total
+    );
+
+    return savedOrder;
+}
 
     public List<Order> getUserOrders(User buyer) {
         return orderRepository.findByBuyer(buyer);
