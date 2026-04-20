@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:replace="${title}">AgroLink</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#16a34a', // green theme 🌱
+                        dark: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100">
+
+<!-- NAVBAR -->
+<div th:replace="layout/navbar :: navbar"></div>
+
+<div class="flex">
+
+    <!-- SIDEBAR -->
+    <div th:replace="layout/sidebar :: sidebar"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 p-6">
+        <div th:replace="${content}"></div>
+    </main>
+
+</div>
+
+</body>
+</html>
