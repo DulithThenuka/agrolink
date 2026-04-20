@@ -41,4 +41,8 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    @Bean
+        public UserDetailsService userDetailsService(CustomUserDetailsService service) {
+    return service;
+}
 }

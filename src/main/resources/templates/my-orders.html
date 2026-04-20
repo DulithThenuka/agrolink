@@ -1,8 +1,0 @@
-<h2>My Orders</h2>
-
-<div th:each="order : ${orders}">
-    <p>Crop: <span th:text="${order.crop.name}"></span></p>
-    <p>Quantity: <span th:text="${order.quantity}"></span></p>
-    <p>Total: <span th:text="${order.totalPrice}"></span></p>
-    <p>Status: <span th:text="${order.status}"></span></p>
-</div>
