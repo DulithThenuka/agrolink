@@ -1,0 +1,33 @@
+<div th:fragment="sidebar">
+    <aside class="w-64 bg-dark text-white min-h-screen p-5">
+
+        <ul class="space-y-4">
+
+            <li>
+                <a th:href="@{/dashboard}" class="block p-2 rounded hover:bg-gray-700">
+                    📊 Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/crops}" class="block p-2 rounded hover:bg-gray-700">
+                    🌾 Crops
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/orders}" class="block p-2 rounded hover:bg-gray-700">
+                    📦 Orders
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/profile}" class="block p-2 rounded hover:bg-gray-700">
+                    👤 Profile
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+</div>
