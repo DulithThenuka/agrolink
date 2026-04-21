@@ -28,42 +28,45 @@ public class CropController {
     private final UserService userService;
     private final FileStorageService fileStorageService;
 
-    public CropController(CropService cropService,UserService userService,FileStorageService fileStorageService) {
-    this.cropService = cropService;
-    this.userService = userService;
-    this.fileStorageService = fileStorageService;
-}
+    public CropController(CropService cropService,
+                          UserService userService,
+                          FileStorageService fileStorageService) {
+        this.cropService = cropService;
+        this.userService = userService;
+        this.fileStorageService = fileStorageService;
+    }
 
     @GetMapping
     public String listCrops(
-        Model model,
-        @RequestParam(defaultValue = "") String keyword,
-        @RequestParam(defaultValue = "") String category,
-        @RequestParam(defaultValue = "") String location,
-        @RequestParam(defaultValue = "0") double minPrice,
-        @RequestParam(defaultValue = "100000") double maxPrice,
-        @RequestParam(defaultValue = "0") int page
-) {
+            Model model,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "") String category,
+            @RequestParam(defaultValue = "") String location,
+            @RequestParam(defaultValue = "0") double minPrice,
+            @RequestParam(defaultValue = "100000") double maxPrice,
+            @RequestParam(defaultValue = "0") int page
+    ) {
 
-    Page<Crop> cropPage = cropService.searchCrops(
-            keyword,
-            category,
-            location,
-            minPrice,
-            maxPrice,
-            PageRequest.of(page, 5)
-    );
+        Page<Crop> cropPage = cropService.searchCrops(
+                keyword,
+                category,
+                location,
+                minPrice,
+                maxPrice,
+                PageRequest.of(page, 5)
+        );
 
-    model.addAttribute("crops", cropPage);
+        model.addAttribute("crops", cropPage);
 
-    model.addAttribute("keyword", keyword);
-    model.addAttribute("category", category);
-    model.addAttribute("location", location);
-    model.addAttribute("minPrice", minPrice);
-    model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("category", category);
+        model.addAttribute("location", location);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("currentPage", page);
 
-    return "crops";
-}
+        return "crops";
+    }
 
     @GetMapping("/add")
     public String addCropPage(Model model) {
@@ -71,11 +74,19 @@ public class CropController {
         return "add-crop";
     }
 
+    // ✅ ADD CROP WITH IMAGE UPLOAD
     @PostMapping("/add")
-    public String addCrop(@ModelAttribute Crop crop, Principal principal) {
+    public String addCrop(@ModelAttribute Crop crop,
+                          @RequestParam("image") MultipartFile file,
+                          Principal principal) {
 
         User farmer = userService.findByEmail(principal.getName());
         crop.setFarmer(farmer);
+
+        if (!file.isEmpty()) {
+            String fileName = fileStorageService.saveFile(file);
+            crop.setImageUrl(fileName);
+        }
 
         cropService.save(crop);
 
@@ -87,20 +98,4 @@ public class CropController {
         cropService.softDelete(id);
         return "redirect:/crops";
     }
-
-    @PostMapping("/add")
-public String addCrop(@ModelAttribute Crop crop,
-                     @RequestParam("image") MultipartFile file,
-                     Principal principal) {
-
-    User farmer = userService.findByEmail(principal.getName());
-    crop.setFarmer(farmer);
-
-    String fileName = fileStorageService.saveFile(file);
-    crop.setImageUrl(fileName);
-
-    cropService.save(crop);
-
-    return "redirect:/crops";
-}
 }
