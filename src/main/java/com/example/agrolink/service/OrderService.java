@@ -1,5 +1,6 @@
 package com.example.agrolink.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -13,23 +14,17 @@ import com.example.agrolink.repository.OrderRepository;
 @Service
 public class OrderService {
 
-    private final OrderRepository orderRepository;
+    private final OrderRepository repo;
     private final CropService cropService;
-    private final EmailService emailService;
 
-    public OrderService(OrderRepository orderRepository, CropService cropService, EmailService emailService) {
-        this.orderRepository = orderRepository;
+    public OrderService(OrderRepository repo, CropService cropService) {
+        this.repo = repo;
         this.cropService = cropService;
-        this.emailService = emailService;
     }
 
     public Order placeOrder(User buyer, Long cropId, int quantity) {
 
         Crop crop = cropService.getById(cropId);
-
-        if (crop == null || !crop.isActive()) {
-            throw new RuntimeException("Crop not available");
-        }
 
         if (quantity > crop.getQuantity()) {
             throw new RuntimeException("Not enough stock");
@@ -37,31 +32,22 @@ public class OrderService {
 
         double total = crop.getPrice() * quantity;
 
+        // ✅ FIX: update stock
+        crop.setQuantity(crop.getQuantity() - quantity);
+        cropService.save(crop);
+
         Order order = new Order();
         order.setBuyer(buyer);
         order.setCrop(crop);
         order.setQuantity(quantity);
         order.setTotalPrice(total);
         order.setStatus(OrderStatus.PENDING);
-        order.setCreatedAt(java.time.LocalDateTime.now());
+        order.setCreatedAt(LocalDateTime.now());
 
-        crop.setQuantity(crop.getQuantity() - quantity);
-
-        cropService.save(crop);
-
-        Order savedOrder = orderRepository.save(order);
-
-        emailService.sendOrderConfirmation(
-                buyer.getEmail(),
-                crop.getName(),
-                quantity,
-                total
-        );
-
-        return savedOrder;
+        return repo.save(order);
     }
 
     public List<Order> getUserOrders(User buyer) {
-        return orderRepository.findByBuyer(buyer);
+        return repo.findByBuyer(buyer);
     }
 }
