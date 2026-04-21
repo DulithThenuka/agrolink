@@ -15,10 +15,10 @@ import com.example.agrolink.service.UserService;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserService userService;
+    private final UserService service;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
+    public AuthController(UserService service) {
+        this.service = service;
     }
 
     @GetMapping("/register")
@@ -29,13 +29,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public String register(@ModelAttribute User user) {
-        userService.register(user);
-        user.setRole(Role.BUYER);
+        user.setRole(Role.BUYER); // ✅ FIX
+        service.register(user);
         return "redirect:/auth/login";
     }
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String login() {
         return "login";
     }
 }
