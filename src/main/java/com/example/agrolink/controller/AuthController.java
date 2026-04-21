@@ -1,10 +1,15 @@
 package com.example.agrolink.controller;
 
-import com.example.agrolink.entity.User;
-import com.example.agrolink.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.example.agrolink.entity.Role;
+import com.example.agrolink.entity.User;
+import com.example.agrolink.service.UserService;
 
 @Controller
 @RequestMapping("/auth")
