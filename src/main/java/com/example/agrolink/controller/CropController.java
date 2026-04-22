@@ -85,7 +85,7 @@ public class CropController {
 
         if (!file.isEmpty()) {
             String fileName = fileStorageService.saveFile(file);
-            crop.setImageUrl(fileName);
+            crop.setImage(fileName);
         }
 
         cropService.save(crop);
