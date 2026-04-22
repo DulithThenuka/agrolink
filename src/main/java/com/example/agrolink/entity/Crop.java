@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Crop {
@@ -18,11 +20,16 @@ public class Crop {
     private double price;
     private int quantity;
 
-    // ✅ Image field
+    // ✅ Image
     private String image;
 
-    // ✅ Soft delete field
+    // ✅ Soft delete
     private boolean active = true;
+
+    // ✅ Farmer relationship
+    @ManyToOne
+    @JoinColumn(name = "farmer_id")
+    private User farmer;
 
     // =========================
     // GETTERS & SETTERS
@@ -32,12 +39,12 @@ public class Crop {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -89,7 +96,7 @@ public class Crop {
     }
 
     // =========================
-    // ACTIVE (SOFT DELETE)
+    // ACTIVE
     // =========================
 
     public boolean isActive() {
@@ -98,5 +105,17 @@ public class Crop {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    // =========================
+    // FARMER
+    // =========================
+
+    public User getFarmer() {
+        return farmer;
+    }
+
+    public void setFarmer(User farmer) {
+        this.farmer = farmer;
     }
 }
