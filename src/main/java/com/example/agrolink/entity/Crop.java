@@ -18,8 +18,11 @@ public class Crop {
     private double price;
     private int quantity;
 
-    // ✅ ADD THIS FIELD
+    // ✅ Image field
     private String image;
+
+    // ✅ Soft delete field
+    private boolean active = true;
 
     // =========================
     // GETTERS & SETTERS
@@ -73,12 +76,27 @@ public class Crop {
         this.quantity = quantity;
     }
 
-    // ✅ IMPORTANT: ADD THESE
+    // =========================
+    // IMAGE
+    // =========================
+
     public String getImage() {
         return image;
     }
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    // =========================
+    // ACTIVE (SOFT DELETE)
+    // =========================
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
