@@ -38,4 +38,13 @@ public class AuthController {
     public String login() {
         return "login";
     }
+    @GetMapping("/dashboard")
+public String dashboard() {
+    return "dashboard";
+}
+
+@GetMapping("/home")
+public String home() {
+    return "home"; // create home.html
+}
 }

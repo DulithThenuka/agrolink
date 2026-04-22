@@ -3,6 +3,8 @@ package com.example.agrolink.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -15,15 +17,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // (optional for testing)
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/register",
-                                "/login",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/uploads/**"   // ✅ IMPORTANT FIX
-                        ).permitAll()
+                        .requestMatchers("/", "/login", "/register", "/home", "/css/**", "/js/**", "/uploads/**").permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/farmer/**").hasRole("FARMER")
@@ -33,10 +27,12 @@ public class SecurityConfig {
                 )
 
                 .formLogin(login -> login
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
-                        .permitAll()
-                )
+                                .loginPage("/login")
+                                .loginProcessingUrl("/login") // ✅ IMPORTANT
+                                .defaultSuccessUrl("/home", true) // ✅ CHANGE THIS
+                                .failureUrl("/login?error=true")
+                                .permitAll()
+)
 
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout")
@@ -44,5 +40,9 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
