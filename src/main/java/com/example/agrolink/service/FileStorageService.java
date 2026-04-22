@@ -13,6 +13,7 @@ public class FileStorageService {
 
     @Value("${upload.path}")
     private String uploadPath;
+    private final String uploadDir = "uploads/";
 
     public String saveFile(MultipartFile file) {
 
