@@ -98,4 +98,20 @@ public class CropController {
         cropService.softDelete(id);
         return "redirect:/crops";
     }
+    @PostMapping("/farmer/crops/add")
+        public String addCrop(@ModelAttribute Crop crop,
+                      @RequestParam("image") MultipartFile file) {
+
+    try {
+        String fileName = fileStorageService.saveFile(file);
+        crop.setImage(fileName);
+
+        cropService.save(crop);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return "redirect:/farmer/crops";
+}
 }
