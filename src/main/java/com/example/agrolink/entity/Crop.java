@@ -4,18 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Crop {
 
     @Id
@@ -23,20 +13,72 @@ public class Crop {
     private Long id;
 
     private String name;
-
-    private String description;
-
+    private String category;
+    private String location;
     private double price;
-
     private int quantity;
 
-    private String category;
+    // ✅ ADD THIS FIELD
+    private String image;
 
-    private String imageUrl;
+    // =========================
+    // GETTERS & SETTERS
+    // =========================
 
-    private boolean active = true; // for soft delete
+    public Long getId() {
+        return id;
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "farmer_id")
-    private User farmer;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    // ✅ IMPORTANT: ADD THESE
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }
