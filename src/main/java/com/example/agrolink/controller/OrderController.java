@@ -26,16 +26,24 @@ public class OrderController {
     }
 
     @PostMapping("/place")
-    public String placeOrder(@RequestParam Long cropId,
-                             @RequestParam int quantity,
-                             Principal principal) {
+public String placeOrder(@RequestParam Long cropId,
+                         @RequestParam int quantity,
+                         Principal principal) {
 
-        User buyer = userService.findByEmail(principal.getName());
-
-        orderService.placeOrder(buyer, cropId, quantity);
-
-        return "redirect:/orders/my";
+    if (quantity <= 0) {
+        return "redirect:/crops?error=invalid_quantity";
     }
+
+    User buyer = userService.findByEmail(principal.getName());
+
+    try {
+        orderService.placeOrder(buyer, cropId, quantity);
+    } catch (Exception e) {
+        return "redirect:/crops?error=order_failed";
+    }
+
+    return "redirect:/orders/my?success=true";
+}
 
     @GetMapping("/my")
     public String myOrders(Model model, Principal principal) {
