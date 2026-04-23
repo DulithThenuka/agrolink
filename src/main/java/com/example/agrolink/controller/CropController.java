@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,8 @@ import com.example.agrolink.entity.User;
 import com.example.agrolink.service.CropService;
 import com.example.agrolink.service.FileStorageService;
 import com.example.agrolink.service.UserService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/crops")
@@ -76,22 +79,27 @@ public class CropController {
 
     // ✅ ADD CROP WITH IMAGE UPLOAD
     @PostMapping("/add")
-    public String addCrop(@ModelAttribute Crop crop,
-                          @RequestParam("image") MultipartFile file,
-                          Principal principal) {
+public String addCrop(@Valid @ModelAttribute Crop crop,
+                      BindingResult result,
+                      @RequestParam("image") MultipartFile file,
+                      Principal principal) {
 
-        User farmer = userService.findByEmail(principal.getName());
-        crop.setFarmer(farmer);
-
-        if (!file.isEmpty()) {
-            String fileName = fileStorageService.saveFile(file);
-            crop.setImage(fileName);
-        }
-
-        cropService.save(crop);
-
-        return "redirect:/crops";
+    if (result.hasErrors()) {
+        return "add-crop";
     }
+
+    User farmer = userService.findByEmail(principal.getName());
+    crop.setFarmer(farmer);
+
+    if (!file.isEmpty()) {
+        String fileName = fileStorageService.saveFile(file);
+        crop.setImage(fileName);
+    }
+
+    cropService.save(crop);
+
+    return "redirect:/crops";
+}
 
     @GetMapping("/delete/{id}")
     public String deleteCrop(@PathVariable Long id) {
