@@ -9,10 +9,19 @@ import com.example.agrolink.entity.User;
 import com.example.agrolink.repository.UserRepository;
 
 @Component
+@Profile("dev")
 public class DataLoader implements CommandLineRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.admin.email}")
+    private String adminEmail;
+
+    @Value("${app.admin.password}")
+    private String adminPassword;
 
     public DataLoader(UserRepository userRepository,
                       PasswordEncoder passwordEncoder) {
@@ -20,19 +29,25 @@ public class DataLoader implements CommandLineRunner {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     @Override
     public void run(String... args) {
 
-        if (userRepository.findByEmail("admin@agrolink.com").isEmpty()) {
+        if (userRepository.findByEmail(adminEmail).isEmpty()) {
+
+            logger.info("Creating default admin user...");
 
             User admin = new User();
             admin.setName("Admin");
-            admin.setEmail("admin@agrolink.com");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setEmail(adminEmail);
+            admin.setPassword(passwordEncoder.encode(adminPassword));
             admin.setRole(Role.ADMIN);
             admin.setLocation("System");
 
             userRepository.save(admin);
+
+        } else {
+            logger.info("Admin user already exists");
         }
     }
 }
