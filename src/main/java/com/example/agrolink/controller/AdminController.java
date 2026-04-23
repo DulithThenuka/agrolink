@@ -10,31 +10,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class AdminController {
 
-    private final UserRepository userRepository;
-    private final CropRepository cropRepository;
-    private final OrderRepository orderRepository;
+    private final AdminService adminService;
 
-    public AdminController(UserRepository userRepository,
-                           CropRepository cropRepository,
-                           OrderRepository orderRepository) {
-        this.userRepository = userRepository;
-        this.cropRepository = cropRepository;
-        this.orderRepository = orderRepository;
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
 
     @GetMapping("/admin/dashboard")
     public String dashboard(Model model) {
 
-        long totalUsers = userRepository.count();
-        long totalCrops = cropRepository.count();
-        long totalOrders = orderRepository.count();
-
-        model.addAttribute("totalUsers", totalUsers);
-        model.addAttribute("totalCrops", totalCrops);
-        model.addAttribute("totalOrders", totalOrders);
-
-        model.addAttribute("recentOrders",
-                orderRepository.findAll().stream().limit(5).toList());
+        model.addAttribute("totalUsers", adminService.getTotalUsers());
+        model.addAttribute("totalCrops", adminService.getTotalCrops());
+        model.addAttribute("totalOrders", adminService.getTotalOrders());
+        model.addAttribute("recentOrders", adminService.getRecentOrders());
 
         return "admin-dashboard";
     }
