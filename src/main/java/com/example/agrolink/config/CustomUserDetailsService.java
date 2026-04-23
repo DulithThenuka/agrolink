@@ -14,22 +14,30 @@ import com.example.agrolink.repository.UserRepository;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository repo;
+    private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository repo) {
-        this.repo = repo;
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        User user = repo.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+        String role = user.getRole() != null ? user.getRole().name() : "USER";
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()))
+                true,
+                true,
+                true,
+                true,
+                Collections.singletonList(
+                        new SimpleGrantedAuthority("ROLE_" + role)
+                )
         );
     }
 }
