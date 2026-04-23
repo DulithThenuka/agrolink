@@ -12,7 +12,16 @@ public class HomeController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard";
+    public String dashboard(Authentication auth) {
+
+        String role = auth.getAuthorities().iterator().next().getAuthority();
+
+        if (role.equals("ROLE_ADMIN")) {
+            return "redirect:/admin/dashboard";
+        } else if (role.equals("ROLE_FARMER")) {
+            return "redirect:/farmer/dashboard";
+        } else {
+            return "redirect:/buyer/dashboard";
+        }
     }
 }
