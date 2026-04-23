@@ -28,23 +28,28 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@ModelAttribute User user) {
-        user.setRole(Role.BUYER); // ✅ FIX
+    public String register(@Valid @ModelAttribute User user,
+                           BindingResult result) {
+
+        if (result.hasErrors()) {
+            return "register";
+        }
+
+        if (service.existsByEmail(user.getEmail())) {
+            return "redirect:/auth/register?error=email_exists";
+        }
+
+        if (user.getRole() == null) {
+            user.setRole(Role.BUYER);
+        }
+
         service.register(user);
-        return "redirect:/auth/login";
+
+        return "redirect:/auth/login?success=true";
     }
 
     @GetMapping("/login")
     public String login() {
         return "login";
     }
-    @GetMapping("/dashboard")
-public String dashboard() {
-    return "dashboard";
-}
-
-@GetMapping("/home")
-public String home() {
-    return "home"; // create home.html
-}
 }
