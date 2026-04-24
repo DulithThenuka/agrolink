@@ -1,7 +1,10 @@
 package com.example.agrolink.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
+import com.example.agrolink.entity.Order;
 import com.example.agrolink.repository.CropRepository;
 import com.example.agrolink.repository.OrderRepository;
 import com.example.agrolink.repository.UserRepository;
@@ -36,5 +39,4 @@ public class AdminService {
     public List<Order> getRecentOrders() {
         return orderRepository.findTop5ByOrderByCreatedAtDesc();
     }
-}
 }

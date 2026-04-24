@@ -23,4 +23,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Admin view
     List<Order> findAllByOrderByCreatedAtDesc();
+
+    List<Order> findTop5ByOrderByCreatedAtDesc();
 }
