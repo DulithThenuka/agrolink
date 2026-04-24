@@ -1,11 +1,10 @@
 package com.example.agrolink.controller;
 
-import com.example.agrolink.repository.CropRepository;
-import com.example.agrolink.repository.OrderRepository;
-import com.example.agrolink.repository.UserRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import com.example.agrolink.service.AdminService;
 
 @Controller
 public class AdminController {

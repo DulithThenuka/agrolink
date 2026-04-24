@@ -14,108 +14,39 @@ public class Crop {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String category;
+
+    @NotBlank
     private String location;
-    private double price;
+
+    @DecimalMin("0.0")
+    private BigDecimal price;
+
+    @Min(0)
     private int quantity;
 
-    // ✅ Image
-    private String image;
+    private String imageUrl;
 
-    // ✅ Soft delete
     private boolean active = true;
 
-    // ✅ Farmer relationship
-    @ManyToOne
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "farmer_id")
     private User farmer;
 
-    // =========================
-    // GETTERS & SETTERS
-    // =========================
-
-    public Long getId() {
-        return id;
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    // =========================
-    // IMAGE
-    // =========================
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    // =========================
-    // ACTIVE
-    // =========================
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    // =========================
-    // FARMER
-    // =========================
-
-    public User getFarmer() {
-        return farmer;
-    }
-
-    public void setFarmer(User farmer) {
-        this.farmer = farmer;
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

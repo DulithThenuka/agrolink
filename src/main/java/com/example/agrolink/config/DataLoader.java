@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import com.example.agrolink.entity.Role;
 import com.example.agrolink.entity.User;
 import com.example.agrolink.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 @Profile("dev")

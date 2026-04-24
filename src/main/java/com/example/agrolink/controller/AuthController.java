@@ -11,6 +11,9 @@ import com.example.agrolink.entity.Role;
 import com.example.agrolink.entity.User;
 import com.example.agrolink.service.UserService;
 
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
