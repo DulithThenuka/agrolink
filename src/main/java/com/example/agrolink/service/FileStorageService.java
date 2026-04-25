@@ -13,7 +13,6 @@ public class FileStorageService {
 
     @Value("${upload.path}")
     private String uploadPath;
-    private final String uploadDir = "uploads/";
 
     public String saveFile(MultipartFile file) {
 
@@ -21,29 +20,26 @@ public class FileStorageService {
             return null;
         }
 
-        // Validate file type
         String contentType = file.getContentType();
-        if (!contentType.startsWith("image/")) {
+        if (contentType == null || !contentType.startsWith("image/")) {
             throw new RuntimeException("Only image files are allowed!");
         }
 
         try {
-            // Create folder if not exists
             File dir = new File(uploadPath);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
 
-            // Unique file name
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
-            File destination = new File(uploadPath + fileName);
+            File destination = new File(uploadPath, fileName);
             file.transferTo(destination);
 
             return fileName;
 
         } catch (IOException e) {
-            throw new RuntimeException("File upload failed!");
+            throw new RuntimeException("File upload failed!", e);
         }
     }
 }
