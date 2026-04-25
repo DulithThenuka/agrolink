@@ -2,9 +2,11 @@ package com.example.agrolink.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.example.agrolink.entity.Order;
+import com.example.agrolink.dto.AdminDashboardDTO;
+import com.example.agrolink.dto.OrderSummaryDTO;
 import com.example.agrolink.repository.CropRepository;
 import com.example.agrolink.repository.OrderRepository;
 import com.example.agrolink.repository.UserRepository;
@@ -24,19 +26,31 @@ public class AdminService {
         this.orderRepository = orderRepository;
     }
 
-    public long getTotalUsers() {
-        return userRepository.count();
-    }
+    public AdminDashboardDTO getDashboardData() {
 
-    public long getTotalCrops() {
-        return cropRepository.count();
-    }
+        long totalUsers = userRepository.count();
+        long totalCrops = cropRepository.count();
+        long totalOrders = orderRepository.count();
 
-    public long getTotalOrders() {
-        return orderRepository.count();
-    }
+        List<OrderSummaryDTO> recentOrders =
+                orderRepository.findByOrderByCreatedAtDesc(PageRequest.of(0, 5))
+                        .getContent()
+                        .stream()
+                        .map(order -> new OrderSummaryDTO(
+                                order.getId(),
+                                order.getCrop().getName(),
+                                order.getQuantity(),
+                                order.getBuyer().getEmail(),
+                                order.getStatus().name(),
+                                order.getCreatedAt()
+                        ))
+                        .toList();
 
-    public List<Order> getRecentOrders() {
-        return orderRepository.findTop5ByOrderByCreatedAtDesc();
+        return new AdminDashboardDTO(
+                totalUsers,
+                totalCrops,
+                totalOrders,
+                recentOrders
+        );
     }
 }

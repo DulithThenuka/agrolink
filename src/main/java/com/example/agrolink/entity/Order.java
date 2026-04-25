@@ -23,7 +23,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "orders", indexes = {
+    @Index(name = "idx_order_buyer", columnList = "buyer_id"),
+    @Index(name = "idx_order_created", columnList = "createdAt")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -36,27 +39,37 @@ public class Order {
 
     @Min(1)
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @NotNull
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatus status = OrderStatus.PENDING;
 
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
+    @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "crop_id")
+    @JoinColumn(name = "crop_id", nullable = false)
     private Crop crop;
+
+    @Version
+    private Long version;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

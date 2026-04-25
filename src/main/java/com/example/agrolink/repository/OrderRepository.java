@@ -12,17 +12,20 @@ import com.example.agrolink.entity.User;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // Buyer orders
     Page<Order> findByBuyerOrderByCreatedAtDesc(User buyer, Pageable pageable);
 
-    // Filter by status
-    List<Order> findByBuyerAndStatus(User buyer, OrderStatus status);
+    Page<Order> findByBuyerAndStatus(User buyer, OrderStatus status, Pageable pageable);
 
-    // Farmer view (orders for their crops)
-    List<Order> findByCrop_Farmer(User farmer);
+    @Query("""
+    SELECT o FROM Order o
+    JOIN FETCH o.crop c
+    JOIN FETCH o.buyer
+    WHERE c.farmer = :farmer
+    ORDER BY o.createdAt DESC
+    """)
+    Page<Order> findFarmerOrders(@Param("farmer") User farmer, Pageable pageable);
 
-    // Admin view
-    List<Order> findAllByOrderByCreatedAtDesc();
+    Page<Order> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-    List<Order> findTop5ByOrderByCreatedAtDesc();
+    Page<Order> findByOrderByCreatedAtDesc(Pageable pageable);
 }

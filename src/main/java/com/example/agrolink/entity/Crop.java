@@ -24,29 +24,35 @@ public class Crop {
     private Long id;
 
     @NotBlank
+    @Column(nullable = false)
     private String name;
 
     @NotBlank
+    @Column(nullable = false)
     private String category;
 
     @NotBlank
+    @Column(nullable = false)
     private String location;
 
     @DecimalMin("0.0")
+    @Column(nullable = false)
     private BigDecimal price;
 
     @Min(0)
-    private int quantity;
+    @Column(nullable = false)
+    private Integer quantity;
 
     private String imageUrl;
 
+    @Column(nullable = false)
     private boolean active = true;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "farmer_id")
+    @JoinColumn(name = "farmer_id", nullable = false)
     private User farmer;
 
     @PrePersist
@@ -58,4 +64,6 @@ public class Crop {
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    // ✅ getters & setters (REQUIRED)
 }

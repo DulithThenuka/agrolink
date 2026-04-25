@@ -26,7 +26,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+    @Index(name = "idx_user_email", columnList = "email")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,6 +40,7 @@ public class User {
     private Long id;
 
     @NotBlank
+    @Column(nullable = false)
     private String name;
 
     @Email
@@ -48,25 +51,42 @@ public class User {
     @NotBlank
     @Size(min = 6)
     @JsonIgnore
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role = Role.BUYER;
 
     private String location;
 
+    @Column(nullable = false)
     private boolean enabled = true;
+
+    @Column(nullable = false)
     private boolean accountNonLocked = true;
+
+    @Column(nullable = false)
+    private boolean accountNonExpired = true;
+
+    @Column(nullable = false)
+    private boolean credentialsNonExpired = true;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Crop> crops;
+
+    @OneToMany(mappedBy = "buyer")
+    @JsonIgnore
+    private List<Order> orders;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        email = email.toLowerCase().trim(); // 🔥 normalize email
     }
 
     @PreUpdate

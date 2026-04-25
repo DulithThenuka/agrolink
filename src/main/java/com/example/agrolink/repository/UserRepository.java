@@ -12,18 +12,24 @@ import com.example.agrolink.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // Login
-    Optional<User> findByEmail(String email);
+    // 🔐 Login
+    Optional<User> findByEmailIgnoreCase(String email);
 
-    // Register validation
-    boolean existsByEmail(String email);
+    boolean existsByEmailIgnoreCase(String email);
 
-    // Admin features
-    List<User> findByRole(Role role);
+    // 👤 Role filtering (paginated)
+    Page<User> findByRole(Role role, Pageable pageable);
 
-    // Search
+    // 🔍 Search
     Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
-    // Location filter
-    List<User> findByLocationContainingIgnoreCase(String location);
+    // 📍 Location filter (paginated)
+    Page<User> findByLocationContainingIgnoreCase(String location, Pageable pageable);
+
+    // 🔄 Combined filter (VERY useful)
+    Page<User> findByRoleAndLocationContainingIgnoreCase(
+            Role role,
+            String location,
+            Pageable pageable
+    );
 }

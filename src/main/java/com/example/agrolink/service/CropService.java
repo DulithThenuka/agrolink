@@ -1,73 +1,97 @@
 package com.example.agrolink.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.example.agrolink.dto.CropDTO;
+import com.example.agrolink.dto.CropRequestDTO;
+import com.example.agrolink.entity.Crop;
+import com.example.agrolink.entity.User;
+import com.example.agrolink.mapper.CropMapper;
+import com.example.agrolink.repository.CropRepository;
+import com.example.agrolink.repository.UserRepository;
+
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import com.example.agrolink.entity.Crop;
-import com.example.agrolink.repository.CropRepository;
 import java.math.BigDecimal;
 
 @Service
 public class CropService {
 
     private final CropRepository cropRepository;
+    private final UserRepository userRepository;
 
-    public CropService(CropRepository cropRepository) {
+    public CropService(CropRepository cropRepository,
+                       UserRepository userRepository) {
         this.cropRepository = cropRepository;
+        this.userRepository = userRepository;
     }
 
-    public Crop save(Crop crop) {
-        return cropRepository.save(crop);
+    // ✅ CREATE
+    public CropDTO createCrop(CropRequestDTO dto, String email) {
+
+        User farmer = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Crop crop = CropMapper.toEntity(dto);
+        crop.setFarmer(farmer);
+
+        return CropMapper.toDTO(cropRepository.save(crop));
     }
 
-    public Page<Crop> getAllActiveCrops(Pageable pageable) {
-        return cropRepository.findByActiveTrue(pageable);
+    // ✅ GET ALL
+    public Page<CropDTO> getAllActiveCrops(Pageable pageable) {
+        return cropRepository.findByActiveTrue(pageable)
+                .map(CropMapper::toDTO);
     }
 
-    public Page<Crop> searchCrops(String keyword,
-                             String category,
-                             String location,
-                             Double minPrice,
-                             Double maxPrice,
-                             Pageable pageable) {
+    // ✅ SEARCH
+    public Page<CropDTO> searchCrops(String keyword,
+                                     String category,
+                                     String location,
+                                     Double minPrice,
+                                     Double maxPrice,
+                                     Pageable pageable) {
 
-    String safeKeyword = (keyword == null) ? "" : keyword;
-    String safeCategory = (category == null) ? "" : category;
-    String safeLocation = (location == null) ? "" : location;
+        BigDecimal min = (minPrice == null) ? null : BigDecimal.valueOf(minPrice);
+        BigDecimal max = (maxPrice == null) ? null : BigDecimal.valueOf(maxPrice);
 
-    BigDecimal min = (minPrice == null)
-            ? BigDecimal.ZERO
-            : BigDecimal.valueOf(minPrice);
-
-    BigDecimal max = (maxPrice == null)
-            ? new BigDecimal("999999999")
-            : BigDecimal.valueOf(maxPrice);
-
-    return cropRepository.searchCrops(
-            safeKeyword,
-            safeCategory,
-            safeLocation,
-            min,
-            max,
-            pageable
-    );
-}
-
-    public Crop getById(Long id) {
-        return cropRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Crop not found with id: " + id));
+        return cropRepository.searchCrops(
+                        keyword,
+                        category,
+                        location,
+                        min,
+                        max,
+                        pageable
+                )
+                .map(CropMapper::toDTO);
     }
 
-    // 🔥 FIXED: safer soft delete flow
-    public void softDelete(Long id) {
-        Crop crop = getById(id);
+    // ✅ GET BY ID
+    public CropDTO getById(Long id) {
+        return CropMapper.toDTO(
+                cropRepository.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Crop not found"))
+        );
+    }
+
+    // ✅ SOFT DELETE (with ownership check)
+    public void softDelete(Long id, String email) {
+
+        Crop crop = cropRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Crop not found"));
+
+        if (!crop.getFarmer().getEmail().equalsIgnoreCase(email)) {
+            throw new IllegalArgumentException("Unauthorized action");
+        }
+
         crop.setActive(false);
         cropRepository.save(crop);
     }
 
+    // ✅ RESTORE
     public void restore(Long id) {
-        Crop crop = getById(id);
+        Crop crop = cropRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Crop not found"));
+
         crop.setActive(true);
         cropRepository.save(crop);
     }
