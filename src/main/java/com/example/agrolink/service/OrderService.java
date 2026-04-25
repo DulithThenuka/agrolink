@@ -1,9 +1,11 @@
 package com.example.agrolink.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.agrolink.entity.Crop;
 import com.example.agrolink.entity.Order;
@@ -22,17 +24,26 @@ public class OrderService {
         this.cropService = cropService;
     }
 
+    @Transactional
     public Order placeOrder(User buyer, Long cropId, int quantity) {
+
+        if (quantity <= 0) {
+            throw new RuntimeException("Invalid quantity");
+        }
 
         Crop crop = cropService.getById(cropId);
 
-        if (quantity > crop.getQuantity()) {
-            throw new RuntimeException("Not enough stock");
+        if (crop.getFarmer().getId().equals(buyer.getId())) {
+            throw new RuntimeException("You cannot order your own crop");
         }
 
-        double total = crop.getPrice() * quantity;
+        if (quantity > crop.getQuantity()) {
+            throw new RuntimeException("Not enough stock available");
+        }
 
-        // ✅ FIX: update stock
+        BigDecimal total = crop.getPrice().multiply(BigDecimal.valueOf(quantity));
+
+        // update stock
         crop.setQuantity(crop.getQuantity() - quantity);
         cropService.save(crop);
 
