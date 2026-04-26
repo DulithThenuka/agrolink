@@ -25,6 +25,10 @@ public class FileStorageService {
             "image/webp"
     );
 
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+            "jpg", "jpeg", "png", "webp"
+    );
+
     private static final long MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
     public String saveFile(MultipartFile file) {
@@ -33,39 +37,49 @@ public class FileStorageService {
             throw new IllegalArgumentException("File is empty");
         }
 
-        // ✅ Validate size
+        // ✅ Size validation
         if (file.getSize() > MAX_SIZE) {
             throw new IllegalArgumentException("File size exceeds 5MB limit");
         }
 
-        // ✅ Validate type
+        // ✅ MIME type validation
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
             throw new IllegalArgumentException("Only JPG, PNG, WEBP images are allowed");
         }
 
         try {
-            // ✅ Create directory safely
             Path uploadDir = Paths.get(uploadPath).toAbsolutePath().normalize();
             Files.createDirectories(uploadDir);
 
             // ✅ Clean filename
-            String originalName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+            String originalName = file.getOriginalFilename();
+            if (originalName == null) {
+                throw new IllegalArgumentException("Invalid file name");
+            }
 
-            String fileName = UUID.randomUUID() + "_" + originalName;
+            String cleanName = originalName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+
+            // ✅ Extension validation
+            String extension = cleanName.substring(cleanName.lastIndexOf(".") + 1).toLowerCase();
+            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+                throw new IllegalArgumentException("Invalid file extension");
+            }
+
+            String fileName = UUID.randomUUID() + "_" + cleanName;
 
             Path targetPath = uploadDir.resolve(fileName);
 
-            // ✅ Save file
-            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            // ✅ Save file safely
+            Files.copy(file.getInputStream(), targetPath);
 
             logger.info("File uploaded successfully: {}", fileName);
 
-            return fileName;
+            return "/uploads/" + fileName;
 
         } catch (IOException e) {
             logger.error("File upload failed", e);
-            throw new RuntimeException("File upload failed");
+            throw new IllegalStateException("File upload failed", e);
         }
     }
 }
