@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -87,4 +88,48 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+    http
+        .csrf(csrf -> csrf.disable()) // required for API
+
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/login", "/auth/register").permitAll()
+            .anyRequest().authenticated()
+        )
+
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+    http
+        .csrf(csrf -> csrf.disable())
+
+        .authorizeHttpRequests(auth -> auth
+
+            // 🔓 Public endpoints
+            .requestMatchers("/api/login", "/auth/**", "/css/**", "/js/**", "/images/**").permitAll()
+
+            // 🔐 Role-based endpoints
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .requestMatchers("/farmer/**").hasRole("FARMER")
+            .requestMatchers("/buyer/**").hasRole("BUYER")
+
+            // 🔐 API endpoints (optional grouping)
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/farmer/**").hasRole("FARMER")
+            .requestMatchers("/api/buyer/**").hasRole("BUYER")
+
+            .anyRequest().authenticated()
+        )
+
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
 }
