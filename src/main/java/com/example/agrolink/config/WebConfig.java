@@ -3,6 +3,7 @@ package com.example.agrolink.config;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -30,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
         try {
             Files.createDirectories(uploadPath);
         } catch (Exception e) {
-            throw new RuntimeException("Could not create upload directory: " + uploadPath, e);
+            throw new IllegalStateException("Could not create upload directory: " + uploadPath, e);
         }
     }
 
@@ -38,7 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath.toUri().getPath())
-                .setCachePeriod(3600); // 1 hour cache
+                .addResourceLocations(uploadPath.toUri().toString() + "/") // ✅ FIXED
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS)); // ✅ modern caching
     }
 }

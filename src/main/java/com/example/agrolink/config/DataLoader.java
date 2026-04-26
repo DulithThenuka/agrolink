@@ -41,30 +41,35 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) {
 
         if (!StringUtils.hasText(adminEmail) || !StringUtils.hasText(adminPassword)) {
-            logger.warn("Admin credentials are not configured. Skipping admin creation.");
+            logger.warn("Admin credentials not configured. Skipping admin creation.");
             return;
         }
 
-        userRepository.findByEmail(adminEmail).ifPresentOrElse(
-            user -> logger.info("Admin already exists with email: {}", adminEmail),
-            () -> createAdminUser()
+        if (adminPassword.length() < 6) {
+            throw new IllegalArgumentException("Admin password must be at least 6 characters");
+        }
+
+        String normalizedEmail = adminEmail.toLowerCase().trim();
+
+        userRepository.findByEmail(normalizedEmail).ifPresentOrElse(
+            user -> logger.info("Admin already exists"),
+            () -> createAdminUser(normalizedEmail)
         );
     }
 
-    private void createAdminUser() {
+    private void createAdminUser(String email) {
 
-        logger.info("Creating default admin user with email: {}", adminEmail);
+        logger.info("Creating default admin user");
 
         User admin = new User();
         admin.setName("Admin");
-        admin.setEmail(adminEmail);
+        admin.setEmail(email);
         admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setRole(Role.ADMIN);
         admin.setLocation("System");
 
-        // 🔥 Important for security system
         admin.setEnabled(true);
-        admin.setLocked(false);
+        admin.setAccountNonLocked(true); // ✅ FIXED
 
         userRepository.save(admin);
 

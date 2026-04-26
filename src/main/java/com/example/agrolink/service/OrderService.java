@@ -61,4 +61,15 @@ public class OrderService {
     public List<Order> getUserOrders(User buyer) {
         return repo.findByBuyer(buyer);
     }
+
+    public Order getOrderById(Long id) {
+    return orderRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+}
+
+public void markAsPaid(Long orderId) {
+    Order order = getOrderById(orderId);
+    order.setStatus(OrderStatus.CONFIRMED);
+    orderRepository.save(order);
+}
 }

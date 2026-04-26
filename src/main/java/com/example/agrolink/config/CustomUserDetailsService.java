@@ -1,13 +1,14 @@
 package com.example.agrolink.config;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.agrolink.entity.User;
 import com.example.agrolink.repository.UserRepository;
@@ -23,35 +24,39 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        logger.info("Attempting to load user with email: {}", email);
+        String normalizedEmail = email.toLowerCase().trim();
 
-        User user = userRepository.findByEmail(email)
+        logger.info("Loading user: {}", normalizedEmail);
+
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> {
-                    logger.error("User not found with email: {}", email);
-                    return new UsernameNotFoundException("User not found with email: " + email);
+                    logger.error("User not found: {}", normalizedEmail);
+                    return new UsernameNotFoundException("User not found");
                 });
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                user.isEnabled(),              // 🔥 real account status
-                true,                          // accountNonExpired
-                true,                          // credentialsNonExpired
-                !user.isLocked(),              // 🔥 lock support
+                user.isEnabled(),
+                true,
+                true,
+                user.isAccountNonLocked(), // ✅ FIXED
                 getAuthorities(user)
         );
     }
 
     private Collection<SimpleGrantedAuthority> getAuthorities(User user) {
+
         if (user.getRole() == null) {
             throw new IllegalStateException("User role is not assigned");
         }
 
-        return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
+        return List.of(
+                new SimpleGrantedAuthority(user.getRole().getAuthority())
         );
     }
 }
