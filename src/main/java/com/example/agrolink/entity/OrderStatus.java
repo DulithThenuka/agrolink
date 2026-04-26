@@ -1,5 +1,7 @@
 package com.example.agrolink.entity;
 
+import java.util.Set;
+
 public enum OrderStatus {
 
     PENDING("Pending"),
@@ -18,24 +20,37 @@ public enum OrderStatus {
         return label;
     }
 
-    // ✅ Final states
+    // ================== STATE CHECKS ==================
+
     public boolean isFinal() {
         return this == DELIVERED || this == CANCELLED;
     }
 
-    // ✅ Can order be modified?
     public boolean isEditable() {
         return this == PENDING || this == CONFIRMED;
     }
 
-    // ✅ Allowed transitions
+    // ================== TRANSITIONS ==================
+
     public boolean canTransitionTo(OrderStatus next) {
 
+        if (next == null) return false;
+
         return switch (this) {
-            case PENDING -> next == CONFIRMED || next == CANCELLED;
-            case CONFIRMED -> next == SHIPPED || next == CANCELLED;
+            case PENDING -> Set.of(CONFIRMED, CANCELLED).contains(next);
+            case CONFIRMED -> Set.of(SHIPPED, CANCELLED).contains(next);
             case SHIPPED -> next == DELIVERED;
-            default -> false;
+            case DELIVERED, CANCELLED -> false; // final states
         };
+    }
+
+    // ================== VALIDATION ==================
+
+    public void validateTransition(OrderStatus next) {
+        if (!canTransitionTo(next)) {
+            throw new IllegalStateException(
+                "Cannot transition from " + this + " to " + next
+            );
+        }
     }
 }

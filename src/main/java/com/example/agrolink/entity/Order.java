@@ -3,20 +3,9 @@ package com.example.agrolink.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +14,8 @@ import lombok.Setter;
 @Entity
 @Table(name = "orders", indexes = {
     @Index(name = "idx_order_buyer", columnList = "buyer_id"),
-    @Index(name = "idx_order_created", columnList = "createdAt")
+    @Index(name = "idx_order_created", columnList = "createdAt"),
+    @Index(name = "idx_order_status", columnList = "status")
 })
 @Getter
 @Setter
@@ -39,17 +29,21 @@ public class Order {
 
     @Min(1)
     @Column(nullable = false)
-    private Integer quantity;
+    private int quantity;
 
     @NotNull
+    @DecimalMin(value = "0.01", message = "Total price must be greater than 0")
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus status = OrderStatus.PENDING;
+    private OrderStatus status;
 
+    @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    @Column
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -63,9 +57,14 @@ public class Order {
     @Version
     private Long version;
 
+    // ================== LIFECYCLE ==================
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
+        if (status == null) {
+            status = OrderStatus.PENDING;
+        }
     }
 
     @PreUpdate

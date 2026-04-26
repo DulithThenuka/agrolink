@@ -6,32 +6,39 @@ public enum Role {
     BUYER("Buyer"),
     ADMIN("Admin");
 
+    private static final String ROLE_PREFIX = "ROLE_";
+
     private final String label;
 
     Role(String label) {
         this.label = label;
     }
 
-    // ✅ For Spring Security
+    // ================== SECURITY ==================
+
     public String getAuthority() {
-        return "ROLE_" + this.name();
+        return ROLE_PREFIX + this.name();
     }
 
-    // ✅ For UI display
+    // ================== UI ==================
+
     public String getLabel() {
         return label;
     }
 
-    // ✅ Role checks
-    public boolean isAdmin() {
-        return this == ADMIN;
+    @Override
+    public String toString() {
+        return label;
     }
 
-    public boolean isFarmer() {
-        return this == FARMER;
+    // ================== LOGIC ==================
+
+    public boolean is(Role role) {
+        return this == role;
     }
 
-    public boolean isBuyer() {
-        return this == BUYER;
+    public boolean hasAccessTo(Role role) {
+        if (this == ADMIN) return true;
+        return this == role;
     }
 }
