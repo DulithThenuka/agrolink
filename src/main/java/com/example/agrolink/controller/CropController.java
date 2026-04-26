@@ -4,6 +4,7 @@ import java.security.Principal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.agrolink.entity.Crop;
 import com.example.agrolink.entity.User;
 import com.example.agrolink.service.CropService;
-import com.example.agrolink.service.FileStorageService;
 import com.example.agrolink.service.UserService;
 
 import jakarta.validation.Valid;
@@ -29,17 +29,18 @@ public class CropController {
 
     private final CropService cropService;
     private final UserService userService;
-    private final FileStorageService fileStorageService;
+
+    @Value("${app.page.size:5}")
+    private int pageSize;
 
     public CropController(CropService cropService,
-                          UserService userService,
-                          FileStorageService fileStorageService) {
+                          UserService userService) {
         this.cropService = cropService;
         this.userService = userService;
-        this.fileStorageService = fileStorageService;
     }
 
-    // ✅ LIST CROPS
+    // ================== LIST CROPS ==================
+
     @GetMapping
     public String listCrops(Model model,
                             @RequestParam(defaultValue = "") String keyword,
@@ -50,7 +51,12 @@ public class CropController {
                             @RequestParam(defaultValue = "0") int page) {
 
         Page<Crop> cropPage = cropService.searchCrops(
-                keyword, category, location, minPrice, maxPrice, PageRequest.of(page, 5)
+                keyword,
+                category,
+                location,
+                minPrice,
+                maxPrice,
+                PageRequest.of(page, pageSize)
         );
 
         model.addAttribute("crops", cropPage);
@@ -64,7 +70,8 @@ public class CropController {
         return "crops";
     }
 
-    // ✅ SHOW ADD FORM (ONLY FARMER)
+    // ================== ADD FORM ==================
+
     @PreAuthorize("hasRole('FARMER')")
     @GetMapping("/add")
     public String addCropPage(Model model) {
@@ -72,7 +79,8 @@ public class CropController {
         return "add-crop";
     }
 
-    // ✅ SAVE CROP
+    // ================== SAVE CROP ==================
+
     @PreAuthorize("hasRole('FARMER')")
     @PostMapping("/add")
     public String addCrop(@Valid @ModelAttribute("crop") Crop crop,
@@ -81,16 +89,36 @@ public class CropController {
                           Principal principal,
                           Model model) {
 
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
         logger.info("Adding crop by user: {}", principal.getName());
 
+        // validation
         if (result.hasErrors()) {
             return "add-crop";
         }
 
-        User farmer = userService.findByEmail(principal.getName());
+        // image required
+        if (file.isEmpty()) {
+            model.addAttribute("errorMessage", "Image is required");
+            return "add-crop";
+        }
+
+        // file type validation
+        if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+            model.addAttribute("errorMessage", "Only image files are allowed");
+            return "add-crop";
+        }
 
         try {
+            User farmer = userService.findByEmail(principal.getName());
+
             cropService.createCrop(crop, file, farmer);
+
+            logger.info("Crop created successfully");
+
         } catch (IllegalArgumentException ex) {
             logger.warn("Crop creation failed: {}", ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
@@ -100,10 +128,15 @@ public class CropController {
         return "redirect:/crops";
     }
 
-    // ✅ DELETE (SAFE)
+    // ================== DELETE CROP ==================
+
     @PreAuthorize("hasRole('FARMER')")
     @PostMapping("/delete/{id}")
     public String deleteCrop(@PathVariable Long id, Principal principal) {
+
+        if (principal == null) {
+            return "redirect:/login";
+        }
 
         logger.info("Deleting crop {} by user {}", id, principal.getName());
 

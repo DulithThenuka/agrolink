@@ -84,17 +84,26 @@ public class AuthController {
     // ================== JWT LOGIN ==================
 
     @PostMapping("/api/login")
-    @ResponseBody
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
+@ResponseBody
+public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
 
-        User user = service.findByEmail(request.getEmail());
+    try {
+
+        String email = request.getEmail().toLowerCase().trim();
+
+        User user = service.findByEmail(email);
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse(false, "Invalid credentials"));
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name()
+        );
+
+        logger.info("User logged in: {}", user.getEmail());
 
         return ResponseEntity.ok(
                 new AuthResponseDTO(
@@ -103,5 +112,9 @@ public class AuthController {
                         user.getRole().name()
                 )
         );
+
+    } catch (Exception e) {
+        return ResponseEntity.badRequest()
+                .body(new ApiResponse(false, "Invalid credentials"));
     }
 }

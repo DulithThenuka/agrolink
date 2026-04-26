@@ -5,6 +5,7 @@ import com.example.agrolink.service.AdminService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,21 +21,16 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')") // ✅ secure
     @GetMapping("/admin/dashboard")
     public String dashboard(Model model) {
 
-        try {
-            logger.info("Loading admin dashboard");
+        logger.info("Loading admin dashboard");
 
-            AdminDashboardDTO dashboard = adminService.getDashboardData();
+        AdminDashboardDTO dashboard = adminService.getDashboardData();
 
-            model.addAttribute("dashboard", dashboard);
+        model.addAttribute("dashboard", dashboard);
 
-            return "admin-dashboard";
-
-        } catch (Exception e) {
-            logger.error("Error loading admin dashboard", e);
-            return "error";
-        }
+        return "admin-dashboard";
     }
 }

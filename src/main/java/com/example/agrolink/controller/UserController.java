@@ -25,22 +25,14 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
+    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
+
+        dto.setEmail(dto.getEmail().toLowerCase().trim());
 
         logger.info("API registration request for email: {}", dto.getEmail());
 
-        try {
-            UserDTO user = userService.register(dto);
+        UserDTO user = userService.register(dto);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
-
-        } catch (IllegalArgumentException ex) {
-
-            logger.warn("Registration failed: {}", ex.getMessage());
-
-            return ResponseEntity.badRequest().body(
-                    new ApiResponse(false, ex.getMessage())
-            );
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 }

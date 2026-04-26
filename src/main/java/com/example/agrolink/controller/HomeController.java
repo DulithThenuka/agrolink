@@ -1,5 +1,7 @@
 package com.example.agrolink.controller;
 
+import com.example.agrolink.entity.Role;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -24,16 +26,21 @@ public class HomeController {
         }
 
         String email = auth.getName();
-        logger.info("User {} accessing dashboard redirect", email);
+        logger.info("Dashboard redirect for user: {}", email);
 
-        if (hasRole(auth, "ROLE_ADMIN")) {
+        if (hasRole(auth, Role.ADMIN.getAuthority())) {
             return "redirect:/admin/dashboard";
-        } 
-        if (hasRole(auth, "ROLE_FARMER")) {
+        }
+
+        if (hasRole(auth, Role.FARMER.getAuthority())) {
             return "redirect:/farmer/dashboard";
         }
 
-        return "redirect:/buyer/dashboard";
+        if (hasRole(auth, Role.BUYER.getAuthority())) {
+            return "redirect:/buyer/dashboard";
+        }
+
+        throw new IllegalStateException("Unknown role for user: " + email);
     }
 
     private boolean hasRole(Authentication auth, String role) {
