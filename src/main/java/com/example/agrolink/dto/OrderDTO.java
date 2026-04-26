@@ -5,17 +5,18 @@ import java.time.LocalDateTime;
 
 public class OrderDTO {
 
-    private Long id;
-    private String cropName;
-    private int quantity;
-    private BigDecimal totalPrice;
-    private String status; // ✅ safer than enum
-    private LocalDateTime createdAt;
+    private final Long id;
+    private final String cropName;
+    private final int quantity;
+    private final BigDecimal totalPrice;
+    private final String status;
+    private final LocalDateTime createdAt;
 
-    public OrderDTO() {}
-
-    public OrderDTO(Long id, String cropName, int quantity,
-                    BigDecimal totalPrice, String status,
+    public OrderDTO(Long id,
+                    String cropName,
+                    int quantity,
+                    BigDecimal totalPrice,
+                    String status,
                     LocalDateTime createdAt) {
         this.id = id;
         this.cropName = cropName;
@@ -25,22 +26,27 @@ public class OrderDTO {
         this.createdAt = createdAt;
     }
 
-    // ✅ Getters & Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getCropName() { return cropName; }
-    public void setCropName(String cropName) { this.cropName = cropName; }
+    public String getCropName() {
+        return cropName;
+    }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public int getQuantity() {
+        return quantity;
+    }
 
-    public BigDecimal getTotalPrice() { return totalPrice; }
-    public void setTotalPrice(BigDecimal totalPrice) { this.totalPrice = totalPrice; }
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getStatus() {
+        return status;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }

@@ -1,34 +1,55 @@
 package com.example.agrolink.dto;
 
+import java.time.LocalDateTime;
+
 public class ApiResponse<T> {
 
-    private boolean success;
-    private String message;
-    private T data;
+    private final boolean success;
+    private final String message;
+    private final T data;
+    private final LocalDateTime timestamp;
 
-    // ✅ Default constructor
-    public ApiResponse() {}
-
-    // ✅ Success with data
-    public ApiResponse(boolean success, String message, T data) {
+    // 🔒 Private constructor
+    private ApiResponse(boolean success, String message, T data) {
         this.success = success;
         this.message = message;
         this.data = data;
+        this.timestamp = LocalDateTime.now();
     }
 
-    // ✅ Success without data
-    public ApiResponse(boolean success, String message) {
-        this.success = success;
-        this.message = message;
+    // ================== FACTORY METHODS ==================
+
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(true, "Success", data);
     }
 
-    // getters & setters
-    public boolean isSuccess() { return success; }
-    public void setSuccess(boolean success) { this.success = success; }
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>(true, message, data);
+    }
 
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
+    public static <T> ApiResponse<T> success(String message) {
+        return new ApiResponse<>(true, message, null);
+    }
 
-    public T getData() { return data; }
-    public void setData(T data) { this.data = data; }
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>(false, message, null);
+    }
+
+    // ================== GETTERS ==================
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
 }

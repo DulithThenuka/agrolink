@@ -1,24 +1,29 @@
 package com.example.agrolink.dto;
 
+import java.time.LocalDateTime;
+
 public class AuthResponseDTO {
 
-    private String token;
-    private String email;
-    private String role;
+    private final String token;
+    private final String type;
+    private final String email;
+    private final String role;
+    private final LocalDateTime timestamp;
 
-    // ✅ Default constructor
-    public AuthResponseDTO() {}
-
-    // ✅ All-args constructor
     public AuthResponseDTO(String token, String email, String role) {
         this.token = token;
+        this.type = "Bearer";
         this.email = email;
         this.role = role;
+        this.timestamp = LocalDateTime.now();
     }
 
-    // ✅ Getters
     public String getToken() {
         return token;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getEmail() {
@@ -29,16 +34,7 @@ public class AuthResponseDTO {
         return role;
     }
 
-    // (Optional but useful)
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 }

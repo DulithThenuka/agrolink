@@ -1,12 +1,12 @@
 package com.example.agrolink.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public class OrderRequestDTO {
 
-    @NotNull(message = "Crop is required")
+    @NotNull(message = "Crop ID is required")
     private Long cropId;
 
     @NotNull(message = "Quantity is required")
