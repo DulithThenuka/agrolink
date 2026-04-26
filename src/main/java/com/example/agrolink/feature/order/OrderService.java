@@ -1,11 +1,26 @@
 package com.example.agrolink.feature.order;
 
 import com.example.agrolink.dto.OrderDTO;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface OrderService {
 
-    void placeOrder(String buyerEmail, Long cropId, Integer quantity);
+    // 📦 PLACE ORDER
+    OrderDTO placeOrder(String buyerEmail, Long cropId, Integer quantity);
 
-    List<OrderDTO> getUserOrders(String email);
-}  
+    // 👤 BUYER ORDERS
+    Page<OrderDTO> getUserOrders(String email, Pageable pageable);
 
+    // 🌾 FARMER ORDERS
+    Page<OrderDTO> getFarmerOrders(String farmerEmail, Pageable pageable);
+
+    // 🔍 GET ORDER
+    OrderDTO getOrderById(Long id);
+
+    // 🔄 UPDATE STATUS
+    void updateOrderStatus(Long orderId, String status);
+
+    // 💰 PAYMENT
+    void markAsPaid(Long orderId);
+}

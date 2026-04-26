@@ -1,4 +1,5 @@
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -10,29 +11,26 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ================== REGISTER ==================
+
     @Override
     public UserDTO register(UserRegisterDTO dto) {
 
-        User user = new User();
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail().toLowerCase().trim());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole(Role.BUYER);
+        if (userRepository.existsByEmailIgnoreCase(dto.getEmail())) {
+            throw new IllegalArgumentException("Email already registered");
+        }
 
-        userRepository.save(user);
+        User user = UserRegisterMapper.toEntity(dto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        return new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRole().name(),
-                user.getLocation()
-        );
+        return UserMapper.toDTO(userRepository.save(user));
     }
+
+    // ================== INTERNAL ==================
 
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }
