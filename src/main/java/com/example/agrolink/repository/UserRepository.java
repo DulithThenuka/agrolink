@@ -1,6 +1,5 @@
 package com.example.agrolink.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -12,24 +11,50 @@ import com.example.agrolink.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    // 🔐 Login
+    // ================== AUTH ==================
+
+    // 🔐 Login (case-insensitive)
     Optional<User> findByEmailIgnoreCase(String email);
 
+    // 🔐 Check existing email
     boolean existsByEmailIgnoreCase(String email);
 
-    // 👤 Role filtering (paginated)
+    // ================== ADMIN ==================
+
+    // 👤 Filter by role
     Page<User> findByRole(Role role, Pageable pageable);
 
-    // 🔍 Search
-    Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
-    // 📍 Location filter (paginated)
+    // 📍 Filter by location
     Page<User> findByLocationContainingIgnoreCase(String location, Pageable pageable);
 
-    // 🔄 Combined filter (VERY useful)
+    // 🔍 Search by name
+    Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    // ================== COMBINED FILTERS ==================
+
+    // 👤 + 📍 Role + location
     Page<User> findByRoleAndLocationContainingIgnoreCase(
             Role role,
             String location,
             Pageable pageable
     );
+
+    // 👤 + 🔍 Role + name
+    Page<User> findByRoleAndNameContainingIgnoreCase(
+            Role role,
+            String name,
+            Pageable pageable
+    );
+
+    // 🔍 + 📍 Name + location
+    Page<User> findByNameContainingIgnoreCaseAndLocationContainingIgnoreCase(
+            String name,
+            String location,
+            Pageable pageable
+    );
+
+    // ================== DASHBOARD ==================
+
+    // 📊 Count by role (useful for admin stats)
+    long countByRole(Role role);
 }

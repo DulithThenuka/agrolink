@@ -18,7 +18,7 @@ public interface CropRepository extends JpaRepository<Crop, Long> {
     WHERE c.active = true
     AND (:name IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%')))
     AND (:category IS NULL OR LOWER(c.category) LIKE LOWER(CONCAT('%', :category, '%')))
-    AND (:location IS NULL OR LOWER(c.location) LIKE LOWER(CONCAT('%', :location, '%')))
+    AND (:location IS NULL OR LOWER(c.farmer.location) LIKE LOWER(CONCAT('%', :location, '%')))
     AND (:minPrice IS NULL OR c.price >= :minPrice)
     AND (:maxPrice IS NULL OR c.price <= :maxPrice)
 """)
