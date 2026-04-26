@@ -3,36 +3,36 @@ package com.example.agrolink.exception;
 import com.example.agrolink.dto.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
-    // ✅ Validation errors
+    // ================== VALIDATION ==================
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(
+    public ResponseEntity<ApiResponse<Map<String, List<String>>>> handleValidationErrors(
             MethodArgumentNotValidException ex) {
 
-        Map<String, String> errors = new HashMap<>();
+        Map<String, List<String>> errors = new HashMap<>();
 
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error ->
-                        errors.put(error.getField(), error.getDefaultMessage())
-                );
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            errors.computeIfAbsent(error.getField(), k -> new ArrayList<>())
+                    .add(error.getDefaultMessage());
+        });
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse<>(false, "Validation failed", errors));
     }
 
-    // ✅ Business logic errors
+    // ================== BUSINESS ==================
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessErrors(IllegalArgumentException ex) {
 
@@ -42,17 +42,19 @@ public class ApiExceptionHandler {
                 .body(new ApiResponse<>(false, ex.getMessage(), null));
     }
 
-    // ✅ Not found (custom usage)
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRuntimeErrors(RuntimeException ex) {
+    // ================== NOT FOUND ==================
 
-        logger.error("Runtime error", ex);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(ResourceNotFoundException ex) {
+
+        logger.warn("Resource not found: {}", ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ApiResponse<>(false, ex.getMessage(), null));
     }
 
-    // ✅ Fallback (very important)
+    // ================== GLOBAL ==================
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalErrors(Exception ex) {
 
