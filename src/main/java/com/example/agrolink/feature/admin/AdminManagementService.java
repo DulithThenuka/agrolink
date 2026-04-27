@@ -7,20 +7,23 @@ import com.example.agrolink.dto.OrderDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface AdminService {
+public interface AdminManagementService {
 
-    // 📊 Dashboard
+    // ================== DASHBOARD ==================
     AdminDashboardDTO getDashboardData();
 
-    // 👤 User management
+    // ================== USERS ==================
     Page<UserDTO> getAllUsers(Pageable pageable);
+
     void lockUser(Long userId);
+
     void unlockUser(Long userId);
 
-    // 📦 Order management
+    // ================== ORDERS ==================
     Page<OrderDTO> getAllOrders(Pageable pageable);
 
-    // 🌾 Crop management
+    // ================== CROPS ==================
     void deactivateCrop(Long cropId);
+
     void restoreCrop(Long cropId);
 }

@@ -7,20 +7,23 @@ import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
-    // 👤 REGISTER
+    // ================== AUTH ==================
     UserDTO register(UserRegisterDTO dto);
 
-    // 🔍 GET USER
+    // ================== READ ==================
     UserDTO getUserByEmail(String email);
     UserDTO getUserById(Long id);
 
-    // ✏️ UPDATE PROFILE
-    UserDTO updateUser(Long id, UserRegisterDTO dto);
+    // ================== PROFILE ==================
+    UserDTO updateUser(Long id, UserUpdateDTO dto, String currentUserEmail);
 
-    // 👥 ADMIN: LIST USERS
+    void changePassword(String email, String oldPassword, String newPassword);
+
+    // ================== ADMIN ==================
     Page<UserDTO> getAllUsers(Pageable pageable);
 
-    // 🔒 ADMIN: ACCOUNT CONTROL
     void lockUser(Long userId);
     void unlockUser(Long userId);
+
+    void deactivateUser(Long userId);
 }

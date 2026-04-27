@@ -1,26 +1,30 @@
 package com.example.agrolink.feature.order;
 
 import com.example.agrolink.dto.OrderDTO;
+import com.example.agrolink.entity.OrderStatus;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
 
-    // 📦 PLACE ORDER
-    OrderDTO placeOrder(String buyerEmail, Long cropId, Integer quantity);
+    // ================== PLACE ORDER ==================
+    OrderDTO placeOrder(String buyerEmail, Long cropId, int quantity);
 
-    // 👤 BUYER ORDERS
+    // ================== BUYER ==================
     Page<OrderDTO> getUserOrders(String email, Pageable pageable);
 
-    // 🌾 FARMER ORDERS
+    // ================== FARMER ==================
     Page<OrderDTO> getFarmerOrders(String farmerEmail, Pageable pageable);
 
-    // 🔍 GET ORDER
+    // ================== READ ==================
     OrderDTO getOrderById(Long id);
 
-    // 🔄 UPDATE STATUS
-    void updateOrderStatus(Long orderId, String status);
+    // ================== STATUS ==================
+    void updateOrderStatus(Long orderId, OrderStatus status, String userEmail);
 
-    // 💰 PAYMENT
-    void markAsPaid(Long orderId);
+    void cancelOrder(Long orderId, String userEmail);
+
+    // ================== PAYMENT ==================
+    void markAsPaid(Long orderId, String userEmail);
 }

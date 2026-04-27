@@ -9,10 +9,10 @@ import java.math.BigDecimal;
 
 public interface CropService {
 
-    // 🌾 CREATE
+    // ================== CREATE ==================
     CropDTO addCrop(CropRequestDTO dto, String farmerEmail);
 
-    // 🔍 SEARCH
+    // ================== SEARCH ==================
     Page<CropDTO> searchCrops(String keyword,
                               String category,
                               String location,
@@ -20,15 +20,15 @@ public interface CropService {
                               BigDecimal maxPrice,
                               Pageable pageable);
 
-    // 📄 GET BY ID
+    // ================== READ ==================
     CropDTO getCropById(Long id);
 
-    // ✏️ UPDATE
+    // ================== UPDATE ==================
     CropDTO updateCrop(Long id, CropRequestDTO dto, String farmerEmail);
 
-    // ❌ DELETE (soft delete with ownership)
+    // ================== DELETE ==================
     void deleteCrop(Long id, String farmerEmail);
 
-    // ♻️ RESTORE (admin feature)
+    // ================== ADMIN ==================
     void restoreCrop(Long id);
 }
