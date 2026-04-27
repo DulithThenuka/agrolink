@@ -4,6 +4,7 @@ import com.example.agrolink.entity.Role;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,31 +22,38 @@ public class HomeController {
     @GetMapping("/dashboard")
     public String dashboard(Authentication auth) {
 
-        if (auth == null || !auth.isAuthenticated()) {
+        if (!isAuthenticated(auth)) {
             return "redirect:/auth/login";
         }
 
         String email = auth.getName();
         logger.info("Dashboard redirect for user: {}", email);
 
-        if (hasRole(auth, Role.ADMIN.getAuthority())) {
+        if (hasRole(auth, Role.ADMIN)) {
             return "redirect:/admin/dashboard";
         }
 
-        if (hasRole(auth, Role.FARMER.getAuthority())) {
+        if (hasRole(auth, Role.FARMER)) {
             return "redirect:/farmer/dashboard";
         }
 
-        if (hasRole(auth, Role.BUYER.getAuthority())) {
+        if (hasRole(auth, Role.BUYER)) {
             return "redirect:/buyer/dashboard";
         }
 
-        throw new IllegalStateException("Unknown role for user: " + email);
+        logger.error("Unknown role for user: {}", email);
+        throw new IllegalStateException("Unknown role for user");
     }
 
-    private boolean hasRole(Authentication auth, String role) {
+    // ================== HELPERS ==================
+
+    private boolean isAuthenticated(Authentication auth) {
+        return auth != null && auth.isAuthenticated();
+    }
+
+    private boolean hasRole(Authentication auth, Role role) {
         return auth.getAuthorities()
                 .stream()
-                .anyMatch(a -> a.getAuthority().equals(role));
+                .anyMatch(a -> a.getAuthority().equals(role.getAuthority()));
     }
 }

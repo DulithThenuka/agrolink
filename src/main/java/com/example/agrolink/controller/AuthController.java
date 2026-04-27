@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -22,14 +23,14 @@ public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    private final UserService service;
+    private final UserService userService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserService service,
+    public AuthController(UserService userService,
                           JwtUtil jwtUtil,
                           PasswordEncoder passwordEncoder) {
-        this.service = service;
+        this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
     }
@@ -51,14 +52,15 @@ public class AuthController {
 
         logger.info("Registration attempt for email: {}", userDTO.getEmail());
 
+        if (result.hasErrors()) {
+            return "register";
+        }
+
         try {
-            service.register(userDTO);
+            userService.register(userDTO);
         } catch (IllegalArgumentException ex) {
             logger.warn("Registration failed: {}", ex.getMessage());
             result.rejectValue("email", "error.user", ex.getMessage());
-        }
-
-        if (result.hasErrors()) {
             return "register";
         }
 
@@ -87,20 +89,17 @@ public class AuthController {
 
     @PostMapping("/api/login")
     @ResponseBody
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
+    public ResponseEntity<?> apiLogin(@Valid @RequestBody LoginRequestDTO request) {
 
         try {
-            String email = request.getEmail().toLowerCase().trim();
+            String email = normalizeEmail(request.getEmail());
 
-            User user = service.findByEmail(email);
+            User user = userService.findByEmail(email);
 
-            // 🔐 Password check
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return ResponseEntity.badRequest()
-                        .body(new ApiResponse<>(false, "Invalid credentials"));
+                return unauthorizedResponse();
             }
 
-            // 🔑 Generate JWT
             String token = jwtUtil.generateToken(
                     user.getEmail(),
                     user.getRole().name()
@@ -116,10 +115,20 @@ public class AuthController {
                     )
             );
 
-        } catch (Exception e) {
-            logger.error("Login failed", e);
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse<>(false, "Invalid credentials"));
+        } catch (Exception ex) {
+            logger.warn("Login failed: {}", ex.getMessage());
+            return unauthorizedResponse();
         }
+    }
+
+    // ================== HELPERS ==================
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.toLowerCase().trim();
+    }
+
+    private ResponseEntity<ApiResponse<?>> unauthorizedResponse() {
+        return ResponseEntity.status(401)
+                .body(new ApiResponse<>(false, "Invalid credentials"));
     }
 }

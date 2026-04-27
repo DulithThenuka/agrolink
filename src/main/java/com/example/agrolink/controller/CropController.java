@@ -2,24 +2,23 @@ package com.example.agrolink.controller;
 
 import java.security.Principal;
 
+import com.example.agrolink.dto.CropRequestDTO;
+import com.example.agrolink.service.CropService;
+import com.example.agrolink.service.UserService;
+
+import jakarta.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.example.agrolink.entity.Crop;
-import com.example.agrolink.entity.User;
-import com.example.agrolink.service.CropService;
-import com.example.agrolink.service.UserService;
-
-import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/crops")
@@ -43,29 +42,31 @@ public class CropController {
 
     @GetMapping
     public String listCrops(Model model,
-                            @RequestParam(defaultValue = "") String keyword,
-                            @RequestParam(defaultValue = "") String category,
-                            @RequestParam(defaultValue = "") String location,
-                            @RequestParam(defaultValue = "0") double minPrice,
-                            @RequestParam(defaultValue = "100000") double maxPrice,
-                            @RequestParam(defaultValue = "0") int page) {
+                           @RequestParam(required = false) String keyword,
+                           @RequestParam(required = false) String category,
+                           @RequestParam(required = false) String location,
+                           @RequestParam(required = false) Double minPrice,
+                           @RequestParam(required = false) Double maxPrice,
+                           @RequestParam(defaultValue = "0") int page) {
 
-        Page<Crop> cropPage = cropService.searchCrops(
+        Page<?> cropPage = cropService.searchCrops(
                 keyword,
                 category,
                 location,
                 minPrice,
                 maxPrice,
-                PageRequest.of(page, pageSize)
+                PageRequest.of(page, pageSize, Sort.by("createdAt").descending())
         );
 
         model.addAttribute("crops", cropPage);
+        model.addAttribute("currentPage", page);
+
+        // Preserve filters
         model.addAttribute("keyword", keyword);
         model.addAttribute("category", category);
         model.addAttribute("location", location);
         model.addAttribute("minPrice", minPrice);
         model.addAttribute("maxPrice", maxPrice);
-        model.addAttribute("currentPage", page);
 
         return "crops";
     }
@@ -75,7 +76,7 @@ public class CropController {
     @PreAuthorize("hasRole('FARMER')")
     @GetMapping("/add")
     public String addCropPage(Model model) {
-        model.addAttribute("crop", new Crop());
+        model.addAttribute("crop", new CropRequestDTO());
         return "add-crop";
     }
 
@@ -83,39 +84,29 @@ public class CropController {
 
     @PreAuthorize("hasRole('FARMER')")
     @PostMapping("/add")
-    public String addCrop(@Valid @ModelAttribute("crop") Crop crop,
+    public String addCrop(@Valid @ModelAttribute("crop") CropRequestDTO dto,
                           BindingResult result,
                           @RequestParam("image") MultipartFile file,
                           Principal principal,
                           Model model) {
 
         if (principal == null) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
-        logger.info("Adding crop by user: {}", principal.getName());
-
-        // validation
         if (result.hasErrors()) {
             return "add-crop";
         }
 
-        // image required
-        if (file.isEmpty()) {
-            model.addAttribute("errorMessage", "Image is required");
-            return "add-crop";
-        }
+        logger.info("Adding crop by user: {}", principal.getName());
 
-        // file type validation
-        if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
-            model.addAttribute("errorMessage", "Only image files are allowed");
+        if (!isValidImage(file)) {
+            model.addAttribute("errorMessage", "Valid image file is required");
             return "add-crop";
         }
 
         try {
-            User farmer = userService.findByEmail(principal.getName());
-
-            cropService.createCrop(crop, file, farmer);
+            cropService.createCrop(dto, file, principal.getName());
 
             logger.info("Crop created successfully");
 
@@ -128,20 +119,29 @@ public class CropController {
         return "redirect:/crops";
     }
 
-    // ================== DELETE CROP ==================
+    // ================== DELETE ==================
 
     @PreAuthorize("hasRole('FARMER')")
     @PostMapping("/delete/{id}")
     public String deleteCrop(@PathVariable Long id, Principal principal) {
 
         if (principal == null) {
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
 
         logger.info("Deleting crop {} by user {}", id, principal.getName());
 
-        cropService.deleteCrop(id, principal.getName());
+        cropService.softDelete(id, principal.getName());
 
         return "redirect:/crops";
+    }
+
+    // ================== HELPERS ==================
+
+    private boolean isValidImage(MultipartFile file) {
+        return file != null &&
+               !file.isEmpty() &&
+               file.getContentType() != null &&
+               file.getContentType().startsWith("image/");
     }
 }
