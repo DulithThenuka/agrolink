@@ -10,7 +10,8 @@ import com.example.agrolink.repository.UserRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 public class CropService {
 
     private static final Logger logger = LoggerFactory.getLogger(CropService.class);
+    private static final BigDecimal DEFAULT_MAX_PRICE = new BigDecimal("999999999");
 
     private final CropRepository cropRepository;
     private final UserRepository userRepository;
@@ -36,23 +38,18 @@ public class CropService {
 
         logger.info("Creating crop for user: {}", email);
 
-        User farmer = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        // ✅ Validation
-        if (dto.getPrice() == null || dto.getPrice().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price must be positive");
-        }
-
-        if (dto.getQuantity() < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
+        User farmer = getUserByEmail(email);
+        validateCropRequest(dto);
 
         Crop crop = CropMapper.toEntity(dto);
         crop.setFarmer(farmer);
         crop.setActive(true);
 
-        return CropMapper.toDTO(cropRepository.save(crop));
+        Crop savedCrop = cropRepository.save(crop);
+
+        logger.info("Crop created successfully with ID: {}", savedCrop.getId());
+
+        return CropMapper.toDTO(savedCrop);
     }
 
     // ================== GET ALL ==================
@@ -69,24 +66,12 @@ public class CropService {
                                      Double maxPrice,
                                      Pageable pageable) {
 
-        String safeKeyword = (keyword == null) ? "" : keyword;
-        String safeCategory = (category == null) ? "" : category;
-        String safeLocation = (location == null) ? "" : location;
-
-        BigDecimal min = (minPrice == null)
-                ? BigDecimal.ZERO
-                : BigDecimal.valueOf(minPrice);
-
-        BigDecimal max = (maxPrice == null)
-                ? new BigDecimal("999999999")
-                : BigDecimal.valueOf(maxPrice);
-
         return cropRepository.searchCrops(
-                        safeKeyword,
-                        safeCategory,
-                        safeLocation,
-                        min,
-                        max,
+                        normalize(keyword),
+                        normalize(category),
+                        normalize(location),
+                        toMinPrice(minPrice),
+                        toMaxPrice(maxPrice),
                         pageable
                 )
                 .map(CropMapper::toDTO);
@@ -105,8 +90,7 @@ public class CropService {
 
         Crop crop = getCropOrThrow(id);
 
-        if (crop.getFarmer() == null ||
-            !crop.getFarmer().getEmail().equalsIgnoreCase(email)) {
+        if (!isOwner(crop, email)) {
             throw new IllegalArgumentException("Unauthorized action");
         }
 
@@ -126,9 +110,43 @@ public class CropService {
         cropRepository.save(crop);
     }
 
-    // ================== HELPER ==================
+    // ================== HELPERS ==================
+
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
     private Crop getCropOrThrow(Long id) {
         return cropRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Crop not found"));
+    }
+
+    private void validateCropRequest(CropRequestDTO dto) {
+
+        if (dto.getPrice() == null || dto.getPrice().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price must be positive");
+        }
+
+        if (dto.getQuantity() < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
+    }
+
+    private boolean isOwner(Crop crop, String email) {
+        return crop.getFarmer() != null &&
+               crop.getFarmer().getEmail().equalsIgnoreCase(email);
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value;
+    }
+
+    private BigDecimal toMinPrice(Double value) {
+        return value == null ? BigDecimal.ZERO : BigDecimal.valueOf(value);
+    }
+
+    private BigDecimal toMaxPrice(Double value) {
+        return value == null ? DEFAULT_MAX_PRICE : BigDecimal.valueOf(value);
     }
 }
