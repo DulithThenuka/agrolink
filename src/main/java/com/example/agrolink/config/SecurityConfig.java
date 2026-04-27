@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,12 +24,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            // 🔥 JWT = stateless → disable CSRF
             .csrf(csrf -> csrf.disable())
+
+            // 🔥 ADD THIS
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
 
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 Public
                 .requestMatchers(
                         "/api/auth/**",
                         "/auth/**",
@@ -38,7 +42,6 @@ public class SecurityConfig {
                         "/uploads/**"
                 ).permitAll()
 
-                // 🔐 Roles
                 .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/farmer/**", "/api/farmer/**").hasRole("FARMER")
                 .requestMatchers("/buyer/**", "/api/buyer/**").hasRole("BUYER")
@@ -46,7 +49,6 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // 🔐 JWT filter
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
