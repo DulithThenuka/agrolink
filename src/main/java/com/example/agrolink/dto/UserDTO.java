@@ -1,42 +1,47 @@
 package com.example.agrolink.dto;
 
-public class UserDTO {
+import com.example.agrolink.entity.Role;
+
+public final class UserDTO {
 
     private final Long id;
     private final String name;
     private final String email;
-    private final String role;
+
+    private final Role role;
+    private final String roleLabel;
+
     private final String location;
+
+    private final boolean enabled;
 
     public UserDTO(Long id,
                    String name,
                    String email,
-                   String role,
-                   String location) {
+                   Role role,
+                   String location,
+                   boolean enabled) {
+
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.roleLabel = role != null ? role.getLabel() : null;
         this.location = location;
+        this.enabled = enabled;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
 
-    public String getRole() {
-        return role;
-    }
+    public Role getRole() { return role; }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getRoleLabel() { return roleLabel; }
+
+    public String getLocation() { return location; }
+
+    public boolean isEnabled() { return enabled; }
 }

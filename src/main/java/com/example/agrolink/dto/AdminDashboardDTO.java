@@ -2,7 +2,7 @@ package com.example.agrolink.dto;
 
 import java.util.List;
 
-public class AdminDashboardDTO {
+public final class AdminDashboardDTO {
 
     private final long totalUsers;
     private final long totalCrops;
@@ -13,25 +13,20 @@ public class AdminDashboardDTO {
                              long totalCrops,
                              long totalOrders,
                              List<OrderSummaryDTO> recentOrders) {
+
         this.totalUsers = totalUsers;
         this.totalCrops = totalCrops;
         this.totalOrders = totalOrders;
-        this.recentOrders = (recentOrders != null) ? recentOrders : List.of();
+        this.recentOrders = recentOrders == null
+                ? List.of()
+                : List.copyOf(recentOrders); // 🔒 defensive copy
     }
 
-    public long getTotalUsers() {
-        return totalUsers;
-    }
+    public long getTotalUsers() { return totalUsers; }
 
-    public long getTotalCrops() {
-        return totalCrops;
-    }
+    public long getTotalCrops() { return totalCrops; }
 
-    public long getTotalOrders() {
-        return totalOrders;
-    }
+    public long getTotalOrders() { return totalOrders; }
 
-    public List<OrderSummaryDTO> getRecentOrders() {
-        return recentOrders;
-    }
+    public List<OrderSummaryDTO> getRecentOrders() { return recentOrders; }
 }
