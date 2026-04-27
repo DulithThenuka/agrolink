@@ -1,8 +1,10 @@
 package com.example.agrolink.exception;
 
 import com.example.agrolink.dto.ApiResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +25,10 @@ public class GlobalExceptionHandler {
 
         Map<String, List<String>> errors = new HashMap<>();
 
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.computeIfAbsent(error.getField(), k -> new ArrayList<>())
-                  .add(error.getDefaultMessage());
-        });
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.computeIfAbsent(error.getField(), k -> new ArrayList<>())
+                        .add(error.getDefaultMessage())
+        );
 
         logger.warn("Validation failed: {}", errors);
 
@@ -53,6 +55,28 @@ public class GlobalExceptionHandler {
         logger.warn("Not found: {}", ex.getMessage());
 
         return new ApiResponse<>(false, ex.getMessage(), null);
+    }
+
+    // ================== ACCESS DENIED ==================
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiResponse<Void> handleAccessDenied(Exception ex) {
+
+        logger.warn("Access denied: {}", ex.getMessage());
+
+        return new ApiResponse<>(false, "Access denied", null);
+    }
+
+    // ================== INVALID JSON ==================
+
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<Void> handleInvalidJson(Exception ex) {
+
+        logger.warn("Invalid JSON request");
+
+        return new ApiResponse<>(false, "Invalid request body", null);
     }
 
     // ================== GLOBAL ==================

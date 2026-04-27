@@ -1,12 +1,15 @@
 package com.example.agrolink.exception;
 
 import com.example.agrolink.dto.ApiResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestControllerAdvice
@@ -27,8 +30,7 @@ public class ApiExceptionHandler {
                     .add(error.getDefaultMessage());
         });
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ApiResponse<>(false, "Validation failed", errors));
+        return buildResponse(HttpStatus.BAD_REQUEST, "Validation failed", errors);
     }
 
     // ================== BUSINESS ==================
@@ -38,8 +40,7 @@ public class ApiExceptionHandler {
 
         logger.warn("Business error: {}", ex.getMessage());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ApiResponse<>(false, ex.getMessage(), null));
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 
     // ================== NOT FOUND ==================
@@ -49,8 +50,17 @@ public class ApiExceptionHandler {
 
         logger.warn("Resource not found: {}", ex.getMessage());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiResponse<>(false, ex.getMessage(), null));
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), null);
+    }
+
+    // ================== ACCESS DENIED ==================
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(Exception ex) {
+
+        logger.warn("Access denied: {}", ex.getMessage());
+
+        return buildResponse(HttpStatus.FORBIDDEN, "Access denied", null);
     }
 
     // ================== GLOBAL ==================
@@ -60,7 +70,23 @@ public class ApiExceptionHandler {
 
         logger.error("Unexpected error", ex);
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ApiResponse<>(false, "Something went wrong", null));
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Something went wrong", null);
+    }
+
+    // ================== HELPER ==================
+
+    private <T> ResponseEntity<ApiResponse<T>> buildResponse(
+            HttpStatus status,
+            String message,
+            T data) {
+
+        ApiResponse<T> response = new ApiResponse<>(
+                false,
+                message,
+                data
+        );
+
+        return ResponseEntity.status(status).body(response);
     }
 }
