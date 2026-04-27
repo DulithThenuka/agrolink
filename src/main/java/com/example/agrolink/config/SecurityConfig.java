@@ -26,7 +26,6 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
 
-            // 🔥 ADD THIS
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
@@ -47,6 +46,17 @@ public class SecurityConfig {
                 .requestMatchers("/buyer/**", "/api/buyer/**").hasRole("BUYER")
 
                 .anyRequest().authenticated()
+            )
+
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((req, res, e) -> {
+                    res.setStatus(401);
+                    res.getWriter().write("Unauthorized");
+                })
+                .accessDeniedHandler((req, res, e) -> {
+                    res.setStatus(403);
+                    res.getWriter().write("Forbidden");
+                })
             )
 
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

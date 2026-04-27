@@ -34,13 +34,15 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ================== REGISTER ==================
+    // ================== REGISTER PAGE ==================
 
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("user", new UserRegisterDTO());
         return "register";
     }
+
+    // ================== REGISTER ==================
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("user") UserRegisterDTO userDTO,
@@ -81,40 +83,43 @@ public class AuthController {
         return "login";
     }
 
-    // ================== JWT LOGIN ==================
+    // ================== JWT LOGIN (API) ==================
 
     @PostMapping("/api/login")
-@ResponseBody
-public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
+    @ResponseBody
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
 
-    try {
+        try {
+            String email = request.getEmail().toLowerCase().trim();
 
-        String email = request.getEmail().toLowerCase().trim();
+            User user = service.findByEmail(email);
 
-        User user = service.findByEmail(email);
+            // 🔐 Password check
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                return ResponseEntity.badRequest()
+                        .body(new ApiResponse<>(false, "Invalid credentials"));
+            }
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            // 🔑 Generate JWT
+            String token = jwtUtil.generateToken(
+                    user.getEmail(),
+                    user.getRole().name()
+            );
+
+            logger.info("User logged in: {}", user.getEmail());
+
+            return ResponseEntity.ok(
+                    new AuthResponseDTO(
+                            token,
+                            user.getEmail(),
+                            user.getRole().name()
+                    )
+            );
+
+        } catch (Exception e) {
+            logger.error("Login failed", e);
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Invalid credentials"));
+                    .body(new ApiResponse<>(false, "Invalid credentials"));
         }
-
-        String token = jwtUtil.generateToken(
-                user.getEmail(),
-                user.getRole().name()
-        );
-
-        logger.info("User logged in: {}", user.getEmail());
-
-        return ResponseEntity.ok(
-                new AuthResponseDTO(
-                        token,
-                        user.getEmail(),
-                        user.getRole().name()
-                )
-        );
-
-    } catch (Exception e) {
-        return ResponseEntity.badRequest()
-                .body(new ApiResponse(false, "Invalid credentials"));
     }
 }

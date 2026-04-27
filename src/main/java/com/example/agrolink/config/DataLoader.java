@@ -51,7 +51,7 @@ public class DataLoader implements CommandLineRunner {
 
         String normalizedEmail = adminEmail.toLowerCase().trim();
 
-        userRepository.findByEmail(normalizedEmail).ifPresentOrElse(
+        userRepository.findByEmailIgnoreCase(normalizedEmail).ifPresentOrElse(
             user -> logger.info("Admin already exists"),
             () -> createAdminUser(normalizedEmail)
         );
@@ -69,7 +69,9 @@ public class DataLoader implements CommandLineRunner {
         admin.setLocation("System");
 
         admin.setEnabled(true);
-        admin.setAccountNonLocked(true); // ✅ FIXED
+        admin.setAccountNonLocked(true);
+        admin.setAccountNonExpired(true);
+        admin.setCredentialsNonExpired(true);
 
         userRepository.save(admin);
 

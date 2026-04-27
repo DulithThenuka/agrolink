@@ -1,6 +1,8 @@
 package com.example.agrolink.config;
 
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
@@ -16,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebConfig.class);
+
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
 
@@ -23,6 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @PostConstruct
     public void init() {
+
         if (!StringUtils.hasText(uploadDir)) {
             throw new IllegalStateException("Upload directory is not configured");
         }
@@ -31,6 +36,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         try {
             Files.createDirectories(uploadPath);
+            logger.info("Upload directory initialized at: {}", uploadPath);
         } catch (Exception e) {
             throw new IllegalStateException("Could not create upload directory: " + uploadPath, e);
         }
@@ -40,7 +46,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(uploadPath.toUri().toString() + "/") // ✅ FIXED
-                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS)); // ✅ modern caching
+                .addResourceLocations(uploadPath.toUri().toString()) // ✅ FIXED
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS));
     }
 }

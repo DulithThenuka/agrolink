@@ -16,7 +16,8 @@ import com.example.agrolink.repository.UserRepository;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(CustomUserDetailsService.class);
 
     private final UserRepository userRepository;
 
@@ -26,25 +27,24 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
 
-        String normalizedEmail = email.toLowerCase().trim();
-
-        logger.info("Loading user: {}", normalizedEmail);
-
-        User user = userRepository.findByEmail(normalizedEmail)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> {
-                    logger.error("User not found: {}", normalizedEmail);
+                    logger.error("User not found: {}", email);
                     return new UsernameNotFoundException("User not found");
                 });
+
+        logger.info("User loaded: {}", user.getEmail());
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
                 user.isEnabled(),
-                true,
-                true,
-                user.isAccountNonLocked(), // ✅ FIXED
+                user.isAccountNonExpired(),
+                user.isCredentialsNonExpired(),
+                user.isAccountNonLocked(),
                 getAuthorities(user)
         );
     }

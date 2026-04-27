@@ -34,44 +34,49 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String authHeader = request.getHeader("Authorization");
+
+        // ✅ Skip if no token
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
+            String token = authHeader.substring(7).trim();
 
-            String authHeader = request.getHeader("Authorization");
+            if (jwtUtil.isValid(token) &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String email = jwtUtil.extractEmail(token);
+                String role = jwtUtil.extractRole(token);
 
-                String token = authHeader.substring(7).trim();
-
-                if (jwtUtil.isValid(token) &&
-                        SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                    String email = jwtUtil.extractEmail(token);
-                    String role = jwtUtil.extractRole(token);
-
-                    if (role == null) {
-                        logger.warn("JWT token missing role");
-                        filterChain.doFilter(request, response);
-                        return;
-                    }
-
-                    var authority = new SimpleGrantedAuthority("ROLE_" + role);
-
-                    var authToken = new UsernamePasswordAuthenticationToken(
-                            email,
-                            null,
-                            List.of(authority)
-                    );
-
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
-
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (role == null) {
+                    logger.warn("JWT missing role for request: {}", request.getRequestURI());
+                    filterChain.doFilter(request, response);
+                    return;
                 }
+
+                String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+
+                var authority = new SimpleGrantedAuthority(authorityRole);
+
+                var authToken = new UsernamePasswordAuthenticationToken(
+                        email,
+                        null,
+                        List.of(authority)
+                );
+
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 
         } catch (Exception e) {
-            logger.error("JWT authentication failed: {}", e.getMessage());
+            logger.error("JWT authentication failed for {}: {}", 
+                    request.getRequestURI(), e.getMessage());
         }
 
         filterChain.doFilter(request, response);
