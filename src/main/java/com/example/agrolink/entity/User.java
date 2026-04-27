@@ -8,10 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -44,7 +41,7 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Role role = Role.BUYER;
 
     @Column(length = 100)
@@ -62,36 +59,63 @@ public class User {
     @Column(nullable = false)
     private boolean credentialsNonExpired = true;
 
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Version
+    private Long version;
+
+    @OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Crop> crops;
 
-    @OneToMany(mappedBy = "buyer", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "buyer")
     @JsonIgnore
     private List<Order> orders;
 
     // ================== LIFECYCLE ==================
 
     @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
         normalizeEmail();
     }
 
     @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
         normalizeEmail();
     }
 
+    // ================== DOMAIN METHODS ==================
+
+    public boolean isAdmin() {
+        return this.role == Role.ADMIN;
+    }
+
+    public boolean isFarmer() {
+        return this.role == Role.FARMER;
+    }
+
+    public boolean isBuyer() {
+        return this.role == Role.BUYER;
+    }
+
+    public void disable() {
+        this.enabled = false;
+    }
+
+    public void lock() {
+        this.accountNonLocked = false;
+    }
+
+    // ================== INTERNAL ==================
+
     private void normalizeEmail() {
-        if (email != null) {
-            email = email.toLowerCase().trim();
+        if (this.email != null) {
+            this.email = this.email.toLowerCase().trim();
         }
     }
 }

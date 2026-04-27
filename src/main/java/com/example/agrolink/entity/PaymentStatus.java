@@ -1,6 +1,6 @@
 package com.example.agrolink.entity;
 
-import java.util.Set;
+import java.util.EnumSet;
 
 public enum PaymentStatus {
 
@@ -36,19 +36,17 @@ public enum PaymentStatus {
         if (next == null) return false;
 
         return switch (this) {
-            case PENDING -> Set.of(SUCCESS, FAILED, CANCELLED).contains(next);
-            case FAILED -> next == PENDING; // retry
+            case PENDING -> EnumSet.of(SUCCESS, FAILED, CANCELLED).contains(next);
+            case FAILED -> next == PENDING; // retry flow
             case CANCELLED -> false;
             case SUCCESS -> false;
         };
     }
 
-    // ================== VALIDATION ==================
-
     public void validateTransition(PaymentStatus next) {
         if (!canTransitionTo(next)) {
             throw new IllegalStateException(
-                "Invalid payment status transition from " + this + " to " + next
+                "Invalid payment transition: " + this + " → " + next
             );
         }
     }

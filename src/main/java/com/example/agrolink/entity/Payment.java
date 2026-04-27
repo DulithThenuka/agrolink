@@ -18,93 +18,93 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🔐 Stripe session ID
-    @Column(unique = true)
+    // 🔐 Stripe Checkout Session ID
+    @Column(unique = true, nullable = false, length = 100)
     private String transactionId;
 
-    // 🔐 Stripe payment intent
+    // 🔐 Stripe Payment Intent ID
+    @Column(length = 100)
     private String paymentIntentId;
 
     @NotNull
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private PaymentStatus status;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
 
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
+    @Version
+    private Long version;
+
     // ================== LIFECYCLE ==================
 
     @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
-        if (status == null) {
-            status = PaymentStatus.PENDING;
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+        if (this.status == null) {
+            this.status = PaymentStatus.PENDING;
         }
     }
 
     @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // ================== GETTERS & SETTERS ==================
+    // ================== DOMAIN METHODS ==================
 
-    public Long getId() {
-        return id;
+    public void markAsPaid() {
+        if (this.status == PaymentStatus.SUCCESS) return; // idempotent
+        this.status = PaymentStatus.SUCCESS;
     }
 
-    public String getTransactionId() {
-        return transactionId;
+    public void markAsFailed() {
+        this.status = PaymentStatus.FAILED;
     }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
+    public boolean isSuccessful() {
+        return this.status == PaymentStatus.SUCCESS;
     }
 
-    public String getPaymentIntentId() {
-        return paymentIntentId;
-    }
+    // ================== GETTERS ==================
 
-    public void setPaymentIntentId(String paymentIntentId) {
-        this.paymentIntentId = paymentIntentId;
-    }
+    public Long getId() { return id; }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
+    public String getTransactionId() { return transactionId; }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
+    public String getPaymentIntentId() { return paymentIntentId; }
 
-    public PaymentStatus getStatus() {
-        return status;
-    }
+    public BigDecimal getAmount() { return amount; }
 
-    public void setStatus(PaymentStatus status) {
-        this.status = status;
-    }
+    public PaymentStatus getStatus() { return status; }
 
-    public Order getOrder() {
-        return order;
-    }
+    public Order getOrder() { return order; }
 
-    public void setOrder(Order order) {
-        this.order = order;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    // ================== SETTERS ==================
+
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+
+    public void setPaymentIntentId(String paymentIntentId) { this.paymentIntentId = paymentIntentId; }
+
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+    public void setStatus(PaymentStatus status) { this.status = status; }
+
+    public void setOrder(Order order) { this.order = order; }
 }

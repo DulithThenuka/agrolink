@@ -1,5 +1,8 @@
 package com.example.agrolink.entity;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public enum Role {
 
     FARMER("Farmer"),
@@ -37,8 +40,15 @@ public enum Role {
         return this == role;
     }
 
-    public boolean hasAccessTo(Role role) {
-        if (this == ADMIN) return true;
-        return this == role;
+    public boolean hasAccessTo(Role requiredRole) {
+        return getAccessibleRoles().contains(requiredRole);
+    }
+
+    private Set<Role> getAccessibleRoles() {
+        return switch (this) {
+            case ADMIN -> EnumSet.allOf(Role.class);
+            case FARMER -> EnumSet.of(FARMER);
+            case BUYER -> EnumSet.of(BUYER);
+        };
     }
 }

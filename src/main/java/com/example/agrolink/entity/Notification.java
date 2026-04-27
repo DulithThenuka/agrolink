@@ -6,7 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notifications")
+@Table(name = "notifications", indexes = {
+        @Index(name = "idx_notification_user", columnList = "user_id"),
+        @Index(name = "idx_notification_read", columnList = "is_read")
+})
 public class Notification {
 
     @Id
@@ -21,62 +24,50 @@ public class Notification {
     private boolean read = false;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30)
     private NotificationType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     // ================== LIFECYCLE ==================
 
     @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
-    // ================== GETTERS & SETTERS ==================
+    // ================== BUSINESS METHODS ==================
 
-    public Long getId() {
-        return id;
+    public void markAsRead() {
+        this.read = true;
     }
 
-    public String getMessage() {
-        return message;
-    }
+    // ================== GETTERS ==================
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    public Long getId() { return id; }
 
-    public boolean isRead() {
-        return read;
-    }
+    public String getMessage() { return message; }
 
-    public void setRead(boolean read) {
-        this.read = read;
-    }
+    public boolean isRead() { return read; }
 
-    public NotificationType getType() {
-        return type;
-    }
+    public NotificationType getType() { return type; }
 
-    public void setType(NotificationType type) {
-        this.type = type;
-    }
+    public User getUser() { return user; }
 
-    public User getUser() {
-        return user;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    // ================== SETTERS ==================
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public void setMessage(String message) { this.message = message; }
+
+    public void setRead(boolean read) { this.read = read; }
+
+    public void setType(NotificationType type) { this.type = type; }
+
+    public void setUser(User user) { this.user = user; }
 }

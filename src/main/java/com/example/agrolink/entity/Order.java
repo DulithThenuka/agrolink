@@ -6,10 +6,7 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "orders", indexes = {
@@ -33,24 +30,24 @@ public class Order {
 
     @NotNull
     @DecimalMin(value = "0.01", message = "Total price must be greater than 0")
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private OrderStatus status;
 
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "crop_id", nullable = false)
     private Crop crop;
 
@@ -60,15 +57,36 @@ public class Order {
     // ================== LIFECYCLE ==================
 
     @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
-        if (status == null) {
-            status = OrderStatus.PENDING;
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+        if (this.status == null) {
+            this.status = OrderStatus.PENDING;
         }
     }
 
     @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // ================== DOMAIN METHODS ==================
+
+    public void markAsConfirmed() {
+        if (this.status == OrderStatus.CONFIRMED) {
+            return; // idempotent
+        }
+        this.status = OrderStatus.CONFIRMED;
+    }
+
+    public void cancel() {
+        if (this.status == OrderStatus.CONFIRMED) {
+            throw new IllegalStateException("Cannot cancel a confirmed order");
+        }
+        this.status = OrderStatus.CANCELLED;
+    }
+
+    public boolean isPaid() {
+        return this.status == OrderStatus.CONFIRMED;
     }
 }

@@ -8,7 +8,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "reviews",
        uniqueConstraints = {
-           @UniqueConstraint(columnNames = {"buyer_id", "crop_id"})
+           @UniqueConstraint(name = "uk_review_buyer_crop", columnNames = {"buyer_id", "crop_id"})
+       },
+       indexes = {
+           @Index(name = "idx_review_crop", columnList = "crop_id"),
+           @Index(name = "idx_review_buyer", columnList = "buyer_id")
        })
 public class Review {
 
@@ -22,72 +26,67 @@ public class Review {
     private int rating;
 
     @Size(max = 500, message = "Comment must be less than 500 characters")
+    @Column(length = 500)
     private String comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "crop_id", nullable = false)
     private Crop crop;
 
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
+    @Version
+    private Long version;
+
     // ================== LIFECYCLE ==================
 
     @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // ================== GETTERS & SETTERS ==================
+    // ================== DOMAIN METHODS ==================
 
-    public Long getId() {
-        return id;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
+    public void updateReview(int rating, String comment) {
         this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
         this.comment = comment;
     }
 
-    public User getBuyer() {
-        return buyer;
-    }
+    // ================== GETTERS ==================
 
-    public void setBuyer(User buyer) {
-        this.buyer = buyer;
-    }
+    public Long getId() { return id; }
 
-    public Crop getCrop() {
-        return crop;
-    }
+    public int getRating() { return rating; }
 
-    public void setCrop(Crop crop) {
-        this.crop = crop;
-    }
+    public String getComment() { return comment; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public User getBuyer() { return buyer; }
+
+    public Crop getCrop() { return crop; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    // ================== SETTERS ==================
+
+    public void setRating(int rating) { this.rating = rating; }
+
+    public void setComment(String comment) { this.comment = comment; }
+
+    public void setBuyer(User buyer) { this.buyer = buyer; }
+
+    public void setCrop(Crop crop) { this.crop = crop; }
 }

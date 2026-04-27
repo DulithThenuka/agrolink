@@ -1,6 +1,6 @@
 package com.example.agrolink.entity;
 
-import java.util.Set;
+import java.util.EnumSet;
 
 public enum OrderStatus {
 
@@ -37,19 +37,17 @@ public enum OrderStatus {
         if (next == null) return false;
 
         return switch (this) {
-            case PENDING -> Set.of(CONFIRMED, CANCELLED).contains(next);
-            case CONFIRMED -> Set.of(SHIPPED, CANCELLED).contains(next);
+            case PENDING -> EnumSet.of(CONFIRMED, CANCELLED).contains(next);
+            case CONFIRMED -> EnumSet.of(SHIPPED, CANCELLED).contains(next);
             case SHIPPED -> next == DELIVERED;
-            case DELIVERED, CANCELLED -> false; // final states
+            case DELIVERED, CANCELLED -> false;
         };
     }
-
-    // ================== VALIDATION ==================
 
     public void validateTransition(OrderStatus next) {
         if (!canTransitionTo(next)) {
             throw new IllegalStateException(
-                "Cannot transition from " + this + " to " + next
+                "Invalid status transition: " + this + " → " + next
             );
         }
     }

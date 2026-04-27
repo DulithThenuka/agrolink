@@ -15,128 +15,105 @@ public class Crop {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String category;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String location;
 
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
     @Min(0)
     @Column(nullable = false)
     private int quantity;
 
-    @Column
+    @Column(length = 255)
     private String imageUrl;
 
     @Column(nullable = false)
     private boolean active = true;
 
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "farmer_id", nullable = false)
     private User farmer;
 
     // ================== LIFECYCLE ==================
 
     @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    public void preUpdate() {
-        updatedAt = LocalDateTime.now();
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // ================== GETTERS & SETTERS ==================
+    // ================== BUSINESS HELPERS ==================
 
-    public Long getId() {
-        return id;
+    public boolean hasEnoughStock(int requestedQty) {
+        return this.quantity >= requestedQty;
     }
 
-    public String getName() {
-        return name;
+    public void reduceStock(int qty) {
+        if (qty < 0 || this.quantity < qty) {
+            throw new IllegalArgumentException("Invalid stock operation");
+        }
+        this.quantity -= qty;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    // ================== GETTERS ==================
 
-    public String getCategory() {
-        return category;
-    }
+    public Long getId() { return id; }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public String getName() { return name; }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getCategory() { return category; }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public String getLocation() { return location; }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
+    public BigDecimal getPrice() { return price; }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
+    public int getQuantity() { return quantity; }
 
-    public int getQuantity() {
-        return quantity;
-    }
+    public String getImageUrl() { return imageUrl; }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+    public boolean isActive() { return active; }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    public boolean isActive() {
-        return active;
-    }
+    public User getFarmer() { return farmer; }
 
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+    // ================== SETTERS ==================
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public void setName(String name) { this.name = name; }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+    public void setCategory(String category) { this.category = category; }
 
-    public User getFarmer() {
-        return farmer;
-    }
+    public void setLocation(String location) { this.location = location; }
 
-    public void setFarmer(User farmer) {
-        this.farmer = farmer;
-    }
+    public void setPrice(BigDecimal price) { this.price = price; }
+
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public void setActive(boolean active) { this.active = active; }
+
+    public void setFarmer(User farmer) { this.farmer = farmer; }
 }
