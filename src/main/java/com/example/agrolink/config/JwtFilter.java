@@ -21,6 +21,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+    private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtUtil jwtUtil;
 
@@ -34,51 +35,70 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        String token = extractToken(request);
 
-        // ✅ Skip if no token
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            String token = authHeader.substring(7).trim();
-
-            if (jwtUtil.isValid(token) &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (jwtUtil.isValid(token) && isNotAuthenticated()) {
 
                 String email = jwtUtil.extractEmail(token);
                 String role = jwtUtil.extractRole(token);
 
-                if (role == null) {
-                    logger.warn("JWT missing role for request: {}", request.getRequestURI());
+                if (email == null || role == null) {
+                    logger.warn("Invalid JWT payload for request: {}", request.getRequestURI());
                     filterChain.doFilter(request, response);
                     return;
                 }
 
-                String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-
-                var authority = new SimpleGrantedAuthority(authorityRole);
-
-                var authToken = new UsernamePasswordAuthenticationToken(
-                        email,
-                        null,
-                        List.of(authority)
-                );
-
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                setAuthentication(email, role, request);
             }
 
-        } catch (Exception e) {
-            logger.error("JWT authentication failed for {}: {}", 
-                    request.getRequestURI(), e.getMessage());
+        } catch (Exception ex) {
+            logger.warn("JWT authentication failed for [{}]: {}", 
+                    request.getRequestURI(), ex.getMessage());
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // ================== HELPERS ==================
+
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+
+        return authHeader.substring(BEARER_PREFIX.length()).trim();
+    }
+
+    private boolean isNotAuthenticated() {
+        return SecurityContextHolder.getContext().getAuthentication() == null;
+    }
+
+    private void setAuthentication(String email, String role, HttpServletRequest request) {
+
+        String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+
+        var authority = new SimpleGrantedAuthority(authorityRole);
+
+        var authToken = new UsernamePasswordAuthenticationToken(
+                email,
+                null,
+                List.of(authority)
+        );
+
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        logger.debug("JWT authenticated user: {}", email);
     }
 }

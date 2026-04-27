@@ -14,6 +14,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/api/auth/**",
+            "/auth/**",
+            "/css/**",
+            "/js/**",
+            "/images/**",
+            "/uploads/**"
+    };
+
     private final JwtFilter jwtFilter;
 
     public SecurityConfig(JwtFilter jwtFilter) {
@@ -23,45 +32,44 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
+        return http
+                .csrf(csrf -> csrf.disable())
 
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
-            .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers(
-                        "/api/auth/**",
-                        "/auth/**",
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/uploads/**"
-                ).permitAll()
+                        // Public endpoints
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 
-                .requestMatchers("/admin/**", "/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/farmer/**", "/api/farmer/**").hasRole("FARMER")
-                .requestMatchers("/buyer/**", "/api/buyer/**").hasRole("BUYER")
+                        // Role-based access
+                        .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/farmer/**", "/farmer/**").hasRole("FARMER")
+                        .requestMatchers("/api/buyer/**", "/buyer/**").hasRole("BUYER")
 
-                .anyRequest().authenticated()
-            )
+                        // Everything else requires authentication
+                        .anyRequest().authenticated()
+                )
 
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((req, res, e) -> {
-                    res.setStatus(401);
-                    res.getWriter().write("Unauthorized");
-                })
-                .accessDeniedHandler((req, res, e) -> {
-                    res.setStatus(403);
-                    res.getWriter().write("Forbidden");
-                })
-            )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, e) -> {
+                            res.setStatus(401);
+                            res.setContentType("application/json");
+                            res.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((req, res, e) -> {
+                            res.setStatus(403);
+                            res.setContentType("application/json");
+                            res.getWriter().write("{\"error\":\"Forbidden\"}");
+                        })
+                )
 
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                // JWT filter
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
-        return http.build();
+                .build();
     }
 
     @Bean
