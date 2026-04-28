@@ -1,8 +1,7 @@
 package com.example.agrolink.controller;
 
 import com.example.agrolink.dto.OrderRequestDTO;
-import com.example.agrolink.service.OrderService;
-
+import com.example.agrolink.feature.order.OrderService;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class OrderController {
         String email = normalizeEmail(principal.getName());
         logger.info("Fetching orders for user: {}", email);
 
-        model.addAttribute("orders", orderService.getUserOrders(email));
+        model.addAttribute("orders", orderService.getUserOrders(email, null));
 
         return "my-orders";
     }
