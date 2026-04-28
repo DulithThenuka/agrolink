@@ -106,7 +106,7 @@ public class CropController {
         }
 
         try {
-            cropService.createCrop(dto, file, principal.getName());
+            cropService.createCrop(dto, principal.getName());
 
             logger.info("Crop created successfully");
 
