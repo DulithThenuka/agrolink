@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -94,7 +95,9 @@ public class AuthController {
         try {
             String email = normalizeEmail(request.getEmail());
 
-            User user = userService.findByEmail(email);
+            // 🔥 FIX: handle Optional safely
+            User user = userService.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
 
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                 return unauthorizedResponse();
@@ -128,7 +131,7 @@ public class AuthController {
     }
 
     private ResponseEntity<ApiResponse<?>> unauthorizedResponse() {
-        return ResponseEntity.status(401)
-                .body(new ApiResponse<>(false, "Invalid credentials"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse<>(false, "Invalid credentials", null));
     }
 }
