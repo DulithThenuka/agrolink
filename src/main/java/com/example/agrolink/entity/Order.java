@@ -121,4 +121,16 @@ public class Order {
     public Object getCrop() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public Object getId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getTotalPrice() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setCreatedAt(LocalDateTime now) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

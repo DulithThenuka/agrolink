@@ -60,7 +60,7 @@ public class OrderService {
 
     // ================== GET USER ORDERS ==================
     public List<Order> getUserOrders(User buyer) {
-        return orderRepository.findByBuyerOrderByCreatedAtDesc(buyer);
+        return (List<Order>) orderRepository.findByBuyerOrderByCreatedAtDesc(buyer);
     }
 
     // ================== GET ORDER ==================

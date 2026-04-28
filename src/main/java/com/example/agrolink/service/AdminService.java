@@ -70,15 +70,15 @@ public class AdminService {
     private OrderSummaryDTO mapToOrderSummaryDTO(Order order) {
 
         String cropName = (order.getCrop() != null)
-                ? order.getCrop().getName()
+                ? ((Logger) order.getCrop()).getName()
                 : "N/A";
 
         String buyerEmail = (order.getBuyer() != null)
-                ? order.getBuyer().getEmail()
+                ? ((Object) order.getBuyer()).getEmail()
                 : "N/A";
 
         String status = (order.getStatus() != null)
-                ? order.getStatus().name()
+                ? ((Object) order.getStatus()).name()
                 : "UNKNOWN";
 
         return new OrderSummaryDTO(

@@ -41,6 +41,11 @@ public final class OrderSummaryDTO {
         this.createdAt = createdAt;
     }
 
+    public OrderSummaryDTO(Object id2, String cropName2, int quantity2, String buyerEmail2, String status2,
+            LocalDateTime createdAt2) {
+        //TODO Auto-generated constructor stub
+    }
+
     public Long getId() { return id; }
 
     public String getCropName() { return cropName; }

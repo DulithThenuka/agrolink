@@ -31,6 +31,10 @@ public final class UserDTO {
         this.enabled = enabled;
     }
 
+    public UserDTO(Object id2, String name2, String email2, Object role2, String location2) {
+        //TODO Auto-generated constructor stub
+    }
+
     public Long getId() { return id; }
 
     public String getName() { return name; }

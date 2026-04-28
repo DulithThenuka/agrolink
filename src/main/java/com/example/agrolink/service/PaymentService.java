@@ -37,7 +37,7 @@ public class PaymentService {
 
         validateOrder(order);
 
-        long amountInCents = convertToCents(order.getTotalPrice());
+        long amountInCents = convertToCents((BigDecimal) order.getTotalPrice());
 
         SessionCreateParams params = buildSessionParams(order, amountInCents);
 
@@ -65,11 +65,11 @@ public class PaymentService {
             throw new IllegalArgumentException("Invalid order");
         }
 
-        if (order.getTotalPrice() == null || order.getTotalPrice().compareTo(BigDecimal.ZERO) <= 0) {
+        if (order.getTotalPrice() == null || ((BigDecimal) order.getTotalPrice()).compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Invalid order amount");
         }
 
-        if (order.getCrop() == null || order.getCrop().getName() == null) {
+        if (((Logger) order.getCrop()).getName() == null || order.getCrop() == null) {
             throw new IllegalArgumentException("Invalid crop data");
         }
     }
@@ -101,7 +101,7 @@ public class PaymentService {
                                                 .setUnitAmount(amount)
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName(safe(order.getCrop().getName()))
+                                                                .setName(safe(((Logger) order.getCrop()).getName()))
                                                                 .build()
                                                 )
                                                 .build()

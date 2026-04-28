@@ -42,4 +42,8 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @EntityGraph(attributePaths = {})
     @Query("SELECT u FROM User u")
     Page<User> findAllUsers(Pageable pageable);
+
+    public boolean existsByEmail(String email);
+
+    public Object findByEmail(String normalized);
 }

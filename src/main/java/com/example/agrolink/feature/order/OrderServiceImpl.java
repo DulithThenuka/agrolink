@@ -82,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
         User buyer = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return orderRepository.findByBuyerOrderByCreatedAtDesc(buyer, pageable)
+        return orderRepository.findByBuyerOrderByCreatedAtDesc(buyer)
                 .map(OrderMapper::toDTO);
     }
 

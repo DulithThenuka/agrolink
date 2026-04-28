@@ -71,25 +71,25 @@ public final class OrderMapper {
 
     private static String getCropName(Order order) {
         return order.getCrop() != null
-                ? order.getCrop().getName()
+                ? ((Object) order.getCrop()).getName()
                 : "Unknown Crop";
     }
 
     private static Long getCropId(Order order) {
         return order.getCrop() != null
-                ? order.getCrop().getId()
+                ? ((OrderDTO) order.getCrop()).getId()
                 : null;
     }
 
     private static String getBuyerEmail(Order order) {
         return order.getBuyer() != null
-                ? order.getBuyer().getEmail()
+                ? ((Object) order.getBuyer()).getEmail()
                 : "Unknown Buyer";
     }
 
     private static String getStatus(Order order) {
         return order.getStatus() != null
-                ? order.getStatus().name()
+                ? ((Object) order.getStatus()).name()
                 : "UNKNOWN";
     }
 

@@ -63,7 +63,7 @@ public class UserService {
 
         String normalized = normalizeEmail(email);
 
-        return repo.findByEmail(normalized)
+        return ((Object) repo.findByEmail(normalized))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
@@ -94,7 +94,7 @@ public class UserService {
         return encoder.encode(rawPassword);
     }
 
-    private Role resolveRole(User user) {
+    private Object resolveRole(User user) {
         return (user.getRole() == null) ? Role.BUYER : user.getRole();
     }
 }

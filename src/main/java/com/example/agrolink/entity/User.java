@@ -174,4 +174,12 @@ public class User {
     public String getName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public String getLocation() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setRole(Object resolveRole) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
