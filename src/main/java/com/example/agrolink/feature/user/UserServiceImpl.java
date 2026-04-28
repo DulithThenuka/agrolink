@@ -117,4 +117,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
+
+    @Override
+    public UserDTO updateUser(Long id, UserUpdateDTO dto, String currentUserEmail) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void changePassword(String email, String oldPassword, String newPassword) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void deactivateUser(Long userId) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

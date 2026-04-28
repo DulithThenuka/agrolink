@@ -124,7 +124,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 🔄 validate transition
-        order.getStatus().validateTransition(newStatus);
+        ((OrderStatus) order.getStatus()).validateTransition(newStatus);
 
         order.setStatus(newStatus);
         orderRepository.save(order);
@@ -144,5 +144,25 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
+    }
+
+    @Override
+    public OrderDTO placeOrder(String buyerEmail, Long cropId, int quantity) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatus status, String userEmail) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void cancelOrder(Long orderId, String userEmail) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void markAsPaid(Long orderId, String userEmail) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

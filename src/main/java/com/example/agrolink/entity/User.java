@@ -146,4 +146,32 @@ public class User {
     public boolean isAccountNonExpired() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public Object getId() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setAccountNonLocked(boolean b) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setName(String trim) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setPassword(String encode) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setEmail(String email) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setLocation(String trim) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

@@ -24,7 +24,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // ================== DASHBOARD ==================
-    @Override
     public AdminDashboardDTO getDashboardData() {
 
         long totalUsers = userRepository.count();
@@ -45,7 +44,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // ================== USERS ==================
-    @Override
     public Page<UserDTO> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(user -> new UserDTO(
@@ -57,7 +55,6 @@ public class AdminServiceImpl implements AdminService {
                 ));
     }
 
-    @Override
     @Transactional
     public void lockUser(Long userId) {
         User user = getUserOrThrow(userId);
@@ -65,7 +62,6 @@ public class AdminServiceImpl implements AdminService {
         userRepository.save(user);
     }
 
-    @Override
     @Transactional
     public void unlockUser(Long userId) {
         User user = getUserOrThrow(userId);
@@ -74,7 +70,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // ================== ORDERS ==================
-    @Override
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
         return orderRepository.findByOrderByCreatedAtDesc(pageable)
                 .map(order -> new OrderDTO(
@@ -88,7 +83,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     // ================== CROPS ==================
-    @Override
     @Transactional
     public void deactivateCrop(Long cropId) {
         Crop crop = getCropOrThrow(cropId);
@@ -96,7 +90,6 @@ public class AdminServiceImpl implements AdminService {
         cropRepository.save(crop);
     }
 
-    @Override
     @Transactional
     public void restoreCrop(Long cropId) {
         Crop crop = getCropOrThrow(cropId);
@@ -119,13 +112,13 @@ public class AdminServiceImpl implements AdminService {
 
     private String getCropName(Order order) {
         return (order.getCrop() != null)
-                ? order.getCrop().getName()
+                ? ((UserDTO) order.getCrop()).getName()
                 : "N/A";
     }
 
     private String getBuyerEmail(Order order) {
         return (order.getBuyer() != null)
-                ? order.getBuyer().getEmail()
+                ? ((UserDTO) order.getBuyer()).getEmail()
                 : "N/A";
     }
 

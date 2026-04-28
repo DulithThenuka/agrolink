@@ -51,4 +51,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findRecentOrders(Pageable pageable);
 
     List<Order> findTop5ByOrderByCreatedAtDesc();
+
+    public Object findByOrderByCreatedAtDesc(Pageable pageable);
 }

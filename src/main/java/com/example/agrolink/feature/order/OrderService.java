@@ -27,4 +27,10 @@ public interface OrderService {
 
     // ================== PAYMENT ==================
     void markAsPaid(Long orderId, String userEmail);
+
+    OrderDTO placeOrder(String email, Long cropId, Integer quantity);
+
+    void updateOrderStatus(Long orderId, String status);
+
+    void markAsPaid(Long orderId);
 }

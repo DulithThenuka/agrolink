@@ -89,4 +89,36 @@ public class Order {
     public boolean isPaid() {
         return this.status == OrderStatus.CONFIRMED;
     }
+
+    public void setBuyer(User buyer) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setCrop(Crop crop) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setQuantity(Integer quantity) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setStatus(OrderStatus orderStatus) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getStatus() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setTotalPrice(BigDecimal total) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getBuyer() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getCrop() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

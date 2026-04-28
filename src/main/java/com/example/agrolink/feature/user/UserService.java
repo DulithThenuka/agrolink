@@ -26,4 +26,6 @@ public interface UserService {
     void unlockUser(Long userId);
 
     void deactivateUser(Long userId);
+
+    UserDTO updateUser(Long id, UserRegisterDTO dto);
 }
