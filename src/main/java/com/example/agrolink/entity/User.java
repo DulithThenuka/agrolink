@@ -130,4 +130,20 @@ public class User {
     public String getEmail() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    public boolean isCredentialsNonExpired() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean isAccountNonLocked() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean isEnabled() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean isAccountNonExpired() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
