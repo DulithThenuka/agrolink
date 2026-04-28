@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -86,7 +85,7 @@ public class AuthController {
         return "login";
     }
 
-    // ================== JWT LOGIN (API) ==================
+    // ================== JWT LOGIN ==================
 
     @PostMapping("/api/login")
     @ResponseBody
@@ -95,9 +94,8 @@ public class AuthController {
         try {
             String email = normalizeEmail(request.getEmail());
 
-            // 🔥 FIX: handle Optional safely
-            User user = userService.findByEmail(email)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+            // ✅ FIXED (no Optional)
+            User user = userService.findByEmail(email);
 
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
                 return unauthorizedResponse();
@@ -108,13 +106,19 @@ public class AuthController {
                     user.getRole().name()
             );
 
+            long expiresIn = 3600;
+
             logger.info("User logged in: {}", user.getEmail());
 
             return ResponseEntity.ok(
-                    new AuthResponseDTO(
-                            token,
-                            user.getEmail(),
-                            user.getRole().name()
+                    ApiResponse.success(
+                            "Login successful",
+                            new AuthResponseDTO(
+                                    token,
+                                    user.getEmail(),
+                                    user.getRole().name(),
+                                    expiresIn
+                            )
                     )
             );
 
@@ -131,7 +135,7 @@ public class AuthController {
     }
 
     private ResponseEntity<ApiResponse<?>> unauthorizedResponse() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ApiResponse<>(false, "Invalid credentials", null));
+        return ResponseEntity.status(401)
+                .body(ApiResponse.error("Invalid credentials"));
     }
 }
