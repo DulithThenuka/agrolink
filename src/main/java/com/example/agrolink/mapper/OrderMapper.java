@@ -2,9 +2,10 @@ package com.example.agrolink.mapper;
 
 import com.example.agrolink.dto.OrderDTO;
 import com.example.agrolink.dto.OrderSummaryDTO;
-import com.example.agrolink.entity.Order;
 
 import java.util.List;
+
+import com.example.agrolink.entity.Order;
 
 public final class OrderMapper {
 
@@ -20,9 +21,12 @@ public final class OrderMapper {
         return new OrderDTO(
                 order.getId(),
                 getCropName(order),
+                getCropId(order),
                 order.getQuantity(),
                 order.getTotalPrice(),
-                order.getStatus(),
+                getStatus(order),
+                getStatusLabel(order),
+                order.isPaid(),
                 order.getCreatedAt()
         );
     }
@@ -35,9 +39,12 @@ public final class OrderMapper {
         return new OrderSummaryDTO(
                 order.getId(),
                 getCropName(order),
+                getCropId(order),
                 order.getQuantity(),
                 getBuyerEmail(order),
                 getStatus(order),
+                getStatusLabel(order),
+                order.isPaid(),
                 order.getCreatedAt()
         );
     }
@@ -68,6 +75,12 @@ public final class OrderMapper {
                 : "Unknown Crop";
     }
 
+    private static Long getCropId(Order order) {
+        return order.getCrop() != null
+                ? order.getCrop().getId()
+                : null;
+    }
+
     private static String getBuyerEmail(Order order) {
         return order.getBuyer() != null
                 ? order.getBuyer().getEmail()
@@ -78,5 +91,16 @@ public final class OrderMapper {
         return order.getStatus() != null
                 ? order.getStatus().name()
                 : "UNKNOWN";
+    }
+
+    private static String getStatusLabel(Order order) {
+        if (order.getStatus() == null) return "Unknown";
+
+        switch (order.getStatus()) {
+            case PENDING: return "Pending";
+            case CONFIRMED: return "Confirmed";
+            case CANCELLED: return "Cancelled";
+            default: return "Unknown";
+        }
     }
 }
