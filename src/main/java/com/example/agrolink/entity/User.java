@@ -118,4 +118,16 @@ public class User {
             this.email = this.email.toLowerCase().trim();
         }
     }
+
+    public String getPassword() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getRole() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String getEmail() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

@@ -122,4 +122,9 @@ public class PaymentService {
     private String safe(String value) {
         return Objects.requireNonNullElse(value, "Product");
     }
+
+    public String createCheckoutSession(Long orderId, String email) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createCheckoutSession'");
+    }
 }

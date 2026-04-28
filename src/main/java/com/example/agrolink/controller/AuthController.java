@@ -103,7 +103,7 @@ public class AuthController {
 
             String token = jwtUtil.generateToken(
                     user.getEmail(),
-                    user.getRole().name()
+                    ((RequestMapping) user.getRole()).name()
             );
 
             long expiresIn = 3600;
@@ -116,7 +116,7 @@ public class AuthController {
                             new AuthResponseDTO(
                                     token,
                                     user.getEmail(),
-                                    user.getRole().name(),
+                                    ((RequestMapping) user.getRole()).name(),
                                     expiresIn
                             )
                     )
