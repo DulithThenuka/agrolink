@@ -1,38 +1,27 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title th:replace="${title}">AgroLink</title>
+    <title>AgroLink</title>
 
-    <!-- Tailwind CDN -->
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Custom Config -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#16a34a', // green theme 🌱
-                        dark: '#1f2937'
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
 </head>
 
 <body class="bg-gray-100">
 
-<!-- NAVBAR -->
+<!-- Navbar -->
 <div th:replace="layout/navbar :: navbar"></div>
 
 <div class="flex">
 
-    <!-- SIDEBAR -->
+    <!-- Sidebar -->
     <div th:replace="layout/sidebar :: sidebar"></div>
 
-    <!-- MAIN CONTENT -->
+    <!-- Content -->
     <main class="flex-1 p-6">
         <div th:replace="${content}"></div>
     </main>
