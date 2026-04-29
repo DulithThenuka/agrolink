@@ -42,6 +42,20 @@
         <div th:replace="${content}"></div>
     </main>
 
+    <div x-data="{ show: false, message: '' }"
+     x-on:notify.window="message = $event.detail.msg; show = true; setTimeout(() => show = false, 3000)"
+     class="fixed top-5 right-5">
+
+    <div x-show="show"
+         x-transition
+         class="bg-green-600 text-white px-4 py-2 rounded shadow-lg">
+
+        <span x-text="message"></span>
+
+    </div>
+
+</div>
+
 </div>
 
 </body>
