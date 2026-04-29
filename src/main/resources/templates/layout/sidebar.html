@@ -1,17 +1,24 @@
 <div th:fragment="sidebar">
-<aside class="w-64 bg-white shadow-md h-screen p-4 hidden md:block">
+<aside class="w-64 glass h-screen p-4 hidden md:block">
 
     <h2 class="font-bold text-lg mb-4">Menu</h2>
 
     <ul class="space-y-2">
 
-        <li><a href="/crops" class="block p-2 rounded hover:bg-gray-100">🌾 Crops</a></li>
+        <li><a href="/crops"
+               class="block p-2 rounded hover:bg-green-100 transition">
+               🌾 Crops
+        </a></li>
 
-        <li><a href="/orders/my" class="block p-2 rounded hover:bg-gray-100">📦 Orders</a></li>
+        <li><a href="/orders/my"
+               class="block p-2 rounded hover:bg-green-100 transition">
+               📦 Orders
+        </a></li>
 
-        <li><a href="/crops/add" class="block p-2 rounded hover:bg-gray-100">➕ Add Crop</a></li>
-
-        <li><a href="/admin/dashboard" class="block p-2 rounded hover:bg-gray-100">📊 Admin</a></li>
+        <li><a href="/crops/add"
+               class="block p-2 rounded hover:bg-green-100 transition">
+               ➕ Add Crop
+        </a></li>
 
     </ul>
 
