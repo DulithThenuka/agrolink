@@ -1,14 +1,14 @@
 <div th:fragment="navbar">
-<nav class="bg-green-600 text-white px-6 py-3 flex justify-between items-center shadow">
+<nav class="glass sticky top-0 z-50 shadow px-6 py-3 flex justify-between items-center">
 
-    <div class="text-xl font-bold">
+    <div class="text-xl font-bold text-green-600 animate__animated animate__fadeInLeft">
         🌱 AgroLink
     </div>
 
-    <div class="space-x-4">
-        <a href="/crops" class="hover:underline">Crops</a>
-        <a href="/orders/my" class="hover:underline">Orders</a>
-        <a href="/dashboard" class="hover:underline">Dashboard</a>
+    <div class="space-x-6 hidden md:block">
+        <a href="/crops" class="hover:text-green-600 transition">Crops</a>
+        <a href="/orders/my" class="hover:text-green-600 transition">Orders</a>
+        <a href="/dashboard" class="hover:text-green-600 transition">Dashboard</a>
     </div>
 
 </nav>
