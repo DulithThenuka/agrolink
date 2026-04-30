@@ -1,0 +1,52 @@
+<div th:fragment="content">
+
+<div class="flex items-center justify-center min-h-[80vh]">
+
+    <form action="/auth/api/login" method="post"
+          class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+
+        <h2 class="text-2xl font-bold text-center mb-6">
+            Login
+        </h2>
+
+        <!-- EMAIL -->
+        <div th:replace="components/forms/input :: input(
+            'Email',
+            'email',
+            'email',
+            'Enter your email',
+            '',
+            null
+        )"></div>
+
+        <!-- PASSWORD -->
+        <div th:replace="components/forms/input :: input(
+            'Password',
+            'password',
+            'password',
+            'Enter password',
+            '',
+            null
+        )"></div>
+
+        <!-- BUTTON -->
+        <button type="submit"
+                class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+
+            Login
+
+        </button>
+
+        <!-- FOOTER -->
+        <p class="text-sm text-center text-gray-500 mt-4">
+            Don't have an account?
+            <a href="/auth/register" class="text-green-600 hover:underline">
+                Register
+            </a>
+        </p>
+
+    </form>
+
+</div>
+
+</div>
