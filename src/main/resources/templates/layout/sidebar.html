@@ -1,26 +1,58 @@
 <div th:fragment="sidebar">
-<aside class="w-64 glass h-screen p-4 hidden md:block">
 
-    <h2 class="font-bold text-lg mb-4">Menu</h2>
+<aside class="h-full bg-white border-r shadow-sm flex flex-col p-4">
 
-    <ul class="space-y-2">
+    <!-- TITLE -->
+    <h2 class="text-lg font-bold mb-6 text-gray-700">
+        Menu
+    </h2>
 
-        <li><a href="/crops"
-               class="block p-2 rounded hover:bg-green-100 transition">
-               🌾 Crops
-        </a></li>
+    <!-- MENU -->
+    <nav class="space-y-2 text-sm font-medium">
 
-        <li><a href="/orders/my"
-               class="block p-2 rounded hover:bg-green-100 transition">
-               📦 Orders
-        </a></li>
+        <!-- CROPS -->
+        <a href="/crops"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
 
-        <li><a href="/crops/add"
-               class="block p-2 rounded hover:bg-green-100 transition">
-               ➕ Add Crop
-        </a></li>
+            <span>🌾</span>
+            <span>Crops</span>
+        </a>
 
-    </ul>
+        <!-- ORDERS -->
+        <a href="/orders/my"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+
+            <span>📦</span>
+            <span>Orders</span>
+        </a>
+
+        <!-- ADD CROP -->
+        <a href="/crops/add"
+           th:classappend="${#httpServletRequest.requestURI.contains('/add')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+
+            <span>➕</span>
+            <span>Add Crop</span>
+        </a>
+
+        <!-- DASHBOARD -->
+        <a href="/dashboard"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/dashboard')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+
+            <span>📊</span>
+            <span>Dashboard</span>
+        </a>
+
+    </nav>
+
+    <!-- FOOTER -->
+    <div class="mt-auto pt-6 border-t text-xs text-gray-400 text-center">
+        AgroLink v1.0
+    </div>
 
 </aside>
+
 </div>
