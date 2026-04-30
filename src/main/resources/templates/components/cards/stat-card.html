@@ -1,0 +1,14 @@
+<div th:fragment="statCard(title, value, color)">
+
+    <div class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition">
+
+        <p class="text-gray-500 text-sm" th:text="${title}"></p>
+
+        <h2 class="text-2xl font-bold mt-2"
+            th:text="${value}"
+            th:classappend="' text-' + ${color} + '-600'">
+        </h2>
+
+    </div>
+
+</div>
