@@ -1,0 +1,58 @@
+<div th:fragment="cropCard(crop)">
+
+    <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group">
+
+        <!-- IMAGE -->
+        <div class="overflow-hidden h-40">
+            <img th:src="@{'/uploads/' + ${crop.imageUrl}}"
+                 class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="p-4">
+
+            <!-- TITLE -->
+            <h2 class="text-lg font-semibold text-gray-800"
+                th:text="${crop.name}"></h2>
+
+            <!-- LOCATION -->
+            <p class="text-sm text-gray-500"
+               th:text="${crop.location}"></p>
+
+            <!-- PRICE + ACTION -->
+            <div class="flex justify-between items-center mt-4">
+
+                <span class="text-green-600 font-bold text-lg"
+                      th:text="'$' + ${crop.price}"></span>
+
+                <!-- BUY FORM -->
+                <form th:action="@{/orders/place}" method="post"
+                      x-data="{ qty: 1 }"
+                      class="flex items-center gap-2">
+
+                    <input type="hidden"
+                           name="cropId"
+                           th:value="${crop.id}"/>
+
+                    <input type="number"
+                           name="quantity"
+                           x-model="qty"
+                           min="1"
+                           class="w-14 text-center border rounded-md text-sm"/>
+
+                    <button
+                        @click="$dispatch('notify', {msg: 'Added to order'})"
+                        class="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition">
+
+                        Buy
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
