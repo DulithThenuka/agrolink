@@ -1,0 +1,13 @@
+<div th:fragment="content">
+
+<h1 class="text-2xl font-bold mb-6">Available Crops</h1>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+    <div th:each="crop : ${crops.content}"
+         th:replace="components/cards/crop-card :: cropCard(${crop})">
+    </div>
+
+</div>
+
+</div>
