@@ -3,31 +3,40 @@
     <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group">
 
         <!-- IMAGE -->
-        <div class="overflow-hidden h-40">
+        <div class="h-44 overflow-hidden">
             <img th:src="@{'/uploads/' + ${crop.imageUrl}}"
+                 alt="Crop Image"
                  class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>
         </div>
 
         <!-- CONTENT -->
         <div class="p-4">
 
-            <!-- TITLE -->
+            <!-- NAME -->
             <h2 class="text-lg font-semibold text-gray-800"
                 th:text="${crop.name}"></h2>
 
-            <!-- LOCATION -->
-            <p class="text-sm text-gray-500"
-               th:text="${crop.location}"></p>
+            <!-- CATEGORY + LOCATION -->
+            <p class="text-sm text-gray-500 mt-1">
+                <span th:text="${crop.category}"></span> •
+                <span th:text="${crop.location}"></span>
+            </p>
 
-            <!-- PRICE + ACTION -->
+            <!-- PRICE -->
+            <div class="mt-3 text-green-600 font-bold text-lg"
+                 th:text="'$' + ${crop.price}">
+            </div>
+
+            <!-- QUANTITY -->
+            <p class="text-xs text-gray-400 mt-1"
+               th:text="'Available: ' + ${crop.quantity}">
+            </p>
+
+            <!-- ACTIONS -->
             <div class="flex justify-between items-center mt-4">
 
-                <span class="text-green-600 font-bold text-lg"
-                      th:text="'$' + ${crop.price}"></span>
-
-                <!-- BUY FORM -->
+                <!-- BUY -->
                 <form th:action="@{/orders/place}" method="post"
-                      x-data="{ qty: 1 }"
                       class="flex items-center gap-2">
 
                     <input type="hidden"
@@ -36,18 +45,27 @@
 
                     <input type="number"
                            name="quantity"
-                           x-model="qty"
+                           value="1"
                            min="1"
                            class="w-14 text-center border rounded-md text-sm"/>
 
-                    <button
-                        @click="$dispatch('notify', {msg: 'Added to order'})"
-                        class="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition">
-
+                    <button type="submit"
+                            class="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition">
                         Buy
                     </button>
 
                 </form>
+
+                <!-- DELETE (ONLY FOR OWNER / FARMER) -->
+                <div th:if="${#authorization.expression('hasRole(''FARMER'')')}">
+
+                    <div th:replace="components/buttons/danger :: dangerConfirm(
+                        'Delete',
+                        @{/crops/delete/{id}(id=${crop.id})},
+                        ${crop.id}
+                    )"></div>
+
+                </div>
 
             </div>
 
