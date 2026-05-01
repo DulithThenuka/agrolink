@@ -1,18 +1,20 @@
-<div th:fragment="table">
+<div th:fragment="table(headers)">
 
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
 
         <table class="w-full text-sm">
 
+            <!-- HEADER -->
             <thead class="bg-gray-50 text-gray-600 text-left">
                 <tr>
-                    <th class="px-4 py-3">Crop</th>
-                    <th class="px-4 py-3">Quantity</th>
-                    <th class="px-4 py-3">Total</th>
-                    <th class="px-4 py-3">Status</th>
+                    <th th:each="header : ${headers}"
+                        class="px-4 py-3 font-medium"
+                        th:text="${header}">
+                    </th>
                 </tr>
             </thead>
 
+            <!-- BODY SLOT -->
             <tbody>
                 <th:block th:replace="${content}"></th:block>
             </tbody>
