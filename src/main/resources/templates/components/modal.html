@@ -1,0 +1,49 @@
+<div th:fragment="modal(id, title)">
+
+    <div x-data="{ open: false }">
+
+        <!-- TRIGGER SLOT -->
+        <div @click="open = true">
+            <th:block th:replace="${trigger}"></th:block>
+        </div>
+
+        <!-- BACKDROP -->
+        <div x-show="open"
+             x-transition
+             class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+
+            <!-- MODAL BOX -->
+            <div @click.outside="open = false"
+                 class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate__animated animate__fadeInDown">
+
+                <!-- HEADER -->
+                <div class="flex justify-between items-center mb-4">
+
+                    <h2 class="text-lg font-semibold text-gray-800"
+                        th:text="${title}">
+                    </h2>
+
+                    <button @click="open = false"
+                            class="text-gray-500 hover:text-gray-700 text-xl">
+                        &times;
+                    </button>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="text-sm text-gray-600 mb-4">
+                    <th:block th:replace="${content}"></th:block>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="flex justify-end gap-3">
+                    <th:block th:replace="${actions}"></th:block>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
