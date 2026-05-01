@@ -1,10 +1,31 @@
-<div th:fragment="empty(message)">
+<div th:fragment="empty(title, message, actionText=null, actionLink=null)">
 
-    <div class="text-center py-10 text-gray-500">
+    <div class="flex flex-col items-center justify-center text-center py-12 px-4">
 
-        <div class="text-4xl mb-2">📭</div>
+        <!-- ICON -->
+        <div class="text-5xl mb-4">
+            📭
+        </div>
 
-        <p th:text="${message}"></p>
+        <!-- TITLE -->
+        <h2 class="text-lg font-semibold text-gray-700"
+            th:text="${title}">
+        </h2>
+
+        <!-- MESSAGE -->
+        <p class="text-sm text-gray-500 mt-2 max-w-sm"
+           th:text="${message}">
+        </p>
+
+        <!-- OPTIONAL ACTION BUTTON -->
+        <a th:if="${actionText != null}"
+           th:href="${actionLink}"
+           class="mt-5 inline-block px-4 py-2 rounded-lg bg-green-600 text-white
+                  hover:bg-green-700 transition">
+
+            <span th:text="${actionText}"></span>
+
+        </a>
 
     </div>
 
