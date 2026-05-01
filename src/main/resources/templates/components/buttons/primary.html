@@ -1,0 +1,33 @@
+<div th:fragment="primary(text, type='button', loading=false)">
+
+    <button th:type="${type}"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+                   bg-green-600 text-white font-medium
+                   hover:bg-green-700 active:scale-95
+                   transition disabled:opacity-50 disabled:cursor-not-allowed"
+
+            th:attr="disabled=${loading}">
+
+        <!-- LOADING SPINNER -->
+        <svg th:if="${loading}"
+             class="animate-spin h-4 w-4"
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24">
+
+            <circle class="opacity-25"
+                    cx="12" cy="12" r="10"
+                    stroke="currentColor" stroke-width="4"></circle>
+
+            <path class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8z"></path>
+
+        </svg>
+
+        <!-- TEXT -->
+        <span th:text="${text}"></span>
+
+    </button>
+
+</div>
