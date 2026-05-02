@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Page Not Found - AgroLink</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+
+    <div class="text-center px-6">
+
+        <!-- BIG 404 -->
+        <h1 class="text-6xl font-bold text-green-600 mb-4">
+            404
+        </h1>
+
+        <!-- TITLE -->
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">
+            Page not found
+        </h2>
+
+        <!-- MESSAGE -->
+        <p class="text-gray-500 mb-6 max-w-md mx-auto">
+            The page you are looking for doesn’t exist or has been moved.
+        </p>
+
+        <!-- ACTIONS -->
+        <div class="flex justify-center gap-4">
+
+            <a href="/"
+               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                Go Home
+            </a>
+
+            <a href="/crops"
+               class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition">
+                Browse Crops
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
