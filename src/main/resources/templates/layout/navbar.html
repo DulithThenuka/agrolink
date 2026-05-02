@@ -1,28 +1,32 @@
 <div th:fragment="navbar">
 
 <nav x-data="{ open: false, userMenu: false }"
-     class="glass shadow px-6 py-3 flex justify-between items-center">
+     class="glass sticky top-0 z-50 shadow px-6 py-3 flex justify-between items-center">
 
     <!-- LOGO -->
-    <div class="text-xl font-bold text-green-600 flex items-center gap-2">
+    <a href="/"
+       class="text-xl font-bold text-green-600 flex items-center gap-2">
         🌱 <span>AgroLink</span>
-    </div>
+    </a>
 
     <!-- DESKTOP MENU -->
     <div class="hidden md:flex items-center space-x-8 font-medium">
 
         <a href="/crops"
-           class="hover:text-green-600 transition duration-200">
+           class="hover:text-green-600 transition"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')} ? ' text-green-600 font-semibold'">
             Crops
         </a>
 
         <a href="/orders/my"
-           class="hover:text-green-600 transition duration-200">
+           class="hover:text-green-600 transition"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')} ? ' text-green-600 font-semibold'">
             Orders
         </a>
 
         <a href="/dashboard"
-           class="hover:text-green-600 transition duration-200">
+           class="hover:text-green-600 transition"
+           th:classappend="${#httpServletRequest.requestURI.startsWith('/dashboard')} ? ' text-green-600 font-semibold'">
             Dashboard
         </a>
 
@@ -32,7 +36,11 @@
             <button @click="userMenu = !userMenu"
                     class="flex items-center gap-2 px-3 py-2 rounded hover:bg-green-50 transition">
 
-                <span class="text-sm">Account</span>
+                <!-- USER EMAIL -->
+                <span class="text-sm"
+                      th:text="${#authentication.name}">
+                    User
+                </span>
 
                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                      viewBox="0 0 24 24">
@@ -43,20 +51,24 @@
 
             </button>
 
+            <!-- DROPDOWN -->
             <div x-show="userMenu"
                  @click.outside="userMenu = false"
                  x-transition
-                 class="absolute right-0 mt-2 w-40 bg-white rounded shadow-lg border">
+                 class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border z-50">
 
                 <a href="/profile"
                    class="block px-4 py-2 hover:bg-gray-100">
                     Profile
                 </a>
 
-                <a href="/auth/login"
-                   class="block px-4 py-2 hover:bg-gray-100 text-red-500">
-                    Logout
-                </a>
+                <!-- LOGOUT (POST) -->
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit"
+                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500">
+                        Logout
+                    </button>
+                </form>
 
             </div>
 
@@ -77,25 +89,32 @@
 
     </button>
 
-    <!-- MOBILE MENU -->
-    <div x-show="open"
-         x-transition
-         class="absolute top-16 left-0 w-full bg-white shadow-md md:hidden">
-
-        <a href="/crops" class="block px-6 py-3 border-b hover:bg-gray-100">
-            Crops
-        </a>
-
-        <a href="/orders/my" class="block px-6 py-3 border-b hover:bg-gray-100">
-            Orders
-        </a>
-
-        <a href="/dashboard" class="block px-6 py-3 hover:bg-gray-100">
-            Dashboard
-        </a>
-
-    </div>
-
 </nav>
+
+<!-- MOBILE MENU -->
+<div x-show="open"
+     x-transition
+     class="md:hidden bg-white shadow-md border-t">
+
+    <a href="/crops" class="block px-6 py-3 border-b hover:bg-gray-100">
+        Crops
+    </a>
+
+    <a href="/orders/my" class="block px-6 py-3 border-b hover:bg-gray-100">
+        Orders
+    </a>
+
+    <a href="/dashboard" class="block px-6 py-3 hover:bg-gray-100">
+        Dashboard
+    </a>
+
+    <!-- MOBILE LOGOUT -->
+    <form th:action="@{/logout}" method="post">
+        <button class="w-full text-left px-6 py-3 text-red-500 hover:bg-gray-100">
+            Logout
+        </button>
+    </form>
+
+</div>
 
 </div>
