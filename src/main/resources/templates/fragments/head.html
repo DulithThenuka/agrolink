@@ -1,0 +1,51 @@
+<div th:fragment="head(title)">
+
+    <!-- META -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- TITLE -->
+    <title th:text="${title}">AgroLink</title>
+
+    <!-- TAILWIND -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ALPINE -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+
+    <!-- GOOGLE FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+          rel="stylesheet">
+
+    <!-- GLOBAL STYLES -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Glass UI */
+        .glass {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Buttons */
+        .btn {
+            @apply px-4 py-2 rounded-lg transition;
+        }
+
+        .btn-primary {
+            @apply bg-green-600 text-white hover:bg-green-700;
+        }
+
+        .btn-secondary {
+            @apply border border-gray-300 hover:bg-gray-100;
+        }
+
+        /* Card */
+        .card {
+            @apply bg-white rounded-xl shadow-md hover:shadow-lg transition p-5;
+        }
+    </style>
+
+</div>
