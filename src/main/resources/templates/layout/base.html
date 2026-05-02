@@ -1,41 +1,56 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>AgroLink</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs" defer></script>
+<!-- HEAD -->
+<head th:replace="fragments/head :: head(${title})"></head>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<body class="bg-gray-100">
 
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-
-        .glass {
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(12px);
-        }
-    </style>
-</head>
-
-<body class="bg-gray-50 min-h-screen flex flex-col">
-
-<!-- NAVBAR -->
+<!-- ================== NAVBAR ================== -->
 <div th:replace="layout/navbar :: navbar"></div>
 
-<div class="flex flex-1">
+<div class="flex min-h-screen">
 
-    <!-- SIDEBAR -->
-    <div class="hidden md:block w-64">
-        <div th:replace="layout/sidebar :: sidebar"></div>
-    </div>
+    <!-- ================== SIDEBAR ================== -->
+    <div th:replace="layout/sidebar :: sidebar"></div>
 
-    <!-- CONTENT -->
+    <!-- ================== MAIN CONTENT ================== -->
     <main class="flex-1 p-6">
+
+        <!-- PAGE CONTENT -->
         <div th:replace="${content}"></div>
+
     </main>
 
 </div>
+
+<!-- ================== TOAST SYSTEM ================== -->
+<div x-data="toastSystem()"
+     x-init="init()"
+     class="fixed top-5 right-5 space-y-3 z-50">
+
+    <template x-for="toast in toasts" :key="toast.id">
+
+        <div x-show="toast.show"
+             x-transition
+             class="flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium min-w-[250px]"
+             :class="toastClasses(toast.type)">
+
+            <span x-text="toast.icon"></span>
+            <span x-text="toast.message" class="flex-1"></span>
+
+            <button @click="remove(toast.id)" class="text-lg">
+                &times;
+            </button>
+
+        </div>
+
+    </template>
+
+</div>
+
+<!-- ================== SCRIPTS ================== -->
+<div th:replace="fragments/scripts :: scripts"></div>
 
 </body>
 </html>
