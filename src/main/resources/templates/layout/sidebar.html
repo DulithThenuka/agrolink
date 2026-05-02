@@ -1,58 +1,104 @@
 <div th:fragment="sidebar">
 
-<aside class="h-full bg-white border-r shadow-sm flex flex-col p-4">
+<div x-data="{ open: true, mobileOpen: false }" class="flex">
 
-    <!-- TITLE -->
-    <h2 class="text-lg font-bold mb-6 text-gray-700">
-        Menu
-    </h2>
-
-    <!-- MENU -->
-    <nav class="space-y-2 text-sm font-medium">
-
-        <!-- CROPS -->
-        <a href="/crops"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
-           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-
-            <span>🌾</span>
-            <span>Crops</span>
-        </a>
-
-        <!-- ORDERS -->
-        <a href="/orders/my"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
-           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-
-            <span>📦</span>
-            <span>Orders</span>
-        </a>
-
-        <!-- ADD CROP -->
-        <a href="/crops/add"
-           th:classappend="${#httpServletRequest.requestURI.contains('/add')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
-           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-
-            <span>➕</span>
-            <span>Add Crop</span>
-        </a>
-
-        <!-- DASHBOARD -->
-        <a href="/dashboard"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/dashboard')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
-           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-
-            <span>📊</span>
-            <span>Dashboard</span>
-        </a>
-
-    </nav>
-
-    <!-- FOOTER -->
-    <div class="mt-auto pt-6 border-t text-xs text-gray-400 text-center">
-        AgroLink v1.0
+    <!-- ================== MOBILE OVERLAY ================== -->
+    <div x-show="mobileOpen"
+         @click="mobileOpen = false"
+         class="fixed inset-0 bg-black bg-opacity-40 z-40 md:hidden">
     </div>
 
-</aside>
+    <!-- ================== SIDEBAR ================== -->
+    <aside
+        :class="open ? 'w-64' : 'w-20'"
+        class="hidden md:flex flex-col h-screen bg-white border-r shadow-sm transition-all duration-300 z-50">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between px-4 py-4">
+
+            <h2 x-show="open"
+                class="text-lg font-bold text-gray-700">
+                Menu
+            </h2>
+
+            <!-- COLLAPSE BUTTON -->
+            <button @click="open = !open"
+                    class="text-gray-500 hover:text-gray-700">
+                <span x-show="open">◀</span>
+                <span x-show="!open">▶</span>
+            </button>
+
+        </div>
+
+        <!-- MENU -->
+        <nav class="flex-1 px-2 space-y-2 text-sm font-medium">
+
+            <!-- CROPS -->
+            <a href="/crops"
+               th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+
+                <span>🌾</span>
+                <span x-show="open">Crops</span>
+            </a>
+
+            <!-- ORDERS -->
+            <a href="/orders/my"
+               th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+
+                <span>📦</span>
+                <span x-show="open">Orders</span>
+            </a>
+
+            <!-- ADD CROP -->
+            <a href="/crops/add"
+               th:classappend="${#httpServletRequest.requestURI.contains('/add')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+
+                <span>➕</span>
+                <span x-show="open">Add Crop</span>
+            </a>
+
+            <!-- DASHBOARD -->
+            <a href="/dashboard"
+               th:classappend="${#httpServletRequest.requestURI.startsWith('/dashboard')} ? ' bg-green-100 text-green-700' : ' text-gray-600'"
+               class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
+
+                <span>📊</span>
+                <span x-show="open">Dashboard</span>
+            </a>
+
+        </nav>
+
+        <!-- FOOTER -->
+        <div class="px-4 py-4 border-t text-xs text-gray-400 text-center"
+             x-show="open">
+            AgroLink v1.0
+        </div>
+
+    </aside>
+
+    <!-- ================== MOBILE SIDEBAR ================== -->
+    <aside x-show="mobileOpen"
+           x-transition
+           class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 md:hidden">
+
+        <div class="p-4 font-bold text-gray-700">
+            Menu
+        </div>
+
+        <nav class="px-4 space-y-2">
+
+            <a href="/crops" class="block py-2 hover:text-green-600">Crops</a>
+            <a href="/orders/my" class="block py-2 hover:text-green-600">Orders</a>
+            <a href="/crops/add" class="block py-2 hover:text-green-600">Add Crop</a>
+            <a href="/dashboard" class="block py-2 hover:text-green-600">Dashboard</a>
+
+        </nav>
+
+    </aside>
+
+</div>
 
 </div>
