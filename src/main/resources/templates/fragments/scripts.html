@@ -1,0 +1,69 @@
+<div th:fragment="scripts">
+
+    <!-- ALPINE (if not already in head) -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
+
+    <!-- ================== TOAST SYSTEM ================== -->
+    <script>
+        function toastSystem() {
+            return {
+                toasts: [],
+
+                init() {
+                    window.addEventListener('toast', (e) => {
+                        this.add(e.detail.message, e.detail.type);
+                    });
+                },
+
+                add(message, type = 'success') {
+
+                    const id = Date.now();
+
+                    const icons = {
+                        success: '✅',
+                        error: '❌',
+                        warning: '⚠️',
+                        info: 'ℹ️'
+                    };
+
+                    this.toasts.push({
+                        id,
+                        message,
+                        type,
+                        icon: icons[type] || 'ℹ️',
+                        show: true
+                    });
+
+                    setTimeout(() => this.remove(id), 3000);
+                },
+
+                remove(id) {
+                    this.toasts = this.toasts.filter(t => t.id !== id);
+                },
+
+                toastClasses(type) {
+                    return {
+                        'bg-green-600 text-white': type === 'success',
+                        'bg-red-600 text-white': type === 'error',
+                        'bg-yellow-500 text-white': type === 'warning',
+                        'bg-blue-600 text-white': type === 'info'
+                    };
+                }
+            }
+        }
+    </script>
+
+    <!-- ================== GLOBAL HELPERS ================== -->
+    <script>
+        // Confirm dialog helper (optional)
+        function confirmAction(message = "Are you sure?") {
+            return confirm(message);
+        }
+
+        // Format currency (optional)
+        function formatCurrency(value) {
+            return '$' + parseFloat(value).toFixed(2);
+        }
+    </script>
+
+</div>
