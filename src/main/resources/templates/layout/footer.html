@@ -1,0 +1,47 @@
+<div th:fragment="footer">
+
+    <footer class="mt-10 bg-white border-t">
+
+        <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+
+            <!-- BRAND -->
+            <div class="text-gray-600 text-sm">
+                © <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span>
+                AgroLink. All rights reserved.
+            </div>
+
+            <!-- LINKS -->
+            <div class="flex gap-6 text-sm text-gray-500">
+
+                <a href="/"
+                   class="hover:text-green-600 transition">
+                    Home
+                </a>
+
+                <a href="/crops"
+                   class="hover:text-green-600 transition">
+                    Crops
+                </a>
+
+                <a href="/orders/my"
+                   class="hover:text-green-600 transition">
+                    Orders
+                </a>
+
+                <a href="/dashboard"
+                   class="hover:text-green-600 transition">
+                    Dashboard
+                </a>
+
+            </div>
+
+            <!-- EXTRA -->
+            <div class="text-xs text-gray-400">
+                Built with ❤️ using Spring Boot & Thymeleaf
+            </div>
+
+        </div>
+
+    </footer>
+
+</div>
