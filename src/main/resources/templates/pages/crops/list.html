@@ -1,13 +1,113 @@
-<div th:fragment="content">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 
-<h1 class="text-2xl font-bold mb-6">Available Crops</h1>
+<head th:replace="fragments/head :: head('Crops')"></head>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+<body>
 
-    <div th:each="crop : ${crops.content}"
-         th:replace="components/cards/crop-card :: cropCard(${crop})">
+<div th:replace="layout/base :: *"
+     th:with="title='Crops', content='pages/crops/list :: content'"></div>
+
+<!-- ================== CONTENT ================== -->
+<div th:fragment="content" class="max-w-7xl mx-auto">
+
+    <!-- ================== HEADER ================== -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+
+        <h1 class="text-2xl font-bold text-gray-800">
+            Available Crops 🌾
+        </h1>
+
+        <!-- SEARCH -->
+        <form method="get" class="flex gap-2">
+
+            <input type="text"
+                   name="keyword"
+                   th:value="${keyword}"
+                   placeholder="Search crops..."
+                   class="px-3 py-2 border rounded-lg w-56"/>
+
+            <button type="submit"
+                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                Search
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- ================== FILTERS ================== -->
+    <form method="get"
+          class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+
+        <input type="text" name="category" th:value="${category}"
+               placeholder="Category"
+               class="px-3 py-2 border rounded-lg"/>
+
+        <input type="text" name="location" th:value="${location}"
+               placeholder="Location"
+               class="px-3 py-2 border rounded-lg"/>
+
+        <input type="number" name="minPrice" th:value="${minPrice}"
+               placeholder="Min Price"
+               class="px-3 py-2 border rounded-lg"/>
+
+        <input type="number" name="maxPrice" th:value="${maxPrice}"
+               placeholder="Max Price"
+               class="px-3 py-2 border rounded-lg"/>
+
+        <button type="submit"
+                class="bg-gray-800 text-white rounded-lg hover:bg-gray-900">
+            Filter
+        </button>
+
+    </form>
+
+    <!-- ================== EMPTY STATE ================== -->
+    <div th:if="${#lists.isEmpty(crops.content)}">
+        <div th:replace="components/feedback/empty-state :: empty(
+            'No Crops Found',
+            'Try adjusting your search or filters.',
+            'Reset',
+            @{/crops}
+        )"></div>
+    </div>
+
+    <!-- ================== GRID ================== -->
+    <div th:unless="${#lists.isEmpty(crops.content)}"
+         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <div th:each="crop : ${crops.content}"
+             th:replace="components/cards/crop-card :: cropCard(${crop})">
+        </div>
+
+    </div>
+
+    <!-- ================== PAGINATION ================== -->
+    <div class="flex justify-center mt-8 gap-2">
+
+        <!-- PREVIOUS -->
+        <a th:if="${crops.hasPrevious()}"
+           th:href="@{/crops(page=${currentPage - 1})}"
+           class="px-3 py-1 border rounded hover:bg-gray-100">
+            Prev
+        </a>
+
+        <!-- CURRENT PAGE -->
+        <span class="px-3 py-1 bg-green-600 text-white rounded"
+              th:text="${currentPage + 1}">
+        </span>
+
+        <!-- NEXT -->
+        <a th:if="${crops.hasNext()}"
+           th:href="@{/crops(page=${currentPage + 1})}"
+           class="px-3 py-1 border rounded hover:bg-gray-100">
+            Next
+        </a>
+
     </div>
 
 </div>
 
-</div>
+</body>
+</html>
