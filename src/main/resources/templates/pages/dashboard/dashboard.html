@@ -1,120 +1,140 @@
-<div th:fragment="content">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 
-<!-- HEADER -->
-<div class="flex justify-between items-center mb-6">
+<head th:replace="fragments/head :: head('Dashboard')"></head>
 
-    <h1 class="text-2xl font-bold text-gray-800">
-        Dashboard
-    </h1>
+<body>
 
-    <div class="text-sm text-gray-500">
-        Welcome back 👋
+<!-- USE BASE LAYOUT -->
+<div th:replace="layout/base :: *"
+     th:with="title='Dashboard', content='pages/dashboard/dashboard :: content'">
+</div>
+
+<!-- ================== CONTENT ================== -->
+<div th:fragment="content" class="max-w-7xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-6">
+
+        <h1 class="text-2xl font-bold text-gray-800">
+            Dashboard
+        </h1>
+
+        <div class="text-sm text-gray-500">
+            Welcome back 👋
+        </div>
+
+    </div>
+
+    <!-- ================= STATS ================= -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+        <div th:replace="components/cards/stat-card :: statCard('Users', ${dashboard.totalUsers}, 'green')"></div>
+
+        <div th:replace="components/cards/stat-card :: statCard('Crops', ${dashboard.totalCrops}, 'blue')"></div>
+
+        <div th:replace="components/cards/stat-card :: statCard('Orders', ${dashboard.totalOrders}, 'purple')"></div>
+
+    </div>
+
+    <!-- ================= QUICK ACTIONS ================= -->
+    <div class="bg-white rounded-xl shadow-md p-5 mb-8">
+
+        <h2 class="font-semibold text-gray-700 mb-4">Quick Actions</h2>
+
+        <div class="flex flex-wrap gap-4">
+
+            <a href="/crops/add"
+               class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                ➕ Add Crop
+            </a>
+
+            <a href="/orders/my"
+               class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                📦 View Orders
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- ================= RECENT ORDERS ================= -->
+    <div class="bg-white rounded-xl shadow-md p-5">
+
+        <div class="flex justify-between items-center mb-4">
+
+            <h2 class="font-semibold text-gray-700">
+                Recent Orders
+            </h2>
+
+            <a href="/orders/my"
+               class="text-sm text-green-600 hover:underline">
+                View all
+            </a>
+
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div th:if="${#lists.isEmpty(dashboard.recentOrders)}">
+            <div th:replace="components/feedback/empty-state :: empty(
+                'No Orders Yet',
+                'Orders will appear here once users start buying.',
+                'Browse Crops',
+                @{/crops}
+            )"></div>
+        </div>
+
+        <!-- TABLE -->
+        <div th:unless="${#lists.isEmpty(dashboard.recentOrders)}"
+             class="overflow-x-auto">
+
+            <table class="w-full text-sm">
+
+                <thead>
+                    <tr class="text-left text-gray-500 border-b">
+                        <th class="py-2">Crop</th>
+                        <th>Buyer</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr th:each="order : ${dashboard.recentOrders}"
+                        class="border-b hover:bg-gray-50 transition">
+
+                        <td class="py-2 font-medium"
+                            th:text="${order.cropName}"></td>
+
+                        <td th:text="${order.buyerEmail}"></td>
+
+                        <td th:text="${order.quantity}"></td>
+
+                        <td>
+                            <span class="px-2 py-1 text-xs rounded-full"
+                                  th:text="${order.status}"
+                                  th:classappend="
+                                    ${order.status == 'PENDING'} ? ' bg-yellow-100 text-yellow-700' :
+                                    ${order.status == 'CONFIRMED'} ? ' bg-blue-100 text-blue-700' :
+                                    ${order.status == 'DELIVERED'} ? ' bg-green-100 text-green-700' :
+                                    ${order.status == 'CANCELLED'} ? ' bg-red-100 text-red-700' :
+                                    ' bg-gray-100 text-gray-700'
+                                  ">
+                            </span>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
     </div>
 
 </div>
 
-<!-- ================= STATS ================= -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-
-    <div th:replace="components/cards/stat-card :: statCard('Users', ${dashboard.totalUsers}, 'green')"></div>
-
-    <div th:replace="components/cards/stat-card :: statCard('Crops', ${dashboard.totalCrops}, 'blue')"></div>
-
-    <div th:replace="components/cards/stat-card :: statCard('Orders', ${dashboard.totalOrders}, 'purple')"></div>
-
-</div>
-
-<!-- ================= QUICK ACTIONS ================= -->
-<div class="bg-white rounded-xl shadow-md p-5 mb-8">
-
-    <h2 class="font-semibold text-gray-700 mb-4">Quick Actions</h2>
-
-    <div class="flex flex-wrap gap-4">
-
-        <a href="/crops/add"
-           class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-            ➕ Add Crop
-        </a>
-
-        <a href="/orders/my"
-           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-            📦 View Orders
-        </a>
-
-    </div>
-
-</div>
-
-<!-- ================= RECENT ORDERS ================= -->
-<div class="bg-white rounded-xl shadow-md p-5">
-
-    <div class="flex justify-between items-center mb-4">
-
-        <h2 class="font-semibold text-gray-700">
-            Recent Orders
-        </h2>
-
-        <a href="/orders/my"
-           class="text-sm text-green-600 hover:underline">
-            View all
-        </a>
-
-    </div>
-
-    <!-- TABLE -->
-    <div th:if="${#lists.isEmpty(dashboard.recentOrders)}"
-         class="text-center text-gray-500 py-6">
-
-        No recent orders yet.
-
-    </div>
-
-    <div th:unless="${#lists.isEmpty(dashboard.recentOrders)}"
-         class="overflow-x-auto">
-
-        <table class="w-full text-sm">
-
-            <thead>
-                <tr class="text-left text-gray-500 border-b">
-                    <th class="py-2">Crop</th>
-                    <th>Buyer</th>
-                    <th>Qty</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-
-            <tbody>
-
-                <tr th:each="order : ${dashboard.recentOrders}"
-                    class="border-b hover:bg-gray-50 transition">
-
-                    <td class="py-2 font-medium"
-                        th:text="${order.cropName}"></td>
-
-                    <td th:text="${order.buyerEmail}"></td>
-
-                    <td th:text="${order.quantity}"></td>
-
-                    <td>
-                        <span class="px-2 py-1 text-xs rounded-full"
-                              th:text="${order.status}"
-                              th:classappend="
-                                ${order.status == 'PENDING'} ? ' bg-yellow-100 text-yellow-700' :
-                                ${order.status == 'CONFIRMED'} ? ' bg-blue-100 text-blue-700' :
-                                ${order.status == 'DELIVERED'} ? ' bg-green-100 text-green-700' :
-                                ' bg-gray-100 text-gray-700'
-                              ">
-                        </span>
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-</div>
+</body>
+</html>
