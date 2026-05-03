@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head('Profile')"></head>
+
+<body>
+
+<div th:replace="layout/base :: *"
+     th:with="title='Profile', content='pages/profile/profile :: content'">
+</div>
+
+<!-- ================== CONTENT ================== -->
+<div th:fragment="content" class="max-w-4xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">
+            My Profile 👤
+        </h1>
+        <p class="text-sm text-gray-500">
+            Manage your account details
+        </p>
+    </div>
+
+    <!-- ================== PROFILE CARD ================== -->
+    <div class="bg-white rounded-xl shadow p-6 flex flex-col md:flex-row gap-6">
+
+        <!-- AVATAR -->
+        <div class="flex justify-center md:justify-start">
+            <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center text-3xl">
+                👤
+            </div>
+        </div>
+
+        <!-- INFO -->
+        <div class="flex-1 space-y-4">
+
+            <!-- NAME -->
+            <div>
+                <p class="text-sm text-gray-500">Name</p>
+                <p class="font-semibold text-gray-800"
+                   th:text="${user.name}"></p>
+            </div>
+
+            <!-- EMAIL -->
+            <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="font-semibold text-gray-800"
+                   th:text="${user.email}"></p>
+            </div>
+
+            <!-- ROLE -->
+            <div>
+                <p class="text-sm text-gray-500">Role</p>
+
+                <span class="px-3 py-1 text-xs rounded-full"
+                      th:text="${user.role}"
+                      th:classappend="
+                        ${user.role.name() == 'ADMIN'} ? ' bg-purple-100 text-purple-700' :
+                        ${user.role.name() == 'FARMER'} ? ' bg-green-100 text-green-700' :
+                        ${user.role.name() == 'BUYER'} ? ' bg-blue-100 text-blue-700' :
+                        ' bg-gray-100 text-gray-700'
+                      ">
+                </span>
+            </div>
+
+            <!-- LOCATION -->
+            <div>
+                <p class="text-sm text-gray-500">Location</p>
+                <p class="font-semibold text-gray-800"
+                   th:text="${user.location != null ? user.location : 'Not set'}"></p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================== ACCOUNT STATUS ================== -->
+    <div class="bg-white rounded-xl shadow p-6 mt-6">
+
+        <h2 class="font-semibold text-gray-700 mb-4">
+            Account Status
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+
+            <div>
+                <p class="text-gray-500">Enabled</p>
+                <p th:text="${user.enabled ? 'Yes' : 'No'}"
+                   th:classappend="${user.enabled} ? ' text-green-600' : ' text-red-500'">
+                </p>
+            </div>
+
+            <div>
+                <p class="text-gray-500">Locked</p>
+                <p th:text="${user.accountNonLocked ? 'No' : 'Yes'}"
+                   th:classappend="${user.accountNonLocked} ? ' text-green-600' : ' text-red-500'">
+                </p>
+            </div>
+
+            <div>
+                <p class="text-gray-500">Account Expired</p>
+                <p th:text="${user.accountNonExpired ? 'No' : 'Yes'}">
+                </p>
+            </div>
+
+            <div>
+                <p class="text-gray-500">Credentials Expired</p>
+                <p th:text="${user.credentialsNonExpired ? 'No' : 'Yes'}">
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================== ACTIONS ================== -->
+    <div class="mt-6 flex justify-between items-center">
+
+        <a href="/dashboard"
+           class="text-gray-500 hover:underline">
+            ← Back to Dashboard
+        </a>
+
+        <!-- FUTURE EDIT BUTTON -->
+        <button class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900">
+            Edit Profile
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+</html>
