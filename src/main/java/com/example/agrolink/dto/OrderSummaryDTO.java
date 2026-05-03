@@ -43,7 +43,15 @@ public final class OrderSummaryDTO {
 
     public OrderSummaryDTO(Object id2, String cropName2, int quantity2, String buyerEmail2, String status2,
             LocalDateTime createdAt2) {
-        //TODO Auto-generated constructor stub
+        this.id = id2 instanceof Long ? (Long) id2 : (id2 != null ? Long.valueOf(id2.toString()) : null);
+        this.cropName = cropName2;
+        this.cropId = null;
+        this.quantity = quantity2;
+        this.buyerEmail = buyerEmail2;
+        this.status = status2;
+        this.statusLabel = null;
+        this.paid = false;
+        this.createdAt = createdAt2;
     }
 
     public Long getId() { return id; }
