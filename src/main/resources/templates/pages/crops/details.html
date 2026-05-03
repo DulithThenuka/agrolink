@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="fragments/head :: head(${crop.name})"></head>
+
+<body>
+
+<div th:replace="layout/base :: *"
+     th:with="title=${crop.name}, content='pages/crops/details :: content'"></div>
+
+<!-- ================== CONTENT ================== -->
+<div th:fragment="content" class="max-w-6xl mx-auto">
+
+    <div class="grid md:grid-cols-2 gap-8">
+
+        <!-- ================== IMAGE ================== -->
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+
+            <img th:src="@{'/uploads/' + ${crop.imageUrl}}"
+                 class="w-full h-[400px] object-cover"/>
+
+        </div>
+
+        <!-- ================== DETAILS ================== -->
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col">
+
+            <!-- NAME -->
+            <h1 class="text-2xl font-bold text-gray-800"
+                th:text="${crop.name}"></h1>
+
+            <!-- CATEGORY + LOCATION -->
+            <p class="text-gray-500 mt-1">
+                <span th:text="${crop.category}"></span> •
+                <span th:text="${crop.location}"></span>
+            </p>
+
+            <!-- PRICE -->
+            <div class="text-3xl font-bold text-green-600 mt-4"
+                 th:text="'$' + ${crop.price}">
+            </div>
+
+            <!-- STOCK -->
+            <div class="mt-2">
+                <span th:if="${crop.quantity > 0}"
+                      class="text-green-600 text-sm">
+                    In Stock (
+                    <span th:text="${crop.quantity}"></span>
+                    )
+                </span>
+
+                <span th:if="${crop.quantity == 0}"
+                      class="text-red-500 text-sm">
+                    Out of Stock
+                </span>
+            </div>
+
+            <!-- DESCRIPTION -->
+            <p class="mt-4 text-gray-600 text-sm"
+               th:text="${crop.description}">
+            </p>
+
+            <!-- ================== BUY SECTION ================== -->
+            <div class="mt-6">
+
+                <form th:action="@{/orders/place}" method="post"
+                      class="flex gap-3 items-center">
+
+                    <input type="hidden" name="cropId"
+                           th:value="${crop.id}"/>
+
+                    <input type="number"
+                           name="quantity"
+                           value="1"
+                           min="1"
+                           th:attr="max=${crop.quantity}"
+                           class="w-20 px-2 py-2 border rounded-lg text-center"/>
+
+                    <button type="submit"
+                            th:disabled="${crop.quantity == 0}"
+                            class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50">
+                        Buy Now
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- ================== FARMER INFO ================== -->
+            <div class="mt-8 pt-4 border-t">
+
+                <h3 class="text-sm font-semibold text-gray-600 mb-2">
+                    Farmer
+                </h3>
+
+                <p class="text-gray-700"
+                   th:text="${crop.farmer.name}"></p>
+
+                <p class="text-xs text-gray-400"
+                   th:text="${crop.farmer.location}"></p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
