@@ -32,7 +32,13 @@ public final class UserDTO {
     }
 
     public UserDTO(Object id2, String name2, String email2, Object role2, String location2) {
-        //TODO Auto-generated constructor stub
+        this.id = id2 instanceof Long ? (Long) id2 : null;
+        this.name = name2;
+        this.email = email2;
+        this.role = role2 instanceof Role ? (Role) role2 : null;
+        this.roleLabel = this.role != null ? this.role.getLabel() : null;
+        this.location = location2;
+        this.enabled = false;
     }
 
     public Long getId() { return id; }
