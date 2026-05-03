@@ -18,7 +18,7 @@ public final class CropDTO {
     private final boolean inStock;
     private final boolean active;
 
-    public CropDTO(Long id, String name, String category, String location, BigDecimal price, int quantity, String imageUrl, String farmerName) {
+    public CropDTO(Long id, String name, String category, String location, BigDecimal price, int quantity, String imageUrl, String farmerName, Long farmerId, boolean active) {
 
         this.id = id;
         this.name = name;
