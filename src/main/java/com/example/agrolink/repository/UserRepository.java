@@ -13,9 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     // ================== AUTH ==================
 
-    Optional<User> findByEmailIgnoreCase(String email);
+    Optional<User> findByEmailIgnoreCase(String email); // ✅ correct
 
-    boolean existsByEmailIgnoreCase(String email);
+    boolean existsByEmailIgnoreCase(String email); // ✅ correct
 
     // ================== ADMIN ==================
 
@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
-    // ================== COMBINED (KEEP MINIMAL) ==================
+    // ================== COMBINED ==================
 
     Page<User> findByRoleAndLocationContainingIgnoreCase(
             Role role,
@@ -37,13 +37,11 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     long countByRole(Role role);
 
-    // ================== OPTIONAL OPTIMIZATION ==================
+    // ================== OPTIONAL ==================
 
     @EntityGraph(attributePaths = {})
     @Query("SELECT u FROM User u")
     Page<User> findAllUsers(Pageable pageable);
 
-    public boolean existsByEmail(String email);
 
-    public Object findByEmail(String normalized);
 }
