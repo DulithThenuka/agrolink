@@ -15,8 +15,8 @@ import lombok.*;
     @Index(name = "idx_user_email", columnList = "email"),
     @Index(name = "idx_user_role", columnList = "role")
 })
-@Getter
-@Setter
+@Getter 
+@Setter 
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -118,68 +118,6 @@ public class User {
             this.email = this.email.toLowerCase().trim();
         }
     }
-
-    public String getPassword() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getRole() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getEmail() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean isCredentialsNonExpired() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean isAccountNonLocked() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean isEnabled() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean isAccountNonExpired() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getId() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setAccountNonLocked(boolean b) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setName(String trim) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setPassword(String encode) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setEmail(String email) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setLocation(String trim) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getName() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getLocation() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setRole(Object resolveRole) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
+
+
