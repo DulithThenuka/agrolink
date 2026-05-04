@@ -1,0 +1,214 @@
+/* ===============================
+   GLOBAL RESET
+================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f9fafb;
+    color: #1f2937;
+}
+
+/* ===============================
+   GLASS EFFECT
+================================= */
+.glass {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* ===============================
+   BUTTONS
+================================= */
+.btn {
+    @apply px-4 py-2 rounded-lg font-medium transition duration-200;
+}
+
+.btn-primary {
+    @apply bg-green-600 text-white hover:bg-green-700 shadow;
+}
+
+.btn-secondary {
+    @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+}
+
+.btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600;
+}
+
+/* ===============================
+   CARD STYLES
+================================= */
+.card {
+    @apply bg-white rounded-xl shadow-md p-5 transition;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* ===============================
+   STAT CARD COLORS
+================================= */
+.stat-green {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: white;
+}
+
+.stat-blue {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+}
+
+.stat-purple {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+}
+
+/* ===============================
+   INPUTS / FORMS
+================================= */
+.input {
+    @apply w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500;
+}
+
+.label {
+    @apply block text-sm font-medium text-gray-600 mb-1;
+}
+
+/* ===============================
+   TABLE
+================================= */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    @apply text-left text-gray-500 text-sm pb-2;
+}
+
+.table td {
+    @apply py-3 border-t;
+}
+
+.table tr:hover {
+    background: #f3f4f6;
+}
+
+/* ===============================
+   STATUS BADGES
+================================= */
+.badge {
+    @apply px-2 py-1 text-xs rounded-full font-medium;
+}
+
+.badge-pending {
+    @apply bg-yellow-100 text-yellow-700;
+}
+
+.badge-confirmed {
+    @apply bg-blue-100 text-blue-700;
+}
+
+.badge-delivered {
+    @apply bg-green-100 text-green-700;
+}
+
+.badge-cancelled {
+    @apply bg-red-100 text-red-700;
+}
+
+/* ===============================
+   SIDEBAR
+================================= */
+.sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg transition;
+}
+
+.sidebar-link:hover {
+    background: #f3f4f6;
+}
+
+.sidebar-active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+/* ===============================
+   ANIMATIONS
+================================= */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===============================
+   LOADER
+================================= */
+.loader {
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #16a34a;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===============================
+   SCROLLBAR
+================================= */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* ===============================
+   UTILITIES
+================================= */
+.shadow-soft {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.hover-scale:hover {
+    transform: scale(1.03);
+}
+
+.transition-fast {
+    transition: all 0.2s ease;
+}
