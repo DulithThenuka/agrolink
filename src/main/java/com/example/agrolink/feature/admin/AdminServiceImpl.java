@@ -8,6 +8,16 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+interface AdminService {
+    AdminDashboardDTO getDashboardData();
+    Page<UserDTO> getAllUsers(Pageable pageable);
+    void lockUser(Long userId);
+    void unlockUser(Long userId);
+    Page<OrderDTO> getAllOrders(Pageable pageable);
+    void deactivateCrop(Long cropId);
+    void restoreCrop(Long cropId);
+}
+
 @Service
 public class AdminServiceImpl implements AdminService {
 
@@ -50,7 +60,7 @@ public class AdminServiceImpl implements AdminService {
                         user.getId(),
                         user.getName(),
                         user.getEmail(),
-                        user.getRole().name(),
+                        user.getRole().toString(),
                         user.getLocation()
                 ));
     }
@@ -71,7 +81,7 @@ public class AdminServiceImpl implements AdminService {
 
     // ================== ORDERS ==================
     public Page<OrderDTO> getAllOrders(Pageable pageable) {
-        return orderRepository.findByOrderByCreatedAtDesc(pageable)
+        return orderRepository.findAll(pageable)
                 .map(order -> new OrderDTO(
                         order.getId(),
                         getCropName(order),
@@ -112,13 +122,13 @@ public class AdminServiceImpl implements AdminService {
 
     private String getCropName(Order order) {
         return (order.getCrop() != null)
-                ? ((UserDTO) order.getCrop()).getName()
+                ? order.getCrop().getName()
                 : "N/A";
     }
 
     private String getBuyerEmail(Order order) {
         return (order.getBuyer() != null)
-                ? ((UserDTO) order.getBuyer()).getEmail()
+                ? order.getBuyer().getEmail()
                 : "N/A";
     }
 
