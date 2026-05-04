@@ -2,6 +2,7 @@ package com.example.agrolink.controller;
 
 import com.example.agrolink.dto.UserDTO;
 import com.example.agrolink.dto.UserRegisterDTO;
+import com.example.agrolink.dto.ApiResponse;
 import com.example.agrolink.service.UserService;
 
 import jakarta.validation.Valid;
@@ -43,7 +44,7 @@ public class UserController {
             logger.warn("Registration failed: {}", ex.getMessage());
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse<>(false, ex.getMessage()));
+                    .body(ApiResponse.error(ex.getMessage()));
         }
     }
 }
