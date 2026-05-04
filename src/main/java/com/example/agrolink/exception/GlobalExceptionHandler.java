@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
 
         logger.warn("Validation failed: {}", errors);
 
-        return new ApiResponse<>(false, "Validation failed", errors);
+        return ApiResponse.error("Validation failed", errors);
     }
 
     // ================== BUSINESS ==================
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
 
         logger.warn("Business error: {}", ex.getMessage());
 
-        return new ApiResponse<>(false, ex.getMessage(), null);
+        return ApiResponse.error(ex.getMessage());
     }
 
     // ================== NOT FOUND ==================
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
         logger.warn("Not found: {}", ex.getMessage());
 
-        return new ApiResponse<>(false, ex.getMessage(), null);
+        return ApiResponse.error(ex.getMessage());
     }
 
     // ================== ACCESS DENIED ==================
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
 
         logger.warn("Access denied: {}", ex.getMessage());
 
-        return new ApiResponse<>(false, "Access denied", null);
+        return ApiResponse.error("Access denied");
     }
 
     // ================== INVALID JSON ==================
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
 
         logger.warn("Invalid JSON request");
 
-        return new ApiResponse<>(false, "Invalid request body", null);
+        return ApiResponse.error("Invalid request body");
     }
 
     // ================== GLOBAL ==================
@@ -87,6 +87,6 @@ public class GlobalExceptionHandler {
 
         logger.error("Unexpected error", ex);
 
-        return new ApiResponse<>(false, "Something went wrong", null);
+        return ApiResponse.error("Something went wrong");
     }
 }
