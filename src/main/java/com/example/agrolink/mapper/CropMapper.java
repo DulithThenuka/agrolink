@@ -25,7 +25,9 @@ public final class CropMapper {
                 crop.getPrice(),
                 crop.getQuantity(),
                 crop.getImageUrl(),
-                getFarmerName(crop)
+                getFarmerName(crop),
+                getFarmerId(crop),
+                crop.isActive()
         );
     }
 
@@ -79,5 +81,13 @@ public final class CropMapper {
         return crop.getFarmer() != null
                 ? crop.getFarmer().getName()
                 : "Unknown";
+    }
+
+    private static Long getFarmerId(Crop crop) {
+        if (crop.getFarmer() == null) {
+            return null;
+        }
+
+        return (Long) crop.getFarmer().getId();
     }
 }
