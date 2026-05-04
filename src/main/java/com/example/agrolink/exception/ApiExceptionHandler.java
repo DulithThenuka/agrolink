@@ -9,13 +9,13 @@ import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     // ================== VALIDATION ==================
 
@@ -81,11 +81,7 @@ public class ApiExceptionHandler {
             String message,
             T data) {
 
-        ApiResponse<T> response = new ApiResponse<>(
-                false,
-                message,
-                data
-        );
+        ApiResponse<T> response = ApiResponse.error(message, data);
 
         return ResponseEntity.status(status).body(response);
     }
