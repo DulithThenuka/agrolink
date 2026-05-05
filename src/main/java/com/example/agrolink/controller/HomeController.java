@@ -48,12 +48,14 @@ public class HomeController {
     // ================== HELPERS ==================
 
     private boolean isAuthenticated(Authentication auth) {
-        return auth != null && auth.isAuthenticated();
+        return auth != null &&
+               auth.isAuthenticated() &&
+               !"anonymousUser".equals(auth.getName());
     }
 
     private boolean hasRole(Authentication auth, Role role) {
         return auth.getAuthorities()
                 .stream()
-                .anyMatch(a -> a.getAuthority().equals(role.getAuthority()));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_" + role.name()));
     }
 }
