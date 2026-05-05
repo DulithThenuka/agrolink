@@ -40,33 +40,26 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-
-                        // Public endpoints
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-
-                        // Role-based access
                         .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/farmer/**", "/farmer/**").hasRole("FARMER")
                         .requestMatchers("/api/buyer/**", "/buyer/**").hasRole("BUYER")
-
-                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
 
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((req, res, e) -> {
-                            res.setStatus(401);
+                            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             res.setContentType("application/json");
                             res.getWriter().write("{\"error\":\"Unauthorized\"}");
                         })
                         .accessDeniedHandler((req, res, e) -> {
-                            res.setStatus(403);
+                            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             res.setContentType("application/json");
                             res.getWriter().write("{\"error\":\"Forbidden\"}");
                         })
                 )
 
-                // JWT filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .build();
