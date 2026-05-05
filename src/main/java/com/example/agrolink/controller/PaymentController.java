@@ -1,6 +1,5 @@
 package com.example.agrolink.controller;
 
-import com.example.agrolink.service.OrderService;
 import com.example.agrolink.service.PaymentService;
 
 import org.slf4j.Logger;
@@ -20,12 +19,9 @@ public class PaymentController {
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
     private final PaymentService paymentService;
-    private final OrderService orderService;
 
-    public PaymentController(PaymentService paymentService,
-                             OrderService orderService) {
+    public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
-        this.orderService = orderService;
     }
 
     // ================== CHECKOUT ==================
@@ -41,12 +37,16 @@ public class PaymentController {
         logger.info("Payment attempt for order {} by {}", orderId, email);
 
         try {
-            // 🔐 Let service handle ownership + validation
             String checkoutUrl = paymentService.createCheckoutSession(orderId, email);
+
+            if (checkoutUrl == null || checkoutUrl.isBlank()) {
+                logger.error("Checkout URL is null");
+                return "redirect:/orders/my?error=true";
+            }
 
             return "redirect:" + checkoutUrl;
 
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception ex) {
             logger.warn("Checkout failed: {}", ex.getMessage());
             return "redirect:/orders/my?error=true";
         }
