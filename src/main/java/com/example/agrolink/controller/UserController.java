@@ -1,23 +1,27 @@
 package com.example.agrolink.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.agrolink.dto.ApiResponse;
 import com.example.agrolink.dto.UserDTO;
 import com.example.agrolink.dto.UserRegisterDTO;
-import com.example.agrolink.dto.ApiResponse;
 import com.example.agrolink.service.UserService;
 
 import jakarta.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
 
@@ -28,23 +32,36 @@ public class UserController {
     // ================== REGISTER ==================
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
+    public ResponseEntity<Object> registerUser(
+            @Valid @RequestBody UserRegisterDTO dto) {
 
         logger.info("API registration request received");
 
         try {
+
             UserDTO user = userService.register(dto);
 
             logger.info("User registered successfully: {}", user.getEmail());
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(user);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(user);
 
         } catch (IllegalArgumentException ex) {
 
             logger.warn("Registration failed: {}", ex.getMessage());
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error(ex.getMessage()));
+
+        } catch (Exception ex) {
+
+            logger.error("Unexpected registration error", ex);
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Internal server error"));
         }
     }
 }
