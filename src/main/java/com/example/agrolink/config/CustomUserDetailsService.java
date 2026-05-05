@@ -65,7 +65,9 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new IllegalStateException("User role is not assigned");
         }
 
+        // ✅ FIX: Assign role properly
         return List.of(
+                new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
         );
     }
 
