@@ -4,7 +4,6 @@ import java.security.Principal;
 
 import com.example.agrolink.dto.CropRequestDTO;
 import com.example.agrolink.service.CropService;
-import com.example.agrolink.service.UserService;
 
 import jakarta.validation.Valid;
 
@@ -27,15 +26,12 @@ public class CropController {
     private static final Logger logger = LoggerFactory.getLogger(CropController.class);
 
     private final CropService cropService;
-    private final UserService userService;
 
     @Value("${app.page.size:5}")
     private int pageSize;
 
-    public CropController(CropService cropService,
-                          UserService userService) {
+    public CropController(CropService cropService) {
         this.cropService = cropService;
-        this.userService = userService;
     }
 
     // ================== LIST CROPS ==================
@@ -106,7 +102,8 @@ public class CropController {
         }
 
         try {
-            cropService.createCrop(dto, principal.getName());
+            // ✅ FIX: pass file to service
+            cropService.createCrop(dto, file, principal.getName());
 
             logger.info("Crop created successfully");
 
@@ -131,7 +128,11 @@ public class CropController {
 
         logger.info("Deleting crop {} by user {}", id, principal.getName());
 
-        cropService.softDelete(id, principal.getName());
+        try {
+            cropService.softDelete(id, principal.getName());
+        } catch (Exception ex) {
+            logger.warn("Delete failed: {}", ex.getMessage());
+        }
 
         return "redirect:/crops";
     }
