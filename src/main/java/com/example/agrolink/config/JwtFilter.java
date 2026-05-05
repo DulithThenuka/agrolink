@@ -37,29 +37,21 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = extractToken(request);
 
-        if (token == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        if (token != null && jwtUtil.isValid(token) && isNotAuthenticated()) {
 
-        try {
-            if (jwtUtil.isValid(token) && isNotAuthenticated()) {
-
+            try {
                 String email = jwtUtil.extractEmail(token);
                 String role = jwtUtil.extractRole(token);
 
-                if (email == null || role == null) {
-                    logger.warn("Invalid JWT payload for request: {}", request.getRequestURI());
-                    filterChain.doFilter(request, response);
-                    return;
+                if (email != null && role != null) {
+                    setAuthentication(email, role, request);
+                } else {
+                    logger.warn("Invalid JWT payload: {}", request.getRequestURI());
                 }
 
-                setAuthentication(email, role, request);
+            } catch (Exception ex) {
+                logger.warn("JWT error [{}]: {}", request.getRequestURI(), ex.getMessage());
             }
-
-        } catch (Exception ex) {
-            logger.warn("JWT authentication failed for [{}]: {}", 
-                    request.getRequestURI(), ex.getMessage());
         }
 
         filterChain.doFilter(request, response);
@@ -70,11 +62,11 @@ public class JwtFilter extends OncePerRequestFilter {
     private String extractToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-            return null;
+        if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
+            return authHeader.substring(BEARER_PREFIX.length()).trim();
         }
 
-        return authHeader.substring(BEARER_PREFIX.length()).trim();
+        return null;
     }
 
     private boolean isNotAuthenticated() {
@@ -99,6 +91,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        logger.debug("JWT authenticated user: {}", email);
+        logger.debug("Authenticated user: {}", email);
     }
 }
