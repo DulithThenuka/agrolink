@@ -72,7 +72,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private String normalizeEmail(String email) {
-        return email.toLowerCase().trim();
+        return email == null ? "" : email.toLowerCase().trim();
     }
 
     private void createAdminUser(String email) {
@@ -84,7 +84,9 @@ public class DataLoader implements CommandLineRunner {
         admin.setEmail(email);
         admin.setPassword(passwordEncoder.encode(adminPassword));
         admin.setRole(Role.ADMIN);
-        admin.setLocation("System");
+
+        // ⚠️ Remove this line if field doesn't exist
+        // admin.setLocation("System");
 
         // Account flags
         admin.setEnabled(true);
