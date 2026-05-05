@@ -31,6 +31,10 @@ public class AdminController {
 
         AdminDashboardDTO dashboard = adminService.getDashboardData();
 
+        if (dashboard == null) {
+        logger.warn("Dashboard data is null");
+    }
+
         model.addAttribute("dashboard", dashboard);
 
         return "admin-dashboard";
