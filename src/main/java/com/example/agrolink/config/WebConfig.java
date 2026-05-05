@@ -58,6 +58,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     private String buildResourceLocation() {
-        return uploadPath.toUri().toString();
+        // ✅ FIX: add file: prefix
+        return "file:" + uploadPath.toString() + "/";
     }
 }
