@@ -3,33 +3,44 @@ package com.example.agrolink.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "orders", indexes = {
-    @Index(name = "idx_order_buyer", columnList = "buyer_id"),
-    @Index(name = "idx_order_created", columnList = "createdAt"),
-    @Index(name = "idx_order_status", columnList = "status")
+        @Index(name = "idx_order_buyer", columnList = "buyer_id"),
+        @Index(name = "idx_order_created", columnList = "createdAt"),
+        @Index(name = "idx_order_status", columnList = "status")
 })
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Min(1)
+    @Min(value = 1, message = "Quantity must be at least 1")
     @Column(nullable = false)
     private int quantity;
 
-    @NotNull
-    @DecimalMin(value = "0.01", message = "Total price must be greater than 0")
+    @NotNull(message = "Total price is required")
+    @DecimalMin(value = "0.01",
+            message = "Total price must be greater than 0")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
@@ -40,7 +51,7 @@ public class Order {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -54,11 +65,20 @@ public class Order {
     @Version
     private Long version;
 
+    // ================== CONSTRUCTORS ==================
+
+    public Order() {
+    }
+
     // ================== LIFECYCLE ==================
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        this.createdAt = now;
+        this.updatedAt = now;
 
         if (this.status == null) {
             this.status = OrderStatus.PENDING;
@@ -73,16 +93,22 @@ public class Order {
     // ================== DOMAIN METHODS ==================
 
     public void markAsConfirmed() {
+
         if (this.status == OrderStatus.CONFIRMED) {
-            return; // idempotent
+            return;
         }
+
         this.status = OrderStatus.CONFIRMED;
     }
 
     public void cancel() {
+
         if (this.status == OrderStatus.CONFIRMED) {
-            throw new IllegalStateException("Cannot cancel a confirmed order");
+            throw new IllegalStateException(
+                    "Cannot cancel a confirmed order"
+            );
         }
+
         this.status = OrderStatus.CANCELLED;
     }
 
@@ -90,47 +116,100 @@ public class Order {
         return this.status == OrderStatus.CONFIRMED;
     }
 
+    // ================== GETTERS ==================
+
+    public Long getId() {
+        return id;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public User getBuyer() {
+        return buyer;
+    }
+
+    public Crop getCrop() {
+        return crop;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    // ================== SETTERS ==================
+
+    public void setQuantity(int quantity) {
+
+        if (quantity < 1) {
+            throw new IllegalArgumentException(
+                    "Quantity must be at least 1"
+            );
+        }
+
+        this.quantity = quantity;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+
+        if (totalPrice == null ||
+                totalPrice.compareTo(BigDecimal.ZERO) <= 0) {
+
+            throw new IllegalArgumentException(
+                    "Total price must be greater than zero"
+            );
+        }
+
+        this.totalPrice = totalPrice;
+    }
+
+    public void setStatus(OrderStatus status) {
+
+        if (status == null) {
+            throw new IllegalArgumentException(
+                    "Status cannot be null"
+            );
+        }
+
+        this.status = status;
+    }
+
     public void setBuyer(User buyer) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        if (buyer == null) {
+            throw new IllegalArgumentException(
+                    "Buyer cannot be null"
+            );
+        }
+
+        this.buyer = buyer;
     }
 
     public void setCrop(Crop crop) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
-    public void setQuantity(Integer quantity) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+        if (crop == null) {
+            throw new IllegalArgumentException(
+                    "Crop cannot be null"
+            );
+        }
 
-    public void setStatus(OrderStatus orderStatus) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getStatus() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setTotalPrice(BigDecimal total) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getBuyer() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getCrop() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getId() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getTotalPrice() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setCreatedAt(LocalDateTime now) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.crop = crop;
     }
 }
