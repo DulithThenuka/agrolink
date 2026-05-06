@@ -41,14 +41,25 @@ public enum Role {
     }
 
     public boolean hasAccessTo(Role requiredRole) {
+
         return getAccessibleRoles().contains(requiredRole);
     }
 
     private Set<Role> getAccessibleRoles() {
-        return switch (this) {
-            case ADMIN -> EnumSet.allOf(Role.class);
-            case FARMER -> EnumSet.of(FARMER);
-            case BUYER -> EnumSet.of(BUYER);
-        };
+
+        switch (this) {
+
+            case ADMIN:
+                return EnumSet.allOf(Role.class);
+
+            case FARMER:
+                return EnumSet.of(FARMER);
+
+            case BUYER:
+                return EnumSet.of(BUYER);
+
+            default:
+                return EnumSet.noneOf(Role.class);
+        }
     }
 }
