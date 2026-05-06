@@ -14,22 +14,32 @@ public class OrderRequestDTO {
     @Max(value = 1000, message = "Quantity cannot exceed 1000")
     private Integer quantity;
 
+    // ================== CONSTRUCTORS ==================
+
+    public OrderRequestDTO() {
+    }
+
     // ================== NORMALIZATION ==================
 
     public void normalize() {
-        // future-proof (e.g., trimming or defaults)
-        if (quantity != null && quantity < 1) {
-            quantity = 1;
-        }
+        // reserved for future normalization logic
     }
 
     // ================== GETTERS & SETTERS ==================
 
-    public Long getCropId() { return cropId; }
+    public Long getCropId() {
+        return cropId;
+    }
 
-    public void setCropId(Long cropId) { this.cropId = cropId; }
+    public void setCropId(Long cropId) {
+        this.cropId = cropId;
+    }
 
-    public Integer getQuantity() { return quantity; }
+    public Integer getQuantity() {
+        return quantity;
+    }
 
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }
