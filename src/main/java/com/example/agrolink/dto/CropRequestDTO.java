@@ -1,8 +1,14 @@
 package com.example.agrolink.dto;
 
-import jakarta.validation.constraints.*;
-
 import java.math.BigDecimal;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class CropRequestDTO {
 
@@ -23,37 +29,72 @@ public class CropRequestDTO {
     @Digits(integer = 8, fraction = 2, message = "Invalid price format")
     private BigDecimal price;
 
+    @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
     @Max(value = 100000, message = "Quantity is too large")
-    private int quantity;
+    private Integer quantity;
+
+    // ================== CONSTRUCTORS ==================
+
+    public CropRequestDTO() {
+    }
 
     // ================== NORMALIZATION ==================
 
     public void normalize() {
-        if (name != null) name = name.trim();
-        if (category != null) category = category.trim();
-        if (location != null) location = location.trim();
+
+        if (name != null) {
+            name = name.trim();
+        }
+
+        if (category != null) {
+            category = category.trim();
+        }
+
+        if (location != null) {
+            location = location.trim();
+        }
     }
 
     // ================== GETTERS & SETTERS ==================
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
 
-    public String getCategory() { return category; }
+    public String getCategory() {
+        return category;
+    }
 
-    public void setCategory(String category) { this.category = category; }
+    public void setCategory(String category) {
+        this.category = category == null ? null : category.trim();
+    }
 
-    public String getLocation() { return location; }
+    public String getLocation() {
+        return location;
+    }
 
-    public void setLocation(String location) { this.location = location; }
+    public void setLocation(String location) {
+        this.location = location == null ? null : location.trim();
+    }
 
-    public BigDecimal getPrice() { return price; }
+    public BigDecimal getPrice() {
+        return price;
+    }
 
-    public void setPrice(BigDecimal price) { this.price = price; }
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
-    public int getQuantity() { return quantity; }
+    public Integer getQuantity() {
+        return quantity;
+    }
 
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }
