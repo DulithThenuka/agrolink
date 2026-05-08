@@ -1,31 +1,47 @@
 package com.example.agrolink.repository;
 
-import com.example.agrolink.entity.Role;
-import com.example.agrolink.entity.User;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.Optional;
+import com.example.agrolink.entity.Role;
+import com.example.agrolink.entity.User;
 
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface UserRepository
+        extends JpaRepository<User, Long>,
+        JpaSpecificationExecutor<User> {
 
     // ================== AUTH ==================
 
-    Optional<User> findByEmailIgnoreCase(String email); // ✅ correct
+    Optional<User> findByEmailIgnoreCase(
+            String email
+    );
 
-    boolean existsByEmailIgnoreCase(String email); // ✅ correct
+    boolean existsByEmailIgnoreCase(
+            String email
+    );
 
     // ================== ADMIN ==================
 
-    Page<User> findByRole(Role role, Pageable pageable);
+    Page<User> findByRole(
+            Role role,
+            Pageable pageable
+    );
 
-    Page<User> findByLocationContainingIgnoreCase(String location, Pageable pageable);
+    Page<User> findByLocationContainingIgnoreCase(
+            String location,
+            Pageable pageable
+    );
 
-    Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<User> findByNameContainingIgnoreCase(
+            String name,
+            Pageable pageable
+    );
 
-    // ================== COMBINED ==================
+    // ================== FILTER ==================
 
     Page<User> findByRoleAndLocationContainingIgnoreCase(
             Role role,
@@ -36,12 +52,4 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     // ================== DASHBOARD ==================
 
     long countByRole(Role role);
-
-    // ================== OPTIONAL ==================
-
-    @EntityGraph(attributePaths = {})
-    @Query("SELECT u FROM User u")
-    Page<User> findAllUsers(Pageable pageable);
-
-
 }
