@@ -1,21 +1,28 @@
 package com.example.agrolink.mapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.example.agrolink.dto.CropDTO;
 import com.example.agrolink.dto.CropRequestDTO;
 import com.example.agrolink.entity.Crop;
 
-import java.util.List;
-
 public final class CropMapper {
 
     private CropMapper() {
-        throw new UnsupportedOperationException("Utility class");
+
+        throw new UnsupportedOperationException(
+                "Utility class"
+        );
     }
 
     // ================== ENTITY → DTO ==================
 
     public static CropDTO toDTO(Crop crop) {
-        if (crop == null) return null;
+
+        if (crop == null) {
+            return null;
+        }
 
         return new CropDTO(
                 crop.getId(),
@@ -31,43 +38,55 @@ public final class CropMapper {
         );
     }
 
-    // ================== LIST MAPPING ==================
+    // ================== LIST ==================
 
-    public static List<CropDTO> toDTOList(List<Crop> crops) {
-        if (crops == null) return List.of();
+    public static List<CropDTO> toDTOList(
+            List<Crop> crops) {
+
+        if (crops == null) {
+            return List.of();
+        }
 
         return crops.stream()
                 .map(CropMapper::toDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     // ================== DTO → ENTITY ==================
 
-    public static Crop toEntity(CropRequestDTO dto) {
-        if (dto == null) return null;
+    public static Crop toEntity(
+            CropRequestDTO dto) {
+
+        if (dto == null) {
+            return null;
+        }
 
         Crop crop = new Crop();
 
         apply(dto, crop);
-
-        // ❗ farmer set in service
-        // ❗ image handled separately
-        // ❗ active flag handled in service
 
         return crop;
     }
 
     // ================== UPDATE ==================
 
-    public static void updateEntity(Crop crop, CropRequestDTO dto) {
-        if (crop == null || dto == null) return;
+    public static void updateEntity(
+            Crop crop,
+            CropRequestDTO dto) {
+
+        if (crop == null || dto == null) {
+            return;
+        }
 
         apply(dto, crop);
     }
 
-    // ================== SHARED LOGIC ==================
+    // ================== SHARED ==================
 
-    private static void apply(CropRequestDTO dto, Crop crop) {
+    private static void apply(
+            CropRequestDTO dto,
+            Crop crop) {
+
         crop.setName(dto.getName());
         crop.setCategory(dto.getCategory());
         crop.setLocation(dto.getLocation());
@@ -75,19 +94,21 @@ public final class CropMapper {
         crop.setQuantity(dto.getQuantity());
     }
 
-    // ================== HELPER ==================
+    // ================== HELPERS ==================
 
-    private static String getFarmerName(Crop crop) {
+    private static String getFarmerName(
+            Crop crop) {
+
         return crop.getFarmer() != null
                 ? crop.getFarmer().getName()
                 : "Unknown";
     }
 
-    private static Long getFarmerId(Crop crop) {
-        if (crop.getFarmer() == null) {
-            return null;
-        }
+    private static Long getFarmerId(
+            Crop crop) {
 
-        return (Long) crop.getFarmer().getId();
+        return crop.getFarmer() != null
+                ? crop.getFarmer().getId()
+                : null;
     }
 }
