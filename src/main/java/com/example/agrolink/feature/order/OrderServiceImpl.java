@@ -1,13 +1,23 @@
 package com.example.agrolink.feature.order;
 
 import com.example.agrolink.dto.OrderDTO;
-import com.example.agrolink.entity.*;
+
+import com.example.agrolink.entity.Crop;
+import com.example.agrolink.entity.Order;
+import com.example.agrolink.entity.OrderStatus;
+import com.example.agrolink.entity.User;
+
 import com.example.agrolink.exception.ResourceNotFoundException;
+
 import com.example.agrolink.mapper.OrderMapper;
-import com.example.agrolink.repository.*;
+
+import com.example.agrolink.repository.CropRepository;
+import com.example.agrolink.repository.OrderRepository;
+import com.example.agrolink.repository.UserRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,145 +34,229 @@ public class OrderServiceImpl implements OrderService {
     public OrderServiceImpl(OrderRepository orderRepository,
                             CropRepository cropRepository,
                             UserRepository userRepository) {
+
         this.orderRepository = orderRepository;
         this.cropRepository = cropRepository;
         this.userRepository = userRepository;
     }
 
     // ================== PLACE ORDER ==================
-    @Override
-    public OrderDTO placeOrder(String email, Long cropId, Integer quantity) {
 
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Invalid quantity");
+    @Override
+    public OrderDTO placeOrder(
+            String buyerEmail,
+            Long cropId,
+            int quantity) {
+
+        if (quantity <= 0) {
+            throw new IllegalArgumentException(
+                    "Invalid quantity"
+            );
         }
 
-        User buyer = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User buyer = userRepository
+                .findByEmailIgnoreCase(buyerEmail)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found"
+                        ));
 
         Crop crop = cropRepository.findById(cropId)
-                .orElseThrow(() -> new ResourceNotFoundException("Crop not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Crop not found"
+                        ));
 
-        // 🔐 prevent self-order
-        if (crop.getFarmer() == null ||
-            crop.getFarmer().getId().equals(buyer.getId())) {
-            throw new IllegalArgumentException("You cannot order your own crop");
+        // Prevent self-order
+
+        if (crop.getFarmer() != null &&
+                crop.getFarmer().getId()
+                        .equals(buyer.getId())) {
+
+            throw new IllegalArgumentException(
+                    "You cannot order your own crop"
+            );
         }
 
-        // 📦 stock validation
-        if (crop.getQuantity() < quantity) {
-            throw new IllegalArgumentException("Not enough stock");
+        // Stock validation
+
+        if (!crop.hasEnoughStock(quantity)) {
+
+            throw new IllegalArgumentException(
+                    "Not enough stock"
+            );
         }
 
-        // 💰 calculate price
-        BigDecimal total = crop.getPrice().multiply(BigDecimal.valueOf(quantity));
+        // Calculate total
 
-        // 📉 update stock
-        crop.setQuantity(crop.getQuantity() - quantity);
-        cropRepository.save(crop); // ✅ important
+        BigDecimal total =
+                crop.getPrice()
+                        .multiply(BigDecimal.valueOf(quantity));
 
-        // 📦 create order
+        // Reduce stock
+
+        crop.reduceStock(quantity);
+
+        cropRepository.save(crop);
+
+        // Create order
+
         Order order = new Order();
+
         order.setBuyer(buyer);
         order.setCrop(crop);
         order.setQuantity(quantity);
         order.setTotalPrice(total);
         order.setStatus(OrderStatus.PENDING);
 
-        Order saved = orderRepository.save(order);
+        Order savedOrder =
+                orderRepository.save(order);
 
-        return OrderMapper.toDTO(saved);
+        return OrderMapper.toDTO(savedOrder);
     }
 
     // ================== BUYER ORDERS ==================
+
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderDTO> getUserOrders(String email, Pageable pageable) {
+    public Page<OrderDTO> getUserOrders(
+            String buyerEmail,
+            Pageable pageable) {
 
-        User buyer = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User buyer = userRepository
+                .findByEmailIgnoreCase(buyerEmail)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found"
+                        ));
 
-        return orderRepository.findByBuyerOrderByCreatedAtDesc(buyer)
+        return orderRepository
+                .findByBuyerOrderByCreatedAtDesc(
+                        buyer,
+                        pageable
+                )
                 .map(OrderMapper::toDTO);
     }
 
     // ================== FARMER ORDERS ==================
+
     @Override
     @Transactional(readOnly = true)
-    public Page<OrderDTO> getFarmerOrders(String email, Pageable pageable) {
+    public Page<OrderDTO> getFarmerOrders(
+            String farmerEmail,
+            Pageable pageable) {
 
-        User farmer = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User farmer = userRepository
+                .findByEmailIgnoreCase(farmerEmail)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found"
+                        ));
 
-        return orderRepository.findFarmerOrders(farmer, pageable)
+        return orderRepository
+                .findFarmerOrders(farmer, pageable)
                 .map(OrderMapper::toDTO);
     }
 
-    // ================== GET ORDER ==================
+    // ================== READ ==================
+
     @Override
     @Transactional(readOnly = true)
     public OrderDTO getOrderById(Long id) {
 
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-
-        return OrderMapper.toDTO(order);
+        return OrderMapper.toDTO(
+                getOrderOrThrow(id)
+        );
     }
 
-    // ================== UPDATE STATUS ==================
+    // ================== STATUS ==================
+
     @Override
-    public void updateOrderStatus(Long orderId, String status) {
+    public void updateOrderStatus(
+            Long orderId,
+            OrderStatus status,
+            String userEmail) {
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        Order order = getOrderOrThrow(orderId);
 
-        OrderStatus newStatus;
-        try {
-            newStatus = OrderStatus.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid order status");
-        }
+        validateFarmerOwnership(order, userEmail);
 
-        // 🔄 validate transition
-        ((OrderStatus) order.getStatus()).validateTransition(newStatus);
+        order.getStatus()
+                .validateTransition(status);
 
-        order.setStatus(newStatus);
+        order.setStatus(status);
+
+        orderRepository.save(order);
+    }
+
+    @Override
+    public void cancelOrder(
+            Long orderId,
+            String userEmail) {
+
+        Order order = getOrderOrThrow(orderId);
+
+        validateBuyerOwnership(order, userEmail);
+
+        order.cancel();
+
         orderRepository.save(order);
     }
 
     // ================== PAYMENT ==================
+
     @Override
     public void markAsPaid(Long orderId) {
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        Order order = getOrderOrThrow(orderId);
 
-        // 🔁 idempotency check
-        if (order.getStatus() == OrderStatus.CONFIRMED) {
-            return;
-        }
+        order.markAsConfirmed();
 
-        order.setStatus(OrderStatus.CONFIRMED);
         orderRepository.save(order);
     }
 
-    @Override
-    public OrderDTO placeOrder(String buyerEmail, Long cropId, int quantity) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    // ================== HELPERS ==================
+
+    private Order getOrderOrThrow(Long id) {
+
+        return orderRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Order not found"
+                        ));
     }
 
-    @Override
-    public void updateOrderStatus(Long orderId, OrderStatus status, String userEmail) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private void validateBuyerOwnership(
+            Order order,
+            String email) {
+
+        if (order.getBuyer() == null ||
+                order.getBuyer().getEmail() == null ||
+                !order.getBuyer()
+                        .getEmail()
+                        .equalsIgnoreCase(email)) {
+
+            throw new IllegalArgumentException(
+                    "Unauthorized action"
+            );
+        }
     }
 
-    @Override
-    public void cancelOrder(Long orderId, String userEmail) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    private void validateFarmerOwnership(
+            Order order,
+            String email) {
 
-    @Override
-    public void markAsPaid(Long orderId, String userEmail) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (order.getCrop() == null ||
+                order.getCrop().getFarmer() == null ||
+                order.getCrop().getFarmer().getEmail() == null ||
+                !order.getCrop()
+                        .getFarmer()
+                        .getEmail()
+                        .equalsIgnoreCase(email)) {
+
+            throw new IllegalArgumentException(
+                    "Unauthorized action"
+            );
+        }
     }
 }
