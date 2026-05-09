@@ -10,11 +10,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
+            "/",
+            "/crops",
             "/api/auth/**",
             "/auth/**",
             "/css/**",
@@ -25,48 +29,108 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
 
-    public SecurityConfig(JwtFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
+    public SecurityConfig(
+            JwtFilter jwtFilter) {
+
+        this.jwtFilter =
+                jwtFilter;
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http)
+            throws Exception {
 
         return http
-                .csrf(csrf -> csrf.disable())
 
+                // disable csrf for JWT
+                .csrf(csrf ->
+                        csrf.disable()
+                )
+
+                // stateless session
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
                 )
 
+                // authorization
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers("/api/admin/**", "/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/farmer/**", "/farmer/**").hasRole("FARMER")
-                        .requestMatchers("/api/buyer/**", "/buyer/**").hasRole("BUYER")
-                        .anyRequest().authenticated()
+
+                        .requestMatchers(
+                                PUBLIC_ENDPOINTS
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/api/admin/**",
+                                "/admin/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                "/api/farmer/**",
+                                "/farmer/**"
+                        ).hasRole("FARMER")
+
+                        .requestMatchers(
+                                "/api/buyer/**",
+                                "/buyer/**"
+                        ).hasRole("BUYER")
+
+                        .anyRequest()
+                        .authenticated()
                 )
 
+                // error handling
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((req, res, e) -> {
-                            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            res.setContentType("application/json");
-                            res.getWriter().write("{\"error\":\"Unauthorized\"}");
-                        })
-                        .accessDeniedHandler((req, res, e) -> {
-                            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            res.setContentType("application/json");
-                            res.getWriter().write("{\"error\":\"Forbidden\"}");
-                        })
+
+                        .authenticationEntryPoint(
+                                (req, res, e) -> {
+
+                                    res.setStatus(
+                                            HttpServletResponse.SC_UNAUTHORIZED
+                                    );
+
+                                    res.setContentType(
+                                            "application/json"
+                                    );
+
+                                    res.getWriter().write(
+                                            "{\"error\":\"Unauthorized\"}"
+                                    );
+                                }
+                        )
+
+                        .accessDeniedHandler(
+                                (req, res, e) -> {
+
+                                    res.setStatus(
+                                            HttpServletResponse.SC_FORBIDDEN
+                                    );
+
+                                    res.setContentType(
+                                            "application/json"
+                                    );
+
+                                    res.getWriter().write(
+                                            "{\"error\":\"Forbidden\"}"
+                                    );
+                                }
+                        )
                 )
 
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                // JWT filter
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
 
                 .build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 }
