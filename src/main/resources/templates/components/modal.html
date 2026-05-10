@@ -1,43 +1,90 @@
-<div th:fragment="modal(id, title)">
+<div
+        th:fragment="modal(id, title, trigger, content, actions)">
 
-    <div x-data="{ open: false }">
+    <div
+            x-data="{ open: false }">
 
-        <!-- TRIGGER SLOT -->
-        <div @click="open = true">
-            <th:block th:replace="${trigger}"></th:block>
+        <!-- TRIGGER -->
+        <div
+                @click="open = true"
+                class="inline-block cursor-pointer">
+
+            <th:block
+                    th:replace="${trigger}">
+            </th:block>
+
         </div>
 
         <!-- BACKDROP -->
-        <div x-show="open"
-             x-transition
-             class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div
+                x-show="open"
+                x-transition
+
+                class="fixed inset-0 z-50
+                       bg-black bg-opacity-40
+                       flex items-center
+                       justify-center p-4"
+
+                style="display: none;">
 
             <!-- MODAL BOX -->
-            <div @click.outside="open = false"
-                 class="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate__animated animate__fadeInDown">
+            <div
+                    @click.away="open = false"
+
+                    class="bg-white rounded-xl
+                           shadow-xl w-full
+                           max-w-md p-6
+                           animate__animated
+                           animate__fadeInDown">
 
                 <!-- HEADER -->
-                <div class="flex justify-between items-center mb-4">
+                <div
+                        class="flex justify-between
+                               items-center mb-4">
 
-                    <h2 class="text-lg font-semibold text-gray-800"
-                        th:text="${title}">
+                    <h2
+                            class="text-lg font-semibold
+                                   text-gray-800"
+
+                            th:text="${title ?: 'Modal'}">
+
+                        Modal
+
                     </h2>
 
-                    <button @click="open = false"
-                            class="text-gray-500 hover:text-gray-700 text-xl">
+                    <!-- CLOSE -->
+                    <button
+                            type="button"
+                            @click="open = false"
+
+                            class="text-gray-500
+                                   hover:text-gray-700
+                                   text-xl transition">
+
                         &times;
+
                     </button>
 
                 </div>
 
                 <!-- BODY -->
-                <div class="text-sm text-gray-600 mb-4">
-                    <th:block th:replace="${content}"></th:block>
+                <div
+                        class="text-sm text-gray-600 mb-5">
+
+                    <th:block
+                            th:replace="${content}">
+                    </th:block>
+
                 </div>
 
                 <!-- FOOTER -->
-                <div class="flex justify-end gap-3">
-                    <th:block th:replace="${actions}"></th:block>
+                <div
+                        class="flex justify-end gap-3">
+
+                    <th:block
+                            th:replace="${actions}">
+                    </th:block>
+
                 </div>
 
             </div>
