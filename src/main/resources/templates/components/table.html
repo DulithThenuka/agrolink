@@ -1,25 +1,53 @@
-<div th:fragment="table(headers)">
+<div th:fragment="table(headers, content)">
 
-    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div
+            class="bg-white rounded-xl
+                   shadow-md overflow-hidden">
 
-        <table class="w-full text-sm">
+        <div class="overflow-x-auto">
 
-            <!-- HEADER -->
-            <thead class="bg-gray-50 text-gray-600 text-left">
-                <tr>
-                    <th th:each="header : ${headers}"
-                        class="px-4 py-3 font-medium"
-                        th:text="${header}">
-                    </th>
-                </tr>
-            </thead>
+            <table
+                    class="w-full text-sm
+                           min-w-full">
 
-            <!-- BODY SLOT -->
-            <tbody>
-                <th:block th:replace="${content}"></th:block>
-            </tbody>
+                <!-- HEADER -->
+                <thead
+                        class="bg-gray-50
+                               text-gray-600
+                               text-left">
 
-        </table>
+                    <tr>
+
+                        <th
+                                th:each="header : ${headers}"
+
+                                class="px-4 py-3
+                                       font-medium
+                                       whitespace-nowrap"
+
+                                th:text="${header}">
+
+                            Header
+
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <!-- BODY -->
+                <tbody
+                        class="divide-y divide-gray-100">
+
+                    <th:block
+                            th:replace="${content}">
+                    </th:block>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
