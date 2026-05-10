@@ -1,69 +1,126 @@
-<div th:fragment="cropCard(crop)">
+<div
+        th:fragment="cropCard(crop)"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group">
+    <div
+            class="bg-white rounded-xl shadow-md
+                   hover:shadow-xl transition duration-300
+                   overflow-hidden group">
 
         <!-- IMAGE -->
-        <div class="h-44 overflow-hidden">
-            <img th:src="@{'/uploads/' + ${crop.imageUrl}}"
-                 alt="Crop Image"
-                 class="w-full h-full object-cover group-hover:scale-110 transition duration-300"/>
+        <div class="h-44 overflow-hidden bg-gray-100">
+
+            <img
+                    th:src="${crop.imageUrl != null && !#strings.isEmpty(crop.imageUrl)}
+                            ? ${crop.imageUrl}
+                            : @{/images/default-crop.jpg}"
+
+                    alt="Crop Image"
+
+                    class="w-full h-full object-cover
+                           group-hover:scale-110
+                           transition duration-300"/>
+
         </div>
 
         <!-- CONTENT -->
         <div class="p-4">
 
             <!-- NAME -->
-            <h2 class="text-lg font-semibold text-gray-800"
-                th:text="${crop.name}"></h2>
+            <h2
+                    class="text-lg font-semibold text-gray-800"
+                    th:text="${crop.name}">
+
+                Crop Name
+
+            </h2>
 
             <!-- CATEGORY + LOCATION -->
             <p class="text-sm text-gray-500 mt-1">
-                <span th:text="${crop.category}"></span> •
-                <span th:text="${crop.location}"></span>
+
+                <span th:text="${crop.category}">
+                    Category
+                </span>
+
+                •
+
+                <span th:text="${crop.location}">
+                    Location
+                </span>
+
             </p>
 
             <!-- PRICE -->
-            <div class="mt-3 text-green-600 font-bold text-lg"
-                 th:text="'$' + ${crop.price}">
+            <div
+                    class="mt-3 text-green-600
+                           font-bold text-lg"
+                    th:text="'$' + ${crop.price}">
+
+                $0.00
+
             </div>
 
             <!-- QUANTITY -->
-            <p class="text-xs text-gray-400 mt-1"
-               th:text="'Available: ' + ${crop.quantity}">
+            <p
+                    class="text-xs text-gray-400 mt-1"
+                    th:text="'Available: ' + ${crop.quantity}">
+
+                Available: 0
+
             </p>
 
             <!-- ACTIONS -->
-            <div class="flex justify-between items-center mt-4">
+            <div
+                    class="flex justify-between
+                           items-center mt-4">
 
-                <!-- BUY -->
-                <form th:action="@{/orders/place}" method="post"
-                      class="flex items-center gap-2">
+                <!-- BUY BUTTON (BUYERS ONLY) -->
+                <div sec:authorize="hasRole('BUYER')">
 
-                    <input type="hidden"
-                           name="cropId"
-                           th:value="${crop.id}"/>
+                    <form
+                            th:action="@{/orders/place}"
+                            method="post"
+                            class="flex items-center gap-2">
 
-                    <input type="number"
-                           name="quantity"
-                           value="1"
-                           min="1"
-                           class="w-14 text-center border rounded-md text-sm"/>
+                        <input
+                                type="hidden"
+                                name="cropId"
+                                th:value="${crop.id}"/>
 
-                    <button type="submit"
-                            class="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition">
-                        Buy
-                    </button>
+                        <input
+                                type="number"
+                                name="quantity"
+                                value="1"
+                                min="1"
+                                th:attr="max=${crop.quantity}"
+                                class="w-16 text-center border
+                                       rounded-md text-sm p-1"/>
 
-                </form>
+                        <button
+                                type="submit"
+                                class="bg-green-600 text-white
+                                       px-3 py-1 rounded-md text-sm
+                                       hover:bg-green-700 transition">
 
-                <!-- DELETE (ONLY FOR OWNER / FARMER) -->
-                <div th:if="${#authorization.expression('hasRole(''FARMER'')')}">
+                            Buy
 
-                    <div th:replace="components/buttons/danger :: dangerConfirm(
-                        'Delete',
-                        @{/crops/delete/{id}(id=${crop.id})},
-                        ${crop.id}
-                    )"></div>
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <!-- DELETE BUTTON (FARMERS ONLY) -->
+                <div sec:authorize="hasRole('FARMER')">
+
+                    <div
+                            th:replace="~{
+                            components/buttons/danger ::
+                            dangerConfirm(
+                                'Delete',
+                                '/crops/delete/' + ${crop.id}
+                            )}">
+                    </div>
 
                 </div>
 
