@@ -1,0 +1,70 @@
+<div th:fragment="select(label, name, options, selectedValue, error)">
+
+    <div class="mb-4">
+
+        <!-- LABEL -->
+        <label
+                th:for="${name}"
+                class="block text-sm
+                       font-medium
+                       text-gray-600
+                       mb-1"
+
+                th:text="${label ?: 'Select'}">
+
+            Select
+
+        </label>
+
+        <!-- SELECT -->
+        <select
+                th:id="${name}"
+                th:name="${name}"
+
+                class="w-full px-3 py-2
+                       border rounded-lg
+                       bg-white
+                       focus:ring-2
+                       focus:ring-green-500
+                       outline-none
+                       transition"
+
+                th:classappend="${error != null}
+                    ? ' border-red-500'
+                    : ' border-gray-300'">
+
+            <!-- DEFAULT OPTION -->
+            <option value="">
+
+                Select an option
+
+            </option>
+
+            <!-- OPTIONS -->
+            <option
+                    th:each="option : ${options}"
+
+                    th:value="${option}"
+                    th:text="${option}"
+
+                    th:selected="${option == selectedValue}">
+
+            </option>
+
+        </select>
+
+        <!-- ERROR -->
+        <p
+                th:if="${error != null}"
+                class="text-red-500
+                       text-xs mt-1"
+
+                th:text="${error}">
+
+            Validation error
+
+        </p>
+
+    </div>
+
+</div>
