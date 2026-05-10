@@ -1,27 +1,66 @@
 <div th:fragment="statCard(title, value, color)">
 
-    <div class="bg-white rounded-xl shadow-md p-5 hover:shadow-lg transition duration-300 flex items-center justify-between">
+    <div
+            class="bg-white rounded-xl shadow-md
+                   p-5 hover:shadow-lg
+                   transition duration-300
+                   flex items-center justify-between">
 
         <!-- LEFT CONTENT -->
         <div>
 
-            <p class="text-sm text-gray-500"
-               th:text="${title}">
+            <!-- TITLE -->
+            <p
+                    class="text-sm text-gray-500"
+                    th:text="${title}">
+
+                Title
+
             </p>
 
-            <h2 class="text-2xl font-bold mt-1"
-                th:text="${value}"
-                th:classappend="' text-' + ${color} + '-600'">
+            <!-- VALUE -->
+            <h2
+                    class="text-2xl font-bold mt-1"
+
+                    th:text="${value}"
+
+                    th:classappend="${color == 'green'}
+                        ? ' text-green-600'
+                        : (${color == 'blue'}
+                            ? ' text-blue-600'
+                            : (${color == 'red'}
+                                ? ' text-red-600'
+                                : (${color == 'yellow'}
+                                    ? ' text-yellow-600'
+                                    : ' text-gray-700')))">
+
+                0
+
             </h2>
 
         </div>
 
         <!-- ICON -->
-        <div class="w-12 h-12 flex items-center justify-center rounded-lg"
-             th:classappend="' bg-' + ${color} + '-100 text-' + ${color} + '-600'">
+        <div
+                class="w-12 h-12 flex items-center
+                       justify-center rounded-lg"
 
-            <!-- Default icon -->
-            <span class="text-xl">📊</span>
+                th:classappend="${color == 'green'}
+                    ? ' bg-green-100 text-green-600'
+                    : (${color == 'blue'}
+                        ? ' bg-blue-100 text-blue-600'
+                        : (${color == 'red'}
+                            ? ' bg-red-100 text-red-600'
+                            : (${color == 'yellow'}
+                                ? ' bg-yellow-100 text-yellow-600'
+                                : ' bg-gray-100 text-gray-600')))">
+
+            <!-- DEFAULT ICON -->
+            <span class="text-xl">
+
+                📊
+
+            </span>
 
         </div>
 
