@@ -1,43 +1,101 @@
-<div th:fragment="footer">
+<div
+        th:fragment="footer"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <footer class="mt-10 bg-white border-t">
+    <footer
+            class="mt-10 bg-white border-t">
 
-        <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div
+                class="max-w-7xl mx-auto
+                       px-6 py-6
+                       flex flex-col
+                       md:flex-row
+                       justify-between
+                       items-center
+                       gap-4">
 
             <!-- BRAND -->
-            <div class="text-gray-600 text-sm">
-                © <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span>
-                AgroLink. All rights reserved.
+            <div
+                    class="text-gray-600 text-sm">
+
+                ©
+                <span
+                        th:text="${#temporals.year(
+                            T(java.time.LocalDateTime).now()
+                        )}">
+                </span>
+
+                AgroLink.
+                All rights reserved.
+
             </div>
 
-            <!-- LINKS -->
-            <div class="flex gap-6 text-sm text-gray-500">
+            <!-- NAV LINKS -->
+            <div
+                    class="flex flex-wrap
+                           justify-center
+                           gap-5 text-sm
+                           text-gray-500">
 
-                <a href="/"
-                   class="hover:text-green-600 transition">
+                <!-- HOME -->
+                <a
+                        th:href="@{/}"
+
+                        class="hover:text-green-600
+                               transition">
+
                     Home
+
                 </a>
 
-                <a href="/crops"
-                   class="hover:text-green-600 transition">
+                <!-- CROPS -->
+                <a
+                        th:href="@{/crops}"
+
+                        class="hover:text-green-600
+                               transition">
+
                     Crops
+
                 </a>
 
-                <a href="/orders/my"
-                   class="hover:text-green-600 transition">
-                    Orders
+                <!-- BUYER ONLY -->
+                <a
+                        sec:authorize="hasRole('BUYER')"
+
+                        th:href="@{/orders/my}"
+
+                        class="hover:text-green-600
+                               transition">
+
+                    My Orders
+
                 </a>
 
-                <a href="/dashboard"
-                   class="hover:text-green-600 transition">
-                    Dashboard
+                <!-- AUTHENTICATED USERS -->
+                <a
+                        sec:authorize="isAuthenticated()"
+
+                        th:href="@{/profile}"
+
+                        class="hover:text-green-600
+                               transition">
+
+                    Profile
+
                 </a>
 
             </div>
 
             <!-- EXTRA -->
-            <div class="text-xs text-gray-400">
-                Built with ❤️ using Spring Boot & Thymeleaf
+            <div
+                    class="text-xs text-gray-400
+                           text-center">
+
+                Built with ❤️ using
+                Spring Boot &
+                Thymeleaf
+
             </div>
 
         </div>
