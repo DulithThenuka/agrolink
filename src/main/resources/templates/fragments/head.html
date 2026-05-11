@@ -2,50 +2,88 @@
 
     <!-- META -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0">
 
     <!-- TITLE -->
-    <title th:text="${title}">AgroLink</title>
+    <title th:text="${title ?: 'AgroLink'}">
+
+        AgroLink
+
+    </title>
 
     <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- ALPINE -->
-    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script
+            src="https://unpkg.com/alpinejs"
+            defer>
+    </script>
 
     <!-- GOOGLE FONT -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-          rel="stylesheet">
+    <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+            rel="stylesheet">
 
     <!-- GLOBAL STYLES -->
     <style>
+
         body {
             font-family: 'Inter', sans-serif;
         }
 
         /* Glass UI */
         .glass {
-            background: rgba(255,255,255,0.6);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         /* Buttons */
         .btn {
-            @apply px-4 py-2 rounded-lg transition;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
         }
 
         .btn-primary {
-            @apply bg-green-600 text-white hover:bg-green-700;
+            background-color: #16a34a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #15803d;
         }
 
         .btn-secondary {
-            @apply border border-gray-300 hover:bg-gray-100;
+            border: 1px solid #d1d5db;
+            background: white;
+        }
+
+        .btn-secondary:hover {
+            background: #f3f4f6;
         }
 
         /* Card */
         .card {
-            @apply bg-white rounded-xl shadow-md hover:shadow-lg transition p-5;
+            background: white;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            box-shadow:
+                    0 1px 3px rgba(0,0,0,0.1),
+                    0 1px 2px rgba(0,0,0,0.06);
+            transition: all 0.2s ease;
         }
+
+        .card:hover {
+            box-shadow:
+                    0 10px 15px rgba(0,0,0,0.1),
+                    0 4px 6px rgba(0,0,0,0.05);
+        }
+
     </style>
 
 </div>
