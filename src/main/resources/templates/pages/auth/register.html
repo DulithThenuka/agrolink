@@ -1,116 +1,182 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/head :: head('Register')"></head>
+<head
+        th:replace="~{
+        fragments/head ::
+        head('Register')
+}">
+</head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body
+        class="bg-gray-100
+               flex items-center
+               justify-center
+               min-h-screen px-4">
 
-<div class="w-full max-w-md">
+<div
+        class="w-full max-w-md">
 
     <!-- CARD -->
-    <div class="bg-white rounded-xl shadow-lg p-6 animate__animated animate__fadeIn">
+    <div
+            class="bg-white rounded-2xl
+                   shadow-lg p-8">
 
         <!-- TITLE -->
-        <h2 class="text-2xl font-bold text-center text-green-600 mb-6">
+        <h2
+                class="text-2xl font-bold
+                       text-center
+                       text-green-600 mb-2">
+
             Create Account 🌱
+
         </h2>
 
-        <!-- ERROR ALERT -->
-        <div th:if="${#fields.hasErrors('*')}"
-             th:replace="components/feedback/alert :: alert('error', 'Please fix the errors below')">
+        <p
+                class="text-center
+                       text-gray-500
+                       text-sm mb-6">
+
+            Join AgroLink today
+
+        </p>
+
+        <!-- GLOBAL ERROR -->
+        <div
+                th:if="${#fields.hasErrors('*')}"
+
+                th:replace="~{
+                components/feedback/alert ::
+                alert(
+                'error',
+                'Please fix the errors below'
+                )
+        }">
         </div>
 
         <!-- FORM -->
-        <form th:action="@{/auth/register}"
-              th:object="${user}"
-              method="post"
-              class="space-y-4">
+        <form
+                th:action="@{/auth/register}"
+                th:object="${user}"
+                method="post"
+
+                class="space-y-4">
 
             <!-- NAME -->
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Full Name</label>
-
-                <input type="text"
-                       th:field="*{name}"
-                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-                       placeholder="Enter your name"/>
-
-                <p class="text-xs text-red-500 mt-1"
-                   th:if="${#fields.hasErrors('name')}"
-                   th:errors="*{name}"></p>
+            <div
+                    th:replace="~{
+                    components/forms/input ::
+                    input(
+                    'Full Name',
+                    'name',
+                    'text',
+                    'Enter your full name',
+                    *{name},
+                    ${#fields.hasErrors('name')}
+                        ? #fields.errors('name')[0]
+                        : null
+                    )
+            }">
             </div>
 
             <!-- EMAIL -->
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Email</label>
-
-                <input type="email"
-                       th:field="*{email}"
-                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-                       placeholder="Enter your email"/>
-
-                <p class="text-xs text-red-500 mt-1"
-                   th:if="${#fields.hasErrors('email')}"
-                   th:errors="*{email}"></p>
+            <div
+                    th:replace="~{
+                    components/forms/input ::
+                    input(
+                    'Email',
+                    'email',
+                    'email',
+                    'Enter your email',
+                    *{email},
+                    ${#fields.hasErrors('email')}
+                        ? #fields.errors('email')[0]
+                        : null
+                    )
+            }">
             </div>
 
             <!-- PASSWORD -->
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Password</label>
-
-                <input type="password"
-                       th:field="*{password}"
-                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-                       placeholder="Enter password"/>
-
-                <p class="text-xs text-red-500 mt-1"
-                   th:if="${#fields.hasErrors('password')}"
-                   th:errors="*{password}"></p>
+            <div
+                    th:replace="~{
+                    components/forms/input ::
+                    input(
+                    'Password',
+                    'password',
+                    'password',
+                    'Enter password',
+                    '',
+                    ${#fields.hasErrors('password')}
+                        ? #fields.errors('password')[0]
+                        : null
+                    )
+            }">
             </div>
 
             <!-- LOCATION -->
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Location</label>
-
-                <input type="text"
-                       th:field="*{location}"
-                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-                       placeholder="City / Area"/>
+            <div
+                    th:replace="~{
+                    components/forms/input ::
+                    input(
+                    'Location',
+                    'location',
+                    'text',
+                    'City / Area',
+                    *{location},
+                    null
+                    )
+            }">
             </div>
 
-            <!-- ROLE -->
-            <div>
-                <label class="block text-sm text-gray-600 mb-1">Register As</label>
+            <!-- ROLE NOTICE -->
+            <div
+                    class="bg-yellow-50
+                           border border-yellow-200
+                           rounded-lg p-3
+                           text-sm text-yellow-700">
 
-                <select th:field="*{role}"
-                        class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+                Accounts are registered
+                as <strong>Buyer</strong>
+                by default.
 
-                    <option value="">Select role</option>
-                    <option value="BUYER">Buyer</option>
-                    <option value="FARMER">Farmer</option>
-
-                </select>
-
-                <p class="text-xs text-red-500 mt-1"
-                   th:if="${#fields.hasErrors('role')}"
-                   th:errors="*{role}"></p>
             </div>
 
-            <!-- SUBMIT BUTTON -->
-            <button type="submit"
-                    class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+            <!-- SUBMIT -->
+            <button
+                    type="submit"
+
+                    class="w-full
+                           bg-green-600
+                           text-white py-2
+                           rounded-lg
+                           hover:bg-green-700
+                           transition">
+
                 Register
+
             </button>
 
         </form>
 
-        <!-- LOGIN LINK -->
-        <p class="text-sm text-center text-gray-500 mt-4">
+        <!-- LOGIN -->
+        <p
+                class="text-sm text-center
+                       text-gray-500 mt-6">
+
             Already have an account?
-            <a href="/auth/login"
-               class="text-green-600 hover:underline">
+
+            <a
+                    th:href="@{/auth/login}"
+
+                    class="text-green-600
+                           hover:underline">
+
                 Login
+
             </a>
+
         </p>
 
     </div>
@@ -118,7 +184,13 @@
 </div>
 
 <!-- SCRIPTS -->
-<div th:replace="fragments/scripts :: scripts"></div>
+<div
+        th:replace="~{
+        fragments/scripts ::
+        scripts
+}">
+</div>
 
 </body>
+
 </html>
