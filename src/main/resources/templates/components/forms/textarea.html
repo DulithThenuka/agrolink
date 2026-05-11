@@ -1,0 +1,55 @@
+<div th:fragment="textarea(label, name, placeholder, value, rows, error)">
+
+    <div class="mb-4">
+
+        <!-- LABEL -->
+        <label
+                th:for="${name}"
+                class="block text-sm
+                       font-medium
+                       text-gray-600
+                       mb-1"
+
+                th:text="${label ?: 'Message'}">
+
+            Message
+
+        </label>
+
+        <!-- TEXTAREA -->
+        <textarea
+                th:id="${name}"
+                th:name="${name}"
+                th:placeholder="${placeholder ?: ''}"
+                th:text="${value}"
+                th:rows="${rows ?: 4}"
+
+                class="w-full px-3 py-2
+                       border rounded-lg
+                       resize-none
+                       focus:ring-2
+                       focus:ring-green-500
+                       outline-none
+                       transition"
+
+                th:classappend="${error != null}
+                    ? ' border-red-500'
+                    : ' border-gray-300'">
+
+        </textarea>
+
+        <!-- ERROR MESSAGE -->
+        <p
+                th:if="${error != null}"
+                class="text-red-500
+                       text-xs mt-1"
+
+                th:text="${error}">
+
+            Validation error
+
+        </p>
+
+    </div>
+
+</div>
