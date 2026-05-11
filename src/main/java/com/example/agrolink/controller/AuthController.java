@@ -82,7 +82,7 @@ public class AuthController {
             model.addAttribute("errorMessage", "Invalid email or password.");
         }
 
-        return "login";
+        return "pages/auth/login";
     }
 
     // ================== JWT LOGIN ==================
