@@ -120,7 +120,7 @@ public class CropController {
                 maxPrice
         );
 
-        return "crops";
+        return "pages/crops/list";
     }
 
     // ================== ADD PAGE ==================
