@@ -1,120 +1,244 @@
-<div th:fragment="navbar">
+<div
+        th:fragment="navbar"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<nav x-data="{ open: false, userMenu: false }"
-     class="glass sticky top-0 z-50 shadow px-6 py-3 flex justify-between items-center">
+    <div
+            x-data="{
+                open: false,
+                userMenu: false
+            }">
 
-    <!-- LOGO -->
-    <a href="/"
-       class="text-xl font-bold text-green-600 flex items-center gap-2">
-        🌱 <span>AgroLink</span>
-    </a>
+        <!-- NAVBAR -->
+        <nav
+                class="glass sticky top-0
+                       z-50 shadow
+                       px-6 py-3
+                       flex justify-between
+                       items-center">
 
-    <!-- DESKTOP MENU -->
-    <div class="hidden md:flex items-center space-x-8 font-medium">
+            <!-- LOGO -->
+            <a
+                    th:href="@{/}"
 
-        <a href="/crops"
-           class="hover:text-green-600 transition"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')} ? ' text-green-600 font-semibold'">
-            Crops
-        </a>
+                    class="text-xl font-bold
+                           text-green-600
+                           flex items-center gap-2">
 
-        <a href="/orders/my"
-           class="hover:text-green-600 transition"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')} ? ' text-green-600 font-semibold'">
-            Orders
-        </a>
+                🌱 <span>AgroLink</span>
 
-        <a href="/dashboard"
-           class="hover:text-green-600 transition"
-           th:classappend="${#httpServletRequest.requestURI.startsWith('/dashboard')} ? ' text-green-600 font-semibold'">
-            Dashboard
-        </a>
+            </a>
 
-        <!-- USER DROPDOWN -->
-        <div class="relative">
+            <!-- DESKTOP MENU -->
+            <div
+                    class="hidden md:flex
+                           items-center
+                           space-x-8 font-medium">
 
-            <button @click="userMenu = !userMenu"
-                    class="flex items-center gap-2 px-3 py-2 rounded hover:bg-green-50 transition">
+                <!-- CROPS -->
+                <a
+                        th:href="@{/crops}"
 
-                <!-- USER EMAIL -->
-                <span class="text-sm"
-                      th:text="${#authentication.name}">
-                    User
-                </span>
+                        class="hover:text-green-600
+                               transition"
 
-                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 9l-7 7-7-7"/>
+                        th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')}
+                            ? ' text-green-600 font-semibold'
+                            : ''">
+
+                    Crops
+
+                </a>
+
+                <!-- BUYER ONLY -->
+                <a
+                        sec:authorize="hasRole('BUYER')"
+
+                        th:href="@{/orders/my}"
+
+                        class="hover:text-green-600
+                               transition"
+
+                        th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')}
+                            ? ' text-green-600 font-semibold'
+                            : ''">
+
+                    Orders
+
+                </a>
+
+                <!-- USER MENU -->
+                <div
+                        sec:authorize="isAuthenticated()"
+                        class="relative">
+
+                    <button
+                            @click="userMenu = !userMenu"
+
+                            class="flex items-center
+                                   gap-2 px-3 py-2
+                                   rounded
+                                   hover:bg-green-50
+                                   transition">
+
+                        <!-- USER EMAIL -->
+                        <span
+                                class="text-sm"
+                                th:text="${#authentication.name}">
+
+                            User
+
+                        </span>
+
+                        <svg
+                                class="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24">
+
+                            <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 9l-7 7-7-7"/>
+
+                        </svg>
+
+                    </button>
+
+                    <!-- DROPDOWN -->
+                    <div
+                            x-show="userMenu"
+                            @click.away="userMenu = false"
+                            x-transition
+
+                            style="display:none"
+
+                            class="absolute right-0
+                                   mt-2 w-44
+                                   bg-white
+                                   rounded-xl
+                                   shadow-lg
+                                   border z-50">
+
+                        <a
+                                th:href="@{/profile}"
+
+                                class="block
+                                       px-4 py-2
+                                       hover:bg-gray-100">
+
+                            Profile
+
+                        </a>
+
+                        <!-- LOGOUT -->
+                        <form
+                                th:action="@{/logout}"
+                                method="post">
+
+                            <button
+                                    type="submit"
+
+                                    class="w-full text-left
+                                           px-4 py-2
+                                           hover:bg-gray-100
+                                           text-red-500">
+
+                                Logout
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- MOBILE BUTTON -->
+            <button
+                    @click="open = !open"
+
+                    class="md:hidden">
+
+                <svg
+                        class="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+
+                    <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"/>
+
                 </svg>
 
             </button>
 
-            <!-- DROPDOWN -->
-            <div x-show="userMenu"
-                 @click.outside="userMenu = false"
-                 x-transition
-                 class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border z-50">
+        </nav>
 
-                <a href="/profile"
-                   class="block px-4 py-2 hover:bg-gray-100">
-                    Profile
-                </a>
+        <!-- MOBILE MENU -->
+        <div
+                x-show="open"
+                x-transition
 
-                <!-- LOGOUT (POST) -->
-                <form th:action="@{/logout}" method="post">
-                    <button type="submit"
-                            class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500">
-                        Logout
-                    </button>
-                </form>
+                style="display:none"
 
-            </div>
+                class="md:hidden
+                       bg-white shadow-md
+                       border-t">
+
+            <a
+                    th:href="@{/crops}"
+
+                    class="block px-6 py-3
+                           border-b
+                           hover:bg-gray-100">
+
+                Crops
+
+            </a>
+
+            <!-- BUYER ONLY -->
+            <a
+                    sec:authorize="hasRole('BUYER')"
+
+                    th:href="@{/orders/my}"
+
+                    class="block px-6 py-3
+                           border-b
+                           hover:bg-gray-100">
+
+                Orders
+
+            </a>
+
+            <!-- LOGOUT -->
+            <form
+                    sec:authorize="isAuthenticated()"
+
+                    th:action="@{/logout}"
+                    method="post">
+
+                <button
+                        type="submit"
+
+                        class="w-full text-left
+                               px-6 py-3
+                               text-red-500
+                               hover:bg-gray-100">
+
+                    Logout
+
+                </button>
+
+            </form>
 
         </div>
 
     </div>
-
-    <!-- MOBILE BUTTON -->
-    <button @click="open = !open"
-            class="md:hidden focus:outline-none">
-
-        <svg class="w-6 h-6" fill="none" stroke="currentColor"
-             viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-
-    </button>
-
-</nav>
-
-<!-- MOBILE MENU -->
-<div x-show="open"
-     x-transition
-     class="md:hidden bg-white shadow-md border-t">
-
-    <a href="/crops" class="block px-6 py-3 border-b hover:bg-gray-100">
-        Crops
-    </a>
-
-    <a href="/orders/my" class="block px-6 py-3 border-b hover:bg-gray-100">
-        Orders
-    </a>
-
-    <a href="/dashboard" class="block px-6 py-3 hover:bg-gray-100">
-        Dashboard
-    </a>
-
-    <!-- MOBILE LOGOUT -->
-    <form th:action="@{/logout}" method="post">
-        <button class="w-full text-left px-6 py-3 text-red-500 hover:bg-gray-100">
-            Logout
-        </button>
-    </form>
-
-</div>
 
 </div>
