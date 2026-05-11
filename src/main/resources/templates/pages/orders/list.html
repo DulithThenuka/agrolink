@@ -1,96 +1,215 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="fragments/head :: head('My Orders')"></head>
+<head
+        th:replace="~{
+        fragments/head ::
+        head('My Orders')
+}">
+</head>
 
 <body>
 
-<div th:replace="layout/base :: *"
-     th:with="title='My Orders', content='pages/orders/list :: content'">
+<!-- BASE LAYOUT -->
+<div
+        th:replace="~{
+        layout/base ::
+        *
+}"
+        th:with="
+            title='My Orders',
+            content='pages/orders/list :: content'
+        ">
 </div>
 
-<!-- ================== CONTENT ================== -->
-<div th:fragment="content" class="max-w-6xl mx-auto">
+<!-- ================== PAGE CONTENT ================== -->
+<div
+        th:fragment="content"
+
+        class="max-w-6xl mx-auto">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center mb-6">
+    <div
+            class="flex justify-between
+                   items-center mb-6">
 
-        <h1 class="text-2xl font-bold text-gray-800">
+        <h1
+                class="text-2xl
+                       font-bold
+                       text-gray-800">
+
             My Orders 📦
+
         </h1>
 
-        <a href="/crops"
-           class="text-sm text-green-600 hover:underline">
+        <a
+                th:href="@{/crops}"
+
+                class="text-sm
+                       text-green-600
+                       hover:underline">
+
             Browse Crops
+
         </a>
 
     </div>
 
-    <!-- ================== EMPTY STATE ================== -->
-    <div th:if="${#lists.isEmpty(orders)}">
-        <div th:replace="components/feedback/empty-state :: empty(
-            'No Orders Yet',
-            'You haven’t placed any orders yet.',
-            'Browse Crops',
-            @{/crops}
-        )"></div>
+    <!-- EMPTY -->
+    <div
+            th:if="${#lists.isEmpty(orders)}">
+
+        <div
+                th:replace="~{
+                components/feedback/empty-state ::
+                empty(
+                    'No Orders Yet',
+                    'You haven’t placed any orders yet.',
+                    'Browse Crops',
+                    '/crops'
+                )
+        }">
+        </div>
+
     </div>
 
-    <!-- ================== TABLE ================== -->
-    <div th:unless="${#lists.isEmpty(orders)}"
-         class="bg-white rounded-xl shadow overflow-hidden">
+    <!-- TABLE -->
+    <div
+            th:unless="${#lists.isEmpty(orders)}"
 
-        <table class="w-full text-sm">
+            class="bg-white
+                   rounded-xl
+                   shadow
+                   overflow-hidden">
+
+        <table
+                class="w-full
+                       text-sm">
 
             <!-- HEADER -->
-            <thead class="bg-gray-50 text-gray-500">
-                <tr>
-                    <th class="px-4 py-3 text-left">Crop</th>
-                    <th class="px-4 py-3 text-left">Quantity</th>
-                    <th class="px-4 py-3 text-left">Total</th>
-                    <th class="px-4 py-3 text-left">Status</th>
-                </tr>
+            <thead
+                    class="bg-gray-50
+                           text-gray-500">
+
+            <tr>
+
+                <th
+                        class="px-4 py-3
+                               text-left">
+
+                    Crop
+
+                </th>
+
+                <th
+                        class="px-4 py-3
+                               text-left">
+
+                    Quantity
+
+                </th>
+
+                <th
+                        class="px-4 py-3
+                               text-left">
+
+                    Total
+
+                </th>
+
+                <th
+                        class="px-4 py-3
+                               text-left">
+
+                    Status
+
+                </th>
+
+            </tr>
+
             </thead>
 
             <!-- BODY -->
             <tbody>
 
-                <tr th:each="order : ${orders}"
-                    th:onclick="|window.location='/orders/' + ${order.id}|"
-                    class="border-t hover:bg-gray-50 transition cursor-pointer">
+            <tr
+                    th:each="order : ${orders}"
 
-                    <!-- CROP -->
-                    <td class="px-4 py-3 font-medium"
-                        th:text="${order.crop.name}">
-                    </td>
+                    class="border-t
+                           hover:bg-gray-50
+                           transition">
 
-                    <!-- QTY -->
-                    <td class="px-4 py-3"
-                        th:text="${order.quantity}">
-                    </td>
+                <!-- CROP -->
+                <td
+                        class="px-4 py-3
+                               font-medium">
 
-                    <!-- PRICE -->
-                    <td class="px-4 py-3 text-green-600 font-semibold"
-                        th:text="'$' + ${order.totalPrice}">
-                    </td>
+                    <a
+                            th:href="@{/orders/{id}(
+                                id=${order.id}
+                            )}"
 
-                    <!-- STATUS -->
-                    <td class="px-4 py-3">
+                            class="hover:text-green-600">
 
-                        <span class="px-2 py-1 text-xs rounded-full"
-                              th:text="${order.status}"
-                              th:classappend="
-                                ${order.status == 'PENDING'} ? ' bg-yellow-100 text-yellow-700' :
-                                ${order.status == 'CONFIRMED'} ? ' bg-blue-100 text-blue-700' :
-                                ${order.status == 'DELIVERED'} ? ' bg-green-100 text-green-700' :
-                                ${order.status == 'CANCELLED'} ? ' bg-red-100 text-red-700' :
-                                ' bg-gray-100 text-gray-700'
-                              ">
+                        <span
+                                th:text="${order.cropName
+                                    ?: order.crop?.name
+                                    ?: 'Unknown Crop'}">
                         </span>
 
-                    </td>
+                    </a>
 
-                </tr>
+                </td>
+
+                <!-- QTY -->
+                <td
+                        class="px-4 py-3"
+
+                        th:text="${order.quantity ?: 0}">
+                </td>
+
+                <!-- PRICE -->
+                <td
+                        class="px-4 py-3
+                               text-green-600
+                               font-semibold"
+
+                        th:text="'$' + ${order.totalPrice}">
+                </td>
+
+                <!-- STATUS -->
+                <td
+                        class="px-4 py-3">
+
+                    <span
+                            class="px-2 py-1
+                                   text-xs
+                                   rounded-full"
+
+                            th:text="${order.status}"
+
+                            th:classappend="
+                            ${order.status == 'PENDING'}
+                            ? ' bg-yellow-100 text-yellow-700' :
+
+                            ${order.status == 'CONFIRMED'}
+                            ? ' bg-blue-100 text-blue-700' :
+
+                            ${order.status == 'DELIVERED'}
+                            ? ' bg-green-100 text-green-700' :
+
+                            ${order.status == 'CANCELLED'}
+                            ? ' bg-red-100 text-red-700' :
+
+                            ' bg-gray-100 text-gray-700'
+                            ">
+                    </span>
+
+                </td>
+
+            </tr>
 
             </tbody>
 
@@ -101,4 +220,5 @@
 </div>
 
 </body>
+
 </html>
