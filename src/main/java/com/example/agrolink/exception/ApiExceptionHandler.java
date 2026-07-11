@@ -52,15 +52,28 @@ public class ApiExceptionHandler {
 
     // ================== BUSINESS ==================
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
     public ResponseEntity<ApiResponse<Void>>
-    handleBusinessErrors(IllegalArgumentException ex) {
+    handleBusinessErrors(RuntimeException ex) {
 
         logger.warn("Business error: {}", ex.getMessage());
 
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage(),
+                null
+        );
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>>
+    handleDataIntegrityErrors(org.springframework.dao.DataIntegrityViolationException ex) {
+
+        logger.warn("Data integrity violation: {}", ex.getMessage());
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                "Resource already exists or database constraint violated",
                 null
         );
     }

@@ -26,7 +26,14 @@ public class SecurityConfig {
             "/js/**",
             "/images/**",
             "/uploads/**",
-            "/error"
+            "/error",
+            "/api/v1/health",
+            "/api/v1/auth/**",
+            "/api/v1/crops",
+            "/api/v1/crops/**",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
     private final JwtFilter jwtFilter;
@@ -49,6 +56,9 @@ public class SecurityConfig {
                 .csrf(csrf ->
                         csrf.disable()
                 )
+
+                // enable CORS
+                .cors(org.springframework.security.config.Customizer.withDefaults())
 
                 // stateless session
                 .sessionManagement(session ->
