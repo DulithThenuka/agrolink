@@ -41,7 +41,7 @@
                         class="hover:text-green-600
                                transition"
 
-                        th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')}
+                        th:classappend="${currentUri != null && currentUri.startsWith('/crops')}
                             ? ' text-green-600 font-semibold'
                             : ''">
 
@@ -58,7 +58,7 @@
                         class="hover:text-green-600
                                transition"
 
-                        th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')}
+                        th:classappend="${currentUri != null && currentUri.startsWith('/orders')}
                             ? ' text-green-600 font-semibold'
                             : ''">
 

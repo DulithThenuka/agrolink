@@ -34,11 +34,11 @@ public class HomeController {
         }
 
         if (hasRole(auth, Role.FARMER)) {
-            return "redirect:/farmer/dashboard";
+            return "redirect:/crops";
         }
 
         if (hasRole(auth, Role.BUYER)) {
-            return "redirect:/buyer/dashboard";
+            return "redirect:/crops";
         }
 
         logger.error("Unknown role for user: {}", email);

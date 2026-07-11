@@ -17,12 +17,8 @@
 <div
         th:replace="~{
         layout/base ::
-        *
-}"
-        th:with="
-            title=${crop.name},
-            content='pages/crops/details :: content'
-        ">
+        base(${crop.name}, ~{::content})
+}">
 </div>
 
 <!-- ================== PAGE CONTENT ================== -->

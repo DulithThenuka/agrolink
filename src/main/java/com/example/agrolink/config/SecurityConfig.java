@@ -25,7 +25,8 @@ public class SecurityConfig {
             "/css/**",
             "/js/**",
             "/images/**",
-            "/uploads/**"
+            "/uploads/**",
+            "/error"
     };
 
     private final JwtFilter jwtFilter;
@@ -58,24 +59,27 @@ public class SecurityConfig {
 
                 // authorization
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.FORWARD, jakarta.servlet.DispatcherType.ERROR).permitAll()
 
                         .requestMatchers(
-                                PUBLIC_ENDPOINTS
+                                java.util.Arrays.stream(PUBLIC_ENDPOINTS)
+                                        .map(org.springframework.security.web.util.matcher.AntPathRequestMatcher::antMatcher)
+                                        .toArray(org.springframework.security.web.util.matcher.AntPathRequestMatcher[]::new)
                         ).permitAll()
 
                         .requestMatchers(
-                                "/api/admin/**",
-                                "/admin/**"
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/admin/**"),
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/admin/**")
                         ).hasRole("ADMIN")
 
                         .requestMatchers(
-                                "/api/farmer/**",
-                                "/farmer/**"
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/farmer/**"),
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/farmer/**")
                         ).hasRole("FARMER")
 
                         .requestMatchers(
-                                "/api/buyer/**",
-                                "/buyer/**"
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/buyer/**"),
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/buyer/**")
                         ).hasRole("BUYER")
 
                         .anyRequest()

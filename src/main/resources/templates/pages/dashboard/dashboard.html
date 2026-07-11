@@ -17,12 +17,8 @@
 <div
         th:replace="~{
         layout/base ::
-        *
-}"
-        th:with="
-            title='Dashboard',
-            content='pages/dashboard/dashboard :: content'
-        ">
+        base('Dashboard', ~{::content})
+}">
 </div>
 
 <!-- ================== PAGE CONTENT ================== -->

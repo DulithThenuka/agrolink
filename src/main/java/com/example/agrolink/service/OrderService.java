@@ -125,11 +125,14 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderDTO getOrderById(
-            Long id) {
+            Long id,
+            String email) {
 
-        return OrderMapper.toDTO(
-                getOrderOrThrow(id)
-        );
+        Order order = getOrderOrThrow(id);
+        if (order.getBuyer() == null || !order.getBuyer().getEmail().equalsIgnoreCase(email)) {
+            throw new IllegalArgumentException("Unauthorized access to order");
+        }
+        return OrderMapper.toDTO(order);
     }
 
     // ================== MARK PAID ==================

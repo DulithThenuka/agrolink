@@ -56,14 +56,14 @@ public class PaymentController {
 
     @GetMapping("/success")
     public String success() {
-        return "payment-success";
+        return "redirect:/orders/my?payment=success";
     }
 
     // ================== CANCEL ==================
 
     @GetMapping("/cancel")
     public String cancel() {
-        return "payment-cancel";
+        return "redirect:/orders/my?payment=cancel";
     }
 
     // ================== HELPERS ==================

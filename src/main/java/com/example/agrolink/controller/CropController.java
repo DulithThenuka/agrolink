@@ -135,7 +135,7 @@ public class CropController {
                 new CropRequestDTO()
         );
 
-        return "add-crop";
+        return "pages/crops/form";
     }
 
     // ================== SAVE ==================
@@ -164,7 +164,7 @@ public class CropController {
 
         if (result.hasErrors()) {
 
-            return "add-crop";
+            return "pages/crops/form";
         }
 
         logger.info(
@@ -179,7 +179,7 @@ public class CropController {
                     "Valid image file is required"
             );
 
-            return "add-crop";
+            return "pages/crops/form";
         }
 
         try {
@@ -207,7 +207,7 @@ public class CropController {
                     ex.getMessage()
             );
 
-            return "add-crop";
+            return "pages/crops/form";
         }
 
         return "redirect:/crops";

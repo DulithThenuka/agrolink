@@ -12,8 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.agrolink.dto.OrderRequestDTO;
 import com.example.agrolink.service.OrderService;
@@ -103,6 +105,9 @@ public class OrderController {
 
     @GetMapping("/my")
     public String myOrders(
+            @RequestParam(value = "success", required = false) String success,
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "payment", required = false) String payment,
             Model model,
             Principal principal) {
 
@@ -121,6 +126,24 @@ public class OrderController {
                 email
         );
 
+        if (success != null) {
+            model.addAttribute("successMessage", "Order placed successfully! Please complete your payment.");
+        }
+        if (error != null) {
+            if ("unauthorized".equals(error)) {
+                model.addAttribute("errorMessage", "You are not authorized to view that order.");
+            } else {
+                model.addAttribute("errorMessage", "An error occurred with your order.");
+            }
+        }
+        if (payment != null) {
+            if ("success".equals(payment)) {
+                model.addAttribute("successMessage", "Payment completed successfully! Your order is confirmed.");
+            } else if ("cancel".equals(payment)) {
+                model.addAttribute("errorMessage", "Payment was cancelled.");
+            }
+        }
+
         model.addAttribute(
                 "orders",
                 orderService.getUserOrders(
@@ -135,7 +158,35 @@ public class OrderController {
                 )
         );
 
-        return "my-orders";
+        return "pages/orders/list";
+    }
+
+    // ================== ORDER DETAILS ==================
+
+    @GetMapping("/{id}")
+    public String orderDetails(
+            @PathVariable("id") Long id,
+            Model model,
+            Principal principal) {
+
+        if (principal == null) {
+            return "redirect:/auth/login";
+        }
+
+        String email = normalizeEmail(principal.getName());
+        logger.info("Fetching order details for order: {} by user: {}", id, email);
+
+        try {
+            com.example.agrolink.dto.OrderDTO order = orderService.getOrderById(id, email);
+            model.addAttribute("order", order);
+            return "pages/orders/details";
+        } catch (IllegalArgumentException ex) {
+            logger.warn("Unauthorized order access attempt: {}", ex.getMessage());
+            return "redirect:/orders/my?error=unauthorized";
+        } catch (Exception ex) {
+            logger.error("Failed to load order details: {}", ex.getMessage());
+            return "redirect:/orders/my?error=true";
+        }
     }
 
     // ================== HELPERS ==================

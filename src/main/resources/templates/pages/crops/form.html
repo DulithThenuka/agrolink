@@ -16,12 +16,8 @@
 <div
         th:replace="~{
         layout/base ::
-        *
-}"
-        th:with="
-            title='Add Crop',
-            content='pages/crops/form :: content'
-        ">
+        base('Add Crop', ~{::content})
+}">
 </div>
 
 <!-- ================== PAGE CONTENT ================== -->

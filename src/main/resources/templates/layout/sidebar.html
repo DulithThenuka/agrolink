@@ -80,7 +80,7 @@
                 <a
                         th:href="@{/crops}"
 
-                        th:classappend="${#httpServletRequest.requestURI.startsWith('/crops')}
+                        th:classappend="${currentUri != null && currentUri.startsWith('/crops')}
                             ? ' bg-green-100 text-green-700'
                             : ' text-gray-600'"
 
@@ -103,7 +103,7 @@
 
                         th:href="@{/orders/my}"
 
-                        th:classappend="${#httpServletRequest.requestURI.startsWith('/orders')}
+                        th:classappend="${currentUri != null && currentUri.startsWith('/orders')}
                             ? ' bg-green-100 text-green-700'
                             : ' text-gray-600'"
 
@@ -126,7 +126,7 @@
 
                         th:href="@{/crops/add}"
 
-                        th:classappend="${#httpServletRequest.requestURI.contains('/add')}
+                        th:classappend="${currentUri != null && currentUri.contains('/add')}
                             ? ' bg-green-100 text-green-700'
                             : ' text-gray-600'"
 

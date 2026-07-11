@@ -37,6 +37,6 @@ public class AdminController {
 
         model.addAttribute("dashboard", dashboard);
 
-        return "admin-dashboard";
+        return "pages/dashboard/dashboard";
     }
 }

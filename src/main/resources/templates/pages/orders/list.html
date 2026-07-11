@@ -16,12 +16,8 @@
 <div
         th:replace="~{
         layout/base ::
-        *
-}"
-        th:with="
-            title='My Orders',
-            content='pages/orders/list :: content'
-        ">
+        base('My Orders', ~{::content})
+}">
 </div>
 
 <!-- ================== PAGE CONTENT ================== -->
@@ -55,6 +51,34 @@
 
         </a>
 
+    </div>
+
+    <!-- SUCCESS MESSAGE -->
+    <div
+            th:if="${successMessage}"
+            class="mb-6"
+
+            th:replace="~{
+            components/feedback/alert ::
+            alert(
+            'success',
+            ${successMessage}
+            )
+    }">
+    </div>
+
+    <!-- ERROR MESSAGE -->
+    <div
+            th:if="${errorMessage}"
+            class="mb-6"
+
+            th:replace="~{
+            components/feedback/alert ::
+            alert(
+            'error',
+            ${errorMessage}
+            )
+    }">
     </div>
 
     <!-- EMPTY -->

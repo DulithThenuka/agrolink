@@ -5,8 +5,7 @@
 
 <body>
 
-<div th:replace="layout/base :: *"
-     th:with="title='Profile', content='pages/profile/profile :: content'">
+<div th:replace="~{layout/base :: base('Profile', ~{::content})}">
 </div>
 
 <!-- ================== CONTENT ================== -->

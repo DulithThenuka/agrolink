@@ -40,7 +40,7 @@ public class AuthController {
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("user", new UserRegisterDTO());
-        return "register";
+        return "pages/auth/register";
     }
 
     // ================== REGISTER ==================
@@ -53,7 +53,7 @@ public class AuthController {
         logger.info("Registration attempt for email: {}", userDTO.getEmail());
 
         if (result.hasErrors()) {
-            return "register";
+            return "pages/auth/register";
         }
 
         try {
@@ -61,7 +61,7 @@ public class AuthController {
         } catch (IllegalArgumentException ex) {
             logger.warn("Registration failed: {}", ex.getMessage());
             result.rejectValue("email", "error.user", ex.getMessage());
-            return "register";
+            return "pages/auth/register";
         }
 
         return "redirect:/auth/login?registered=true";
