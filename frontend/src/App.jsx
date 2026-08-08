@@ -14,7 +14,9 @@ import { AddCrop } from './pages/AddCrop';
 import { Dashboard } from './pages/Dashboard';
 import { Analytics } from './pages/Analytics';
 import { CropAdvisor } from './pages/CropAdvisor';
+import { PricePrediction } from './pages/PricePrediction';
 import { Orders } from './pages/Orders';
+
 
 
 import { Profile } from './pages/Profile';
@@ -53,6 +55,8 @@ function AppContent() {
             <Route path="/crops/:id" element={<CropDetails />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/advisor" element={<CropAdvisor />} />
+            <Route path="/price-prediction" element={<PricePrediction />} />
+
 
 
 

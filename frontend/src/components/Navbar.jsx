@@ -59,6 +59,16 @@ export const Navbar = () => {
             AI Advisor 🤖
           </Link>
 
+          <Link
+            to="/price-prediction"
+            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/price-prediction') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Price Predictor 📈
+          </Link>
+
+
 
 
           {isBuyer && (
