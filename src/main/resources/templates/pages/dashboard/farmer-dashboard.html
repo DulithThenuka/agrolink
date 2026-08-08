@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head
+        th:replace="~{
+        fragments/head ::
+        head('Smart Farmer Dashboard')
+        }">
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- ================== PAGE CONTENT ================== -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-grow w-full animate-fade-in-up">
+
+    <!-- TOP GREETING BANNER -->
+    <div class="glass rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xl bg-gradient-to-r from-emerald-900/90 via-teal-900/90 to-slate-900 text-white relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                    <span>🌾 Smart Agronomy Engine</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-display">
+                    Good Morning, <span th:text="${farmerDashboard.farmerName}">Farmer</span> 👨‍🌾
+                </h1>
+                <p class="text-emerald-100/80 text-sm max-w-xl">
+                    Your farm health score is optimal. Review live risk gauges, low-stock warnings, and buyer orders below.
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 shrink-0">
+                <div class="text-center">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-300 block">Overall Farm Health</span>
+                    <span class="text-4xl font-extrabold font-display text-white" th:text="${farmerDashboard.farmHealthPercentage} + '%'">87%</span>
+                </div>
+                <div class="w-12 h-12 rounded-full border-4 border-emerald-400 border-t-transparent animate-spin-slow flex items-center justify-center text-lg">
+                    🌱
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RISK & MARKET MATRIX GRID -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <!-- WEATHER RISK -->
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md flex items-center justify-between">
+            <div class="space-y-1">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Weather Risk</p>
+                <h3 class="text-2xl font-extrabold font-display text-emerald-600 flex items-center gap-1.5" th:text="${farmerDashboard.weatherRisk} + ' ☀️'">
+                    Low ☀️
+                </h3>
+                <p class="text-[11px] text-slate-500 font-semibold">26°C Sunny • 0% Rain Precip</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold">
+                🌤️
+            </div>
+        </div>
+
+        <!-- DISEASE RISK -->
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md flex items-center justify-between">
+            <div class="space-y-1">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Crop Disease Risk</p>
+                <h3 class="text-2xl font-extrabold font-display text-amber-600 flex items-center gap-1.5" th:text="${farmerDashboard.diseaseRisk} + ' ⚠️'">
+                    Medium ⚠️
+                </h3>
+                <p class="text-[11px] text-amber-700 font-semibold">Fungal alert for Solanaceae</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">
+                🔬
+            </div>
+        </div>
+
+        <!-- MARKET DEMAND -->
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md flex items-center justify-between">
+            <div class="space-y-1">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Market Demand</p>
+                <h3 class="text-2xl font-extrabold font-display text-teal-600 flex items-center gap-1.5" th:text="${farmerDashboard.marketDemand} + ' 🔥'">
+                    High 🔥
+                </h3>
+                <p class="text-[11px] text-teal-700 font-semibold">Strong commercial demand</p>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl font-bold">
+                📈
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN FINANCIAL & INVENTORY STATS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Current Crops Listed</p>
+            <h2 class="text-3xl font-extrabold text-slate-900 font-display mt-2" th:text="${farmerDashboard.currentCropsCount} + ' Batches'">6 Batches</h2>
+            <p class="text-xs text-emerald-600 font-bold mt-1">1,450 Kg Active Inventory</p>
+        </div>
+
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Expected Revenue</p>
+            <h2 class="text-3xl font-extrabold text-emerald-600 font-display mt-2" th:text="'Rs. ' + ${#numbers.formatDecimal(farmerDashboard.expectedRevenueLkr, 1, 'COMMA', 0, 'POINT')}">Rs. 248,000</h2>
+            <p class="text-xs text-slate-500 font-semibold mt-1">Projected gross direct trade</p>
+        </div>
+
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Pending Buyer Orders</p>
+            <h2 class="text-3xl font-extrabold text-amber-600 font-display mt-2" th:text="${farmerDashboard.pendingOrdersCount} + ' Orders'">12 Orders</h2>
+            <p class="text-xs text-amber-700 font-bold mt-1">Requires harvest dispatch</p>
+        </div>
+
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Delivery Success Rate</p>
+            <h2 class="text-3xl font-extrabold text-slate-900 font-display mt-2">99.4%</h2>
+            <p class="text-xs text-emerald-600 font-bold mt-1">On-time logistics rating</p>
+        </div>
+    </div>
+
+    <!-- LOW STOCK WARNINGS & RECOMMENDED SELLING PRICES -->
+    <div class="grid lg:grid-cols-12 gap-8">
+        
+        <!-- LOW STOCK WARNINGS -->
+        <div class="lg:col-span-6 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 font-display flex items-center gap-2">
+                    <span class="text-amber-500">⚠️</span> Low-Stock Inventory Alerts
+                </h3>
+                <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">Re-stock Warning</span>
+            </div>
+
+            <div class="space-y-3">
+                <th:block th:each="alert : ${farmerDashboard.lowStockAlerts}">
+                    <div class="p-3.5 bg-amber-50/80 rounded-2xl border border-amber-200/80 flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm" th:text="${alert.cropName}">Crop Name</h4>
+                            <p class="text-xs text-amber-800 font-semibold mt-0.5" th:text="'Only ' + ${alert.remainingQuantity} + ' Kg remaining in warehouse'">Only 12 Kg remaining</p>
+                        </div>
+                        <a th:href="@{/crops/add}" class="btn btn-accent py-1.5 px-3 text-xs font-bold shrink-0">
+                            Re-stock +
+                        </a>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <!-- RECOMMENDED SELLING PRICE BENCHMARKS -->
+        <div class="lg:col-span-6 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 font-display flex items-center gap-2">
+                    <span class="text-emerald-600">💡</span> Agronomy Price Benchmarks
+                </h3>
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">AI Price Suggestion</span>
+            </div>
+
+            <div class="space-y-3">
+                <th:block th:each="bench : ${farmerDashboard.cropBenchmarks}">
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 flex items-center justify-between text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900 text-sm" th:text="${bench.cropName}">Samba Rice</span>
+                            <span class="text-slate-500 font-medium block" th:text="'Current: Rs. ' + ${bench.currentPrice} + '/Kg'">Current: Rs. 210</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-extrabold text-emerald-600 text-sm block" th:text="'Rec: Rs. ' + ${bench.recommendedPrice} + '/Kg'">Rec: Rs. 240</span>
+                            <span class="text-[10px] font-bold text-emerald-700 uppercase" th:text="${bench.demandLevel}">High Demand</span>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PENDING BUYER ORDERS TABLE -->
+    <div class="premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-4">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-slate-900 font-display">Pending Buyer Orders &amp; Dispatch</h3>
+            <a th:href="@{/crops/add}" class="btn btn-primary py-2 px-4 text-xs font-bold">
+                ➕ Publish New Batch
+            </a>
+        </div>
+
+        <div class="premium-table-container">
+            <table class="premium-table">
+                <thead>
+                <tr>
+                    <th>Harvest Item</th>
+                    <th>Buyer Email</th>
+                    <th>Qty (Kg)</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${farmerDashboard.recentFarmerOrders}">
+                    <td class="font-bold text-slate-900" th:text="${order.cropName}">Crop Name</td>
+                    <td class="text-slate-500 text-xs font-semibold" th:text="${order.buyerEmail}">buyer@example.com</td>
+                    <td class="font-extrabold text-slate-800" th:text="${order.quantity} + ' Kg'">100 Kg</td>
+                    <td>
+                        <span class="badge-premium badge-pending font-bold uppercase text-[10px]" th:text="${order.status}">PENDING</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary py-1.5 px-3 text-[11px] font-bold">
+                            Mark Dispatched →
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- SCRIPTS -->
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+</html>

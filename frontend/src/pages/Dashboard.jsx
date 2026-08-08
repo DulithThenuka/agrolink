@@ -3,10 +3,17 @@ import { Link } from 'react-router-dom';
 import { adminAPI, cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp, Sparkles } from 'lucide-react';
+import { FarmerDashboard } from './FarmerDashboard';
 
 export const Dashboard = () => {
   const { user, isFarmer, isBuyer, isAdmin } = useAuth();
+  
+  if (isFarmer) {
+    return <FarmerDashboard />;
+  }
+
   const [stats, setStats] = useState({ totalUsers: 0, totalCrops: 0, totalOrders: 0 });
+
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 

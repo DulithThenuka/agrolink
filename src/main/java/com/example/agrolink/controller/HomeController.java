@@ -34,8 +34,9 @@ public class HomeController {
         }
 
         if (hasRole(auth, Role.FARMER)) {
-            return "redirect:/crops";
+            return "redirect:/farmer/dashboard";
         }
+
 
         if (hasRole(auth, Role.BUYER)) {
             return "redirect:/crops";
