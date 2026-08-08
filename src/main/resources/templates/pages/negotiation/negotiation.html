@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
+
+<head
+        th:replace="~{
+        fragments/head ::
+        head('Buyer ↔ Farmer Negotiation')
+        }">
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- ================== PAGE CONTENT ================== -->
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-grow w-full animate-fade-in-up">
+
+    <!-- HEADER BANNER -->
+    <div class="glass rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xl bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                <span>💬 B2B Direct Trade Room</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-display">
+                Buyer ↔ Farmer Negotiation 💬
+            </h1>
+            <p class="text-emerald-100/80 text-sm max-w-2xl">
+                Direct wholesale negotiation between commercial buyers and farmers. Agree on weekly supply volumes, custom pricing, and generate binding B2B contracts.
+            </p>
+        </div>
+    </div>
+
+    <!-- B2B CONTRACT CERTIFICATE BANNER (IF CONTRACT CREATED) -->
+    <div th:if="${negotiation.status == 'CONTRACT_CREATED'}" class="p-6 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 rounded-3xl text-white shadow-xl space-y-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">📜</span>
+                <div>
+                    <h3 class="text-lg font-extrabold font-display">B2B Smart Contract Generated &amp; Signed</h3>
+                    <p class="text-xs text-emerald-100 font-semibold" th:text="'Contract Reference ID: ' + ${negotiation.contractId}">#AGRO-B2B-8924</p>
+                </div>
+            </div>
+            <span class="px-4 py-1.5 bg-white text-emerald-900 font-extrabold text-xs rounded-full shadow-md">
+                ✓ Binding Agreement Active
+            </span>
+        </div>
+        <div class="p-4 bg-white/10 rounded-2xl border border-white/10 text-xs flex justify-between items-center">
+            <span>Agreed Terms: <strong class="text-white">500kg / week @ Rs. 200/kg (Delivery Included)</strong></span>
+            <span class="font-bold text-emerald-200">Escrow Payment Locked</span>
+        </div>
+    </div>
+
+    <!-- MAIN CHAT & NEGOTIATION CONTAINER -->
+    <div class="grid lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- CHAT THREAD PANEL -->
+        <div class="lg:col-span-7 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-display">Live Trade Conversation</h3>
+                    <p class="text-xs text-slate-400" th:text="${negotiation.buyerName} + ' ↔ ' + ${negotiation.farmerName}">Buyer ↔ Farmer</p>
+                </div>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full" th:text="${negotiation.cropName}">Tomato</span>
+            </div>
+
+            <!-- CHAT MESSAGES THREAD -->
+            <div class="space-y-3 py-2 max-h-96 overflow-y-auto pr-1">
+                <th:block th:each="msg : ${negotiation.messages}">
+                    <!-- BUYER MESSAGE (LEFT) -->
+                    <div th:if="${msg.senderRole == 'BUYER'}" class="flex gap-3 items-start max-w-[85%]">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shrink-0">👤</div>
+                        <div class="p-3.5 bg-slate-100 rounded-2xl text-xs font-semibold text-slate-800 space-y-1">
+                            <span class="text-[10px] font-bold text-slate-400 block uppercase" th:text="${negotiation.buyerName} + ' • ' + ${msg.timestampText}">Buyer</span>
+                            <p th:text="${msg.text}">Message text</p>
+                        </div>
+                    </div>
+
+                    <!-- FARMER MESSAGE (RIGHT) -->
+                    <div th:if="${msg.senderRole == 'FARMER'}" class="flex gap-3 items-start justify-end ml-auto max-w-[85%]">
+                        <div class="p-3.5 bg-emerald-600 text-white rounded-2xl text-xs font-semibold space-y-1 text-right shadow-md">
+                            <span class="text-[10px] font-bold text-emerald-200 block uppercase" th:text="${negotiation.farmerName} + ' • ' + ${msg.timestampText}">Farmer</span>
+                            <p th:text="${msg.text}">Message text</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-xs shrink-0">🧑‍🌾</div>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- INPUT CHAT BOX -->
+            <div class="pt-3 border-t border-slate-100 flex gap-2">
+                <input type="text" placeholder="Type counter offer or message..." class="input-premium text-xs flex-1" />
+                <button class="btn btn-primary py-2.5 px-4 text-xs font-bold">
+                    Send 💬
+                </button>
+            </div>
+        </div>
+
+        <!-- COUNTER OFFER & CONTRACT TERMS PANEL -->
+        <div class="lg:col-span-5 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-5">
+            <div class="pb-3 border-b border-slate-100">
+                <h3 class="text-base font-bold text-slate-900 font-display">Active Counter-Proposal Terms</h3>
+                <p class="text-xs text-slate-400">Review terms before accepting binding agreement</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500">
+                        <span>Proposed Price:</span>
+                        <span class="text-base font-extrabold text-emerald-600 font-display" th:text="'Rs. ' + ${#numbers.formatDecimal(negotiation.currentOfferedPriceLkr, 1, 2)} + '/kg'">Rs. 200.00/kg</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500">
+                        <span>Weekly Supply Volume:</span>
+                        <span class="text-sm font-bold text-slate-900" th:text="${negotiation.currentOfferedQuantityKg} + ' kg / week'">500 kg / week</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs font-bold text-slate-500">
+                        <span>Delivery Terms:</span>
+                        <span class="text-xs font-bold text-emerald-700">Included to Warehouse</span>
+                    </div>
+                </div>
+
+                <!-- ACCEPT OFFER FORM -->
+                <form th:if="${negotiation.status != 'CONTRACT_CREATED'}" th:action="@{/negotiation/accept}" method="post" class="space-y-3">
+                    <button type="submit" class="btn btn-primary w-full py-3 font-bold text-xs shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2">
+                        <span>📜</span> ACCEPT OFFER &amp; CREATE CONTRACT
+                    </button>
+                </form>
+
+                <div th:if="${negotiation.status == 'CONTRACT_CREATED'}" class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-1">
+                    <span class="text-xs font-extrabold text-emerald-800 block">✓ Contract Active &amp; Enforced</span>
+                    <a th:href="@{/orders/my}" class="text-[11px] font-bold text-emerald-600 hover:underline">Track Escrow Delivery →</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- SCRIPTS -->
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+</html>

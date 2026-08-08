@@ -86,6 +86,16 @@ export const Navbar = () => {
             Disease Scanner 📷
           </Link>
 
+          <Link
+            to="/negotiation"
+            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/negotiation') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Negotiations 💬
+          </Link>
+
+
 
 
 
