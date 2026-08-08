@@ -18,7 +18,9 @@ import { PricePrediction } from './pages/PricePrediction';
 import { DemandForecasting } from './pages/DemandForecasting';
 import { CropDiseaseDetection } from './pages/CropDiseaseDetection';
 import { TradeNegotiation } from './pages/TradeNegotiation';
+import { ContractFarming } from './pages/ContractFarming';
 import { Orders } from './pages/Orders';
+
 
 
 
@@ -65,6 +67,8 @@ function AppContent() {
             <Route path="/demand-forecasting" element={<DemandForecasting />} />
             <Route path="/disease-detection" element={<CropDiseaseDetection />} />
             <Route path="/negotiation" element={<TradeNegotiation />} />
+            <Route path="/contracts" element={<ContractFarming />} />
+
 
 
 

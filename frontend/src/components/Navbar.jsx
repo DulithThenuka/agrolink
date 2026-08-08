@@ -95,6 +95,16 @@ export const Navbar = () => {
             Negotiations 💬
           </Link>
 
+          <Link
+            to="/contracts"
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/contracts') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Contracts 📑
+          </Link>
+
+
 
 
 

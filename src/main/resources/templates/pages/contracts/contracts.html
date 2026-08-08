@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
+
+<head
+        th:replace="~{
+        fragments/head ::
+        head('Contract Farming & B2B Tenders')
+        }">
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- ================== PAGE CONTENT ================== -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-grow w-full animate-fade-in-up">
+
+    <!-- HEADER -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200/60">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2 border border-emerald-200/60">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> B2B Contract Farming Hub
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">
+                Contract Farming &amp; B2B Purchase Requests 📑
+            </h1>
+            <p class="text-slate-500 text-sm mt-1">
+                Commercial supermarkets, hotel chains, and exporters publish long-term future harvest requirements. Apply to secure guaranteed income.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button onclick="alert('B2B Purchase Tender Form opened for Commercial Enterprise')" class="btn btn-primary py-2.5 px-5 text-xs font-bold shadow-md shadow-emerald-500/20">
+                + Create Purchase Request
+            </button>
+        </div>
+    </div>
+
+    <!-- APPLICATION SUCCESS NOTIFICATION -->
+    <div th:if="${appliedSuccess}" class="p-4 bg-emerald-100 text-emerald-900 rounded-2xl border border-emerald-200 text-xs font-bold flex items-center gap-2">
+        <span>✓</span> Your Contract Farming Application has been submitted to the buyer! The buyer will review your weekly capacity.
+    </div>
+
+    <!-- CONTRACT TENDERS GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <th:block th:each="contract : ${contracts}">
+            <div class="premium-card p-6 bg-white border border-slate-100/90 shadow-lg space-y-4 flex flex-col justify-between">
+                <div class="space-y-3">
+                    <!-- BUYER & TENDER BADGE -->
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/50" th:text="${contract.buyerCategory}">
+                                Supermarket Chain
+                            </span>
+                            <h3 class="text-lg font-extrabold text-slate-900 font-display mt-1" th:text="${contract.buyerName}">
+                                Keells Supermarket
+                            </h3>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase" th:text="${contract.qualityGrade}">
+                            Grade A
+                        </span>
+                    </div>
+
+                    <!-- REQUIREMENT TITLE -->
+                    <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500">Requirement:</span>
+                        <span class="text-sm font-extrabold text-emerald-600 font-display flex items-center gap-1.5">
+                            🌾 <span th:text="${contract.cropName}">Tomato</span>
+                        </span>
+                    </div>
+
+                    <!-- SPECIFICATIONS MATRIX -->
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center text-slate-600">
+                            <span class="font-medium">Monthly Quantity:</span>
+                            <span class="font-extrabold text-slate-900" th:text="${#numbers.formatInteger(contract.monthlyQuantityKg, 1, 'COMMA')} + ' kg / month'">2,000 kg/month</span>
+                        </div>
+
+                        <div class="flex justify-between items-center text-slate-600">
+                            <span class="font-medium">Contract Term:</span>
+                            <span class="font-extrabold text-slate-900" th:text="${contract.durationMonths} + ' Months'">6 Months</span>
+                        </div>
+
+                        <div class="flex justify-between items-center text-slate-600">
+                            <span class="font-medium">Expected Price:</span>
+                            <span class="font-extrabold text-emerald-600" th:text="'Rs. ' + ${#numbers.formatDecimal(contract.minPriceLkr, 1, 0)} + ' – ' + ${#numbers.formatDecimal(contract.maxPriceLkr, 1, 0)} + '/kg'">Rs. 180–220/kg</span>
+                        </div>
+
+                        <div class="flex justify-between items-center text-slate-600">
+                            <span class="font-medium">Delivery Frequency:</span>
+                            <span class="font-bold text-slate-800" th:text="${contract.deliveryFrequency}">Weekly</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span class="text-[11px] text-slate-400 font-semibold" th:text="${contract.applicantCount} + ' farmers applied'">14 applicants</span>
+                    <form th:action="@{/contracts/apply}" method="post">
+                        <button type="submit" class="btn btn-primary py-2.5 px-4 text-xs font-bold shadow-md shadow-emerald-500/20">
+                            Apply for Contract →
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </th:block>
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- SCRIPTS -->
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+</html>
