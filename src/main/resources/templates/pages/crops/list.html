@@ -21,7 +21,7 @@
     <!-- HEADER & SEARCH -->
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 pb-6 border-b border-slate-200/60">
         <div>
-            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">Available Crops 🌾</h1>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">Produce Marketplace 🌾</h1>
             <p class="text-slate-500 text-sm mt-1">Discover, order, or sell fresh organic agriculture harvests directly.</p>
         </div>
 
@@ -39,6 +39,32 @@
             </button>
         </form>
     </div>
+
+    <!-- QUICK CATEGORY PILLS -->
+    <div class="flex flex-wrap gap-2.5 items-center">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mr-1">Filter Category:</span>
+        <a th:href="@{/crops}" class="px-4 py-2 rounded-xl text-xs font-bold transition border"
+           th:classappend="${category == null || category == ''} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            All Yields
+        </a>
+        <a th:href="@{/crops(category='Vegetables')}" class="px-4 py-2 rounded-xl text-xs font-bold transition border"
+           th:classappend="${category == 'Vegetables'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            🥬 Vegetables
+        </a>
+        <a th:href="@{/crops(category='Grains')}" class="px-4 py-2 rounded-xl text-xs font-bold transition border"
+           th:classappend="${category == 'Grains'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            🌾 Grains &amp; Cereals
+        </a>
+        <a th:href="@{/crops(category='Fruits')}" class="px-4 py-2 rounded-xl text-xs font-bold transition border"
+           th:classappend="${category == 'Fruits'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            🍎 Fruits
+        </a>
+        <a th:href="@{/crops(category='Spices')}" class="px-4 py-2 rounded-xl text-xs font-bold transition border"
+           th:classappend="${category == 'Spices'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            🌶️ Spices
+        </a>
+    </div>
+
 
     <!-- FILTERS -->
     <div class="premium-card p-6 bg-white border border-slate-100">

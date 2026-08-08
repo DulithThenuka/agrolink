@@ -98,6 +98,29 @@ export const CropsList = () => {
         </form>
       </div>
 
+      {/* QUICK CATEGORY PILLS */}
+      <div className="flex flex-wrap gap-2.5 items-center">
+        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mr-1">Category Pill Filters:</span>
+        {['', 'Vegetables', 'Grains', 'Fruits', 'Spices'].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => {
+              setCategory(cat);
+              setPage(0);
+              fetchCrops();
+            }}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition border ${
+              category === cat
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'
+            }`}
+          >
+            {cat === '' ? 'All Produce' : cat}
+          </button>
+        ))}
+      </div>
+
+
       {/* FILTER BAR */}
       <div className="premium-card p-6 bg-white border border-slate-100">
         <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">

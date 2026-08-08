@@ -41,6 +41,16 @@ export const Navbar = () => {
             Crops Catalog
           </Link>
 
+          <Link
+            to="/analytics"
+            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/analytics') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Analytics
+          </Link>
+
+
           {isBuyer && (
             <Link
               to="/orders"

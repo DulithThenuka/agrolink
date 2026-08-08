@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
+
+<head
+        th:replace="~{
+        fragments/head ::
+        head('Market Analytics & Price Trends')
+        }">
+</head>
+
+<body class="bg-slate-50 text-slate-900 font-sans antialiased flex flex-col min-h-screen">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- ================== PAGE CONTENT ================== -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-grow w-full animate-fade-in-up">
+
+    <!-- HEADER & COMMODITY TICKER -->
+    <div class="space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-200/80">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Agricultural Market Intelligence
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-display">Crop Analytics &amp; Price Trends 📈</h1>
+                <p class="text-slate-500 text-sm mt-1">Real-time pricing benchmarks, direct trade savings metrics, and market demand forecasts.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="window.print()" class="btn btn-secondary text-xs font-bold py-2.5 px-4">
+                    📄 Export Report
+                </button>
+                <a th:href="@{/crops}" class="btn btn-primary text-xs font-bold py-2.5 px-5 shadow-md shadow-emerald-500/20">
+                    Browse Produce →
+                </a>
+            </div>
+        </div>
+
+        <!-- LIVE COMMODITY PRICE TICKER BAR -->
+        <div class="glass rounded-2xl p-3 border border-white/80 shadow-md overflow-x-auto">
+            <div class="flex items-center gap-6 min-w-max px-2">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-slate-400 border-r border-slate-200 pr-4">Commodity Index</span>
+                <th:block th:each="item : ${analytics.commodityPrices}">
+                    <div class="flex items-center gap-2 text-xs font-bold">
+                        <span class="text-slate-800" th:text="${item.name}">Crop</span>
+                        <span class="text-emerald-700" th:text="'Rs.' + ${item.pricePerKg}">Rs. 0</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px]"
+                              th:classappend="${item.trend == 'UP'} ? 'bg-emerald-100 text-emerald-800' : (${item.trend == 'DOWN'} ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600')"
+                              th:text="${item.changePercentage > 0 ? '+' : ''} + ${item.changePercentage} + '%'">
+                            +0.0%
+                        </span>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS OVERVIEW CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Total Traded Volume</p>
+            <h2 class="text-3xl font-extrabold text-slate-900 font-display mt-2" th:text="'$' + ${#numbers.formatDecimal(analytics.totalTradeVolume, 1, 2)}">$184,050.00</h2>
+            <p class="text-xs text-emerald-600 font-bold mt-1">↑ +18.4% vs last quarter</p>
+        </div>
+
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Active Listings</p>
+            <h2 class="text-3xl font-extrabold text-slate-900 font-display mt-2" th:text="${analytics.totalListings}">142</h2>
+            <p class="text-xs text-emerald-600 font-bold mt-1">Verified farm sources</p>
+        </div>
+
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Escrow Settled Orders</p>
+            <h2 class="text-3xl font-extrabold text-slate-900 font-display mt-2" th:text="${analytics.totalCompletedOrders}">98</h2>
+            <p class="text-xs text-emerald-600 font-bold mt-1">100% On-time fulfillment</p>
+        </div>
+
+        <div class="premium-card p-6 bg-white border border-slate-100 shadow-md">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Avg Buyer Savings</p>
+            <h2 class="text-3xl font-extrabold text-emerald-600 font-display mt-2" th:text="${analytics.averageSavingsPercentage} + '%'">34.2%</h2>
+            <p class="text-xs text-slate-500 font-semibold mt-1">Vs. wholesale middleman markup</p>
+        </div>
+    </div>
+
+    <!-- VISUAL CHARTS SECTION -->
+    <div class="grid lg:grid-cols-12 gap-8">
+        
+        <!-- CHART 1: HISTORICAL PRICE TREND -->
+        <div class="lg:col-span-8 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 font-display">Crop Price Benchmark Trends ($/Kg)</h3>
+                    <p class="text-xs text-slate-400">Monthly direct price movement comparison</p>
+                </div>
+                <span class="px-3 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-full">6 Month View</span>
+            </div>
+            <div class="relative h-72">
+                <canvas id="priceTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- CHART 2: CATEGORY SHARE -->
+        <div class="lg:col-span-4 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-4">
+            <div class="pb-2 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 font-display">Production Category Share</h3>
+                <p class="text-xs text-slate-400">Yield breakdown by crop type</p>
+            </div>
+            <div class="relative h-72 flex items-center justify-center">
+                <canvas id="categoryShareChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SAVINGS COMPARISON BAR CHART & CALCULATOR -->
+    <div class="grid lg:grid-cols-12 gap-8">
+
+        <!-- SAVINGS BAR CHART -->
+        <div class="lg:col-span-7 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-4">
+            <div class="pb-2 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 font-display">Direct Trade vs Traditional Wholesale Cost ($/Kg)</h3>
+                <p class="text-xs text-slate-400">Showing buyer savings per unit</p>
+            </div>
+            <div class="relative h-72">
+                <canvas id="savingsComparisonChart"></canvas>
+            </div>
+        </div>
+
+        <!-- INTERACTIVE FARMER PROFIT CALCULATOR -->
+        <div class="lg:col-span-5 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-5"
+             x-data="{
+                 yieldKg: 500,
+                 suggestedPrice: 2.50,
+                 get totalRevenue() { return (this.yieldKg * this.suggestedPrice).toFixed(2); },
+                 get directProfit() { return (this.yieldKg * this.suggestedPrice * 0.92).toFixed(2); }
+             }">
+            <div class="pb-3 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 font-display">Farmer Profit Estimator 🧮</h3>
+                <p class="text-xs text-slate-400">Estimate listing revenues bypassing intermediary fees</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Expected Harvest Yield (Kg)</label>
+                    <input type="number" x-model.number="yieldKg" min="10" max="10000" class="input-premium font-bold" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Listing Price ($ / Kg)</label>
+                    <input type="number" step="0.10" x-model.number="suggestedPrice" min="0.50" max="50" class="input-premium font-bold" />
+                </div>
+
+                <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 space-y-2">
+                    <div class="flex justify-between items-center text-xs font-semibold text-slate-600">
+                        <span>Gross Trade Volume:</span>
+                        <span class="font-bold text-slate-900" x-text="'$' + totalRevenue">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm font-extrabold text-emerald-800">
+                        <span>Estimated Net Farmer Revenue:</span>
+                        <span class="text-xl font-display text-emerald-600" x-text="'$' + directProfit">$0.00</span>
+                    </div>
+                </div>
+
+                <a th:href="@{/crops}" class="btn btn-primary w-full py-3 font-bold text-xs shadow-md shadow-emerald-500/20">
+                    List Your Produce Batch →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- SCRIPTS & CHART.JS CODE -->
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // --- 1. PRICE TREND LINE CHART ---
+        const priceCtx = document.getElementById('priceTrendChart');
+        if (priceCtx) {
+            new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Grains & Cereals',
+                            data: [1.80, 1.85, 1.90, 1.95, 2.10, 2.20],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Vegetables',
+                            data: [2.50, 2.40, 2.65, 2.80, 2.70, 2.90],
+                            borderColor: '#0d9488',
+                            backgroundColor: 'transparent',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Fruits',
+                            data: [3.20, 3.10, 3.30, 3.50, 3.45, 3.60],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'transparent',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: false } }
+                }
+            });
+        }
+
+        // --- 2. CATEGORY SHARE DOUGHNUT CHART ---
+        const catCtx = document.getElementById('categoryShareChart');
+        if (catCtx) {
+            new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Vegetables', 'Grains', 'Fruits', 'Spices'],
+                    datasets: [{
+                        data: [42.5, 28.0, 18.5, 11.0],
+                        backgroundColor: ['#10b981', '#0d9488', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        // --- 3. SAVINGS COMPARISON BAR CHART ---
+        const savCtx = document.getElementById('savingsComparisonChart');
+        if (savCtx) {
+            new Chart(savCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Rice', 'Tomatoes', 'Potatoes', 'Sweet Corn', 'Green Chillies'],
+                    datasets: [
+                        {
+                            label: 'Traditional Wholesale Price ($)',
+                            data: [3.10, 2.80, 3.50, 2.20, 5.80],
+                            backgroundColor: '#cbd5e1',
+                            borderRadius: 8
+                        },
+                        {
+                            label: 'AgroLink Direct Price ($)',
+                            data: [2.20, 1.85, 2.40, 1.40, 3.90],
+                            backgroundColor: '#10b981',
+                            borderRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

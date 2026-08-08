@@ -12,7 +12,9 @@ import { CropsList } from './pages/CropsList';
 import { CropDetails } from './pages/CropDetails';
 import { AddCrop } from './pages/AddCrop';
 import { Dashboard } from './pages/Dashboard';
+import { Analytics } from './pages/Analytics';
 import { Orders } from './pages/Orders';
+
 import { Profile } from './pages/Profile';
 
 const ProtectedRoute = ({ children, requireFarmer }) => {
@@ -47,6 +49,8 @@ function AppContent() {
 
             <Route path="/crops" element={<CropsList />} />
             <Route path="/crops/:id" element={<CropDetails />} />
+            <Route path="/analytics" element={<Analytics />} />
+
 
             <Route
               path="/crops/add"

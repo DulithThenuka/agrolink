@@ -42,6 +42,15 @@
                         <span>📦 Orders</span>
                     </a>
 
+                    <!-- ANALYTICS -->
+                    <a th:href="@{/analytics}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/analytics')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>📈 Analytics</span>
+                    </a>
+
                     <!-- DASHBOARD -->
                     <a sec:authorize="isAuthenticated()"
                        th:href="@{/dashboard}"
@@ -51,6 +60,7 @@
                            : ''">
                         <span>📊 Dashboard</span>
                     </a>
+
 
                 </div>
 
