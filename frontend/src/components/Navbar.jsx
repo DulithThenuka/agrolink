@@ -68,6 +68,16 @@ export const Navbar = () => {
             Price Predictor 📈
           </Link>
 
+          <Link
+            to="/demand-forecasting"
+            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/demand-forecasting') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Demand Forecast 📊
+          </Link>
+
+
 
 
 

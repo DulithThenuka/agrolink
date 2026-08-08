@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
+
+<head
+        th:replace="~{
+        fragments/head ::
+        head('Demand Forecasting & Overproduction Prevention')
+        }">
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- ================== PAGE CONTENT ================== -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-grow w-full animate-fade-in-up">
+
+    <!-- HEADER BANNER -->
+    <div class="glass rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xl bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                <span>📊 Economic Market Balance</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-display">
+                Demand Forecasting 📊
+            </h1>
+            <p class="text-emerald-100/80 text-sm max-w-2xl">
+                Prevent overproduction gluts and crop price crashes. View regional demand trends before sowing your harvest.
+            </p>
+        </div>
+    </div>
+
+    <!-- PROVINCIAL TABS -->
+    <div class="flex flex-wrap gap-3 items-center">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mr-2">Select Province:</span>
+        <a th:href="@{/demand-forecasting(province='Western Province')}" class="px-5 py-2.5 rounded-xl text-xs font-bold transition border"
+           th:classappend="${selectedProvince == 'Western Province' || selectedProvince == null} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            🏛️ Western Province
+        </a>
+        <a th:href="@{/demand-forecasting(province='Central Province')}" class="px-5 py-2.5 rounded-xl text-xs font-bold transition border"
+           th:classappend="${selectedProvince == 'Central Province'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            ⛰️ Central Province
+        </a>
+        <a th:href="@{/demand-forecasting(province='Northern Province')}" class="px-5 py-2.5 rounded-xl text-xs font-bold transition border"
+           th:classappend="${selectedProvince == 'Northern Province'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20' : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'">
+            🌅 Northern Province
+        </a>
+    </div>
+
+    <!-- SOCIAL/ECONOMIC PROBLEM SOLVING BANNER -->
+    <div class="premium-card p-6 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 shadow-md space-y-2">
+        <div class="flex items-center gap-2">
+            <span class="text-lg">🛡️</span>
+            <h3 class="text-base font-bold text-emerald-900 font-display">Overproduction Prevention Safeguard</h3>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed" th:text="${forecast.socialImpactNotice}">
+            Preventing Harvest Crashes: By diversifying away from Beans and towards Chili &amp; Tomatoes, AgroLink protects local farmer incomes while ensuring consumer price stability in Western Province.
+        </p>
+    </div>
+
+    <!-- DEMAND MATRIX CARDS -->
+    <div class="premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-6">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 font-display">
+                    Expected Demand – <span th:text="${forecast.provinceName}">Western Province</span>
+                </h3>
+                <p class="text-xs text-slate-400">Current regional consumption surge vs active planting intent</p>
+            </div>
+            <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-extrabold rounded-full" th:text="${forecast.overallMarketBalance}">
+                Balanced Supply Allocation
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <th:block th:each="item : ${forecast.cropDemands}">
+                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xs">🌾</span>
+                            <span th:text="${item.cropName}">Crop</span>
+                        </h4>
+                        <span class="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider"
+                              th:classappend="${item.demandLevel == 'VERY HIGH'} ? 'bg-teal-100 text-teal-800' : (${item.demandLevel == 'HIGH'} ? 'bg-emerald-100 text-emerald-800' : (${item.demandLevel == 'MEDIUM'} ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700'))"
+                              th:text="${item.demandLevel}">
+                            HIGH
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <span class="font-bold text-slate-600">Surge Projection:</span>
+                        <span class="font-extrabold text-sm"
+                              th:classappend="${item.positiveTrend} ? 'text-emerald-600' : 'text-red-600'"
+                              th:text="${item.positiveTrend ? '↑ ' : '↓ '} + ${item.surgePercentage} + '%'">
+                            ↑ 24%
+                        </span>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between text-xs">
+                        <span class="text-slate-500 font-medium">Recommendation:</span>
+                        <span class="font-bold text-slate-800" th:text="${item.riskStatus}">High Priority Planting</span>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+
+        <!-- ACTION BUTTON -->
+        <div class="pt-4 border-t border-slate-100 flex justify-between items-center">
+            <span class="text-xs text-slate-400 font-semibold">Help distribute regional production and prevent market gluts</span>
+            <a th:href="@{/crops/add}" class="btn btn-primary py-2.5 px-6 shadow-md shadow-emerald-500/20 text-xs font-bold">
+                Register Planned Planting Quota →
+            </a>
+        </div>
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- SCRIPTS -->
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+</html>

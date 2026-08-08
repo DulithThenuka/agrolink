@@ -15,7 +15,9 @@ import { Dashboard } from './pages/Dashboard';
 import { Analytics } from './pages/Analytics';
 import { CropAdvisor } from './pages/CropAdvisor';
 import { PricePrediction } from './pages/PricePrediction';
+import { DemandForecasting } from './pages/DemandForecasting';
 import { Orders } from './pages/Orders';
+
 
 
 
@@ -56,6 +58,8 @@ function AppContent() {
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/advisor" element={<CropAdvisor />} />
             <Route path="/price-prediction" element={<PricePrediction />} />
+            <Route path="/demand-forecasting" element={<DemandForecasting />} />
+
 
 
 
