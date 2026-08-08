@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
+
+<head
+        th:replace="~{
+        fragments/head ::
+        head('AI Crop Advisor & Agronomy Engine')
+        }">
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- ================== PAGE CONTENT ================== -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-grow w-full animate-fade-in-up">
+
+    <!-- HEADER BANNER -->
+    <div class="glass rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xl bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                <span>🤖 AI Agronomy Machine Intelligence</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-display">
+                AI Crop Advisor 🤖
+            </h1>
+            <p class="text-emerald-100/80 text-sm max-w-2xl">
+                Enter your farm's agro-ecological parameters to analyze crop suitability match scores, harvesting timelines, and profit forecasts.
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN TWO COLUMN LAYOUT -->
+    <div class="grid lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- LEFT INPUT FORM PANEL -->
+        <div class="lg:col-span-5 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-5">
+            <div class="pb-3 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 font-display flex items-center gap-2">
+                    <span>🌱</span> Farm Input Parameters
+                </h3>
+                <p class="text-xs text-slate-400">Configure your specific field conditions</p>
+            </div>
+
+            <form th:action="@{/advisor/analyze}" method="post" th:object="${request}" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Farm Location</label>
+                    <select th:field="*{location}" class="input-premium text-sm font-semibold">
+                        <option value="Anuradhapura">Anuradhapura (Dry Zone)</option>
+                        <option value="Nuwara Eliya">Nuwara Eliya (Hill Country)</option>
+                        <option value="Jaffna">Jaffna (Northern Peninsula)</option>
+                        <option value="Dambulla">Dambulla (Central Valley)</option>
+                        <option value="Badulla">Badulla (Uva Province)</option>
+                        <option value="Kurunegala">Kurunegala (Intermediate Zone)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Land Size (Acres)</label>
+                        <input type="number" step="0.5" th:field="*{landSizeAcres}" class="input-premium text-sm font-bold" />
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Planting Month</label>
+                        <select th:field="*{month}" class="input-premium text-sm font-semibold">
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                            <option value="January">January</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Soil Type</label>
+                    <select th:field="*{soilType}" class="input-premium text-sm font-semibold">
+                        <option value="Sandy Loam">Sandy Loam</option>
+                        <option value="Clay Loam">Clay Loam</option>
+                        <option value="Red Yellow Latosols">Red Yellow Latosols</option>
+                        <option value="Black Soil">Black Soil</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Water Availability</label>
+                    <select th:field="*{waterAvailability}" class="input-premium text-sm font-semibold">
+                        <option value="Medium">Medium (Rainfed + Well)</option>
+                        <option value="High">High (Irrigated Canal)</option>
+                        <option value="Low">Low (Rainfed Only)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Budget (Rs.)</label>
+                    <input type="number" th:field="*{budgetLkr}" class="input-premium text-sm font-bold" />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full py-3 font-bold text-xs shadow-md shadow-emerald-500/20">
+                    Run AI Agronomy Analysis 🤖
+                </button>
+            </form>
+        </div>
+
+        <!-- RIGHT ANALYSIS RESULTS PANEL -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- TOP RECOMMENDATION CARD -->
+            <div class="premium-card p-6 bg-white border border-emerald-100 shadow-xl space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                    <div>
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-extrabold rounded-full uppercase tracking-wider">
+                            🏆 Top AI Recommendation
+                        </span>
+                        <h2 class="text-2xl font-extrabold text-slate-900 font-display mt-2 flex items-center gap-2">
+                            Best Recommendation: <span class="text-emerald-600" th:text="${result.bestRecommendation}">Chili</span>
+                        </h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-3xl font-extrabold text-emerald-600 font-display">92%</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">Suitability Match</span>
+                    </div>
+                </div>
+
+                <!-- SUITABILITY RANKED LIST -->
+                <div class="space-y-3 pt-2">
+                    <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Recommended Crops Breakdown</h3>
+                    <th:block th:each="crop, iterStat : ${result.recommendedCrops}">
+                        <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs" th:text="${iterStat.count}">1</span>
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm" th:text="${crop.cropName}">Chili</h4>
+                                    <p class="text-[11px] text-slate-400 font-semibold">Agro-Ecological Match</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-32 bg-slate-200 h-2.5 rounded-full overflow-hidden hidden sm:block">
+                                    <div class="bg-emerald-500 h-full rounded-full" th:style="'width: ' + ${crop.suitabilityPercentage} + '%'"></div>
+                                </div>
+                                <span class="font-extrabold text-emerald-700 text-sm" th:text="${crop.suitabilityPercentage} + '%'">92%</span>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+
+            <!-- PROJECTION METRICS GRID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="premium-card p-5 bg-white border border-slate-100 shadow-md space-y-1">
+                    <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Expected Harvesting Period</p>
+                    <h3 class="text-xl font-extrabold text-slate-900 font-display" th:text="${result.expectedHarvestingPeriod}">90–120 days</h3>
+                    <p class="text-xs text-emerald-600 font-bold mt-1">Optimal growth cycle</p>
+                </div>
+
+                <div class="premium-card p-5 bg-white border border-slate-100 shadow-md space-y-1">
+                    <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Estimated Cost</p>
+                    <h3 class="text-xl font-extrabold text-slate-900 font-display" th:text="'Rs. ' + ${#numbers.formatDecimal(result.estimatedCostLkr, 1, 'COMMA', 0, 'POINT')}">Rs. 110,000</h3>
+                    <p class="text-xs text-slate-500 font-semibold mt-1">Within specified budget</p>
+                </div>
+
+                <div class="premium-card p-5 bg-white border border-slate-100 shadow-md space-y-1">
+                    <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Estimated Revenue</p>
+                    <h3 class="text-xl font-extrabold text-emerald-600 font-display"
+                        th:text="'Rs. ' + ${#numbers.formatDecimal(result.minEstimatedRevenueLkr, 1, 'COMMA', 0, 'POINT')} + ' – Rs. ' + ${#numbers.formatDecimal(result.maxEstimatedRevenueLkr, 1, 'COMMA', 0, 'POINT')}">
+                        Rs. 230,000 – Rs. 290,000
+                    </h3>
+                    <p class="text-xs text-emerald-600 font-bold mt-1">Net profit: Rs. 120,000+</p>
+                </div>
+
+                <div class="premium-card p-5 bg-white border border-slate-100 shadow-md space-y-1">
+                    <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Agronomic Risk Level</p>
+                    <h3 class="text-xl font-extrabold text-amber-600 font-display" th:text="${result.riskLevel}">Medium</h3>
+                    <p class="text-xs text-amber-700 font-semibold mt-1">Standard pest control required</p>
+                </div>
+            </div>
+
+            <!-- ACTION BANNER -->
+            <div class="p-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl text-white shadow-lg flex justify-between items-center">
+                <div>
+                    <h4 class="font-bold text-base font-display">Ready to list your recommended harvest?</h4>
+                    <p class="text-xs text-emerald-100 mt-0.5">Pre-fill listing details directly in the AgroLink marketplace.</p>
+                </div>
+                <a th:href="@{/crops/add}" class="btn btn-secondary py-2.5 px-5 text-xs font-bold bg-white text-emerald-900 border-none shrink-0 shadow-md">
+                    List Harvest Batch →
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- SCRIPTS -->
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+</html>

@@ -50,6 +50,16 @@ export const Navbar = () => {
             Analytics
           </Link>
 
+          <Link
+            to="/advisor"
+            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/advisor') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            AI Advisor 🤖
+          </Link>
+
+
 
           {isBuyer && (
             <Link

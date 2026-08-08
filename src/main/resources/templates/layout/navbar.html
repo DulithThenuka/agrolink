@@ -51,6 +51,16 @@
                         <span>📈 Analytics</span>
                     </a>
 
+                    <!-- AI ADVISOR -->
+                    <a th:href="@{/advisor}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/advisor')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>🤖 AI Advisor</span>
+                    </a>
+
+
                     <!-- DASHBOARD -->
                     <a sec:authorize="isAuthenticated()"
                        th:href="@{/dashboard}"
