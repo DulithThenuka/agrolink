@@ -23,27 +23,27 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
         {/* LOGO */}
-        <Link to="/" className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2 font-display group">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300">
+        <Link to="/" className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2 font-display group shrink-0 mr-4">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300">
             <Sprout className="w-5 h-5" />
           </div>
           <span>Agro<span className="text-emerald-600">Link</span></span>
         </Link>
 
         {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center space-x-8 text-sm font-semibold text-slate-600">
+        <div className="hidden md:flex items-center space-x-2 lg:space-x-4 text-xs font-semibold text-slate-600 overflow-x-auto py-1">
           <Link
             to="/crops"
-            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
               isActive('/crops') ? 'text-emerald-600 font-bold' : ''
             }`}
           >
-            Crops Catalog
+            Crops
           </Link>
 
           <Link
             to="/analytics"
-            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
               isActive('/analytics') ? 'text-emerald-600 font-bold' : ''
             }`}
           >
@@ -52,7 +52,7 @@ export const Navbar = () => {
 
           <Link
             to="/advisor"
-            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
               isActive('/advisor') ? 'text-emerald-600 font-bold' : ''
             }`}
           >
@@ -61,7 +61,7 @@ export const Navbar = () => {
 
           <Link
             to="/price-prediction"
-            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
               isActive('/price-prediction') ? 'text-emerald-600 font-bold' : ''
             }`}
           >
@@ -70,7 +70,7 @@ export const Navbar = () => {
 
           <Link
             to="/demand-forecasting"
-            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
               isActive('/demand-forecasting') ? 'text-emerald-600 font-bold' : ''
             }`}
           >
@@ -79,7 +79,7 @@ export const Navbar = () => {
 
           <Link
             to="/disease-detection"
-            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
               isActive('/disease-detection') ? 'text-emerald-600 font-bold' : ''
             }`}
           >
@@ -88,12 +88,13 @@ export const Navbar = () => {
 
           <Link
             to="/negotiation"
-            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
               isActive('/negotiation') ? 'text-emerald-600 font-bold' : ''
             }`}
           >
             Negotiations 💬
           </Link>
+
 
 
 

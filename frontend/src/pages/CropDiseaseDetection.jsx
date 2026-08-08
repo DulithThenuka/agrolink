@@ -35,21 +35,21 @@ export const CropDiseaseDetection = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
-      {/* HEADER BANNER */}
-      <div className="glass rounded-3xl p-8 border border-white/80 shadow-2xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 text-white relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
-            <Camera className="w-4 h-4 text-emerald-400" /> CNN Computer Vision Diagnostics
+      {/* HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200/60">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2 border border-emerald-200/60">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> CNN Computer Vision Diagnostics
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display flex items-center gap-3">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 font-display flex items-center gap-2">
             Crop Disease Scanner 📷
           </h1>
-          <p className="text-emerald-100/80 text-sm max-w-2xl">
+          <p className="text-slate-500 text-sm mt-1">
             Upload or scan a leaf photo to diagnose crop pathologies, calculate confidence scores, and get treatment advice.
           </p>
         </div>
       </div>
+
 
       {/* TWO COLUMN LAYOUT */}
       <div className="grid lg:grid-cols-12 gap-8 items-start">
