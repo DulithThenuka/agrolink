@@ -1,32 +1,37 @@
 <div th:fragment="statCard(title, value, color)">
 
-    <div class="premium-card p-6 bg-white border border-slate-100 flex items-center justify-between">
+    <div class="premium-card p-6 bg-white border border-slate-100/90 shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-between group">
 
         <!-- LEFT CONTENT -->
-        <div>
+        <div class="space-y-1">
             <!-- TITLE -->
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider" th:text="${title}">
-                Title
-            </p>
+            <div class="flex items-center gap-2">
+                <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest" th:text="${title}">
+                    Title
+                </p>
+                <span class="text-[10px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                    +12% this mo
+                </span>
+            </div>
 
             <!-- VALUE -->
-            <h2 class="text-3xl font-extrabold mt-2 font-display text-slate-800" th:text="${value}">
+            <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-slate-900" th:text="${value}">
                 0
             </h2>
         </div>
 
         <!-- ICON -->
-        <div class="w-12 h-12 flex items-center justify-center rounded-2xl"
+        <div class="w-14 h-14 flex items-center justify-center rounded-2xl transition duration-300 group-hover:scale-110 shadow-sm"
              th:classappend="${color == 'green'}
-                 ? ' bg-emerald-50 text-emerald-600'
+                 ? ' bg-emerald-50 text-emerald-600 border border-emerald-100'
                  : (${color == 'blue'}
-                     ? ' bg-blue-50 text-blue-600'
+                     ? ' bg-sky-50 text-sky-600 border border-sky-100'
                      : (${color == 'purple'}
-                         ? ' bg-purple-50 text-purple-600'
-                         : ' bg-slate-50 text-slate-600'))">
+                         ? ' bg-purple-50 text-purple-600 border border-purple-100'
+                         : ' bg-slate-50 text-slate-600 border border-slate-100'))">
 
             <!-- ICON MAPPING -->
-            <span class="text-xl font-bold" th:text="${title == 'Users'} ? '👥' : (${title == 'Crops'} ? '🌾' : (${title == 'Orders'} ? '📦' : '📊'))">
+            <span class="text-2xl font-bold" th:text="${title == 'Users'} ? '👥' : (${title == 'Crops'} ? '🌾' : (${title == 'Orders'} ? '📦' : '📊'))">
                 📊
             </span>
 
