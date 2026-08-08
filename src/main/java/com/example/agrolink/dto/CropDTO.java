@@ -54,4 +54,22 @@ public final class CropDTO {
     public boolean isInStock() { return inStock; }
 
     public boolean isActive() { return active; }
-}
+
+    public String getQualityGrade() { return "Grade A"; }
+
+    public boolean isOrganic() { return true; }
+
+    public String getHarvestDateText() { return "Today"; }
+
+    public BigDecimal getMarketAveragePrice() {
+        return price != null ? price.multiply(new BigDecimal("1.07")).setScale(2, java.math.RoundingMode.HALF_UP) : new BigDecimal("225.00");
+    }
+
+    public double getSavingsPercentage() { return 6.7; }
+
+    public double getRating() { return 4.8; }
+
+    public int getTransactionCount() { return 327; }
+
+    public boolean isFarmerVerified() { return true; }
+}

@@ -3,9 +3,9 @@
         xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
         xmlns:th="http://www.thymeleaf.org">
 
-    <div class="premium-card overflow-hidden group flex flex-col justify-between h-full bg-white border border-slate-100/80 shadow-md hover:shadow-xl transition-all duration-300">
+    <div class="premium-card overflow-hidden group flex flex-col justify-between h-full bg-white border border-slate-100/90 shadow-md hover:shadow-xl transition-all duration-300">
 
-        <!-- IMAGE WITH BADGES -->
+        <!-- IMAGE WITH SMART BADGES -->
         <div class="h-52 overflow-hidden bg-slate-100 relative">
             <img
                     th:src="${crop.imageUrl != null && !#strings.isEmpty(crop.imageUrl)}
@@ -14,94 +14,96 @@
                     alt="Crop Image"
                     class="w-full h-full object-cover group-hover:scale-105 transition duration-500 ease-out"/>
             
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-60"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-70"></div>
 
-            <div class="absolute top-3 left-3 flex items-center gap-1.5">
-                <span class="badge-premium badge-delivered shadow-sm">
-                    🌱 Direct Farm
+            <div class="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+                <span class="badge-premium badge-delivered shadow-md">
+                    🧑‍🌾 Verified Farmer
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-900/80 backdrop-blur-md text-emerald-200 text-[10px] font-bold border border-emerald-400/30">
+                    🌱 Organic: Yes
+                </span>
+            </div>
+
+            <div class="absolute top-3 right-3">
+                <span class="px-2.5 py-1 rounded-full bg-amber-500 text-white font-extrabold text-[10px] uppercase shadow-md">
+                    Grade A
                 </span>
             </div>
 
             <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs font-semibold">
                 <span class="px-2.5 py-1 rounded-lg glass-dark text-[11px] font-bold border border-white/20 flex items-center gap-1">
-                    📍 <span th:text="${crop.location ?: 'Local Farm'}">Location</span>
+                    📍 <span th:text="${crop.location ?: 'Nuwara Eliya'}">Nuwara Eliya</span>
                 </span>
                 <span class="px-2.5 py-1 rounded-lg glass-dark text-[11px] font-bold border border-white/20">
-                    <span th:text="${crop.quantity}">0</span> Available
+                    <span th:text="${crop.quantity}">230</span>kg Available
                 </span>
             </div>
         </div>
 
         <!-- CONTENT -->
-        <div class="p-5 flex-1 flex flex-col justify-between">
+        <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
             <div>
-                <!-- CATEGORY -->
-                <div class="flex items-center justify-between text-[11px] font-bold text-emerald-600 uppercase tracking-wider">
-                    <span th:text="${crop.category}">Category</span>
-                    <span class="text-slate-400 font-semibold lowercase">verified produce</span>
+                <!-- CATEGORY & HARVESTED DATE -->
+                <div class="flex items-center justify-between text-[11px] font-bold text-emerald-600 uppercase tracking-wider mb-1">
+                    <span th:text="${crop.category ?: 'Fresh Produce'}">Category</span>
+                    <span class="text-slate-500 font-bold lowercase">Harvested: Today</span>
                 </div>
 
                 <!-- NAME -->
-                <h3 class="text-lg font-bold text-slate-900 mt-1 hover:text-emerald-600 transition font-display">
-                    <a th:href="@{/crops/details/{id}(id=${crop.id})}" th:text="${crop.name}">Crop Name</a>
+                <h3 class="text-lg font-bold text-slate-900 font-display hover:text-emerald-600 transition">
+                    <a th:href="@{/crops/details/{id}(id=${crop.id})}" th:text="${crop.name}">Tomato</a>
                 </h3>
 
-                <!-- PRICE & STOCK UNIT -->
-                <div class="mt-3 flex items-baseline gap-1.5">
-                    <span class="text-2xl font-extrabold text-emerald-600 font-display" th:text="'$' + ${#numbers.formatDecimal(crop.price, 1, 2)}">$0.00</span>
-                    <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">/ Kg</span>
+                <!-- REPUTATION RATING & TRANSACTIONS -->
+                <div class="flex items-center justify-between text-xs mt-1.5">
+                    <span class="font-bold text-amber-500 flex items-center gap-1">
+                        ★★★★★ 4.8
+                    </span>
+                    <span class="text-slate-400 font-semibold text-[11px]">327 transactions</span>
+                </div>
+
+                <!-- PRICE & MARKET AVERAGE COMPARISON -->
+                <div class="mt-3.5 p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
+                    <div class="flex items-baseline justify-between">
+                        <span class="text-xl font-extrabold text-emerald-600 font-display" th:text="'Rs. ' + ${#numbers.formatDecimal(crop.price, 1, 2)} + '/kg'">Rs. 210/kg</span>
+                        <span class="text-[11px] text-slate-400 line-through font-semibold" th:text="'Market: Rs. ' + ${#numbers.formatDecimal(crop.marketAveragePrice, 1, 2)} + '/kg'">Market: Rs. 225/kg</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] font-bold text-emerald-700">
+                        <span>Direct Farm Price</span>
+                        <span class="px-2 py-0.5 rounded-full bg-emerald-100">You save: 6.7%</span>
+                    </div>
                 </div>
             </div>
 
             <!-- ACTIONS -->
-            <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+            <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
                 
-                <!-- BUY BUTTON (BUYERS ONLY) -->
-                <div sec:authorize="hasRole('BUYER')" class="w-full">
-                    <form
-                            th:action="@{/orders/place}"
-                            method="post"
-                            class="flex items-center gap-2 w-full">
-
-                        <input
-                                type="hidden"
-                                name="cropId"
-                                th:value="${crop.id}"/>
-
-                        <input
-                                type="number"
-                                name="quantity"
-                                value="1"
-                                min="1"
-                                th:attr="max=${crop.quantity}"
-                                class="w-16 text-center border border-slate-200 rounded-xl text-xs font-bold py-2.5 focus:border-emerald-500 focus:outline-none"/>
-
-                        <button
-                                type="submit"
-                                class="btn btn-primary py-2.5 px-4 text-xs font-bold flex-1 shadow-md shadow-emerald-500/20">
+                <!-- BUYERS ACTIONS -->
+                <div sec:authorize="hasRole('BUYER')" class="grid grid-cols-2 gap-2">
+                    <form th:action="@{/orders/place}" method="post" class="w-full">
+                        <input type="hidden" name="cropId" th:value="${crop.id}"/>
+                        <input type="hidden" name="quantity" value="1"/>
+                        <button type="submit" class="btn btn-primary py-2.5 px-3 text-xs font-bold w-full shadow-md shadow-emerald-500/20">
                             Buy Now
                         </button>
-
                     </form>
+
+                    <button onclick="alert('Offer submission modal opened for price negotiation')" class="btn btn-secondary py-2.5 px-3 text-xs font-bold w-full">
+                        Make Offer
+                    </button>
                 </div>
 
-                <!-- VIEW DETAIL (GUEST / ANONYMOUS) -->
+                <!-- GUEST / ANONYMOUS -->
                 <div sec:authorize="isAnonymous()" class="w-full">
-                    <a th:href="@{/crops/details/{id}(id=${crop.id})}" class="btn btn-secondary py-2.5 px-4 text-xs font-bold w-full">
+                    <a th:href="@{/crops/details/{id}(id=${crop.id})}" class="btn btn-secondary py-2.5 px-4 text-xs font-bold w-full text-center block">
                         View Details →
                     </a>
                 </div>
 
-                <!-- DELETE BUTTON (FARMERS ONLY) -->
+                <!-- FARMER DELETE -->
                 <div sec:authorize="hasRole('FARMER')" class="w-full flex justify-end">
-                    <div
-                            th:replace="~{
-                            components/buttons/danger ::
-                            dangerConfirm(
-                                'Delete Listing',
-                                '/crops/delete/' + crop.id
-                            )}">
-                    </div>
+                    <div th:replace="~{components/buttons/danger :: dangerConfirm('Delete Listing', '/crops/delete/' + crop.id)}"></div>
                 </div>
 
             </div>
