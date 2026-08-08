@@ -8,288 +8,101 @@
         th:replace="~{
         fragments/head ::
         head('Dashboard')
-}">
+        }">
 </head>
 
-<body>
+<body class="bg-slate-50">
 
 <!-- BASE LAYOUT -->
-<div
-        th:replace="~{
-        layout/base ::
-        base('Dashboard', ~{::content})
-}">
-</div>
+<div th:replace="~{layout/base :: base('Dashboard', ~{::content})}"></div>
 
 <!-- ================== PAGE CONTENT ================== -->
-<div
-        th:fragment="content"
-
-        class="max-w-7xl mx-auto">
+<div th:fragment="content" class="max-w-7xl mx-auto space-y-8 animate-fade-in-up">
 
     <!-- HEADER -->
-    <div
-            class="flex justify-between
-                   items-center mb-6">
-
-        <h1
-                class="text-2xl
-                       font-bold
-                       text-gray-800">
-
-            Dashboard
-
-        </h1>
-
-        <div
-                class="text-sm
-                       text-gray-500">
-
-            Welcome back 👋
-
+    <div class="flex justify-between items-center pb-5 border-b border-slate-200/60">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">Dashboard</h1>
+            <p class="text-slate-500 text-sm mt-1">Monitor users, track live crops, and manage agricultural transactions.</p>
         </div>
 
+        <div class="px-4 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-2xl text-xs flex items-center gap-1.5 border border-emerald-100 shadow-sm">
+            <span>👋</span> Welcome back
+        </div>
     </div>
 
     <!-- ================= STATS ================= -->
-    <div
-            th:if="${dashboard != null}"
-
-            class="grid
-                   grid-cols-1
-                   md:grid-cols-3
-                   gap-6 mb-8">
-
-        <div
-                th:replace="~{
-                components/cards/stat-card ::
-                statCard(
-                    'Users',
-                    ${dashboard.totalUsers ?: 0},
-                    'green'
-                )
-        }">
-        </div>
-
-        <div
-                th:replace="~{
-                components/cards/stat-card ::
-                statCard(
-                    'Crops',
-                    ${dashboard.totalCrops ?: 0},
-                    'blue'
-                )
-        }">
-        </div>
-
-        <div
-                th:replace="~{
-                components/cards/stat-card ::
-                statCard(
-                    'Orders',
-                    ${dashboard.totalOrders ?: 0},
-                    'purple'
-                )
-        }">
-        </div>
-
+    <div th:if="${dashboard != null}" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div th:replace="~{components/cards/stat-card :: statCard('Users', ${dashboard.totalUsers ?: 0}, 'green')}"></div>
+        <div th:replace="~{components/cards/stat-card :: statCard('Crops', ${dashboard.totalCrops ?: 0}, 'blue')}"></div>
+        <div th:replace="~{components/cards/stat-card :: statCard('Orders', ${dashboard.totalOrders ?: 0}, 'purple')}"></div>
     </div>
 
     <!-- ================= QUICK ACTIONS ================= -->
-    <div
-            class="bg-white
-                   rounded-xl
-                   shadow-md p-5
-                   mb-8">
-
-        <h2
-                class="font-semibold
-                       text-gray-700
-                       mb-4">
-
-            Quick Actions
-
-        </h2>
-
-        <div
-                class="flex flex-wrap
-                       gap-4">
-
-            <!-- FARMER -->
-            <a
-                    sec:authorize="hasRole('FARMER')"
-
-                    th:href="@{/crops/add}"
-
-                    class="bg-green-600
-                           text-white
-                           px-4 py-2
-                           rounded-lg
-                           hover:bg-green-700
-                           transition">
-
-                ➕ Add Crop
-
+    <div class="premium-card p-6 bg-white border border-slate-100">
+        <h2 class="text-base font-bold text-slate-800 font-display mb-4">Quick Actions</h2>
+        
+        <div class="flex flex-wrap gap-3">
+            <!-- FARMER ONLY -->
+            <a sec:authorize="hasRole('FARMER')" th:href="@{/crops/add}"
+               class="btn btn-primary py-2.5 px-5 shadow-md shadow-emerald-100 text-xs">
+                ➕ Publish Crop Listing
             </a>
 
-            <!-- BUYER -->
-            <a
-                    sec:authorize="hasRole('BUYER')"
-
-                    th:href="@{/orders/my}"
-
-                    class="bg-blue-600
-                           text-white
-                           px-4 py-2
-                           rounded-lg
-                           hover:bg-blue-700
-                           transition">
-
-                📦 View Orders
-
+            <!-- BUYER ONLY -->
+            <a sec:authorize="hasRole('BUYER')" th:href="@{/orders/my}"
+               class="btn btn-primary py-2.5 px-5 shadow-md shadow-emerald-100 text-xs">
+                📦 Manage Orders
             </a>
-
+            
+            <a th:href="@{/crops}" class="btn btn-secondary py-2.5 px-5 text-xs">
+                🌾 Browse Listings
+            </a>
         </div>
-
     </div>
 
     <!-- ================= RECENT ORDERS ================= -->
-    <div
-            class="bg-white
-                   rounded-xl
-                   shadow-md p-5">
-
-        <div
-                class="flex justify-between
-                       items-center mb-4">
-
-            <h2
-                    class="font-semibold
-                           text-gray-700">
-
-                Recent Orders
-
-            </h2>
-
-            <a
-                    sec:authorize="hasRole('BUYER')"
-
-                    th:href="@{/orders/my}"
-
-                    class="text-sm
-                           text-green-600
-                           hover:underline">
-
-                View all
-
+    <div class="premium-card p-6 bg-white border border-slate-100">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-base font-bold text-slate-800 font-display">Recent Orders</h2>
+            
+            <a sec:authorize="hasRole('BUYER')" th:href="@{/orders/my}"
+               class="text-xs text-emerald-600 hover:text-emerald-700 font-bold transition">
+                View All Orders →
             </a>
-
         </div>
 
-        <!-- EMPTY -->
-        <div
-                th:if="${dashboard == null
-                    || #lists.isEmpty(
-                        dashboard.recentOrders
-                    )}">
-
-            <div
-                    th:replace="~{
-                    components/feedback/empty-state ::
-                    empty(
-                        'No Orders Yet',
-                        'Orders will appear here once users start buying.',
-                        'Browse Crops',
-                        '/crops'
-                    )
-            }">
-            </div>
-
+        <!-- EMPTY STATE -->
+        <div th:if="${dashboard == null || #lists.isEmpty(dashboard.recentOrders)}">
+            <div th:replace="~{components/feedback/empty-state :: empty('No Orders Yet', 'As users complete purchases, transactions will be visible here.', 'Browse Crops', '/crops')}"></div>
         </div>
 
         <!-- TABLE -->
-        <div
-                th:if="${dashboard != null
-                    && !#lists.isEmpty(
-                        dashboard.recentOrders
-                    )}"
-
-                class="overflow-x-auto">
-
-            <table
-                    class="w-full text-sm">
-
+        <div th:if="${dashboard != null && !#lists.isEmpty(dashboard.recentOrders)}" class="premium-table-container">
+            <table class="premium-table">
                 <thead>
-
-                <tr
-                        class="text-left
-                               text-gray-500
-                               border-b">
-
-                    <th class="py-2">
-                        Crop
-                    </th>
-
-                    <th>
-                        Buyer
-                    </th>
-
-                    <th>
-                        Qty
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
+                <tr>
+                    <th>Crop</th>
+                    <th>Buyer</th>
+                    <th>Qty</th>
+                    <th>Status</th>
                 </tr>
-
                 </thead>
-
                 <tbody>
-
-                <tr
-                        th:each="order :
-                            ${dashboard.recentOrders}"
-
-                        class="border-b
-                               hover:bg-gray-50
-                               transition">
-
-                    <td
-                            class="py-2
-                                   font-medium"
-
-                            th:text="${order.cropName ?: '-'}">
-                    </td>
-
-                    <td
-                            th:text="${order.buyerEmail ?: '-'}">
-                    </td>
-
-                    <td
-                            th:text="${order.quantity ?: 0}">
-                    </td>
-
+                <tr th:each="order : ${dashboard.recentOrders}">
+                    <td class="font-semibold text-slate-800" th:text="${order.cropName ?: '-'}">Crop Name</td>
+                    <td class="text-slate-500" th:text="${order.buyerEmail ?: '-'}">Buyer Email</td>
+                    <td class="font-bold text-slate-600" th:text="${order.quantity ?: 0}">Quantity</td>
                     <td>
-
-                        <span
-                                class="px-2 py-1
-                                       text-xs
-                                       rounded-full"
-
-                                th:text="${order.status ?: 'UNKNOWN'}">
-
+                        <span class="badge-premium font-bold uppercase text-[10px]"
+                              th:text="${order.status ?: 'PENDING'}"
+                              th:classappend="${order.status == 'PENDING' ? 'badge-pending' : (order.status == 'DELIVERED' ? 'badge-delivered' : (order.status == 'CONFIRMED' ? 'badge-confirmed' : 'badge-cancelled'))}">
+                            PENDING
                         </span>
-
                     </td>
-
                 </tr>
-
                 </tbody>
-
             </table>
-
         </div>
 
     </div>

@@ -9,44 +9,29 @@
         th:replace="~{
         fragments/head ::
         head(${title ?: 'AgroLink'})
-}">
+        }">
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
 
 <!-- ================== NAVBAR ================== -->
 <div
         th:if="${showLayout == null || showLayout}"
-
-        th:replace="~{
-        layout/navbar ::
-        navbar
-}">
+        th:replace="~{layout/navbar :: navbar}">
 </div>
 
-<div class="flex min-h-screen">
+<div class="flex flex-1 relative">
 
     <!-- ================== SIDEBAR ================== -->
     <div
             th:if="${showLayout == null || showLayout}"
-
-            th:replace="~{
-            layout/sidebar ::
-            sidebar
-    }">
+            th:replace="~{layout/sidebar :: sidebar}">
     </div>
 
     <!-- ================== MAIN CONTENT ================== -->
-    <main
-            class="flex-1 p-6 overflow-x-hidden">
-
+    <main class="flex-1 p-6 md:p-10 overflow-x-hidden">
         <!-- PAGE CONTENT -->
-        <div
-                th:if="${content != null}"
-
-                 th:replace="${content}">
-        </div>
-
+        <div th:if="${content != null}" th:replace="${content}"></div>
     </main>
 
 </div>
@@ -55,58 +40,38 @@
 <div
         x-data="toastSystem()"
         x-init="init()"
+        class="fixed top-6 right-6 space-y-3.5 z-[9999] pointer-events-none">
 
-        class="fixed top-5 right-5
-               space-y-3 z-50">
-
-    <template
-            x-for="toast in toasts"
-            :key="toast.id">
-
+    <template x-for="toast in toasts" :key="toast.id">
         <div
                 x-show="toast.show"
-                x-transition
-
-                class="flex items-center gap-3
-                       px-4 py-3 rounded-lg
-                       shadow-lg text-sm
-                       font-medium min-w-[250px]"
-
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+                x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="flex items-center gap-3 px-4.5 py-3.5 rounded-2xl shadow-xl border text-sm font-semibold min-w-[280px] pointer-events-auto backdrop-blur-md"
                 :class="toastClasses(toast.type)">
 
-            <span
-                    x-text="toast.icon">
-            </span>
-
-            <span
-                    x-text="toast.message"
-                    class="flex-1">
-            </span>
+            <span class="text-base" x-text="toast.icon"></span>
+            
+            <span x-text="toast.message" class="flex-1"></span>
 
             <button
                     type="button"
                     @click="remove(toast.id)"
-
-                    class="text-lg">
-
+                    class="text-slate-400 hover:text-slate-600 transition text-lg leading-none p-0.5">
                 &times;
-
             </button>
 
         </div>
-
     </template>
 
 </div>
 
 <!-- ================== SCRIPTS ================== -->
-<div
-        th:replace="~{
-        fragments/scripts ::
-        scripts
-}">
-</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
 
 </body>
-
 </html>

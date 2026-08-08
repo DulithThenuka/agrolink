@@ -7,216 +7,107 @@
         th:replace="~{
         fragments/head ::
         head('Add Crop')
-}">
+        }">
 </head>
 
-<body>
+<body class="bg-slate-50">
 
 <!-- BASE LAYOUT -->
-<div
-        th:replace="~{
-        layout/base ::
-        base('Add Crop', ~{::content})
-}">
-</div>
+<div th:replace="~{layout/base :: base('Add Crop', ~{::content})}"></div>
 
 <!-- ================== PAGE CONTENT ================== -->
-<div
-        th:fragment="content"
+<div th:fragment="content" class="max-w-2xl mx-auto animate-fade-in-up">
 
-        class="max-w-3xl mx-auto">
-
-    <div
-            class="bg-white
-                   rounded-xl shadow
-                   p-6">
+    <div class="premium-card p-8 bg-white border border-slate-100">
 
         <!-- TITLE -->
-        <h2
-                class="text-2xl
-                       font-bold
-                       text-gray-800
-                       mb-2">
-
-            Add New Crop 🌾
-
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900 font-display mb-1.5">
+            Add New Crop Listing 🌾
         </h2>
 
-        <p
-                class="text-gray-500
-                       text-sm mb-6">
-
-            Add your crop details below
-
+        <p class="text-slate-500 text-sm mb-6">
+            Provide details about your fresh harvest to present it to buyers.
         </p>
 
         <!-- ERROR ALERT -->
-        <div
-                th:if="${#fields.hasErrors('*')}"
-
-                th:replace="~{
-                components/feedback/alert ::
-                alert(
-                'error',
-                'Please fix the errors below'
-                )
-        }">
+        <div th:if="${#fields.hasErrors('*')}"
+             th:replace="~{
+                 components/feedback/alert ::
+                 alert('error', 'Please resolve the highlighted validation errors.')
+             }">
         </div>
 
         <!-- FORM -->
         <form
                 th:action="@{/crops/add}"
                 th:object="${crop}"
-
                 method="post"
                 enctype="multipart/form-data"
-
                 class="space-y-5">
 
             <!-- NAME -->
-            <div
-                    th:replace="~{
-                    components/forms/input ::
-                    input(
-                    'Crop Name',
-                    'name',
-                    'text',
-                    'Enter crop name',
-                    *{name},
-                    ${#fields.hasErrors('name')}
-                        ? #fields.errors('name')[0]
-                        : null
-                    )
+            <div th:replace="~{
+                components/forms/input ::
+                input('Crop Name', 'name', 'text', 'e.g. Honeycrisp Apples', *{name}, ${#fields.hasErrors('name')} ? #fields.errors('name')[0] : null)
             }">
             </div>
 
             <!-- CATEGORY -->
-            <div
-                    th:replace="~{
-                    components/forms/input ::
-                    input(
-                    'Category',
-                    'category',
-                    'text',
-                    'Vegetables, Fruits, Grains...',
-                    *{category},
-                    null
-                    )
+            <div th:replace="~{
+                components/forms/input ::
+                input('Category', 'category', 'text', 'e.g. Fruits, Vegetables, Grains', *{category}, null)
             }">
             </div>
 
-            <!-- PRICE -->
-            <div
-                    th:replace="~{
+            <div class="grid grid-cols-2 gap-4">
+                <!-- PRICE -->
+                <div th:replace="~{
                     components/forms/input ::
-                    input(
-                    'Price ($)',
-                    'price',
-                    'number',
-                    '0.00',
-                    *{price},
-                    ${#fields.hasErrors('price')}
-                        ? #fields.errors('price')[0]
-                        : null
-                    )
-            }">
-            </div>
+                    input('Price ($)', 'price', 'number', '0.00', *{price}, ${#fields.hasErrors('price')} ? #fields.errors('price')[0] : null)
+                }">
+                </div>
 
-            <!-- QUANTITY -->
-            <div
-                    th:replace="~{
+                <!-- QUANTITY -->
+                <div th:replace="~{
                     components/forms/input ::
-                    input(
-                    'Quantity',
-                    'quantity',
-                    'number',
-                    'Enter quantity',
-                    *{quantity},
-                    ${#fields.hasErrors('quantity')}
-                        ? #fields.errors('quantity')[0]
-                        : null
-                    )
-            }">
+                    input('Quantity', 'quantity', 'number', 'e.g. 100', *{quantity}, ${#fields.hasErrors('quantity')} ? #fields.errors('quantity')[0] : null)
+                }">
+                </div>
             </div>
 
             <!-- LOCATION -->
-            <div
-                    th:replace="~{
-                    components/forms/input ::
-                    input(
-                    'Location',
-                    'location',
-                    'text',
-                    'City / Area',
-                    *{location},
-                    null
-                    )
+            <div th:replace="~{
+                components/forms/input ::
+                input('Location', 'location', 'text', 'City / Area of harvest', *{location}, null)
             }">
             </div>
 
             <!-- IMAGE -->
-            <div>
-
-                <label
-                        class="block text-sm
-                               text-gray-600
-                               mb-1">
-
-                    Crop Image
-
-                </label>
-
-                <input
-                        type="file"
-                        name="image"
-                        accept="image/*"
-
-                        class="w-full
-                               border rounded-lg
-                               p-2"/>
-
-                <p
-                        class="text-xs
-                               text-gray-400
-                               mt-1">
-
-                    Upload JPG / PNG / WEBP image
-
-                </p>
-
+            <div class="space-y-1.5">
+                <label class="label-premium">Crop Image</label>
+                <div class="flex items-center justify-center w-full">
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-200 border-dashed rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100/50 transition">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <span class="text-2xl mb-1">📸</span>
+                            <p class="text-xs text-slate-500"><span class="font-bold text-emerald-600">Click to upload</span> or drag and drop</p>
+                            <p class="text-[10px] text-slate-400 mt-1">PNG, JPG or WEBP (Max 5MB)</p>
+                        </div>
+                        <input type="file" name="image" accept="image/*" class="hidden" />
+                    </label>
+                </div>
             </div>
 
             <!-- BUTTONS -->
-            <div
-                    class="flex justify-between
-                           items-center mt-6">
-
+            <div class="flex justify-between items-center pt-6 border-t border-slate-100/80 mt-8">
                 <!-- BACK -->
-                <a
-                        th:href="@{/crops}"
-
-                        class="text-gray-600
-                               hover:underline">
-
-                    ← Back
-
+                <a th:href="@{/crops}" class="text-slate-500 hover:text-emerald-600 font-semibold transition text-sm flex items-center gap-1.5">
+                    <span>←</span> Cancel
                 </a>
 
                 <!-- SUBMIT -->
-                <button
-                        type="submit"
-
-                        class="bg-green-600
-                               text-white
-                               px-5 py-2
-                               rounded-lg
-                               hover:bg-green-700
-                               transition">
-
-                    Save Crop
-
+                <button type="submit" class="btn btn-primary py-3 px-6 shadow-md shadow-emerald-100">
+                    Publish Listing
                 </button>
-
             </div>
 
         </form>
@@ -226,5 +117,4 @@
 </div>
 
 </body>
-
 </html>

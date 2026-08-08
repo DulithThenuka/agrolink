@@ -1,6 +1,7 @@
 <div
         th:fragment="navbar"
-        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        xmlns:th="http://www.thymeleaf.org">
 
     <div
             x-data="{
@@ -9,232 +10,145 @@
             }">
 
         <!-- NAVBAR -->
-        <nav
-                class="glass sticky top-0
-                       z-50 shadow
-                       px-6 py-3
-                       flex justify-between
-                       items-center">
+        <nav class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-slate-200/50 backdrop-blur-md">
 
             <!-- LOGO -->
-            <a
-                    th:href="@{/}"
-
-                    class="text-xl font-bold
-                           text-green-600
-                           flex items-center gap-2">
-
-                🌱 <span>AgroLink</span>
-
+            <a th:href="@{/}" class="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2 font-display">
+                <span class="text-emerald-500">🌱</span><span>Agro<span class="text-emerald-600">Link</span></span>
             </a>
 
             <!-- DESKTOP MENU -->
-            <div
-                    class="hidden md:flex
-                           items-center
-                           space-x-8 font-medium">
+            <div class="hidden md:flex items-center space-x-8 font-medium text-slate-600">
 
                 <!-- CROPS -->
-                <a
-                        th:href="@{/crops}"
-
-                        class="hover:text-green-600
-                               transition"
-
-                        th:classappend="${currentUri != null && currentUri.startsWith('/crops')}
-                            ? ' text-green-600 font-semibold'
-                            : ''">
-
+                <a th:href="@{/crops}"
+                   class="hover:text-emerald-600 transition duration-150 ease-in-out text-sm"
+                   th:classappend="${currentUri != null && currentUri.startsWith('/crops')}
+                       ? ' text-emerald-600 font-semibold'
+                       : ''">
                     Crops
-
                 </a>
 
                 <!-- BUYER ONLY -->
-                <a
-                        sec:authorize="hasRole('BUYER')"
-
-                        th:href="@{/orders/my}"
-
-                        class="hover:text-green-600
-                               transition"
-
-                        th:classappend="${currentUri != null && currentUri.startsWith('/orders')}
-                            ? ' text-green-600 font-semibold'
-                            : ''">
-
+                <a sec:authorize="hasRole('BUYER')"
+                   th:href="@{/orders/my}"
+                   class="hover:text-emerald-600 transition duration-150 ease-in-out text-sm"
+                   th:classappend="${currentUri != null && currentUri.startsWith('/orders')}
+                       ? ' text-emerald-600 font-semibold'
+                       : ''">
                     Orders
-
                 </a>
 
-                <!-- USER MENU -->
-                <div
-                        sec:authorize="isAuthenticated()"
-                        class="relative">
+                <!-- DASHBOARD (For Logged in Users) -->
+                <a sec:authorize="isAuthenticated()"
+                   th:href="@{/dashboard}"
+                   class="hover:text-emerald-600 transition duration-150 ease-in-out text-sm"
+                   th:classappend="${currentUri != null && currentUri.startsWith('/dashboard')}
+                       ? ' text-emerald-600 font-semibold'
+                       : ''">
+                    Dashboard
+                </a>
 
-                    <button
-                            @click="userMenu = !userMenu"
+                <!-- ANONYMOUS ACCESS -->
+                <a sec:authorize="isAnonymous()"
+                   th:href="@{/auth/login}"
+                   class="hover:text-emerald-600 transition duration-150 ease-in-out text-sm">
+                    Sign In
+                </a>
 
-                            class="flex items-center
-                                   gap-2 px-3 py-2
-                                   rounded
-                                   hover:bg-green-50
-                                   transition">
+                <a sec:authorize="isAnonymous()"
+                   th:href="@{/auth/register}"
+                   class="btn btn-primary py-2 px-5 text-xs">
+                    Get Started
+                </a>
 
+                <!-- AUTHENTICATED USER MENU -->
+                <div sec:authorize="isAuthenticated()" class="relative">
+                    <button @click="userMenu = !userMenu"
+                            class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50/80 hover:text-emerald-700 transition duration-150 ease-in-out text-sm font-semibold text-slate-700">
                         <!-- USER EMAIL -->
-                        <span
-                                class="text-sm"
-                                th:text="${#authentication.name}">
-
-                            User
-
-                        </span>
-
-                        <svg
-                                class="w-4 h-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24">
-
-                            <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M19 9l-7 7-7-7"/>
-
+                        <span th:text="${#authentication.name}">User</span>
+                        <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
                         </svg>
-
                     </button>
 
                     <!-- DROPDOWN -->
-                    <div
-                            x-show="userMenu"
-                            @click.away="userMenu = false"
-                            x-transition
-
-                            style="display:none"
-
-                            class="absolute right-0
-                                   mt-2 w-44
-                                   bg-white
-                                   rounded-xl
-                                   shadow-lg
-                                   border z-50">
-
-                        <a
-                                th:href="@{/profile}"
-
-                                class="block
-                                       px-4 py-2
-                                       hover:bg-gray-100">
-
-                            Profile
-
+                    <div x-show="userMenu"
+                         @click.away="userMenu = false"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         style="display:none"
+                         class="absolute right-0 mt-2.5 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 p-1.5 z-50">
+                        
+                        <a th:href="@{/profile}"
+                           class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition">
+                            👤 Profile
                         </a>
 
+                        <div class="h-px bg-slate-100 my-1"></div>
+
                         <!-- LOGOUT -->
-                        <form
-                                th:action="@{/logout}"
-                                method="post">
-
-                            <button
-                                    type="submit"
-
-                                    class="w-full text-left
-                                           px-4 py-2
-                                           hover:bg-gray-100
-                                           text-red-500">
-
-                                Logout
-
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit"
+                                    class="w-full flex items-center gap-2 text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl transition font-medium">
+                                🚪 Logout
                             </button>
-
                         </form>
-
                     </div>
-
                 </div>
 
             </div>
 
             <!-- MOBILE BUTTON -->
-            <button
-                    @click="open = !open"
-
-                    class="md:hidden">
-
-                <svg
-                        class="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24">
-
-                    <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16"/>
-
+            <button @click="open = !open" class="md:hidden text-slate-700 hover:text-emerald-600 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
-
             </button>
 
         </nav>
 
         <!-- MOBILE MENU -->
-        <div
-                x-show="open"
-                x-transition
+        <div x-show="open"
+             x-transition
+             style="display:none"
+             class="md:hidden bg-white/95 backdrop-blur-md shadow-lg border-t border-slate-100 p-4 space-y-2 absolute w-full left-0 z-40">
 
-                style="display:none"
-
-                class="md:hidden
-                       bg-white shadow-md
-                       border-t">
-
-            <a
-                    th:href="@{/crops}"
-
-                    class="block px-6 py-3
-                           border-b
-                           hover:bg-gray-100">
-
-                Crops
-
+            <a th:href="@{/crops}" class="block px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50">
+                🌾 Crops
             </a>
 
             <!-- BUYER ONLY -->
-            <a
-                    sec:authorize="hasRole('BUYER')"
+            <a sec:authorize="hasRole('BUYER')" th:href="@{/orders/my}" class="block px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50">
+                📦 Orders
+            </a>
 
-                    th:href="@{/orders/my}"
+            <a sec:authorize="isAuthenticated()" th:href="@{/dashboard}" class="block px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50">
+                📊 Dashboard
+            </a>
 
-                    class="block px-6 py-3
-                           border-b
-                           hover:bg-gray-100">
+            <a sec:authorize="isAuthenticated()" th:href="@{/profile}" class="block px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50">
+                👤 Profile
+            </a>
 
-                Orders
+            <a sec:authorize="isAnonymous()" th:href="@{/auth/login}" class="block px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50">
+                Sign In
+            </a>
 
+            <a sec:authorize="isAnonymous()" th:href="@{/auth/register}" class="block px-4 py-3 rounded-xl text-center btn btn-primary text-sm">
+                Get Started
             </a>
 
             <!-- LOGOUT -->
-            <form
-                    sec:authorize="isAuthenticated()"
-
-                    th:action="@{/logout}"
-                    method="post">
-
-                <button
-                        type="submit"
-
-                        class="w-full text-left
-                               px-6 py-3
-                               text-red-500
-                               hover:bg-gray-100">
-
-                    Logout
-
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="pt-2 border-t border-slate-100">
+                <button type="submit" class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-medium">
+                    🚪 Logout
                 </button>
-
             </form>
 
         </div>

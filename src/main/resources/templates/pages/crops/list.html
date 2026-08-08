@@ -7,247 +7,120 @@
         th:replace="~{
         fragments/head ::
         head('Crops')
-}">
+        }">
 </head>
 
-<body>
+<body class="bg-slate-50">
 
 <!-- BASE LAYOUT -->
-<div
-        th:replace="~{
-        layout/base ::
-        base('Crops', ~{::content})
-}">
-</div>
+<div th:replace="~{layout/base :: base('Crops', ~{::content})}"></div>
 
 <!-- ================== PAGE CONTENT ================== -->
-<div
-        th:fragment="content"
+<div th:fragment="content" class="max-w-7xl mx-auto space-y-8 animate-fade-in-up">
 
-        class="max-w-7xl mx-auto">
-
-    <!-- HEADER -->
-    <div
-            class="flex flex-col
-                   md:flex-row
-                   md:items-center
-                   md:justify-between
-                   mb-6 gap-4">
-
-        <h1
-                class="text-2xl
-                       font-bold
-                       text-gray-800">
-
-            Available Crops 🌾
-
-        </h1>
+    <!-- HEADER & SEARCH -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 pb-6 border-b border-slate-200/60">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">Available Crops 🌾</h1>
+            <p class="text-slate-500 text-sm mt-1">Discover, order, or sell fresh organic agriculture harvests directly.</p>
+        </div>
 
         <!-- SEARCH -->
-        <form
-                method="get"
-
-                th:action="@{/crops}"
-
-                class="flex gap-2">
-
+        <form method="get" th:action="@{/crops}" class="flex gap-2">
             <input
                     type="text"
                     name="keyword"
-
                     th:value="${keyword}"
-
                     placeholder="Search crops..."
+                    class="px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition duration-200 text-sm w-full md:w-64"/>
 
-                    class="px-3 py-2
-                           border rounded-lg
-                           w-56"/>
-
-            <button
-                    type="submit"
-
-                    class="bg-green-600
-                           text-white
-                           px-4 py-2
-                           rounded-lg
-                           hover:bg-green-700">
-
+            <button type="submit" class="btn btn-primary px-5 py-2.5 shadow-sm">
                 Search
-
             </button>
-
         </form>
-
     </div>
 
     <!-- FILTERS -->
-    <form
-            method="get"
+    <div class="premium-card p-6 bg-white border border-slate-100">
+        <form method="get" th:action="@{/crops}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Category</label>
+                <input type="text" name="category" th:value="${category}" placeholder="e.g. Vegetables"
+                       class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition duration-200 text-sm">
+            </div>
 
-            th:action="@{/crops}"
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
+                <input type="text" name="location" th:value="${location}" placeholder="e.g. California"
+                       class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition duration-200 text-sm">
+            </div>
 
-            class="grid
-                   grid-cols-2
-                   md:grid-cols-5
-                   gap-3 mb-6">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Min Price ($)</label>
+                <input type="number" name="minPrice" th:value="${minPrice}" placeholder="0"
+                       class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition duration-200 text-sm">
+            </div>
 
-        <input
-                type="text"
-                name="category"
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">Max Price ($)</label>
+                <input type="number" name="maxPrice" th:value="${maxPrice}" placeholder="1000"
+                       class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition duration-200 text-sm">
+            </div>
 
-                th:value="${category}"
+            <button type="submit" class="btn btn-secondary w-full py-2.5 font-bold">
+                Apply Filters
+            </button>
+        </form>
+    </div>
 
-                placeholder="Category"
-
-                class="px-3 py-2
-                       border rounded-lg"/>
-
-        <input
-                type="text"
-                name="location"
-
-                th:value="${location}"
-
-                placeholder="Location"
-
-                class="px-3 py-2
-                       border rounded-lg"/>
-
-        <input
-                type="number"
-                name="minPrice"
-
-                th:value="${minPrice}"
-
-                placeholder="Min Price"
-
-                class="px-3 py-2
-                       border rounded-lg"/>
-
-        <input
-                type="number"
-                name="maxPrice"
-
-                th:value="${maxPrice}"
-
-                placeholder="Max Price"
-
-                class="px-3 py-2
-                       border rounded-lg"/>
-
-        <button
-                type="submit"
-
-                class="bg-gray-800
-                       text-white
-                       rounded-lg
-                       hover:bg-gray-900">
-
-            Filter
-
-        </button>
-
-    </form>
-
-    <!-- EMPTY -->
-    <div
-            th:if="${#lists.isEmpty(crops.content)}">
-
-        <div
-                th:replace="~{
-                components/feedback/empty-state ::
-                empty(
-                    'No Crops Found',
-                    'Try adjusting your search or filters.',
-                    'Reset',
-                    '/crops'
-                )
-        }">
-        </div>
-
+    <!-- EMPTY STATE -->
+    <div th:if="${#lists.isEmpty(crops.content)}" class="py-12">
+        <div th:replace="~{components/feedback/empty-state :: empty('No Crops Found', 'Try adjusting your filters or keyword parameters.', 'Reset Filters', '/crops')}"></div>
     </div>
 
     <!-- GRID -->
-    <div
-            th:unless="${#lists.isEmpty(crops.content)}"
-
-            class="grid
-                   grid-cols-1
-                   sm:grid-cols-2
-                   md:grid-cols-3
-                   lg:grid-cols-4
-                   gap-6">
-
-        <th:block
-                th:each="crop : ${crops.content}">
-
-            <div
-                    th:replace="~{
-                    components/cards/crop-card ::
-                    cropCard(${crop})
-            }">
-            </div>
-
+    <div th:unless="${#lists.isEmpty(crops.content)}"
+         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <th:block th:each="crop : ${crops.content}">
+            <div th:replace="~{components/cards/crop-card :: cropCard(${crop})}"></div>
         </th:block>
-
     </div>
 
     <!-- PAGINATION -->
-    <div
-            class="flex justify-center
-                   mt-8 gap-2">
-
+    <div th:unless="${#lists.isEmpty(crops.content)}" class="flex justify-center items-center mt-12 gap-3">
         <!-- PREVIOUS -->
-        <a
-                th:if="${crops.hasPrevious()}"
-
-                th:href="@{/crops(
-                    page=${currentPage - 1},
-                    keyword=${keyword},
-                    category=${category},
-                    location=${location},
-                    minPrice=${minPrice},
-                    maxPrice=${maxPrice}
-                )}"
-
-                class="px-3 py-1
-                       border rounded
-                       hover:bg-gray-100">
-
-            Prev
-
+        <a th:if="${crops.hasPrevious()}"
+           th:href="@{/crops(
+               page=${currentPage - 1},
+               keyword=${keyword},
+               category=${category},
+               location=${location},
+               minPrice=${minPrice},
+               maxPrice=${maxPrice}
+           )}"
+           class="btn btn-secondary py-2 px-4 text-xs font-bold shadow-sm">
+            Previous
         </a>
 
-        <!-- CURRENT -->
-        <span
-                class="px-3 py-1
-                       bg-green-600
-                       text-white rounded"
-
-                th:text="${currentPage + 1}">
+        <!-- CURRENT PAGE NUMBER -->
+        <span class="px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold"
+              th:text="${currentPage + 1}">
+            1
         </span>
 
         <!-- NEXT -->
-        <a
-                th:if="${crops.hasNext()}"
-
-                th:href="@{/crops(
-                    page=${currentPage + 1},
-                    keyword=${keyword},
-                    category=${category},
-                    location=${location},
-                    minPrice=${minPrice},
-                    maxPrice=${maxPrice}
-                )}"
-
-                class="px-3 py-1
-                       border rounded
-                       hover:bg-gray-100">
-
+        <a th:if="${crops.hasNext()}"
+           th:href="@{/crops(
+               page=${currentPage + 1},
+               keyword=${keyword},
+               category=${category},
+               location=${location},
+               minPrice=${minPrice},
+               maxPrice=${maxPrice}
+           )}"
+           class="btn btn-secondary py-2 px-4 text-xs font-bold shadow-sm">
             Next
-
         </a>
-
     </div>
 
 </div>

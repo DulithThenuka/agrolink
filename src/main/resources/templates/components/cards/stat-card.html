@@ -1,65 +1,33 @@
 <div th:fragment="statCard(title, value, color)">
 
-    <div
-            class="bg-white rounded-xl shadow-md
-                   p-5 hover:shadow-lg
-                   transition duration-300
-                   flex items-center justify-between">
+    <div class="premium-card p-6 bg-white border border-slate-100 flex items-center justify-between">
 
         <!-- LEFT CONTENT -->
         <div>
-
             <!-- TITLE -->
-            <p
-                    class="text-sm text-gray-500"
-                    th:text="${title}">
-
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider" th:text="${title}">
                 Title
-
             </p>
 
             <!-- VALUE -->
-            <h2
-                    class="text-2xl font-bold mt-1"
-
-                    th:text="${value}"
-
-                    th:classappend="${color == 'green'}
-                        ? ' text-green-600'
-                        : (${color == 'blue'}
-                            ? ' text-blue-600'
-                            : (${color == 'red'}
-                                ? ' text-red-600'
-                                : (${color == 'yellow'}
-                                    ? ' text-yellow-600'
-                                    : ' text-gray-700')))">
-
+            <h2 class="text-3xl font-extrabold mt-2 font-display text-slate-800" th:text="${value}">
                 0
-
             </h2>
-
         </div>
 
         <!-- ICON -->
-        <div
-                class="w-12 h-12 flex items-center
-                       justify-center rounded-lg"
+        <div class="w-12 h-12 flex items-center justify-center rounded-2xl"
+             th:classappend="${color == 'green'}
+                 ? ' bg-emerald-50 text-emerald-600'
+                 : (${color == 'blue'}
+                     ? ' bg-blue-50 text-blue-600'
+                     : (${color == 'purple'}
+                         ? ' bg-purple-50 text-purple-600'
+                         : ' bg-slate-50 text-slate-600'))">
 
-                th:classappend="${color == 'green'}
-                    ? ' bg-green-100 text-green-600'
-                    : (${color == 'blue'}
-                        ? ' bg-blue-100 text-blue-600'
-                        : (${color == 'red'}
-                            ? ' bg-red-100 text-red-600'
-                            : (${color == 'yellow'}
-                                ? ' bg-yellow-100 text-yellow-600'
-                                : ' bg-gray-100 text-gray-600')))">
-
-            <!-- DEFAULT ICON -->
-            <span class="text-xl">
-
+            <!-- ICON MAPPING -->
+            <span class="text-xl font-bold" th:text="${title == 'Users'} ? '👥' : (${title == 'Crops'} ? '🌾' : (${title == 'Orders'} ? '📦' : '📊'))">
                 📊
-
             </span>
 
         </div>

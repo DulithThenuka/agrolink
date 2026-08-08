@@ -1,6 +1,7 @@
 <div
         th:fragment="sidebar"
-        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        xmlns:th="http://www.thymeleaf.org">
 
     <div
             x-data="{
@@ -13,134 +14,95 @@
         <div
                 x-show="mobileOpen"
                 @click="mobileOpen = false"
-
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
                 style="display:none"
-
-                class="fixed inset-0
-                       bg-black bg-opacity-40
-                       z-40 md:hidden">
-
+                class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 md:hidden">
         </div>
 
         <!-- ================== DESKTOP SIDEBAR ================== -->
         <aside
-
                 :class="open ? 'w-64' : 'w-20'"
-
-                class="hidden md:flex
-                       flex-col h-screen
-                       bg-white border-r
-                       shadow-sm
-                       transition-all
-                       duration-300 z-50">
+                class="hidden md:flex flex-col h-screen bg-white border-r border-slate-200 shadow-sm transition-all duration-300 z-50">
 
             <!-- HEADER -->
-            <div
-                    class="flex items-center
-                           justify-between
-                           px-4 py-4">
-
-                <h2
-                        x-show="open"
-
-                        class="text-lg font-bold
-                               text-gray-700">
-
-                    Menu
-
+            <div class="flex items-center justify-between px-5 py-5 border-b border-slate-100">
+                <h2 x-show="open" class="text-sm font-bold tracking-wider text-slate-400 uppercase font-display">
+                    Navigation
                 </h2>
-
+                
                 <!-- COLLAPSE BUTTON -->
                 <button
                         type="button"
                         @click="open = !open"
-
-                        class="text-gray-500
-                               hover:text-gray-700">
-
-                    <span x-show="open">
-                        ◀
-                    </span>
-
-                    <span x-show="!open">
-                        ▶
-                    </span>
-
+                        class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
+                    <span x-show="open" class="text-xs">◀</span>
+                    <span x-show="!open" class="text-xs">▶</span>
                 </button>
-
             </div>
 
             <!-- MENU -->
-            <nav
-                    class="flex-1 px-2
-                           space-y-2
-                           text-sm font-medium">
+            <nav class="flex-1 px-3 py-4 space-y-1.5">
+
+                <!-- DASHBOARD -->
+                <a
+                        th:href="@{/dashboard}"
+                        th:classappend="${currentUri != null && currentUri.equals('/dashboard')}
+                            ? 'sidebar-link-active'
+                            : 'text-slate-600 hover:bg-slate-50'"
+                        class="sidebar-link-premium">
+                    <span class="text-lg">📊</span>
+                    <span x-show="open" class="text-sm font-semibold">Dashboard</span>
+                </a>
 
                 <!-- CROPS -->
                 <a
                         th:href="@{/crops}"
-
-                        th:classappend="${currentUri != null && currentUri.startsWith('/crops')}
-                            ? ' bg-green-100 text-green-700'
-                            : ' text-gray-600'"
-
-                        class="flex items-center
-                               gap-3 px-3 py-2
-                               rounded-lg
-                               hover:bg-gray-100
-                               transition">
-
-                    <span>🌾</span>
-                    <span x-show="open">
-                        Crops
-                    </span>
-
+                        th:classappend="${currentUri != null && currentUri.startsWith('/crops') && !currentUri.contains('/add')}
+                            ? 'sidebar-link-active'
+                            : 'text-slate-600 hover:bg-slate-50'"
+                        class="sidebar-link-premium">
+                    <span class="text-lg">🌾</span>
+                    <span x-show="open" class="text-sm font-semibold">Browse Crops</span>
                 </a>
 
                 <!-- BUYER ONLY -->
                 <a
                         sec:authorize="hasRole('BUYER')"
-
                         th:href="@{/orders/my}"
-
                         th:classappend="${currentUri != null && currentUri.startsWith('/orders')}
-                            ? ' bg-green-100 text-green-700'
-                            : ' text-gray-600'"
-
-                        class="flex items-center
-                               gap-3 px-3 py-2
-                               rounded-lg
-                               hover:bg-gray-100
-                               transition">
-
-                    <span>📦</span>
-                    <span x-show="open">
-                        Orders
-                    </span>
-
+                            ? 'sidebar-link-active'
+                            : 'text-slate-600 hover:bg-slate-50'"
+                        class="sidebar-link-premium">
+                    <span class="text-lg">📦</span>
+                    <span x-show="open" class="text-sm font-semibold">My Orders</span>
                 </a>
 
                 <!-- FARMER ONLY -->
                 <a
                         sec:authorize="hasRole('FARMER')"
-
                         th:href="@{/crops/add}"
-
                         th:classappend="${currentUri != null && currentUri.contains('/add')}
-                            ? ' bg-green-100 text-green-700'
-                            : ' text-gray-600'"
+                            ? 'sidebar-link-active'
+                            : 'text-slate-600 hover:bg-slate-50'"
+                        class="sidebar-link-premium">
+                    <span class="text-lg">➕</span>
+                    <span x-show="open" class="text-sm font-semibold">Add Crop</span>
+                </a>
 
-                        class="flex items-center
-                               gap-3 px-3 py-2
-                               rounded-lg
-                               hover:bg-gray-100
-                               transition">
-
-                    <span>➕</span>
-                    <span x-show="open">
-                        Add Crop
-                    </span>
-
+                <!-- PROFILE -->
+                <a
+                        th:href="@{/profile}"
+                        th:classappend="${currentUri != null && currentUri.startsWith('/profile')}
+                            ? 'sidebar-link-active'
+                            : 'text-slate-600 hover:bg-slate-50'"
+                        class="sidebar-link-premium">
+                    <span class="text-lg">👤</span>
+                    <span x-show="open" class="text-sm font-semibold">Profile Settings</span>
                 </a>
 
             </nav>
@@ -148,14 +110,8 @@
             <!-- FOOTER -->
             <div
                     x-show="open"
-
-                    class="px-4 py-4
-                           border-t text-xs
-                           text-gray-400
-                           text-center">
-
+                    class="px-5 py-4 border-t border-slate-100 text-[10px] uppercase tracking-widest font-bold text-slate-400 text-center">
                 AgroLink v1.0
-
             </div>
 
         </aside>
@@ -164,91 +120,61 @@
         <button
                 type="button"
                 @click="mobileOpen = true"
-
-                class="fixed bottom-5 left-5
-                       md:hidden
-                       bg-green-600
-                       text-white
-                       p-3 rounded-full
-                       shadow-lg z-50">
-
-            ☰
-
+                class="fixed bottom-6 right-6 md:hidden bg-emerald-600 text-white p-4 rounded-full shadow-xl hover:bg-emerald-700 active:scale-95 transition z-50 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
         </button>
 
         <!-- ================== MOBILE SIDEBAR ================== -->
         <aside
                 x-show="mobileOpen"
-                x-transition
-
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="-translate-x-full"
+                x-transition:enter-end="translate-x-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="translate-x-0"
+                x-transition:leave-end="-translate-x-full"
                 style="display:none"
+                class="fixed left-0 top-0 h-full w-64 bg-white shadow-2xl z-50 md:hidden flex flex-col border-r border-slate-100">
 
-                class="fixed left-0 top-0
-                       h-full w-64
-                       bg-white
-                       shadow-lg
-                       z-50 md:hidden">
-
-            <div
-                    class="flex justify-between
-                           items-center
-                           p-4 border-b">
-
-                <span
-                        class="font-bold text-gray-700">
-
+            <div class="flex justify-between items-center px-5 py-5 border-b border-slate-100">
+                <span class="font-bold tracking-tight text-slate-800 font-display">
                     Menu
-
                 </span>
-
                 <button
                         type="button"
-                        @click="mobileOpen = false">
-
-                    ✕
-
+                        @click="mobileOpen = false"
+                        class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                 </button>
-
             </div>
 
-            <nav
-                    class="px-4 py-3
-                           space-y-2">
+            <nav class="flex-1 px-4 py-5 space-y-2">
+                
+                <a th:href="@{/dashboard}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
+                    📊 Dashboard
+                </a>
 
-                <a
-                        th:href="@{/crops}"
-
-                        class="block py-2
-                               hover:text-green-600">
-
-                    Crops
-
+                <a th:href="@{/crops}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
+                    🌾 Browse Crops
                 </a>
 
                 <!-- BUYER ONLY -->
-                <a
-                        sec:authorize="hasRole('BUYER')"
-
-                        th:href="@{/orders/my}"
-
-                        class="block py-2
-                               hover:text-green-600">
-
-                    Orders
-
+                <a sec:authorize="hasRole('BUYER')" th:href="@{/orders/my}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
+                    📦 My Orders
                 </a>
 
                 <!-- FARMER ONLY -->
-                <a
-                        sec:authorize="hasRole('FARMER')"
+                <a sec:authorize="hasRole('FARMER')" th:href="@{/crops/add}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
+                    ➕ Add Crop
+                </a>
 
-                        th:href="@{/crops/add}"
-
-                        class="block py-2
-                               hover:text-green-600">
-
-                    Add Crop
-
+                <!-- PROFILE -->
+                <a th:href="@{/profile}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-medium">
+                    👤 Profile Settings
                 </a>
 
             </nav>

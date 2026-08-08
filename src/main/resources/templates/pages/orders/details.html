@@ -7,249 +7,103 @@
         th:replace="~{
         fragments/head ::
         head('Order Details')
-}">
+        }">
 </head>
 
-<body>
+<body class="bg-slate-50">
 
 <!-- BASE LAYOUT -->
-<div
-        th:replace="~{
-        layout/base ::
-        base('Order Details', ~{::content})
-}">
-</div>
+<div th:replace="~{layout/base :: base('Order Details', ~{::content})}"></div>
 
 <!-- ================== PAGE CONTENT ================== -->
-<div
-        th:fragment="content"
-
-        class="max-w-4xl mx-auto">
+<div th:fragment="content" class="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
 
     <!-- HEADER -->
-    <div class="mb-6">
+    <div class="flex justify-between items-center pb-5 border-b border-slate-200/60">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">
+                Order #<span th:text="${order.id}">123</span>
+            </h1>
+            <p class="text-slate-500 text-sm mt-1">
+                Placed on 
+                <span th:if="${order.createdAt != null}" 
+                      th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy')}">08 Aug 2026</span>
+            </p>
+        </div>
 
-        <h1
-                class="text-2xl
-                       font-bold
-                       text-gray-800">
-
-            Order #
-
-            <span
-                    th:text="${order.id}">
-            </span>
-
-        </h1>
-
-        <p
-                class="text-sm
-                       text-gray-500">
-
-            Placed on
-
-            <span
-                    th:if="${order.createdAt != null}"
-
-                    th:text="${#temporals.format(
-                        order.createdAt,
-                        'dd MMM yyyy'
-                    )}">
-            </span>
-
-        </p>
-
+        <a th:href="@{/orders/my}" class="text-xs text-emerald-600 hover:text-emerald-700 font-bold transition">
+            ← My Orders
+        </a>
     </div>
 
     <!-- MAIN CARD -->
-    <div
-            class="bg-white
-                   rounded-xl
-                   shadow p-6
-                   space-y-6">
-
+    <div class="premium-card p-8 bg-white border border-slate-100 space-y-6">
+        
         <!-- STATUS -->
-        <div
-                class="flex justify-between
-                       items-center">
-
-            <h2
-                    class="font-semibold
-                           text-gray-700">
-
-                Order Status
-
-            </h2>
-
-            <span
-                    class="px-3 py-1
-                           text-sm rounded-full"
-
-                    th:text="${order.status}"
-
-                    th:classappend="
-                    ${order.status == 'PENDING'}
-                    ? ' bg-yellow-100 text-yellow-700' :
-
-                    ${order.status == 'CONFIRMED'}
-                    ? ' bg-blue-100 text-blue-700' :
-
-                    ${order.status == 'DELIVERED'}
-                    ? ' bg-green-100 text-green-700' :
-
-                    ${order.status == 'CANCELLED'}
-                    ? ' bg-red-100 text-red-700' :
-
-                    ' bg-gray-100 text-gray-700'
-                    ">
+        <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+            <h2 class="text-sm font-bold text-slate-800 font-display uppercase tracking-wider">Order Status</h2>
+            <span class="badge-premium font-bold uppercase text-xs px-4 py-1.5"
+                  th:text="${order.status}"
+                  th:classappend="${order.status == 'PENDING' ? 'badge-pending' : (order.status == 'DELIVERED' ? 'badge-delivered' : (order.status == 'CONFIRMED' ? 'badge-confirmed' : 'badge-cancelled'))}">
+                PENDING
             </span>
-
         </div>
 
-        <!-- CROP INFO -->
-        <div
-                class="border-t pt-4">
-
-            <h3
-                    class="font-semibold
-                           text-gray-700
-                           mb-3">
-
-                Crop Details
-
-            </h3>
-
-            <div
-                    class="flex items-center
-                           gap-4">
-
-                <img
-                        th:if="${order.crop != null}"
-
-                        th:src="${order.crop.imageUrl}"
-
-                        alt="Crop"
-
-                        class="w-20 h-20
-                               rounded
-                               object-cover"/>
-
+        <!-- CROP DETAILS -->
+        <div class="pb-4 border-b border-slate-100">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Crop Details</h3>
+            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <img th:if="${order.crop != null}"
+                     th:src="${order.crop.imageUrl != null && !#strings.isEmpty(order.crop.imageUrl)} ? ${order.crop.imageUrl} : @{/images/default-crop.jpg}"
+                     alt="Crop Image"
+                     class="w-16 h-16 rounded-xl object-cover border border-slate-200/60 shadow-sm"/>
+                
                 <div>
-
-                    <p
-                            class="font-medium
-                                   text-gray-800"
-
-                            th:text="${order.crop?.name ?: 'Unknown Crop'}">
-                    </p>
-
-                    <p
-                            class="text-sm
-                                   text-gray-500"
-
-                            th:text="${order.crop?.category ?: '-'}">
-                    </p>
-
+                    <p class="font-bold text-slate-800 font-display" th:text="${order.cropName ?: (order.crop != null ? order.crop.name : 'Unknown Crop')}">Crop Name</p>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-0.5" th:text="${order.crop != null ? order.crop.category : '-'}">Category</p>
                 </div>
-
             </div>
-
         </div>
 
-        <!-- ORDER INFO -->
-        <div
-                class="border-t pt-4
-                       grid grid-cols-2
-                       gap-4 text-sm">
-
+        <!-- TRANSACTION INFO -->
+        <div class="grid grid-cols-2 gap-6 pb-4 border-b border-slate-100">
             <div>
-
-                <p class="text-gray-500">
-                    Quantity
-                </p>
-
-                <p
-                        class="font-medium"
-
-                        th:text="${order.quantity ?: 0}">
-                </p>
-
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Quantity ordered</p>
+                <p class="font-bold text-slate-800 text-base mt-1" th:text="${order.quantity ?: 0}">0</p>
             </div>
 
             <div>
-
-                <p class="text-gray-500">
-                    Total Price
-                </p>
-
-                <p
-                        class="font-medium
-                               text-green-600"
-
-                        th:text="'$' + ${order.totalPrice}">
-                </p>
-
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Settlement</p>
+                <p class="font-extrabold text-emerald-600 text-base mt-1" th:text="'$' + ${order.totalPrice}">$0.00</p>
             </div>
-
         </div>
 
         <!-- BUYER INFO -->
-        <div
-                class="border-t pt-4">
-
-            <h3
-                    class="font-semibold
-                           text-gray-700
-                           mb-2">
-
-                Buyer
-
-            </h3>
-
-            <p
-                    class="text-gray-800"
-
-                    th:text="${order.buyerEmail
-                        ?: order.buyer?.email
-                        ?: 'Unknown'}">
-            </p>
-
+        <div class="pb-6">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">Buyer Information</h3>
+            <div class="flex items-center gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-base font-bold text-emerald-700">
+                    👤
+                </div>
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Account Username</div>
+                    <div class="text-sm font-bold text-slate-700" th:text="${order.buyerEmail ?: (order.buyer != null ? order.buyer.email : 'Unknown')}">buyer@email.com</div>
+                </div>
+            </div>
         </div>
 
         <!-- ACTIONS -->
-        <div
-                class="border-t pt-4
-                       flex justify-between
-                       items-center">
-
-            <a
-                    th:href="@{/orders/my}"
-
-                    class="text-gray-500
-                           hover:underline">
-
-                ← Back to Orders
-
+        <div class="flex justify-between items-center pt-6 border-t border-slate-100">
+            <a th:href="@{/orders/my}" class="text-slate-500 hover:text-emerald-600 font-semibold transition text-sm flex items-center gap-1">
+                <span>←</span> Back to Orders
             </a>
 
-            <!-- PAY -->
-            <a
-                    th:if="${order.status == 'PENDING'}"
-
-                    th:href="@{/payment/checkout/{id}(
-                        id=${order.id}
-                    )}"
-
-                    class="bg-green-600
-                           text-white
-                           px-5 py-2
-                           rounded-lg
-                           hover:bg-green-700">
-
+            <!-- PAY NOW -->
+            <a th:if="${order.status == 'PENDING'}"
+               th:href="@{/payment/checkout/{id}(id=${order.id})}"
+               class="btn btn-primary py-2.5 px-6 shadow-md shadow-emerald-100 text-xs">
                 Pay Now
-
             </a>
-
         </div>
 
     </div>

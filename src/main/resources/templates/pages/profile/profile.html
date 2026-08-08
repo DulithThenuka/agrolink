@@ -3,71 +3,65 @@
 
 <head th:replace="fragments/head :: head('Profile')"></head>
 
-<body>
+<body class="bg-slate-50">
 
 <div th:replace="~{layout/base :: base('Profile', ~{::content})}">
 </div>
 
 <!-- ================== CONTENT ================== -->
-<div th:fragment="content" class="max-w-4xl mx-auto">
+<div th:fragment="content" class="max-w-4xl mx-auto space-y-6 animate-fade-in-up">
 
     <!-- HEADER -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">
-            My Profile 👤
-        </h1>
-        <p class="text-sm text-gray-500">
-            Manage your account details
-        </p>
+    <div class="flex justify-between items-center pb-5 border-b border-slate-200/60">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">My Profile 👤</h1>
+            <p class="text-slate-500 text-sm mt-1">Manage credentials, view account status, and configure personal settings.</p>
+        </div>
+
+        <a th:href="@{/dashboard}" class="text-xs text-emerald-600 hover:text-emerald-700 font-bold transition">
+            ← Dashboard
+        </a>
     </div>
 
     <!-- ================== PROFILE CARD ================== -->
-    <div class="bg-white rounded-xl shadow p-6 flex flex-col md:flex-row gap-6">
+    <div class="premium-card p-8 bg-white border border-slate-100 flex flex-col md:flex-row gap-8 items-start">
 
         <!-- AVATAR -->
-        <div class="flex justify-center md:justify-start">
-            <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center text-3xl">
+        <div class="flex justify-center w-full md:w-auto">
+            <div class="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center text-3xl shadow-inner border border-emerald-200/50">
                 👤
             </div>
         </div>
 
         <!-- INFO -->
-        <div class="flex-1 space-y-4">
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
 
             <!-- NAME -->
-            <div>
-                <p class="text-sm text-gray-500">Name</p>
-                <p class="font-semibold text-gray-800"
-                   th:text="${user.name}"></p>
+            <div class="space-y-1">
+                <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Full Name</span>
+                <p class="font-bold text-slate-800 text-base" th:text="${user.name}">John Doe</p>
             </div>
 
             <!-- EMAIL -->
-            <div>
-                <p class="text-sm text-gray-500">Email</p>
-                <p class="font-semibold text-gray-800"
-                   th:text="${user.email}"></p>
+            <div class="space-y-1">
+                <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Email Address</span>
+                <p class="font-bold text-slate-800 text-base" th:text="${user.email}">john@example.com</p>
             </div>
 
             <!-- ROLE -->
-            <div>
-                <p class="text-sm text-gray-500">Role</p>
-
-                <span class="px-3 py-1 text-xs rounded-full"
+            <div class="space-y-1.5">
+                <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Platform Role</span>
+                <span class="badge-premium font-bold uppercase text-[10px] px-3.5 py-1"
                       th:text="${user.role}"
-                      th:classappend="
-                        ${user.role.name() == 'ADMIN'} ? ' bg-purple-100 text-purple-700' :
-                        ${user.role.name() == 'FARMER'} ? ' bg-green-100 text-green-700' :
-                        ${user.role.name() == 'BUYER'} ? ' bg-blue-100 text-blue-700' :
-                        ' bg-gray-100 text-gray-700'
-                      ">
+                      th:classappend="${user.role.name() == 'ADMIN' ? 'badge-confirmed' : (user.role.name() == 'FARMER' ? 'badge-delivered' : 'badge-pending')}">
+                    BUYER
                 </span>
             </div>
 
             <!-- LOCATION -->
-            <div>
-                <p class="text-sm text-gray-500">Location</p>
-                <p class="font-semibold text-gray-800"
-                   th:text="${user.location != null ? user.location : 'Not set'}"></p>
+            <div class="space-y-1">
+                <span class="text-slate-400 text-xs font-bold uppercase tracking-wider block">Location / Region</span>
+                <p class="font-bold text-slate-800 text-base" th:text="${user.location != null ? user.location : 'Not set'}">Not set</p>
             </div>
 
         </div>
@@ -75,37 +69,35 @@
     </div>
 
     <!-- ================== ACCOUNT STATUS ================== -->
-    <div class="bg-white rounded-xl shadow p-6 mt-6">
+    <div class="premium-card p-8 bg-white border border-slate-100">
 
-        <h2 class="font-semibold text-gray-700 mb-4">
-            Account Status
-        </h2>
+        <h2 class="text-base font-bold text-slate-800 font-display mb-6">Security &amp; Account Flags</h2>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm font-semibold">
 
-            <div>
-                <p class="text-gray-500">Enabled</p>
+            <div class="space-y-1">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Account Active</p>
                 <p th:text="${user.enabled ? 'Yes' : 'No'}"
-                   th:classappend="${user.enabled} ? ' text-green-600' : ' text-red-500'">
+                   th:classappend="${user.enabled} ? ' text-emerald-600' : ' text-red-500'">
                 </p>
             </div>
 
-            <div>
-                <p class="text-gray-500">Locked</p>
+            <div class="space-y-1">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Security Lockout</p>
                 <p th:text="${user.accountNonLocked ? 'No' : 'Yes'}"
-                   th:classappend="${user.accountNonLocked} ? ' text-green-600' : ' text-red-500'">
+                   th:classappend="${user.accountNonLocked} ? ' text-emerald-600' : ' text-red-500'">
                 </p>
             </div>
 
-            <div>
-                <p class="text-gray-500">Account Expired</p>
-                <p th:text="${user.accountNonExpired ? 'No' : 'Yes'}">
+            <div class="space-y-1">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Expired Account</p>
+                <p th:text="${user.accountNonExpired ? 'No' : 'Yes'}" class="text-slate-700">
                 </p>
             </div>
 
-            <div>
-                <p class="text-gray-500">Credentials Expired</p>
-                <p th:text="${user.credentialsNonExpired ? 'No' : 'Yes'}">
+            <div class="space-y-1">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Credentials Expired</p>
+                <p th:text="${user.credentialsNonExpired ? 'No' : 'Yes'}" class="text-slate-700">
                 </p>
             </div>
 
@@ -114,16 +106,14 @@
     </div>
 
     <!-- ================== ACTIONS ================== -->
-    <div class="mt-6 flex justify-between items-center">
+    <div class="flex justify-between items-center pt-4">
 
-        <a href="/dashboard"
-           class="text-gray-500 hover:underline">
-            ← Back to Dashboard
+        <a th:href="@{/dashboard}" class="text-slate-500 hover:text-emerald-600 font-semibold transition text-sm flex items-center gap-1.5">
+            <span>←</span> Back to Dashboard
         </a>
 
-        <!-- FUTURE EDIT BUTTON -->
-        <button class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900">
-            Edit Profile
+        <button class="btn btn-secondary text-xs py-2.5 px-6 font-bold shadow-sm">
+            Edit Settings
         </button>
 
     </div>

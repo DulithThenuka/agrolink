@@ -7,10 +7,10 @@
         th:replace="~{
         fragments/head ::
         head('Login')
-}">
+        }">
 </head>
 
-<body class="relative flex items-center justify-center min-h-screen px-4 overflow-hidden bg-gradient-to-br from-green-950 via-emerald-900 to-teal-950">
+<body class="relative flex items-center justify-center min-h-screen px-4 overflow-hidden bg-gradient-to-br from-slate-950 via-emerald-950 to-teal-950">
 
 <!-- 3D BACKGROUND CANVAS -->
 <div id="three-bg" class="absolute inset-0 w-full h-full z-0 pointer-events-none"></div>
@@ -18,14 +18,14 @@
 <div class="relative w-full max-w-md z-10 hero-card opacity-0">
 
     <!-- GLASS CARD -->
-    <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20">
+    <div class="bg-slate-900/40 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/10">
 
         <!-- TITLE -->
-        <h2 class="text-3xl font-bold text-center text-green-400 mb-2 tracking-wide hero-title">
-            Welcome Back 🌱
+        <h2 class="text-3xl font-bold text-center text-white mb-2 tracking-tight hero-title font-display">
+            Welcome Back <span class="text-emerald-400">🌱</span>
         </h2>
 
-        <p class="text-center text-green-200/70 text-sm mb-6 hero-sub">
+        <p class="text-center text-slate-300/80 text-sm mb-6 hero-sub">
             Login to your AgroLink account
         </p>
 
@@ -49,47 +49,31 @@
         <form th:action="@{/auth/login}" method="post" class="space-y-5">
 
             <!-- EMAIL -->
-            <div class="form-field"
-                 th:replace="~{
-                     components/forms/input ::
-                     input(
-                         'Email',
-                         'email',
-                         'email',
-                         'Enter your email',
-                         '',
-                         null
-                     )
-                 }">
+            <div class="form-field">
+                <label for="email" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Address</label>
+                <input id="email" type="email" name="email" placeholder="Enter your email" required
+                       class="w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition duration-200 text-sm">
             </div>
 
             <!-- PASSWORD -->
-            <div class="form-field"
-                 th:replace="~{
-                     components/forms/input ::
-                     input(
-                         'Password',
-                         'password',
-                         'password',
-                         'Enter your password',
-                         '',
-                         null
-                     )
-                 }">
+            <div class="form-field">
+                <label for="password" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Password</label>
+                <input id="password" type="password" name="password" placeholder="Enter your password" required
+                       class="w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition duration-200 text-sm">
             </div>
 
             <!-- SUBMIT -->
             <button type="submit"
-                    class="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 active:scale-[0.98] transition-all font-semibold shadow-lg shadow-green-500/25 mt-2">
-                Login
+                    class="w-full btn btn-primary py-3 rounded-xl text-sm font-semibold mt-2 shadow-lg shadow-emerald-950/40">
+                Sign In
             </button>
 
         </form>
 
         <!-- REGISTER LINK -->
-        <p class="text-sm text-center text-green-200/60 mt-6">
+        <p class="text-sm text-center text-slate-300/60 mt-6">
             Don’t have an account?
-            <a th:href="@{/auth/register}" class="text-green-400 hover:text-green-300 font-semibold underline underline-offset-4 ml-1">
+            <a th:href="@{/auth/register}" class="text-emerald-400 hover:text-emerald-300 font-semibold underline underline-offset-4 ml-1">
                 Register
             </a>
         </p>
@@ -99,11 +83,7 @@
 </div>
 
 <!-- SCRIPTS -->
-<div th:replace="~{
-    fragments/scripts ::
-    scripts
-}">
-</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
 
 <!-- THREE.JS & GSAP VIA CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -148,7 +128,7 @@
         if (!container) return;
 
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x064e3b, 0.01);
+        scene.fog = new THREE.FogExp2(0x064e3b, 0.015);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 8;
@@ -177,10 +157,10 @@
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
         const material = new THREE.PointsMaterial({
-            color: 0x34d399,
+            color: 0x10b981,
             size: 0.12,
             transparent: true,
-            opacity: 0.7,
+            opacity: 0.6,
             blending: THREE.AdditiveBlending
         });
 
@@ -224,5 +204,4 @@
 </script>
 
 </body>
-
 </html>

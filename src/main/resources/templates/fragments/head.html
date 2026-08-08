@@ -23,67 +23,74 @@
             defer>
     </script>
 
-    <!-- GOOGLE FONT -->
-    <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-            rel="stylesheet">
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- GLOBAL STYLES -->
-    <style>
-
-        body {
-            font-family: 'Inter', sans-serif;
+    <!-- TAILWIND CONFIG -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        dark: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-glow': 'pulseGlow 2s infinite ease-in-out',
+                        'float': 'float 4s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '1', transform: 'scale(1.05)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
         }
+    </script>
 
-        /* Glass UI */
-        .glass {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background-color: #16a34a;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #15803d;
-        }
-
-        .btn-secondary {
-            border: 1px solid #d1d5db;
-            background: white;
-        }
-
-        .btn-secondary:hover {
-            background: #f3f4f6;
-        }
-
-        /* Card */
-        .card {
-            background: white;
-            border-radius: 1rem;
-            padding: 1.25rem;
-            box-shadow:
-                    0 1px 3px rgba(0,0,0,0.1),
-                    0 1px 2px rgba(0,0,0,0.06);
-            transition: all 0.2s ease;
-        }
-
-        .card:hover {
-            box-shadow:
-                    0 10px 15px rgba(0,0,0,0.1),
-                    0 4px 6px rgba(0,0,0,0.05);
-        }
-
-    </style>
+    <!-- GLOBAL STYLE OVERRIDES -->
+    <link rel="stylesheet" th:href="@{/CSS/app.css}">
 
 </div>

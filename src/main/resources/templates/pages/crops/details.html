@@ -8,221 +8,123 @@
         th:replace="~{
         fragments/head ::
         head(${crop.name})
-}">
+        }">
 </head>
 
-<body>
+<body class="bg-slate-50">
 
 <!-- BASE LAYOUT -->
-<div
-        th:replace="~{
-        layout/base ::
-        base(${crop.name}, ~{::content})
-}">
-</div>
+<div th:replace="~{layout/base :: base(${crop.name}, ~{::content})}"></div>
 
 <!-- ================== PAGE CONTENT ================== -->
-<div
-        th:fragment="content"
+<div th:fragment="content" class="max-w-5xl mx-auto animate-fade-in-up">
 
-        class="max-w-6xl mx-auto">
+    <!-- BACK ACTION -->
+    <div class="mb-6">
+        <a th:href="@{/crops}" class="text-slate-500 hover:text-emerald-600 transition flex items-center gap-2 text-sm font-semibold">
+            <span>←</span> Back to browse
+        </a>
+    </div>
 
-    <div
-            class="grid md:grid-cols-2
-                   gap-8">
+    <div class="grid md:grid-cols-2 gap-10">
 
-        <!-- IMAGE -->
-        <div
-                class="bg-white
-                       rounded-xl shadow
-                       overflow-hidden">
-
+        <!-- IMAGE CONTAINER -->
+        <div class="premium-card overflow-hidden bg-slate-100 border border-slate-100 flex items-center justify-center p-0">
             <img
-                    th:src="${crop.imageUrl}"
-
+                    th:src="${crop.imageUrl != null && !#strings.isEmpty(crop.imageUrl)}
+                            ? ${crop.imageUrl}
+                            : @{/images/default-crop.jpg}"
                     alt="Crop Image"
-
-                    class="w-full
-                           h-[400px]
-                           object-cover"/>
-
+                    class="w-full h-[450px] object-cover"/>
         </div>
 
-        <!-- DETAILS -->
-        <div
-                class="bg-white
-                       rounded-xl shadow
-                       p-6 flex flex-col">
+        <!-- DETAILS CARD -->
+        <div class="premium-card p-8 bg-white border border-slate-100 flex flex-col justify-between">
+            <div class="space-y-5">
+                <!-- CATEGORY + LOCATION -->
+                <div class="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-widest">
+                    <span th:text="${crop.category}">Category</span>
+                    <span>•</span>
+                    <span th:text="${crop.location}">Location</span>
+                </div>
 
-            <!-- NAME -->
-            <h1
-                    class="text-2xl
-                           font-bold
-                           text-gray-800"
+                <!-- NAME -->
+                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display" th:text="${crop.name}">
+                    Crop Name
+                </h1>
 
-                    th:text="${crop.name}">
-
-            </h1>
-
-            <!-- CATEGORY + LOCATION -->
-            <p
-                    class="text-gray-500 mt-1">
-
-                <span
-                        th:text="${crop.category}">
-                </span>
-
-                •
-
-                <span
-                        th:text="${crop.location}">
-                </span>
-
-            </p>
-
-            <!-- PRICE -->
-            <div
-                    class="text-3xl
-                           font-bold
-                           text-green-600
-                           mt-4"
-
-                    th:text="'$' + ${crop.price}">
-
-            </div>
-
-            <!-- STOCK -->
-            <div class="mt-2">
-
-                <span
-                        th:if="${crop.quantity > 0}"
-
-                        class="text-green-600
-                               text-sm">
-
-                    In Stock
-                    (
-                    <span
-                            th:text="${crop.quantity}">
+                <!-- STOCK BADGE -->
+                <div>
+                    <span th:if="${crop.quantity > 0}"
+                          class="badge-premium badge-delivered py-1 px-3.5 text-xs font-bold">
+                        In Stock (<span th:text="${crop.quantity}">0</span> units available)
                     </span>
-                    )
+                    <span th:if="${crop.quantity == 0}"
+                          class="badge-premium badge-cancelled py-1 px-3.5 text-xs font-bold">
+                        Out of Stock
+                    </span>
+                </div>
 
-                </span>
+                <!-- PRICE -->
+                <div class="pt-3 border-t border-slate-100">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Direct Price</div>
+                    <div class="flex items-baseline gap-1 mt-1">
+                        <span class="text-4xl font-extrabold text-emerald-600 font-display" th:text="'$' + ${crop.price}">$0.00</span>
+                        <span class="text-sm text-slate-500 font-semibold">/ unit</span>
+                    </div>
+                </div>
 
-                <span
-                        th:if="${crop.quantity == 0}"
-
-                        class="text-red-500
-                               text-sm">
-
-                    Out of Stock
-
-                </span>
-
+                <!-- DESCRIPTION -->
+                <div th:if="${crop.description != null}" class="space-y-1.5">
+                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Description</div>
+                    <p class="text-slate-600 text-sm leading-relaxed" th:text="${crop.description}">
+                        Crop description goes here.
+                    </p>
+                </div>
             </div>
 
-            <!-- DESCRIPTION -->
-            <p
-                    th:if="${crop.description != null}"
+            <!-- PURCHASE SECTION -->
+            <div class="pt-6 border-t border-slate-100 mt-8 space-y-4">
+                
+                <!-- BUYER ACTION FORM -->
+                <div sec:authorize="hasRole('BUYER')">
+                    <form th:action="@{/orders/place}" method="post" class="flex gap-3 items-center">
+                        <input type="hidden" name="cropId" th:value="${crop.id}"/>
+                        
+                        <div class="w-24">
+                            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Qty</label>
+                            <input type="number" name="quantity" value="1" min="1"
+                                   th:attr="max=${crop.quantity}"
+                                   class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-center font-bold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 text-sm"/>
+                        </div>
 
-                    class="mt-4 text-gray-600
-                           text-sm"
+                        <div class="flex-1 pt-4">
+                            <button type="submit" th:disabled="${crop.quantity == 0}"
+                                    class="w-full btn btn-primary py-3 font-bold shadow-lg shadow-emerald-200 disabled:opacity-50">
+                                Buy Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                    th:text="${crop.description}">
+                <!-- ANONYMOUS PROMPT -->
+                <div sec:authorize="!isAuthenticated()" class="text-center bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                    <p class="text-xs text-slate-500 font-medium">To place an order directly with the farmer:</p>
+                    <a th:href="@{/auth/login}" class="text-sm text-emerald-600 hover:text-emerald-700 font-bold mt-1.5 inline-block transition">
+                        Login to Purchase →
+                    </a>
+                </div>
 
-            </p>
-
-            <!-- BUY SECTION -->
-            <div
-                    sec:authorize="hasRole('BUYER')"
-
-                    class="mt-6">
-
-                <form
-                        th:action="@{/orders/place}"
-                        method="post"
-
-                        class="flex gap-3
-                               items-center">
-
-                    <input
-                            type="hidden"
-                            name="cropId"
-
-                            th:value="${crop.id}"/>
-
-                    <input
-                            type="number"
-
-                            name="quantity"
-                            value="1"
-                            min="1"
-
-                            th:attr="max=${crop.quantity}"
-
-                            class="w-20 px-2 py-2
-                                   border rounded-lg
-                                   text-center"/>
-
-                    <button
-                            type="submit"
-
-                            th:disabled="${crop.quantity == 0}"
-
-                            class="bg-green-600
-                                   text-white
-                                   px-5 py-2
-                                   rounded-lg
-                                   hover:bg-green-700
-                                   disabled:opacity-50">
-
-                        Buy Now
-
-                    </button>
-
-                </form>
-
-            </div>
-
-            <!-- LOGIN PROMPT -->
-            <div
-                    sec:authorize="!isAuthenticated()"
-
-                    class="mt-6">
-
-                <a
-                        th:href="@{/auth/login}"
-
-                        class="text-green-600
-                               hover:underline">
-
-                    Login to purchase
-
-                </a>
-
-            </div>
-
-            <!-- FARMER INFO -->
-            <div
-                    class="mt-8 pt-4
-                           border-t">
-
-                <h3
-                        class="text-sm
-                               font-semibold
-                               text-gray-600
-                               mb-2">
-
-                    Farmer
-
-                </h3>
-
-                <p
-                        class="text-gray-700"
-
-                        th:text="${crop.farmerName ?: 'Unknown'}">
-
-                </p>
+                <!-- FARMER DETAILS -->
+                <div class="flex items-center gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-lg font-bold text-emerald-700">
+                        👨‍🌾
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Harvested By</div>
+                        <div class="text-sm font-bold text-slate-700" th:text="${crop.farmerName ?: 'Unknown Farmer'}">Farmer Name</div>
+                    </div>
+                </div>
 
             </div>
 
@@ -233,5 +135,4 @@
 </div>
 
 </body>
-
 </html>
