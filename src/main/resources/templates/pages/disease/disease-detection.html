@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="http://www.thymeleaf.org">
+
+<head
+        th:replace="~{
+        fragments/head ::
+        head('AI Crop Disease Scanner')
+        }">
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-slate-800 flex flex-col min-h-screen">
+
+<!-- NAVBAR -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- ================== PAGE CONTENT ================== -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-grow w-full animate-fade-in-up">
+
+    <!-- HEADER BANNER -->
+    <div class="glass rounded-3xl p-6 sm:p-8 border border-white/80 shadow-xl bg-gradient-to-r from-emerald-950 via-teal-900 to-slate-900 text-white relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                <span>📷 CNN Computer Vision Pipeline</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-display">
+                Crop Disease Scanner 📷
+            </h1>
+            <p class="text-emerald-100/80 text-sm max-w-2xl">
+                Upload or capture a leaf photo to diagnose crop pathologies, review treatment guidelines, and connect with extension experts.
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN TWO COLUMN GRID -->
+    <div class="grid lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- UPLOAD / SAMPLE SELECTOR PANEL -->
+        <div class="lg:col-span-5 premium-card p-6 bg-white border border-slate-100 shadow-lg space-y-5">
+            <div class="pb-3 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 font-display flex items-center gap-2">
+                    <span>🔬</span> Leaf Photo Diagnostic Scan
+                </h3>
+                <p class="text-xs text-slate-400">Upload photo or choose a leaf sample</p>
+            </div>
+
+            <!-- UPLOAD DROPZONE -->
+            <div class="border-2 border-slate-200 border-dashed rounded-3xl p-6 text-center space-y-3 bg-slate-50 hover:bg-slate-100/60 transition cursor-pointer">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto text-2xl font-bold shadow-sm">
+                    📸
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-800"><span class="text-emerald-600">Click to upload leaf photo</span> or drag &amp; drop</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Supports PNG, JPG, WEBP (Max 10MB)</p>
+                </div>
+            </div>
+
+            <!-- SAMPLE LEAF PRESET SELECTOR -->
+            <form th:action="@{/disease-detection/scan}" method="post" th:object="${request}" class="space-y-4 pt-2">
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Select Preset Leaf Sample:</label>
+                <select th:field="*{sampleCrop}" class="input-premium text-sm font-semibold">
+                    <option value="Tomato">🍅 Tomato Leaf (Suspected Early Blight)</option>
+                    <option value="Rice">🌾 Rice Leaf (Suspected Blast)</option>
+                    <option value="Potato">🥔 Potato Leaf (Suspected Late Blight)</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary w-full py-3 font-bold text-xs shadow-md shadow-emerald-500/20">
+                    Run AI Vision Scan 🔬
+                </button>
+            </form>
+        </div>
+
+        <!-- DIAGNOSTIC RESULTS PANEL -->
+        <div class="lg:col-span-7 space-y-6">
+
+            <!-- RESULT CARD -->
+            <div class="premium-card p-6 bg-white border border-emerald-100 shadow-xl space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                    <div>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-extrabold rounded-full uppercase tracking-wider">
+                            Condition Identified
+                        </span>
+                        <h2 class="text-2xl font-extrabold text-slate-900 font-display mt-2" th:text="${result.detectedDisease}">
+                            Tomato Early Blight
+                        </h2>
+                        <p class="text-xs text-slate-400 font-semibold italic mt-0.5" th:text="'Pathogen: ' + ${result.scientificName}">
+                            Alternaria solani
+                        </p>
+                    </div>
+
+                    <div class="text-right">
+                        <span class="text-3xl font-extrabold text-emerald-600 font-display" th:text="${result.confidencePercentage} + '%'">94.3%</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">CNN Confidence</span>
+                    </div>
+                </div>
+
+                <!-- SEVERITY RATING -->
+                <div class="p-3 bg-amber-50 rounded-2xl border border-amber-200/80 flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-700">Infection Severity Rating:</span>
+                    <span class="px-3 py-1 bg-amber-500 text-white font-extrabold text-xs rounded-xl" th:text="${result.severityLevel}">
+                        Moderate
+                    </span>
+                </div>
+
+                <!-- RECOMMENDED TREATMENT STEPS -->
+                <div class="space-y-3 pt-2">
+                    <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Recommended Agronomic Treatment Action</h3>
+                    <div class="space-y-2">
+                        <th:block th:each="action : ${result.recommendedActions}">
+                            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-3">
+                                <span class="text-emerald-600 font-bold text-sm">✓</span>
+                                <p class="text-xs font-semibold text-slate-700 leading-relaxed" th:text="${action}">Treatment action</p>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEARBY EXPERT OFFICER CARD -->
+            <div class="premium-card p-6 bg-white border border-slate-100 shadow-md space-y-3">
+                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 block">Nearby Extension Specialist Available</span>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xl">
+                            👨‍🔬
+                        </div>
+                        <div>
+                            <h4 class="font-extrabold text-slate-900 text-base" th:text="${result.nearbyExpert.name}">Dr. K. L. Perera</h4>
+                            <p class="text-xs text-slate-500 font-semibold" th:text="${result.nearbyExpert.title}">Senior Agricultural Officer</p>
+                            <p class="text-[11px] text-emerald-600 font-bold mt-0.5" th:text="${result.nearbyExpert.officeLocation}">Anuradhapura District Office</p>
+                        </div>
+                    </div>
+                    <a th:href="'tel:' + ${result.nearbyExpert.phone}" class="btn btn-secondary py-2 px-4 text-xs font-bold shrink-0">
+                        📞 Call Specialist
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- SCRIPTS -->
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+
+</body>
+</html>

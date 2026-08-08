@@ -16,7 +16,9 @@ import { Analytics } from './pages/Analytics';
 import { CropAdvisor } from './pages/CropAdvisor';
 import { PricePrediction } from './pages/PricePrediction';
 import { DemandForecasting } from './pages/DemandForecasting';
+import { CropDiseaseDetection } from './pages/CropDiseaseDetection';
 import { Orders } from './pages/Orders';
+
 
 
 
@@ -59,6 +61,8 @@ function AppContent() {
             <Route path="/advisor" element={<CropAdvisor />} />
             <Route path="/price-prediction" element={<PricePrediction />} />
             <Route path="/demand-forecasting" element={<DemandForecasting />} />
+            <Route path="/disease-detection" element={<CropDiseaseDetection />} />
+
 
 
 

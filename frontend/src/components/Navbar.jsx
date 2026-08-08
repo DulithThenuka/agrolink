@@ -77,6 +77,16 @@ export const Navbar = () => {
             Demand Forecast 📊
           </Link>
 
+          <Link
+            to="/disease-detection"
+            className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/disease-detection') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Disease Scanner 📷
+          </Link>
+
+
 
 
 
