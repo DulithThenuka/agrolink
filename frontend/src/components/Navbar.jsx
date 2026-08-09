@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Sprout, LogOut, User as UserIcon, LayoutDashboard, ShoppingBag, PlusCircle, Menu, X, ChevronDown } from 'lucide-react';
 
 export const Navbar = () => {
-  const { isAuthenticated, user, logout, isBuyer } = useAuth();
+  const { isAuthenticated, user, logout, isBuyer, isFarmer, isLogistics, isAdmin } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -32,96 +32,96 @@ export const Navbar = () => {
 
         {/* DESKTOP MENU */}
         <div className="hidden md:flex items-center space-x-2 lg:space-x-4 text-xs font-semibold text-slate-600 overflow-x-auto py-1">
-          <Link
-            to="/crops"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/crops') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Crops
-          </Link>
+          {(!isLogistics) && (
+            <Link
+              to="/crops"
+              className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                isActive('/crops') ? 'text-emerald-600 font-bold' : ''
+              }`}
+            >
+              Crops
+            </Link>
+          )}
 
-          <Link
-            to="/analytics"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/analytics') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Analytics
-          </Link>
+          {(!isLogistics) && (
+            <>
+              <Link
+                to="/analytics"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/analytics') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Analytics
+              </Link>
 
-          <Link
-            to="/advisor"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/advisor') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            AI Advisor 🤖
-          </Link>
+              <Link
+                to="/advisor"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/advisor') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                AI Advisor 🤖
+              </Link>
 
-          <Link
-            to="/price-prediction"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/price-prediction') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Price Predictor 📈
-          </Link>
+              <Link
+                to="/price-prediction"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/price-prediction') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Price Predictor 📈
+              </Link>
 
-          <Link
-            to="/demand-forecasting"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/demand-forecasting') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Demand Forecast 📊
-          </Link>
+              <Link
+                to="/demand-forecasting"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/demand-forecasting') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Demand Forecast 📊
+              </Link>
 
-          <Link
-            to="/disease-detection"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/disease-detection') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Disease Scanner 📷
-          </Link>
+              <Link
+                to="/disease-detection"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/disease-detection') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Disease Scanner 📷
+              </Link>
 
-          <Link
-            to="/negotiation"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/negotiation') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Negotiations 💬
-          </Link>
+              <Link
+                to="/negotiation"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/negotiation') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Negotiations 💬
+              </Link>
 
-          <Link
-            to="/contracts"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/contracts') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Contracts 📑
-          </Link>
+              <Link
+                to="/contracts"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/contracts') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Contracts 📑
+              </Link>
+            </>
+          )}
 
-          <Link
-            to="/logistics"
-            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-              isActive('/logistics') ? 'text-emerald-600 font-bold' : ''
-            }`}
-          >
-            Smart Logistics 🚚
-          </Link>
+          {(isLogistics || isAdmin) && (
+            <Link
+              to="/logistics"
+              className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                isActive('/logistics') ? 'text-emerald-600 font-bold' : ''
+              }`}
+            >
+              Smart Logistics 🚚
+            </Link>
+          )}
 
-
-
-
-
-
-
-
-
-          {isBuyer && (
+          {(isBuyer || isAdmin) && (
             <Link
               to="/orders"
               className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
@@ -199,15 +199,27 @@ export const Navbar = () => {
       {/* MOBILE MENU DRAWER */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-slate-100 p-4 space-y-3 mt-4 rounded-2xl shadow-xl">
-          <Link
-            to="/crops"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
-          >
-            <ShoppingBag className="w-4 h-4 text-emerald-600" /> Crops Catalog
-          </Link>
+          {(!isLogistics) && (
+            <Link
+              to="/crops"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              <ShoppingBag className="w-4 h-4 text-emerald-600" /> Crops Catalog
+            </Link>
+          )}
 
-          {isBuyer && (
+          {(isLogistics || isAdmin) && (
+            <Link
+              to="/logistics"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
+            >
+              <ShoppingBag className="w-4 h-4 text-emerald-600" /> Smart Logistics 🚚
+            </Link>
+          )}
+
+          {(isBuyer || isAdmin) && (
             <Link
               to="/orders"
               onClick={() => setMobileMenuOpen(false)}

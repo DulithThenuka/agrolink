@@ -23,15 +23,23 @@ import { Orders } from './pages/Orders';
 import { Logistics } from './pages/Logistics';
 import { Profile } from './pages/Profile';
 
-const ProtectedRoute = ({ children, requireFarmer }) => {
-  const { isAuthenticated, isFarmer } = useAuth();
+const ProtectedRoute = ({ children, requireFarmer, requireBuyer, requireLogistics }) => {
+  const { isAuthenticated, isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requireFarmer && !isFarmer) {
-    return <Navigate to="/crops" replace />;
+  if (requireFarmer && !(isFarmer || isAdmin)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (requireBuyer && !(isBuyer || isAdmin)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (requireLogistics && !(isLogistics || isAdmin)) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -63,13 +71,6 @@ function AppContent() {
             <Route path="/negotiation" element={<TradeNegotiation />} />
             <Route path="/contracts" element={<ContractFarming />} />
 
-
-
-
-
-
-
-
             <Route
               path="/crops/add"
               element={
@@ -91,7 +92,7 @@ function AppContent() {
             <Route
               path="/orders"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requireBuyer>
                   <Orders />
                 </ProtectedRoute>
               }
@@ -100,7 +101,7 @@ function AppContent() {
             <Route
               path="/logistics"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requireLogistics>
                   <Logistics />
                 </ProtectedRoute>
               }

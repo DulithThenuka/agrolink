@@ -22,6 +22,7 @@ export const Sidebar = () => {
       </div>
 
       <nav className="space-y-1.5 font-semibold text-sm">
+        {/* Dashboard available for all logged-in users */}
         <Link
           to="/dashboard"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
@@ -34,18 +35,22 @@ export const Sidebar = () => {
           <span>Dashboard</span>
         </Link>
 
-        <Link
-          to="/crops"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/crops')
-              ? 'bg-emerald-50 text-emerald-700 font-bold'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <Sprout className="w-5 h-5 text-emerald-600" />
-          <span>Browse Crops</span>
-        </Link>
+        {/* Crops catalog for Buyer, Farmer, Admin */}
+        {(isBuyer || isFarmer || isAdmin) && (
+          <Link
+            to="/crops"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+              isActive('/crops')
+                ? 'bg-emerald-50 text-emerald-700 font-bold'
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Sprout className="w-5 h-5 text-emerald-600" />
+            <span>Browse Crops</span>
+          </Link>
+        )}
 
+        {/* My Orders for Buyer and Admin */}
         {(isBuyer || isAdmin) && (
           <Link
             to="/orders"
@@ -60,19 +65,8 @@ export const Sidebar = () => {
           </Link>
         )}
 
-        <Link
-          to="/logistics"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/logistics')
-              ? 'bg-emerald-50 text-emerald-700 font-bold'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <Truck className="w-5 h-5 text-emerald-600" />
-          <span>Smart Logistics 🚚</span>
-        </Link>
-
-        {isFarmer && (
+        {/* Add Crop Listing for Farmer and Admin */}
+        {(isFarmer || isAdmin) && (
           <Link
             to="/crops/add"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
@@ -86,6 +80,22 @@ export const Sidebar = () => {
           </Link>
         )}
 
+        {/* Smart Logistics for Driver/Logistics Provider and Admin */}
+        {(isLogistics || isAdmin) && (
+          <Link
+            to="/logistics"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+              isActive('/logistics')
+                ? 'bg-emerald-50 text-emerald-700 font-bold'
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <Truck className="w-5 h-5 text-emerald-600" />
+            <span>Smart Logistics 🚚</span>
+          </Link>
+        )}
+
+        {/* Profile settings for all users */}
         <Link
           to="/profile"
           className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
