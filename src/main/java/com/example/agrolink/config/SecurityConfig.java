@@ -72,6 +72,10 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.FORWARD, jakarta.servlet.DispatcherType.ERROR).permitAll()
 
                         .requestMatchers(
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.OPTIONS, "/**")
+                        ).permitAll()
+
+                        .requestMatchers(
                                 java.util.Arrays.stream(PUBLIC_ENDPOINTS)
                                         .map(org.springframework.security.web.util.matcher.AntPathRequestMatcher::antMatcher)
                                         .toArray(org.springframework.security.web.util.matcher.AntPathRequestMatcher[]::new)

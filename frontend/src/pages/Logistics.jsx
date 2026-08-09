@@ -40,7 +40,7 @@ export const Logistics = () => {
     setMsg('');
     try {
       const res = await logisticsAPI.acceptDelivery(orderId);
-      if (res && res.status === 'SUCCESS') {
+      if (res && (res.success || res.data)) {
         setMsg('✅ Delivery accepted successfully! Check "My Active Deliveries".');
         fetchData();
         setActiveTab('active');
@@ -60,7 +60,7 @@ export const Logistics = () => {
         status: nextStatus,
         notes: customNotes,
       });
-      if (res && res.status === 'SUCCESS') {
+      if (res && (res.success || res.data)) {
         setMsg(`✅ Delivery updated to: ${nextStatus}`);
         fetchData();
       }

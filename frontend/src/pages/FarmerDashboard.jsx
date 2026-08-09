@@ -37,7 +37,7 @@ export const FarmerDashboard = () => {
     setMsg('');
     try {
       const res = await ordersAPI.farmerAccept(orderId);
-      if (res && res.status === 'SUCCESS') {
+      if (res && (res.success || res.data)) {
         setMsg('✅ Order accepted! Transport requested from logistics fleet.');
         fetchFarmerOrders();
       }

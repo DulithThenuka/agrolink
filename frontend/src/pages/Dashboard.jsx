@@ -2,14 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminAPI, cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp, Sparkles } from 'lucide-react';
+import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp, Sparkles, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { FarmerDashboard } from './FarmerDashboard';
+import { Logistics } from './Logistics';
 
 export const Dashboard = () => {
-  const { user, isFarmer, isBuyer, isAdmin } = useAuth();
+  const { user, isFarmer, isBuyer, isLogistics, isAdmin, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
   
   if (isFarmer) {
     return <FarmerDashboard />;
+  }
+
+  if (isLogistics) {
+    return <Logistics />;
   }
 
   const [stats, setStats] = useState({ totalUsers: 0, totalCrops: 0, totalOrders: 0 });
@@ -59,9 +71,19 @@ export const Dashboard = () => {
           <p className="text-slate-500 text-sm mt-1">Monitor real-time trade activity, list harvests, and track pending dispatches.</p>
         </div>
 
-        <div className="px-4 py-2 bg-emerald-50 text-emerald-800 font-bold rounded-2xl text-xs flex items-center gap-2 border border-emerald-200/70 shadow-sm self-start sm:self-auto">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Welcome back, {user?.email}</span>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <div className="px-4 py-2 bg-emerald-50 text-emerald-800 font-bold rounded-2xl text-xs flex items-center gap-2 border border-emerald-200/70 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Welcome back, {user?.email}</span>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-2xl text-xs flex items-center gap-1.5 border border-red-200/70 transition shadow-sm"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
 

@@ -60,7 +60,7 @@ export const Orders = () => {
     setMsg('');
     try {
       const res = await ordersAPI.buyerConfirm(orderId);
-      if (res && res.status === 'SUCCESS') {
+      if (res && (res.success || res.data)) {
         setMsg('🎉 Delivery confirmed! Settlement complete - Farmer paid.');
         fetchOrders();
       }

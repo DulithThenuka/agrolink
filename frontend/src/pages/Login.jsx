@@ -16,7 +16,11 @@ export const Login = () => {
     setError('');
     const res = await login(email, password);
     if (res.success) {
-      navigate('/dashboard');
+      if (res.role === 'LOGISTICS' || res.role === 'ROLE_LOGISTICS') {
+        navigate('/logistics');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       setError(res.message || 'Failed to authenticate');
     }

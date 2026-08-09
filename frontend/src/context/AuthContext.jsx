@@ -16,13 +16,15 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await authAPI.login({ email, password });
       if (res && res.data) {
-        const { token: jwtToken, email: userEmail, role } = res.data;
+        const jwtToken = res.data.accessToken || res.data.token;
+        const userEmail = res.data.email;
+        const role = res.data.role;
         const userData = { email: userEmail, role };
         setToken(jwtToken);
         setUser(userData);
         localStorage.setItem('token', jwtToken);
         localStorage.setItem('user', JSON.stringify(userData));
-        return { success: true };
+        return { success: true, role };
       }
       return { success: false, message: res.message || 'Login failed' };
     } catch (err) {
@@ -36,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await authAPI.register({ name, email, password, location, role });
-      if (res && res.status === 'SUCCESS') {
+      if (res && (res.success || res.data)) {
         return { success: true };
       }
       return { success: false, message: res.message || 'Registration failed' };

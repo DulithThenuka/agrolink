@@ -1,11 +1,17 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Sprout, ShoppingBag, PlusCircle, User, Truck } from 'lucide-react';
+import { LayoutDashboard, Sprout, ShoppingBag, PlusCircle, User, Truck, LogOut } from 'lucide-react';
 
 export const Sidebar = () => {
-  const { isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
+  const { isFarmer, isBuyer, isLogistics, isAdmin, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -91,6 +97,14 @@ export const Sidebar = () => {
           <User className="w-5 h-5 text-emerald-600" />
           <span>Profile Settings</span>
         </Link>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 font-bold transition mt-4"
+        >
+          <LogOut className="w-5 h-5 text-red-500" />
+          <span>Logout</span>
+        </button>
       </nav>
 
       <div className="mt-auto px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100 text-[10px] uppercase font-bold text-slate-400 text-center tracking-widest">
