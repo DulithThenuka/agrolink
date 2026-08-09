@@ -95,6 +95,21 @@ export const Sidebar = () => {
           </Link>
         )}
 
+        {/* Expert Advisory for Farmer, Expert, Admin */}
+        {(isFarmer || isExpert || isAdmin) && (
+          <Link
+            to="/experts"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+              isActive('/experts')
+                ? 'bg-emerald-50 text-emerald-700 font-bold'
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <span className="text-lg">👨‍🔬</span>
+            <span>Expert Advisory 👨‍🔬</span>
+          </Link>
+        )}
+
         {/* Profile settings for all users */}
         <Link
           to="/profile"

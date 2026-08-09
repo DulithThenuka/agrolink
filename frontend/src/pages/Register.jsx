@@ -121,8 +121,24 @@ export const Register = () => {
               />
             </div>
 
+            <div>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                Account Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
+              >
+                <option value="BUYER">🛒 Buyer / Wholesale Purchaser</option>
+                <option value="FARMER">🌾 Farmer / Harvest Grower</option>
+                <option value="LOGISTICS">🚚 Logistics Driver / Fleet Operator</option>
+                <option value="EXPERT">👨‍🔬 Agricultural Expert / Agronomist / Vet</option>
+              </select>
+            </div>
+
             <div className="p-3 bg-emerald-50/60 border border-emerald-100 rounded-xl text-xs text-emerald-800 font-semibold">
-              New user accounts are initialized with <strong className="text-emerald-900">Buyer</strong> access by default.
+              Select your role to access customized dashboards and feature suites.
             </div>
 
             <button

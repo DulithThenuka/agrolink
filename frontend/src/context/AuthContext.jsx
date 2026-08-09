@@ -64,6 +64,7 @@ export const AuthProvider = ({ children }) => {
   const isFarmer = user?.role === 'FARMER' || user?.role === 'ROLE_FARMER';
   const isBuyer = user?.role === 'BUYER' || user?.role === 'ROLE_BUYER';
   const isLogistics = user?.role === 'LOGISTICS' || user?.role === 'ROLE_LOGISTICS';
+  const isExpert = user?.role === 'EXPERT' || user?.role === 'ROLE_EXPERT';
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN';
 
   return (
@@ -76,6 +77,7 @@ export const AuthProvider = ({ children }) => {
         isFarmer,
         isBuyer,
         isLogistics,
+        isExpert,
         isAdmin,
         login,
         register,

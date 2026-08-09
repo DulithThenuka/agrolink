@@ -91,4 +91,12 @@ export const iotAPI = {
   triggerIrrigation: (deviceId, enable) => api.post('/iot/irrigation/trigger', null, { params: { deviceId, enable } }),
 };
 
+export const expertsAPI = {
+  getAvailable: () => api.get('/experts'),
+  submitConsultation: (data) => api.post('/experts/consultations', data),
+  getMyConsultations: () => api.get('/experts/consultations/my'),
+  getAllConsultations: () => api.get('/experts/consultations/all'),
+  replyConsultation: (id, data) => api.post(`/experts/consultations/${id}/reply`, data),
+};
+
 export default api;
