@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.example.agrolink.entity.EscrowStatus;
 import com.example.agrolink.entity.Order;
 import com.example.agrolink.entity.OrderStatus;
 import com.example.agrolink.entity.User;
@@ -56,6 +57,14 @@ public interface OrderRepository
     @EntityGraph(attributePaths = {"crop", "buyer", "driver"})
     Page<Order> findByDriverOrderByCreatedAtDesc(
             User driver,
+            Pageable pageable
+    );
+
+    // ================== ESCROW & DISPUTES ==================
+
+    @EntityGraph(attributePaths = {"crop", "buyer", "driver"})
+    Page<Order> findByEscrowStatusOrderByCreatedAtDesc(
+            EscrowStatus escrowStatus,
             Pageable pageable
     );
 

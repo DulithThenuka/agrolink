@@ -32,6 +32,12 @@ public final class OrderDTO {
     private final Double currentLng;
     private final String trackingNotes;
 
+    private final String escrowStatus;
+    private final String escrowStatusLabel;
+    private final String disputeReason;
+    private final String disputeResolution;
+    private final LocalDateTime disputeRaisedAt;
+
     private final LocalDateTime createdAt;
 
     public OrderDTO(Long id,
@@ -54,6 +60,11 @@ public final class OrderDTO {
                     Double currentLat,
                     Double currentLng,
                     String trackingNotes,
+                    String escrowStatus,
+                    String escrowStatusLabel,
+                    String disputeReason,
+                    String disputeResolution,
+                    LocalDateTime disputeRaisedAt,
                     LocalDateTime createdAt) {
 
         this.id = id;
@@ -76,6 +87,11 @@ public final class OrderDTO {
         this.currentLat = currentLat;
         this.currentLng = currentLng;
         this.trackingNotes = trackingNotes;
+        this.escrowStatus = escrowStatus;
+        this.escrowStatusLabel = escrowStatusLabel;
+        this.disputeReason = disputeReason;
+        this.disputeResolution = disputeResolution;
+        this.disputeRaisedAt = disputeRaisedAt;
         this.createdAt = createdAt;
     }
 
@@ -118,6 +134,16 @@ public final class OrderDTO {
     public Double getCurrentLng() { return currentLng; }
 
     public String getTrackingNotes() { return trackingNotes; }
+
+    public String getEscrowStatus() { return escrowStatus; }
+
+    public String getEscrowStatusLabel() { return escrowStatusLabel; }
+
+    public String getDisputeReason() { return disputeReason; }
+
+    public String getDisputeResolution() { return disputeResolution; }
+
+    public LocalDateTime getDisputeRaisedAt() { return disputeRaisedAt; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

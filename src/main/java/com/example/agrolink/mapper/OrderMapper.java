@@ -34,6 +34,9 @@ public final class OrderMapper {
         String driverName = order.getDriver() != null ? order.getDriver().getName() : null;
         String driverEmail = order.getDriver() != null ? order.getDriver().getEmail() : null;
 
+        String escrowStatusName = order.getEscrowStatus() != null ? order.getEscrowStatus().name() : "HELD_IN_ESCROW";
+        String escrowStatusLabel = order.getEscrowStatus() != null ? order.getEscrowStatus().getLabel() : "Held in Escrow";
+
         return new OrderDTO(
                 order.getId(),
                 getCropName(order),
@@ -55,6 +58,11 @@ public final class OrderMapper {
                 order.getCurrentLat(),
                 order.getCurrentLng(),
                 order.getTrackingNotes(),
+                escrowStatusName,
+                escrowStatusLabel,
+                order.getDisputeReason(),
+                order.getDisputeResolution(),
+                order.getDisputeRaisedAt(),
                 order.getCreatedAt()
         );
     }

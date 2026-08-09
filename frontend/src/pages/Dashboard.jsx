@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminAPI, cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp, Sparkles, LogOut } from 'lucide-react';
+import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp, Sparkles, LogOut, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FarmerDashboard } from './FarmerDashboard';
 import { Logistics } from './Logistics';

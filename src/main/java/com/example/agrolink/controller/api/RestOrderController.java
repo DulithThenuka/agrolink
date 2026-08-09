@@ -84,7 +84,25 @@ public class RestOrderController {
         String email = normalizeEmail(principal.getName());
         logger.info("Buyer {} confirming delivery for order {}", email, id);
         OrderDTO updated = orderService.buyerConfirmDelivery(id, email);
-        return ApiResponse.success("Delivery confirmed! Farmer has been paid.", updated);
+        return ApiResponse.success("Delivery confirmed! Escrow funds released to farmer.", updated);
+    }
+
+    public static class DisputeRequest {
+        private String reason;
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
+    }
+
+    @PostMapping("/{id}/dispute")
+    public ApiResponse<OrderDTO> raiseDispute(@PathVariable Long id, @RequestBody(required = false) DisputeRequest request, Principal principal) {
+        if (principal == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Not authenticated");
+        }
+        String email = normalizeEmail(principal.getName());
+        String reason = (request != null && request.getReason() != null) ? request.getReason() : "Dispute reported by buyer.";
+        logger.warn("Buyer {} raising escrow dispute on order {}. Reason: {}", email, id, reason);
+        OrderDTO updated = orderService.raiseDispute(id, email, reason);
+        return ApiResponse.success("Escrow dispute raised. Funds locked under Admin Investigation.", updated);
     }
 
     @GetMapping("/farmer")

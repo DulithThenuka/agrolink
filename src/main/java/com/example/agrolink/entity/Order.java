@@ -87,6 +87,19 @@ public class Order {
     @Column(length = 255)
     private String trackingNotes = "Awaiting transport assignment";
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private EscrowStatus escrowStatus = EscrowStatus.HELD_IN_ESCROW;
+
+    @Column(length = 500)
+    private String disputeReason;
+
+    @Column(length = 500)
+    private String disputeResolution;
+
+    @Column
+    private LocalDateTime disputeRaisedAt;
+
     @Version
     private Long version;
 
@@ -300,5 +313,37 @@ public class Order {
 
     public void setTrackingNotes(String trackingNotes) {
         this.trackingNotes = trackingNotes;
+    }
+
+    public EscrowStatus getEscrowStatus() {
+        return escrowStatus;
+    }
+
+    public void setEscrowStatus(EscrowStatus escrowStatus) {
+        this.escrowStatus = escrowStatus;
+    }
+
+    public String getDisputeReason() {
+        return disputeReason;
+    }
+
+    public void setDisputeReason(String disputeReason) {
+        this.disputeReason = disputeReason;
+    }
+
+    public String getDisputeResolution() {
+        return disputeResolution;
+    }
+
+    public void setDisputeResolution(String disputeResolution) {
+        this.disputeResolution = disputeResolution;
+    }
+
+    public LocalDateTime getDisputeRaisedAt() {
+        return disputeRaisedAt;
+    }
+
+    public void setDisputeRaisedAt(LocalDateTime disputeRaisedAt) {
+        this.disputeRaisedAt = disputeRaisedAt;
     }
 }

@@ -61,13 +61,62 @@ export const Orders = () => {
     try {
       const res = await ordersAPI.buyerConfirm(orderId);
       if (res && (res.success || res.data)) {
-        setMsg('🎉 Delivery confirmed! Settlement complete - Farmer paid.');
+        setMsg('🎉 Delivery confirmed! AgroLink Escrow released funds to farmer.');
         fetchOrders();
       }
     } catch (err) {
       setMsg(`❌ Confirmation error: ${err}`);
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleRaiseDispute = async (orderId) => {
+    const reason = prompt('Please enter your dispute reason (e.g. damaged crops, wrong weight, delayed delivery):');
+    if (!reason || !reason.trim()) return;
+
+    setActionLoading(orderId);
+    setMsg('');
+    try {
+      const res = await ordersAPI.raiseDispute(orderId, { reason: reason.trim() });
+      if (res && (res.success || res.data)) {
+        setMsg('⚠️ Escrow dispute filed successfully! Locked under Admin Investigation.');
+        fetchOrders();
+      }
+    } catch (err) {
+      setMsg(`❌ Dispute filing error: ${err}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const renderEscrowBadge = (escrowStatus) => {
+    switch (escrowStatus) {
+      case 'RELEASED_TO_FARMER':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+            🛡️ Escrow: Released
+          </span>
+        );
+      case 'DISPUTED':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+            ⚠️ Escrow: Disputed
+          </span>
+        );
+      case 'REFUNDED_TO_BUYER':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-purple-100 text-purple-800 border border-purple-200">
+            ↩️ Escrow: Refunded
+          </span>
+        );
+      case 'HELD_IN_ESCROW':
+      default:
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-50 text-blue-700 border border-blue-200">
+            🛡️ Escrow: Held in Vault
+          </span>
+        );
     }
   };
 
@@ -135,13 +184,11 @@ export const Orders = () => {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className="text-right">
+                    <div className="text-right flex flex-col items-end gap-1">
                       <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 block">
                         {order.statusLabel || order.status}
                       </span>
-                      <span className="text-[10px] text-slate-400 font-semibold block mt-1">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </span>
+                      {renderEscrowBadge(order.escrowStatus)}
                     </div>
 
                     <div className="text-slate-400">
@@ -227,30 +274,53 @@ export const Orders = () => {
                       </p>
                     </div>
 
-                    {/* Buyer Action Button when DELIVERED */}
-                    {order.status === 'DELIVERED' && (
-                      <div className="pt-2 flex items-center justify-between bg-purple-50 p-4 rounded-2xl border border-purple-200">
-                        <div>
-                          <p className="font-extrabold text-slate-900 text-xs">Crop Delivered to Destination!</p>
-                          <p className="text-[11px] text-slate-500 font-medium">Please inspect cargo and confirm receipt to release payout to farmer.</p>
-                        </div>
-
-                        <button
-                          onClick={() => handleBuyerConfirm(order.id)}
-                          disabled={actionLoading === order.id}
-                          className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2 disabled:opacity-50"
-                        >
-                          {actionLoading === order.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <>
-                              <CheckCircle2 className="w-4 h-4" />
-                              <span>Confirm Receipt (Release Payment)</span>
-                            </>
-                          )}
-                        </button>
+                    {/* Escrow Dispute Info if Disputed */}
+                    {order.escrowStatus === 'DISPUTED' && (
+                      <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl text-xs space-y-1">
+                        <span className="font-extrabold text-amber-900 flex items-center gap-1.5">
+                          <AlertCircle className="w-4 h-4 text-amber-600" /> AgroLink Escrow Locked under Admin Investigation:
+                        </span>
+                        <p className="text-amber-800 font-medium italic">
+                          Reason: "{order.disputeReason || 'Dispute raised by buyer.'}"
+                        </p>
+                        {order.disputeResolution && (
+                          <p className="text-emerald-800 font-bold mt-1">
+                            Resolution: {order.disputeResolution}
+                          </p>
+                        )}
                       </div>
                     )}
+
+                    {/* Buyer Actions: Confirm Delivery or Raise Dispute */}
+                    <div className="pt-2 flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200">
+                      <div>
+                        <p className="font-extrabold text-slate-900 text-xs">AgroLink Escrow Protection 🛡️</p>
+                        <p className="text-[11px] text-slate-500 font-medium">Funds are safely held until you confirm crop delivery or raise a dispute.</p>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        {order.status === 'DELIVERED' && order.escrowStatus !== 'RELEASED_TO_FARMER' && order.escrowStatus !== 'REFUNDED_TO_BUYER' && (
+                          <button
+                            onClick={() => handleBuyerConfirm(order.id)}
+                            disabled={actionLoading === order.id}
+                            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2 disabled:opacity-50"
+                          >
+                            {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Delivery (Release Escrow)'}
+                          </button>
+                        )}
+
+                        {order.escrowStatus !== 'RELEASED_TO_FARMER' && order.escrowStatus !== 'REFUNDED_TO_BUYER' && order.escrowStatus !== 'DISPUTED' && (
+                          <button
+                            onClick={() => handleRaiseDispute(order.id)}
+                            disabled={actionLoading === order.id}
+                            className="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 disabled:opacity-50"
+                          >
+                            <AlertCircle className="w-4 h-4 text-amber-600" />
+                            <span>Raise Dispute ⚠️</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

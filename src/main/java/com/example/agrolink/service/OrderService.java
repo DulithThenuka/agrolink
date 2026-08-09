@@ -1,6 +1,7 @@
 package com.example.agrolink.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.agrolink.dto.OrderDTO;
 import com.example.agrolink.entity.Crop;
+import com.example.agrolink.entity.EscrowStatus;
 import com.example.agrolink.entity.Order;
 import com.example.agrolink.entity.OrderStatus;
 import com.example.agrolink.entity.User;
@@ -246,10 +248,62 @@ public class OrderService {
         }
 
         order.setStatus(OrderStatus.PAID);
-        order.setTrackingNotes("Buyer confirmed delivery. Settlement complete: Farmer paid!");
+        order.setEscrowStatus(EscrowStatus.RELEASED_TO_FARMER);
+        order.setTrackingNotes("Buyer confirmed delivery. Escrow funds released: Farmer paid!");
         Order updated = orderRepository.save(order);
-        logger.info("Order {} confirmed by buyer. Status: PAID (Farmer paid)", orderId);
+        logger.info("Order {} confirmed by buyer. Escrow released to farmer.", orderId);
         return OrderMapper.toDTO(updated);
+    }
+
+    public OrderDTO raiseDispute(Long orderId, String buyerEmail, String reason) {
+        Order order = getOrderOrThrow(orderId);
+        if (order.getBuyer() == null || !order.getBuyer().getEmail().equalsIgnoreCase(buyerEmail)) {
+            throw new IllegalArgumentException("Unauthorized: Only the buyer can raise an escrow dispute");
+        }
+
+        if (order.getEscrowStatus() == EscrowStatus.RELEASED_TO_FARMER || order.getEscrowStatus() == EscrowStatus.REFUNDED_TO_BUYER) {
+            throw new IllegalStateException("Cannot dispute order after escrow is already settled");
+        }
+
+        order.setEscrowStatus(EscrowStatus.DISPUTED);
+        order.setDisputeReason(reason != null && !reason.isBlank() ? reason : "Buyer reported delivery or cargo issue.");
+        order.setDisputeRaisedAt(LocalDateTime.now());
+        order.setTrackingNotes("⚠️ Escrow Disputed! Locked under Admin Investigation. Reason: " + order.getDisputeReason());
+        Order updated = orderRepository.save(order);
+        logger.warn("Order {} escrow disputed by buyer {}. Reason: {}", orderId, buyerEmail, reason);
+        return OrderMapper.toDTO(updated);
+    }
+
+    public OrderDTO resolveDisputeByAdmin(Long orderId, String decision, String resolutionNotes) {
+        Order order = getOrderOrThrow(orderId);
+
+        if (order.getEscrowStatus() != EscrowStatus.DISPUTED) {
+            throw new IllegalStateException("Order is not currently under dispute");
+        }
+
+        String notes = (resolutionNotes != null && !resolutionNotes.isBlank()) ? resolutionNotes : "Admin investigation completed.";
+
+        if ("REFUND".equalsIgnoreCase(decision)) {
+            order.setEscrowStatus(EscrowStatus.REFUNDED_TO_BUYER);
+            order.setStatus(OrderStatus.CANCELLED);
+            order.setDisputeResolution("Admin Investigation: Refunded to Buyer. " + notes);
+            order.setTrackingNotes("🛡️ Admin Resolution: Dispute settled with 100% Buyer Refund.");
+        } else {
+            order.setEscrowStatus(EscrowStatus.RELEASED_TO_FARMER);
+            order.setStatus(OrderStatus.PAID);
+            order.setDisputeResolution("Admin Investigation: Escrow Released to Farmer. " + notes);
+            order.setTrackingNotes("🛡️ Admin Resolution: Dispute settled with Payment Released to Farmer.");
+        }
+
+        Order updated = orderRepository.save(order);
+        logger.info("Order {} dispute resolved by Admin. Decision: {}", orderId, decision);
+        return OrderMapper.toDTO(updated);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderDTO> getDisputedOrders(Pageable pageable) {
+        return orderRepository.findByEscrowStatusOrderByCreatedAtDesc(EscrowStatus.DISPUTED, pageable)
+                .map(OrderMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -402,7 +456,8 @@ public class OrderService {
         order.setDeliveryLocation(delivery);
         order.setDistanceKm(31);
         order.setLogisticsFee(new BigDecimal("4800.00"));
-        order.setTrackingNotes("Order placed by buyer. Waiting for farmer acceptance.");
+        order.setEscrowStatus(com.example.agrolink.entity.EscrowStatus.HELD_IN_ESCROW);
+        order.setTrackingNotes("Order placed by buyer. Payment held in AgroLink Escrow.");
 
         return order;
     }

@@ -52,6 +52,7 @@ export const ordersAPI = {
   getById: (id) => api.get(`/orders/${id}`),
   farmerAccept: (id) => api.post(`/orders/${id}/farmer-accept`),
   buyerConfirm: (id) => api.post(`/orders/${id}/buyer-confirm`),
+  raiseDispute: (id, data) => api.post(`/orders/${id}/dispute`, data),
   getFarmerOrders: (params) => api.get('/orders/farmer', { params }),
 };
 
@@ -64,6 +65,8 @@ export const logisticsAPI = {
 
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
+  getDisputedEscrows: (params) => api.get('/admin/escrow/disputed', { params }),
+  resolveEscrowDispute: (id, data) => api.post(`/admin/escrow/${id}/resolve`, data),
 };
 
 export default api;
