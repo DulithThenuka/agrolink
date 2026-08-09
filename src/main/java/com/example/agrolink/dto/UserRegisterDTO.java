@@ -24,6 +24,8 @@ public class UserRegisterDTO {
           message = "Location must be less than 100 characters")
     private String location;
 
+    private String role;
+
     // ================== CONSTRUCTORS ==================
 
     public UserRegisterDTO() {
@@ -47,6 +49,10 @@ public class UserRegisterDTO {
 
         if (location != null) {
             location = location.trim();
+        }
+
+        if (role != null) {
+            role = role.trim().toUpperCase();
         }
     }
 
@@ -90,5 +96,13 @@ public class UserRegisterDTO {
         this.location = location == null
                 ? null
                 : location.trim();
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role == null ? null : role.trim().toUpperCase();
     }
 }

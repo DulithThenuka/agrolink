@@ -32,10 +32,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, location) => {
+  const register = async (name, email, password, location, role = 'BUYER') => {
     setLoading(true);
     try {
-      const res = await authAPI.register({ name, email, password, location });
+      const res = await authAPI.register({ name, email, password, location, role });
       if (res && res.status === 'SUCCESS') {
         return { success: true };
       }
@@ -61,6 +61,7 @@ export const AuthProvider = ({ children }) => {
 
   const isFarmer = user?.role === 'FARMER' || user?.role === 'ROLE_FARMER';
   const isBuyer = user?.role === 'BUYER' || user?.role === 'ROLE_BUYER';
+  const isLogistics = user?.role === 'LOGISTICS' || user?.role === 'ROLE_LOGISTICS';
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN';
 
   return (
@@ -72,6 +73,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!token,
         isFarmer,
         isBuyer,
+        isLogistics,
         isAdmin,
         login,
         register,

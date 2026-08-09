@@ -20,13 +20,7 @@ import { CropDiseaseDetection } from './pages/CropDiseaseDetection';
 import { TradeNegotiation } from './pages/TradeNegotiation';
 import { ContractFarming } from './pages/ContractFarming';
 import { Orders } from './pages/Orders';
-
-
-
-
-
-
-
+import { Logistics } from './pages/Logistics';
 import { Profile } from './pages/Profile';
 
 const ProtectedRoute = ({ children, requireFarmer }) => {
@@ -99,6 +93,15 @@ function AppContent() {
               element={
                 <ProtectedRoute>
                   <Orders />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/logistics"
+              element={
+                <ProtectedRoute>
+                  <Logistics />
                 </ProtectedRoute>
               }
             />

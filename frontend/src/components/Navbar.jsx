@@ -104,6 +104,15 @@ export const Navbar = () => {
             Contracts 📑
           </Link>
 
+          <Link
+            to="/logistics"
+            className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+              isActive('/logistics') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Smart Logistics 🚚
+          </Link>
+
 
 
 

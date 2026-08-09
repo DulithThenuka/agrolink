@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Sprout, ShoppingBag, PlusCircle, User } from 'lucide-react';
+import { LayoutDashboard, Sprout, ShoppingBag, PlusCircle, User, Truck } from 'lucide-react';
 
 export const Sidebar = () => {
-  const { isFarmer, isBuyer } = useAuth();
+  const { isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -40,7 +40,7 @@ export const Sidebar = () => {
           <span>Browse Crops</span>
         </Link>
 
-        {isBuyer && (
+        {(isBuyer || isAdmin) && (
           <Link
             to="/orders"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
@@ -53,6 +53,18 @@ export const Sidebar = () => {
             <span>My Orders</span>
           </Link>
         )}
+
+        <Link
+          to="/logistics"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            isActive('/logistics')
+              ? 'bg-emerald-50 text-emerald-700 font-bold'
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          <Truck className="w-5 h-5 text-emerald-600" />
+          <span>Smart Logistics 🚚</span>
+        </Link>
 
         {isFarmer && (
           <Link

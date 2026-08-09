@@ -39,9 +39,14 @@ public final class UserRegisterMapper {
 
         user.setPassword(dto.getPassword());
 
-        // never trust role from client
-
-        user.setRole(Role.BUYER);
+        // Map requested role if valid, else default to BUYER
+        Role requestedRole = Role.BUYER;
+        if (dto.getRole() != null && !dto.getRole().isBlank()) {
+            try {
+                requestedRole = Role.valueOf(dto.getRole().trim().toUpperCase());
+            } catch (Exception ignored) {}
+        }
+        user.setRole(requestedRole);
 
         if (dto.getLocation() != null) {
 

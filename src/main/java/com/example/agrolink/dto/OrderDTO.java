@@ -18,6 +18,20 @@ public final class OrderDTO {
 
     private final boolean isPaid;
 
+    private final String buyerName;
+    private final String buyerEmail;
+    private final String farmerName;
+
+    private final String pickupLocation;
+    private final String deliveryLocation;
+    private final Integer distanceKm;
+    private final BigDecimal logisticsFee;
+    private final String driverName;
+    private final String driverEmail;
+    private final Double currentLat;
+    private final Double currentLng;
+    private final String trackingNotes;
+
     private final LocalDateTime createdAt;
 
     public OrderDTO(Long id,
@@ -28,6 +42,18 @@ public final class OrderDTO {
                     String status,
                     String statusLabel,
                     boolean isPaid,
+                    String buyerName,
+                    String buyerEmail,
+                    String farmerName,
+                    String pickupLocation,
+                    String deliveryLocation,
+                    Integer distanceKm,
+                    BigDecimal logisticsFee,
+                    String driverName,
+                    String driverEmail,
+                    Double currentLat,
+                    Double currentLng,
+                    String trackingNotes,
                     LocalDateTime createdAt) {
 
         this.id = id;
@@ -38,6 +64,18 @@ public final class OrderDTO {
         this.status = status;
         this.statusLabel = statusLabel;
         this.isPaid = isPaid;
+        this.buyerName = buyerName;
+        this.buyerEmail = buyerEmail;
+        this.farmerName = farmerName;
+        this.pickupLocation = pickupLocation;
+        this.deliveryLocation = deliveryLocation;
+        this.distanceKm = distanceKm;
+        this.logisticsFee = logisticsFee;
+        this.driverName = driverName;
+        this.driverEmail = driverEmail;
+        this.currentLat = currentLat;
+        this.currentLng = currentLng;
+        this.trackingNotes = trackingNotes;
         this.createdAt = createdAt;
     }
 
@@ -56,6 +94,30 @@ public final class OrderDTO {
     public String getStatusLabel() { return statusLabel; }
 
     public boolean isPaid() { return isPaid; }
+
+    public String getBuyerName() { return buyerName; }
+
+    public String getBuyerEmail() { return buyerEmail; }
+
+    public String getFarmerName() { return farmerName; }
+
+    public String getPickupLocation() { return pickupLocation; }
+
+    public String getDeliveryLocation() { return deliveryLocation; }
+
+    public Integer getDistanceKm() { return distanceKm; }
+
+    public BigDecimal getLogisticsFee() { return logisticsFee; }
+
+    public String getDriverName() { return driverName; }
+
+    public String getDriverEmail() { return driverEmail; }
+
+    public Double getCurrentLat() { return currentLat; }
+
+    public Double getCurrentLng() { return currentLng; }
+
+    public String getTrackingNotes() { return trackingNotes; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
 }

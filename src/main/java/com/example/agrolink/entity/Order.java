@@ -62,6 +62,31 @@ public class Order {
     @JoinColumn(name = "crop_id", nullable = false)
     private Crop crop;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id")
+    private User driver;
+
+    @Column(length = 100)
+    private String pickupLocation = "Homagama";
+
+    @Column(length = 100)
+    private String deliveryLocation = "Colombo";
+
+    @Column
+    private Integer distanceKm = 31;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal logisticsFee = new BigDecimal("4800.00");
+
+    @Column
+    private Double currentLat = 6.8400;
+
+    @Column
+    private Double currentLng = 79.9980;
+
+    @Column(length = 255)
+    private String trackingNotes = "Awaiting transport assignment";
+
     @Version
     private Long version;
 
@@ -94,7 +119,7 @@ public class Order {
 
     public void markAsConfirmed() {
 
-        if (this.status == OrderStatus.CONFIRMED) {
+        if (this.status == OrderStatus.CONFIRMED || this.status == OrderStatus.PAID) {
             return;
         }
 
@@ -103,9 +128,9 @@ public class Order {
 
     public void cancel() {
 
-        if (this.status == OrderStatus.CONFIRMED) {
+        if (this.status == OrderStatus.CONFIRMED || this.status == OrderStatus.PAID) {
             throw new IllegalStateException(
-                    "Cannot cancel a confirmed order"
+                    "Cannot cancel a confirmed or paid order"
             );
         }
 
@@ -113,7 +138,7 @@ public class Order {
     }
 
     public boolean isPaid() {
-        return this.status == OrderStatus.CONFIRMED;
+        return this.status == OrderStatus.PAID || this.status == OrderStatus.CONFIRMED;
     }
 
     // ================== GETTERS ==================
@@ -148,6 +173,38 @@ public class Order {
 
     public Crop getCrop() {
         return crop;
+    }
+
+    public User getDriver() {
+        return driver;
+    }
+
+    public String getPickupLocation() {
+        return pickupLocation;
+    }
+
+    public String getDeliveryLocation() {
+        return deliveryLocation;
+    }
+
+    public Integer getDistanceKm() {
+        return distanceKm;
+    }
+
+    public BigDecimal getLogisticsFee() {
+        return logisticsFee;
+    }
+
+    public Double getCurrentLat() {
+        return currentLat;
+    }
+
+    public Double getCurrentLng() {
+        return currentLng;
+    }
+
+    public String getTrackingNotes() {
+        return trackingNotes;
     }
 
     public Long getVersion() {
@@ -211,5 +268,37 @@ public class Order {
         }
 
         this.crop = crop;
+    }
+
+    public void setDriver(User driver) {
+        this.driver = driver;
+    }
+
+    public void setPickupLocation(String pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+
+    public void setDeliveryLocation(String deliveryLocation) {
+        this.deliveryLocation = deliveryLocation;
+    }
+
+    public void setDistanceKm(Integer distanceKm) {
+        this.distanceKm = distanceKm;
+    }
+
+    public void setLogisticsFee(BigDecimal logisticsFee) {
+        this.logisticsFee = logisticsFee;
+    }
+
+    public void setCurrentLat(Double currentLat) {
+        this.currentLat = currentLat;
+    }
+
+    public void setCurrentLng(Double currentLng) {
+        this.currentLng = currentLng;
+    }
+
+    public void setTrackingNotes(String trackingNotes) {
+        this.trackingNotes = trackingNotes;
     }
 }

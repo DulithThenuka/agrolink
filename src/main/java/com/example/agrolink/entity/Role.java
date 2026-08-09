@@ -7,6 +7,7 @@ public enum Role {
 
     FARMER("Farmer"),
     BUYER("Buyer"),
+    LOGISTICS("Logistics Provider"),
     ADMIN("Admin");
 
     private static final String ROLE_PREFIX = "ROLE_";
@@ -57,6 +58,9 @@ public enum Role {
 
             case BUYER:
                 return EnumSet.of(BUYER);
+
+            case LOGISTICS:
+                return EnumSet.of(LOGISTICS);
 
             default:
                 return EnumSet.noneOf(Role.class);

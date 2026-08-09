@@ -9,6 +9,7 @@ export const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [location, setLocation] = useState('');
+  const [role, setRole] = useState('BUYER');
   const [error, setError] = useState('');
   const { register, loading } = useAuth();
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const res = await register(name, email, password, location);
+    const res = await register(name, email, password, location, role);
     if (res.success) {
       navigate('/login');
     } else {
@@ -49,6 +50,21 @@ export const Register = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                Account Role / Type
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
+              >
+                <option value="BUYER">🛒 Buyer (Purchaser)</option>
+                <option value="FARMER">🌾 Farmer (Crop Producer)</option>
+                <option value="LOGISTICS">🚚 Logistics Provider / Driver</option>
+              </select>
+            </div>
+
             <div>
               <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                 Full Name
@@ -99,7 +115,7 @@ export const Register = () => {
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="City / Region"
+                placeholder="City / Region (e.g. Homagama or Colombo)"
                 required
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
               />

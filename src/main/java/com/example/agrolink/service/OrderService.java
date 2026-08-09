@@ -164,6 +164,106 @@ public class OrderService {
         );
     }
 
+    // ================== LOGISTICS & LIFECYCLE WORKFLOW ==================
+
+    public OrderDTO farmerAcceptOrder(Long orderId, String farmerEmail) {
+        Order order = getOrderOrThrow(orderId);
+        if (order.getCrop() == null || order.getCrop().getFarmer() == null ||
+                !order.getCrop().getFarmer().getEmail().equalsIgnoreCase(farmerEmail)) {
+            throw new IllegalArgumentException("Unauthorized: Only the crop farmer can accept this order");
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException("Order is not in PENDING state");
+        }
+
+        order.setStatus(OrderStatus.TRANSPORT_REQUESTED);
+        order.setTrackingNotes("Farmer accepted order. Transport requested.");
+        Order updated = orderRepository.save(order);
+        logger.info("Order {} accepted by farmer {}, transport requested", orderId, farmerEmail);
+        return OrderMapper.toDTO(updated);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderDTO> getAvailableDeliveries(Pageable pageable) {
+        return orderRepository.findByStatusOrderByCreatedAtDesc(OrderStatus.TRANSPORT_REQUESTED, pageable)
+                .map(OrderMapper::toDTO);
+    }
+
+    public OrderDTO driverAcceptDelivery(Long orderId, String driverEmail) {
+        Order order = getOrderOrThrow(orderId);
+        User driver = getUserByEmail(driverEmail);
+
+        if (order.getStatus() != OrderStatus.TRANSPORT_REQUESTED) {
+            throw new IllegalStateException("Order is not available for transport assignment");
+        }
+
+        order.setDriver(driver);
+        order.setStatus(OrderStatus.DRIVER_ASSIGNED);
+        order.setTrackingNotes("Driver assigned: " + driver.getName() + ". Preparing for pickup.");
+        Order updated = orderRepository.save(order);
+        logger.info("Order {} assigned to logistics driver {}", orderId, driverEmail);
+        return OrderMapper.toDTO(updated);
+    }
+
+    public OrderDTO updateDeliveryStatus(Long orderId, String driverEmail, OrderStatus nextStatus, String trackingNotes, Double lat, Double lng) {
+        Order order = getOrderOrThrow(orderId);
+
+        if (order.getDriver() == null || !order.getDriver().getEmail().equalsIgnoreCase(driverEmail)) {
+            throw new IllegalArgumentException("Unauthorized: Only the assigned driver can update delivery status");
+        }
+
+        order.getStatus().validateTransition(nextStatus);
+        order.setStatus(nextStatus);
+
+        if (trackingNotes != null && !trackingNotes.isBlank()) {
+            order.setTrackingNotes(trackingNotes);
+        } else {
+            switch (nextStatus) {
+                case COLLECTED -> order.setTrackingNotes("Crop collected from farmer. En route.");
+                case IN_TRANSIT -> order.setTrackingNotes("Live tracking active: In transit to delivery point.");
+                case DELIVERED -> order.setTrackingNotes("Crop delivered to buyer location. Awaiting buyer confirmation.");
+                default -> {}
+            }
+        }
+
+        if (lat != null) order.setCurrentLat(lat);
+        if (lng != null) order.setCurrentLng(lng);
+
+        Order updated = orderRepository.save(order);
+        logger.info("Order {} status updated to {} by driver {}", orderId, nextStatus, driverEmail);
+        return OrderMapper.toDTO(updated);
+    }
+
+    public OrderDTO buyerConfirmDelivery(Long orderId, String buyerEmail) {
+        Order order = getOrderOrThrow(orderId);
+        if (order.getBuyer() == null || !order.getBuyer().getEmail().equalsIgnoreCase(buyerEmail)) {
+            throw new IllegalArgumentException("Unauthorized: Only the buyer can confirm order delivery");
+        }
+
+        if (order.getStatus() != OrderStatus.DELIVERED && order.getStatus() != OrderStatus.CONFIRMED) {
+            throw new IllegalStateException("Order must be DELIVERED before confirming");
+        }
+
+        order.setStatus(OrderStatus.PAID);
+        order.setTrackingNotes("Buyer confirmed delivery. Settlement complete: Farmer paid!");
+        Order updated = orderRepository.save(order);
+        logger.info("Order {} confirmed by buyer. Status: PAID (Farmer paid)", orderId);
+        return OrderMapper.toDTO(updated);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderDTO> getFarmerOrders(String farmerEmail, Pageable pageable) {
+        User farmer = getUserByEmail(farmerEmail);
+        return orderRepository.findFarmerOrders(farmer, pageable).map(OrderMapper::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OrderDTO> getDriverOrders(String driverEmail, Pageable pageable) {
+        User driver = getUserByEmail(driverEmail);
+        return orderRepository.findByDriverOrderByCreatedAtDesc(driver, pageable).map(OrderMapper::toDTO);
+    }
+
     // ================== HELPERS ==================
 
     private User getUserByEmail(
@@ -289,6 +389,20 @@ public class OrderService {
         order.setStatus(
                 OrderStatus.PENDING
         );
+
+        String pickup = (crop.getFarmer() != null && crop.getFarmer().getLocation() != null && !crop.getFarmer().getLocation().isBlank())
+                ? crop.getFarmer().getLocation()
+                : (crop.getLocation() != null && !crop.getLocation().isBlank() ? crop.getLocation() : "Homagama");
+
+        String delivery = (buyer.getLocation() != null && !buyer.getLocation().isBlank())
+                ? buyer.getLocation()
+                : "Colombo";
+
+        order.setPickupLocation(pickup);
+        order.setDeliveryLocation(delivery);
+        order.setDistanceKm(31);
+        order.setLogisticsFee(new BigDecimal("4800.00"));
+        order.setTrackingNotes("Order placed by buyer. Waiting for farmer acceptance.");
 
         return order;
     }

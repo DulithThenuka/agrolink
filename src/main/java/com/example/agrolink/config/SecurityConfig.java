@@ -92,6 +92,11 @@ public class SecurityConfig {
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/buyer/**")
                         ).hasRole("BUYER")
 
+                        .requestMatchers(
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/v1/logistics/**"),
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/logistics/**")
+                        ).hasAnyRole("LOGISTICS", "ADMIN", "FARMER", "BUYER")
+
                         .anyRequest()
                         .authenticated()
                 )

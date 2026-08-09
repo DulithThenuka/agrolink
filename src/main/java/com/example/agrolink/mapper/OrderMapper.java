@@ -24,6 +24,16 @@ public final class OrderMapper {
             return null;
         }
 
+        String farmerName = order.getCrop() != null && order.getCrop().getFarmer() != null
+                ? order.getCrop().getFarmer().getName()
+                : "Unknown Farmer";
+
+        String buyerName = order.getBuyer() != null ? order.getBuyer().getName() : "Unknown Buyer";
+        String buyerEmail = order.getBuyer() != null ? order.getBuyer().getEmail() : "";
+
+        String driverName = order.getDriver() != null ? order.getDriver().getName() : null;
+        String driverEmail = order.getDriver() != null ? order.getDriver().getEmail() : null;
+
         return new OrderDTO(
                 order.getId(),
                 getCropName(order),
@@ -33,6 +43,18 @@ public final class OrderMapper {
                 getStatus(order),
                 getStatusLabel(order),
                 order.isPaid(),
+                buyerName,
+                buyerEmail,
+                farmerName,
+                order.getPickupLocation(),
+                order.getDeliveryLocation(),
+                order.getDistanceKm(),
+                order.getLogisticsFee(),
+                driverName,
+                driverEmail,
+                order.getCurrentLat(),
+                order.getCurrentLng(),
+                order.getTrackingNotes(),
                 order.getCreatedAt()
         );
     }

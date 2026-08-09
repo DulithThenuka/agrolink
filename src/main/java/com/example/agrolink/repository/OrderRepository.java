@@ -45,6 +45,20 @@ public interface OrderRepository
             Pageable pageable
     );
 
+    // ================== LOGISTICS & DRIVER ==================
+
+    @EntityGraph(attributePaths = {"crop", "buyer", "driver"})
+    Page<Order> findByStatusOrderByCreatedAtDesc(
+            OrderStatus status,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {"crop", "buyer", "driver"})
+    Page<Order> findByDriverOrderByCreatedAtDesc(
+            User driver,
+            Pageable pageable
+    );
+
     // ================== ADMIN ==================
 
     @EntityGraph(attributePaths = {"crop", "buyer"})

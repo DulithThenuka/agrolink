@@ -50,6 +50,16 @@ export const ordersAPI = {
   place: (data) => api.post('/orders', data),
   getMyOrders: (params) => api.get('/orders/my', { params }),
   getById: (id) => api.get(`/orders/${id}`),
+  farmerAccept: (id) => api.post(`/orders/${id}/farmer-accept`),
+  buyerConfirm: (id) => api.post(`/orders/${id}/buyer-confirm`),
+  getFarmerOrders: (params) => api.get('/orders/farmer', { params }),
+};
+
+export const logisticsAPI = {
+  getAvailableDeliveries: (params) => api.get('/logistics/available', { params }),
+  acceptDelivery: (id) => api.post(`/logistics/${id}/accept`),
+  updateStatus: (id, data) => api.post(`/logistics/${id}/status`, data),
+  getMyJobs: (params) => api.get('/logistics/my-jobs', { params }),
 };
 
 export const adminAPI = {

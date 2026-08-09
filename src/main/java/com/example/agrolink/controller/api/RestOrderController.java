@@ -65,6 +65,44 @@ public class RestOrderController {
         return ApiResponse.success(order);
     }
 
+    @PostMapping("/{id}/farmer-accept")
+    public ApiResponse<OrderDTO> farmerAcceptOrder(@PathVariable Long id, Principal principal) {
+        if (principal == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Not authenticated");
+        }
+        String email = normalizeEmail(principal.getName());
+        logger.info("Farmer {} accepting order {}", email, id);
+        OrderDTO updated = orderService.farmerAcceptOrder(id, email);
+        return ApiResponse.success("Order accepted and transport requested", updated);
+    }
+
+    @PostMapping("/{id}/buyer-confirm")
+    public ApiResponse<OrderDTO> buyerConfirmDelivery(@PathVariable Long id, Principal principal) {
+        if (principal == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Not authenticated");
+        }
+        String email = normalizeEmail(principal.getName());
+        logger.info("Buyer {} confirming delivery for order {}", email, id);
+        OrderDTO updated = orderService.buyerConfirmDelivery(id, email);
+        return ApiResponse.success("Delivery confirmed! Farmer has been paid.", updated);
+    }
+
+    @GetMapping("/farmer")
+    public ApiResponse<PagedResponse<OrderDTO>> getFarmerOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal) {
+        if (principal == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Not authenticated");
+        }
+        String email = normalizeEmail(principal.getName());
+        Page<OrderDTO> orderPage = orderService.getFarmerOrders(
+                email,
+                PageRequest.of(page, size, Sort.by("createdAt").descending())
+        );
+        return ApiResponse.success(toPagedResponse(orderPage));
+    }
+
     private String normalizeEmail(String email) {
         return email == null ? "" : email.toLowerCase().trim();
     }

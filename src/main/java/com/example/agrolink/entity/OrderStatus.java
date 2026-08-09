@@ -5,9 +5,14 @@ import java.util.EnumSet;
 public enum OrderStatus {
 
     PENDING("Pending"),
-    CONFIRMED("Confirmed"),
-    SHIPPED("Shipped"),
+    FARMER_ACCEPTED("Farmer Accepted"),
+    TRANSPORT_REQUESTED("Transport Requested"),
+    DRIVER_ASSIGNED("Driver Assigned"),
+    COLLECTED("Crop Collected"),
+    IN_TRANSIT("In Transit"),
     DELIVERED("Delivered"),
+    CONFIRMED("Buyer Confirmed"),
+    PAID("Farmer Paid"),
     CANCELLED("Cancelled");
 
     private final String label;
@@ -25,13 +30,14 @@ public enum OrderStatus {
     // ================== STATE CHECKS ==================
 
     public boolean isFinal() {
-        return this == DELIVERED ||
+        return this == PAID ||
                this == CANCELLED;
     }
 
     public boolean isEditable() {
         return this == PENDING ||
-               this == CONFIRMED;
+               this == FARMER_ACCEPTED ||
+               this == TRANSPORT_REQUESTED;
     }
 
     // ================== TRANSITIONS ==================
@@ -46,20 +52,54 @@ public enum OrderStatus {
 
             case PENDING:
                 return EnumSet.of(
+                        FARMER_ACCEPTED,
+                        TRANSPORT_REQUESTED,
                         CONFIRMED,
                         CANCELLED
                 ).contains(next);
 
-            case CONFIRMED:
+            case FARMER_ACCEPTED:
                 return EnumSet.of(
-                        SHIPPED,
+                        TRANSPORT_REQUESTED,
+                        DRIVER_ASSIGNED,
                         CANCELLED
                 ).contains(next);
 
-            case SHIPPED:
-                return next == DELIVERED;
+            case TRANSPORT_REQUESTED:
+                return EnumSet.of(
+                        DRIVER_ASSIGNED,
+                        CANCELLED
+                ).contains(next);
+
+            case DRIVER_ASSIGNED:
+                return EnumSet.of(
+                        COLLECTED,
+                        CANCELLED
+                ).contains(next);
+
+            case COLLECTED:
+                return EnumSet.of(
+                        IN_TRANSIT,
+                        DELIVERED
+                ).contains(next);
+
+            case IN_TRANSIT:
+                return EnumSet.of(
+                        DELIVERED
+                ).contains(next);
 
             case DELIVERED:
+                return EnumSet.of(
+                        CONFIRMED,
+                        PAID
+                ).contains(next);
+
+            case CONFIRMED:
+                return EnumSet.of(
+                        PAID
+                ).contains(next);
+
+            case PAID:
             case CANCELLED:
                 return false;
 
