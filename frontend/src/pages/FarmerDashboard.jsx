@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Sprout, Sun, AlertTriangle, TrendingUp, ShoppingBag, PlusCircle, ArrowRight, ShieldCheck, DollarSign, Package, CheckCircle2, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
+import { BuyerProfileModal } from '../components/BuyerProfileModal';
 
 export const FarmerDashboard = () => {
   const { user } = useAuth();
@@ -13,6 +14,7 @@ export const FarmerDashboard = () => {
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState('');
+  const [selectedBuyer, setSelectedBuyer] = useState(null);
 
   const fetchFarmerOrders = async () => {
     setLoadingOrders(true);
@@ -176,7 +178,16 @@ export const FarmerDashboard = () => {
                 {farmerOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-emerald-50/40 transition">
                     <td className="p-4 font-bold text-slate-900">{order.cropName}</td>
-                    <td className="p-4 text-slate-500 text-xs">{order.buyerEmail || order.buyerName}</td>
+                    <td className="p-4 text-slate-500 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBuyer({ id: order.buyerId, name: order.buyerName, email: order.buyerEmail })}
+                        className="text-emerald-700 font-bold hover:underline flex items-center gap-1"
+                      >
+                        <span>{order.buyerEmail || order.buyerName || 'Buyer'}</span>
+                        <span className="text-[9px] bg-blue-100 text-blue-800 font-black px-1.5 py-0.5 rounded">Verified Buyer ⭐</span>
+                      </button>
+                    </td>
                     <td className="p-4 font-extrabold text-slate-800">{order.quantity} Kg</td>
                     <td className="p-4">
                       <span className="badge-premium badge-pending uppercase text-[10px]">
@@ -213,6 +224,15 @@ export const FarmerDashboard = () => {
           </div>
         )}
       </div>
+
+      {selectedBuyer && (
+        <BuyerProfileModal
+          buyerId={selectedBuyer.id}
+          buyerName={selectedBuyer.name}
+          buyerEmail={selectedBuyer.email}
+          onClose={() => setSelectedBuyer(null)}
+        />
+      )}
     </div>
   );
 };

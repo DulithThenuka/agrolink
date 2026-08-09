@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.agrolink.dto.BuyerProfileDTO;
 import com.example.agrolink.dto.CropDTO;
 import com.example.agrolink.dto.FarmerProfileDTO;
 import com.example.agrolink.dto.UserDTO;
@@ -140,6 +141,29 @@ public class UserService {
                 farmer.getBuyerSatisfactionRate(),
                 cropDTOs.size(),
                 cropDTOs
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public BuyerProfileDTO getBuyerProfile(Long buyerId) {
+        User buyer = repo.findById(buyerId)
+                .orElseThrow(() -> new IllegalArgumentException("Buyer not found with ID: " + buyerId));
+
+        int memberSince = buyer.getCreatedAt() != null ? buyer.getCreatedAt().getYear() : 2026;
+        String buyerLocation = (buyer.getLocation() != null && !buyer.getLocation().isBlank()) ? buyer.getLocation() : "Colombo";
+
+        return new BuyerProfileDTO(
+                buyer.getId(),
+                buyer.getName(),
+                buyer.getEmail(),
+                buyer.isVerifiedBuyer(),
+                buyerLocation,
+                memberSince,
+                342,
+                buyer.getOrderCancellationRate(),
+                buyer.getOnTimePaymentRate(),
+                buyer.getBuyerTrustScore(),
+                buyer.getFarmerSatisfactionRate()
         );
     }
 

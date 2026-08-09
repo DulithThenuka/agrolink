@@ -79,6 +79,21 @@ public class User {
     private Double buyerSatisfactionRate = 97.0;
 
     @Column(nullable = false)
+    private boolean isVerifiedBuyer = true;
+
+    @Column
+    private Double orderCancellationRate = 1.2;
+
+    @Column
+    private Double onTimePaymentRate = 99.1;
+
+    @Column
+    private Double buyerTrustScore = 4.9;
+
+    @Column
+    private Double farmerSatisfactionRate = 98.0;
+
+    @Column(nullable = false)
     private boolean enabled = true;
 
     @Column(nullable = false)
@@ -373,6 +388,46 @@ public class User {
 
     public void setBuyerSatisfactionRate(Double buyerSatisfactionRate) {
         this.buyerSatisfactionRate = buyerSatisfactionRate;
+    }
+
+    public boolean isVerifiedBuyer() {
+        return isVerifiedBuyer;
+    }
+
+    public void setVerifiedBuyer(boolean verifiedBuyer) {
+        isVerifiedBuyer = verifiedBuyer;
+    }
+
+    public Double getOrderCancellationRate() {
+        return orderCancellationRate != null ? orderCancellationRate : 1.2;
+    }
+
+    public void setOrderCancellationRate(Double orderCancellationRate) {
+        this.orderCancellationRate = orderCancellationRate;
+    }
+
+    public Double getOnTimePaymentRate() {
+        return onTimePaymentRate != null ? onTimePaymentRate : 99.1;
+    }
+
+    public void setOnTimePaymentRate(Double onTimePaymentRate) {
+        this.onTimePaymentRate = onTimePaymentRate;
+    }
+
+    public Double getBuyerTrustScore() {
+        return buyerTrustScore != null ? buyerTrustScore : 4.9;
+    }
+
+    public void setBuyerTrustScore(Double buyerTrustScore) {
+        this.buyerTrustScore = buyerTrustScore;
+    }
+
+    public Double getFarmerSatisfactionRate() {
+        return farmerSatisfactionRate != null ? farmerSatisfactionRate : 98.0;
+    }
+
+    public void setFarmerSatisfactionRate(Double farmerSatisfactionRate) {
+        this.farmerSatisfactionRate = farmerSatisfactionRate;
     }
 
     public void setCrops(List<Crop> crops) {

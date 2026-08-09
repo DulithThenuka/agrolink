@@ -6,10 +6,12 @@ import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp
 import { useNavigate } from 'react-router-dom';
 import { FarmerDashboard } from './FarmerDashboard';
 import { Logistics } from './Logistics';
+import { BuyerProfileModal } from '../components/BuyerProfileModal';
 
 export const Dashboard = () => {
   const { user, isFarmer, isBuyer, isLogistics, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+  const [selectedBuyer, setSelectedBuyer] = useState(null);
 
   const handleLogout = () => {
     logout();
@@ -203,7 +205,15 @@ export const Dashboard = () => {
                 {recentOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-emerald-50/40 transition">
                     <td className="p-4 font-bold text-slate-900">{order.cropName || order.crop?.name || 'Crop Batch'}</td>
-                    <td className="p-4 text-slate-500 text-xs">{order.buyerEmail || user?.email}</td>
+                    <td className="p-4 text-slate-500 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBuyer({ id: order.buyerId, name: order.buyerName, email: order.buyerEmail || user?.email })}
+                        className="text-emerald-700 font-bold hover:underline"
+                      >
+                        {order.buyerEmail || user?.email || 'Buyer'} ⭐
+                      </button>
+                    </td>
                     <td className="p-4 font-bold">{order.quantity} Kg</td>
                     <td className="p-4">
                       <span className="badge-premium badge-delivered">
@@ -217,6 +227,15 @@ export const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {selectedBuyer && (
+        <BuyerProfileModal
+          buyerId={selectedBuyer.id}
+          buyerName={selectedBuyer.name}
+          buyerEmail={selectedBuyer.email}
+          onClose={() => setSelectedBuyer(null)}
+        />
+      )}
     </div>
   );
 };

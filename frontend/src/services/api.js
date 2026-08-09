@@ -73,4 +73,8 @@ export const farmersAPI = {
   getProfile: (id) => api.get(`/farmers/${id}/profile`),
 };
 
+export const buyersAPI = {
+  getProfile: (id) => api.get(`/buyers/${id}/profile`),
+};
+
 export default api;

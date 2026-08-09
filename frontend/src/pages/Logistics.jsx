@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { logisticsAPI } from '../services/api';
 import { Truck, MapPin, Package, Navigation, DollarSign, CheckCircle2, Clock, Loader2, ArrowRight, RefreshCw, ShieldCheck } from 'lucide-react';
+import { BuyerProfileModal } from '../components/BuyerProfileModal';
 
 export const Logistics = () => {
   const [availableJobs, setAvailableJobs] = useState([]);
@@ -9,6 +10,7 @@ export const Logistics = () => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState('');
+  const [selectedBuyer, setSelectedBuyer] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -383,6 +385,15 @@ export const Logistics = () => {
             </div>
           )}
         </div>
+      )}
+
+      {selectedBuyer && (
+        <BuyerProfileModal
+          buyerId={selectedBuyer.id}
+          buyerName={selectedBuyer.name}
+          buyerEmail={selectedBuyer.email}
+          onClose={() => setSelectedBuyer(null)}
+        />
       )}
     </div>
   );
