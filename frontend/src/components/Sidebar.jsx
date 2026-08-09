@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, Sprout, ShoppingBag, PlusCircle, User, Truck, LogOut } from 'lucide-react';
 
 export const Sidebar = () => {
-  const { isFarmer, isBuyer, isLogistics, isAdmin, logout } = useAuth();
+  const { isFarmer, isBuyer, isLogistics, isExpert, isSupplier, isAdmin, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -107,6 +107,21 @@ export const Sidebar = () => {
           >
             <span className="text-lg">👨‍🔬</span>
             <span>Expert Advisory 👨‍🔬</span>
+          </Link>
+        )}
+
+        {/* Supplier Marketplace for Farmer, Supplier, Admin */}
+        {(isFarmer || isSupplier || isAdmin) && (
+          <Link
+            to="/supplier-marketplace"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+              isActive('/supplier-marketplace')
+                ? 'bg-emerald-50 text-emerald-700 font-bold'
+                : 'text-slate-600 hover:bg-slate-50'
+            }`}
+          >
+            <span className="text-lg">🧰</span>
+            <span>Supplier Marketplace 🧰</span>
           </Link>
         )}
 

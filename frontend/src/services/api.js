@@ -99,4 +99,12 @@ export const expertsAPI = {
   replyConsultation: (id, data) => api.post(`/experts/consultations/${id}/reply`, data),
 };
 
+export const suppliersAPI = {
+  getItems: (category) => api.get('/suppliers/items', { params: { category } }),
+  createItem: (data) => api.post('/suppliers/items', data),
+  purchaseItem: (id, quantity) => api.post(`/suppliers/items/${id}/purchase`, null, { params: { quantity } }),
+  getFarmerOrders: () => api.get('/suppliers/orders/farmer'),
+  getSupplierOrders: () => api.get('/suppliers/orders/supplier'),
+};
+
 export default api;

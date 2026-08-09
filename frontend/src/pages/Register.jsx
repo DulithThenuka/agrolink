@@ -134,6 +134,7 @@ export const Register = () => {
                 <option value="FARMER">🌾 Farmer / Harvest Grower</option>
                 <option value="LOGISTICS">🚚 Logistics Driver / Fleet Operator</option>
                 <option value="EXPERT">👨‍🔬 Agricultural Expert / Agronomist / Vet</option>
+                <option value="SUPPLIER">🧰 Supplier / Agricultural Input Provider</option>
               </select>
             </div>
 

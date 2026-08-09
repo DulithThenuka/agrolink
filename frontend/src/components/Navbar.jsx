@@ -116,6 +116,15 @@ export const Navbar = () => {
               >
                 Expert Advisory 👨‍🔬
               </Link>
+
+              <Link
+                to="/supplier-marketplace"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/supplier-marketplace') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Supplies 🧰
+              </Link>
             </>
           )}
 

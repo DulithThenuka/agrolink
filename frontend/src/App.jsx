@@ -24,6 +24,7 @@ import { Logistics } from './pages/Logistics';
 import { Profile } from './pages/Profile';
 import { TraceabilityPage } from './pages/TraceabilityPage';
 import { ExpertModule } from './pages/ExpertModule';
+import { SupplierMarketplace } from './pages/SupplierMarketplace';
 
 const ProtectedRoute = ({ children, requireFarmer, requireBuyer, requireLogistics }) => {
   const { isAuthenticated, isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
@@ -74,6 +75,7 @@ function AppContent() {
             <Route path="/negotiation" element={<TradeNegotiation />} />
             <Route path="/contracts" element={<ContractFarming />} />
             <Route path="/experts" element={<ExpertModule />} />
+            <Route path="/supplier-marketplace" element={<SupplierMarketplace />} />
 
             <Route
               path="/crops/add"
