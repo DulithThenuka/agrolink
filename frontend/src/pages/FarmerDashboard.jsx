@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sprout, Sun, AlertTriangle, TrendingUp, ShoppingBag, PlusCircle, ArrowRight, ShieldCheck, DollarSign, Package, CheckCircle2, Loader2, CloudRain } from 'lucide-react';
+import { Sprout, Sun, AlertTriangle, TrendingUp, ShoppingBag, PlusCircle, ArrowRight, ShieldCheck, DollarSign, Package, CheckCircle2, Loader2, CloudRain, Cpu, Wifi, Droplet, Thermometer } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
 import { BuyerProfileModal } from '../components/BuyerProfileModal';
 import { WeatherIntelligenceModal } from '../components/WeatherIntelligenceModal';
+import { IoTFarmControlModal } from '../components/IoTFarmControlModal';
 
 export const FarmerDashboard = () => {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ export const FarmerDashboard = () => {
   const [msg, setMsg] = useState('');
   const [selectedBuyer, setSelectedBuyer] = useState(null);
   const [showWeatherModal, setShowWeatherModal] = useState(false);
+  const [showIoTModal, setShowIoTModal] = useState(false);
 
   const fetchFarmerOrders = async () => {
     setLoadingOrders(true);
@@ -139,6 +141,63 @@ export const FarmerDashboard = () => {
             <span className="text-[10px] font-bold text-indigo-300 uppercase block">Irrigation Advice</span>
             <span className="text-sm font-extrabold text-indigo-200">Pause Drip Irrigation</span>
           </div>
+        </div>
+      </div>
+
+      {/* IOT SMART FARM LIVE TELEMETRY WIDGET */}
+      <div className="p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950 to-teal-950 border border-emerald-800/80 shadow-xl text-white space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+              <Wifi className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> ESP32 IoT Live Telemetry Stream
+            </span>
+            <span className="text-xs font-mono font-bold text-slate-300">Device: ESP32-AGRO-8941</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowIoTModal(true)}
+            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+          >
+            <Cpu className="w-4 h-4" /> Open IoT Irrigation Controller 🌱
+          </button>
+        </div>
+
+        {/* SENSOR VALUE TILES */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs text-center">
+          <div className="p-3 bg-amber-950/70 rounded-2xl border border-amber-800/60">
+            <span className="text-[10px] font-bold text-amber-300 uppercase block">Soil Moisture</span>
+            <span className="text-xl font-black text-amber-100 font-display">32% ⚠</span>
+          </div>
+
+          <div className="p-3 bg-slate-950/70 rounded-2xl border border-slate-800">
+            <span className="text-[10px] font-bold text-slate-400 uppercase block">Temperature</span>
+            <span className="text-xl font-black text-white font-display">29°C</span>
+          </div>
+
+          <div className="p-3 bg-blue-950/70 rounded-2xl border border-blue-800/60">
+            <span className="text-[10px] font-bold text-blue-300 uppercase block">Humidity</span>
+            <span className="text-xl font-black text-blue-100 font-display">71%</span>
+          </div>
+
+          <div className="p-3 bg-emerald-950/70 rounded-2xl border border-emerald-800/60">
+            <span className="text-[10px] font-bold text-emerald-300 uppercase block">Soil pH</span>
+            <span className="text-xl font-black text-emerald-100 font-display">6.4</span>
+          </div>
+
+          <div className="p-3 bg-purple-950/70 rounded-2xl border border-purple-800/60 col-span-2 sm:col-span-1">
+            <span className="text-[10px] font-bold text-purple-300 uppercase block">Water Tank</span>
+            <span className="text-xl font-black text-purple-100 font-display">38%</span>
+          </div>
+        </div>
+
+        <div className="p-3 bg-emerald-950/90 rounded-2xl border border-emerald-800/60 flex items-center justify-between text-xs flex-wrap gap-2">
+          <p className="text-emerald-200 font-bold">
+            🤖 <strong>AI IoT Recommendation:</strong> Irrigation required within the next 4 hours.
+          </p>
+          <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700">
+            Automatic Irrigation Ready
+          </span>
         </div>
       </div>
 
@@ -286,6 +345,13 @@ export const FarmerDashboard = () => {
         <WeatherIntelligenceModal
           location="Nuwara Eliya"
           onClose={() => setShowWeatherModal(false)}
+        />
+      )}
+
+      {showIoTModal && (
+        <IoTFarmControlModal
+          deviceId="ESP32-AGRO-8941"
+          onClose={() => setShowIoTModal(false)}
         />
       )}
     </div>

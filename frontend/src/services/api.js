@@ -86,4 +86,9 @@ export const weatherAPI = {
   getIntelligence: (location) => api.get('/weather/intelligence', { params: { location } }),
 };
 
+export const iotAPI = {
+  getTelemetry: (deviceId) => api.get('/iot/telemetry', { params: { deviceId } }),
+  triggerIrrigation: (deviceId, enable) => api.post('/iot/irrigation/trigger', null, { params: { deviceId, enable } }),
+};
+
 export default api;
