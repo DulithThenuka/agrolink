@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sprout, Sun, AlertTriangle, TrendingUp, ShoppingBag, PlusCircle, ArrowRight, ShieldCheck, DollarSign, Package, CheckCircle2, Loader2 } from 'lucide-react';
+import { Sprout, Sun, AlertTriangle, TrendingUp, ShoppingBag, PlusCircle, ArrowRight, ShieldCheck, DollarSign, Package, CheckCircle2, Loader2, CloudRain } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
 import { BuyerProfileModal } from '../components/BuyerProfileModal';
+import { WeatherIntelligenceModal } from '../components/WeatherIntelligenceModal';
 
 export const FarmerDashboard = () => {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ export const FarmerDashboard = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState('');
   const [selectedBuyer, setSelectedBuyer] = useState(null);
+  const [showWeatherModal, setShowWeatherModal] = useState(false);
 
   const fetchFarmerOrders = async () => {
     setLoadingOrders(true);
@@ -98,18 +100,64 @@ export const FarmerDashboard = () => {
         </div>
       )}
 
+      {/* WEATHER INTELLIGENCE SEVERE WARNING BANNER */}
+      <div className="p-5 rounded-3xl bg-gradient-to-r from-red-950 via-amber-950 to-slate-900 border border-red-800/80 shadow-xl text-white space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-red-500/30 text-red-300 border border-red-400/40 text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+              <AlertTriangle className="w-3.5 h-3.5 text-red-400 animate-pulse" /> Severe Weather Risk
+            </span>
+            <span className="text-xs font-bold text-amber-300">Expected: Tomorrow 3 PM – 8 PM</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowWeatherModal(true)}
+            className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+          >
+            <CloudRain className="w-4 h-4" /> 7-Day Climate &amp; Irrigation Advisory 🌧️
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs items-center">
+          <div className="md:col-span-2 space-y-1">
+            <h3 className="text-xl font-black text-white font-display flex items-center gap-2">
+              <span>⚠ Heavy Rain Warning</span>
+              <span className="text-xs font-extrabold bg-red-800 px-2 py-0.5 rounded-full text-red-100">82mm Rain</span>
+            </h3>
+            <p className="text-red-100/90 text-xs font-medium">
+              <strong>Affected Crops:</strong> Tomatoes, Chili • <strong>Recommendation:</strong> Avoid fertilizer application tomorrow.
+            </p>
+          </div>
+
+          <div className="p-3 bg-red-950/70 rounded-2xl border border-red-800/60 text-center">
+            <span className="text-[10px] font-bold text-amber-300 uppercase block">Flooding Risk</span>
+            <span className="text-sm font-extrabold text-red-200">HIGH (Flash Flood Warning)</span>
+          </div>
+
+          <div className="p-3 bg-indigo-950/70 rounded-2xl border border-indigo-800/60 text-center">
+            <span className="text-[10px] font-bold text-indigo-300 uppercase block">Irrigation Advice</span>
+            <span className="text-sm font-extrabold text-indigo-200">Pause Drip Irrigation</span>
+          </div>
+        </div>
+      </div>
+
       {/* RISK & MARKET MATRIX */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <motion.div whileHover={{ y: -3 }} className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between">
+        <motion.div
+          whileHover={{ y: -3 }}
+          onClick={() => setShowWeatherModal(true)}
+          className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between cursor-pointer group"
+        >
           <div className="space-y-1">
-            <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Weather Risk</p>
-            <h3 className="text-2xl font-extrabold font-display text-emerald-600 flex items-center gap-1.5">
-              Low ☀️
+            <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Weather Intelligence</p>
+            <h3 className="text-2xl font-extrabold font-display text-red-600 flex items-center gap-1.5">
+              High Risk 🌧️
             </h3>
-            <p className="text-[11px] text-slate-500 font-semibold">26°C Sunny • 0% Rain Precip</p>
+            <p className="text-[11px] text-red-700 font-semibold">82mm Heavy Rain Tomorrow • Click Details</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold border border-emerald-100">
-            <Sun className="w-6 h-6 text-emerald-600" />
+          <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl font-bold border border-red-100 group-hover:scale-105 transition">
+            <CloudRain className="w-6 h-6 text-red-600" />
           </div>
         </motion.div>
 
@@ -231,6 +279,13 @@ export const FarmerDashboard = () => {
           buyerName={selectedBuyer.name}
           buyerEmail={selectedBuyer.email}
           onClose={() => setSelectedBuyer(null)}
+        />
+      )}
+
+      {showWeatherModal && (
+        <WeatherIntelligenceModal
+          location="Nuwara Eliya"
+          onClose={() => setShowWeatherModal(false)}
         />
       )}
     </div>

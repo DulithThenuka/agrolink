@@ -82,4 +82,8 @@ export const traceabilityAPI = {
   getByCropId: (cropId) => api.get(`/trace/crop/${cropId}`),
 };
 
+export const weatherAPI = {
+  getIntelligence: (location) => api.get('/weather/intelligence', { params: { location } }),
+};
+
 export default api;
