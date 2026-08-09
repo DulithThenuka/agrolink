@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2 } from 'lucide-react';
+import { FarmerProfileModal } from '../components/FarmerProfileModal';
 
 export const CropsList = () => {
   const { isBuyer, isFarmer } = useAuth();
+  const navigate = useNavigate();
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
@@ -202,10 +205,17 @@ export const CropsList = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-70" />
 
-                <div className="absolute top-3 left-3 flex flex-col gap-1 items-start">
-                  <span className="badge-premium badge-delivered shadow-md text-[10px]">
-                    🧑‍🌾 Verified Farmer
-                  </span>
+                <div className="absolute top-3 left-3 flex flex-col gap-1 items-start z-10">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName });
+                    }}
+                    className="badge-premium badge-delivered shadow-md text-[10px] hover:scale-105 transition font-bold"
+                  >
+                    🧑‍🌾 {crop.farmerName || 'Nimal Perera'} ✓
+                  </button>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-950/80 backdrop-blur-md text-emerald-200 text-[9px] font-bold border border-emerald-400/30">
                     🌱 Organic: Yes
                   </span>
@@ -321,6 +331,14 @@ export const CropsList = () => {
             Next
           </button>
         </div>
+      )}
+
+      {selectedFarmer && (
+        <FarmerProfileModal
+          farmerId={selectedFarmer.id}
+          farmerName={selectedFarmer.name}
+          onClose={() => setSelectedFarmer(null)}
+        />
       )}
     </div>
   );

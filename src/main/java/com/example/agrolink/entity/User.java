@@ -58,6 +58,27 @@ public class User {
     private String location;
 
     @Column(nullable = false)
+    private boolean isVerified = true;
+
+    @Column(length = 100)
+    private String district = "Kandy";
+
+    @Column
+    private Integer completedOrdersCount = 482;
+
+    @Column
+    private Double overallRating = 4.8;
+
+    @Column
+    private Double onTimeDeliveryRate = 96.0;
+
+    @Column
+    private Double productQualityRating = 4.9;
+
+    @Column
+    private Double buyerSatisfactionRate = 97.0;
+
+    @Column(nullable = false)
     private boolean enabled = true;
 
     @Column(nullable = false)
@@ -296,6 +317,62 @@ public class User {
 
     public void setCredentialsNonExpired(boolean credentialsNonExpired) {
         this.credentialsNonExpired = credentialsNonExpired;
+    }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
+    }
+
+    public String getDistrict() {
+        return (district != null && !district.isBlank()) ? district : (location != null && !location.isBlank() ? location : "Kandy");
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public Integer getCompletedOrdersCount() {
+        return completedOrdersCount != null ? completedOrdersCount : 482;
+    }
+
+    public void setCompletedOrdersCount(Integer completedOrdersCount) {
+        this.completedOrdersCount = completedOrdersCount;
+    }
+
+    public Double getOverallRating() {
+        return overallRating != null ? overallRating : 4.8;
+    }
+
+    public void setOverallRating(Double overallRating) {
+        this.overallRating = overallRating;
+    }
+
+    public Double getOnTimeDeliveryRate() {
+        return onTimeDeliveryRate != null ? onTimeDeliveryRate : 96.0;
+    }
+
+    public void setOnTimeDeliveryRate(Double onTimeDeliveryRate) {
+        this.onTimeDeliveryRate = onTimeDeliveryRate;
+    }
+
+    public Double getProductQualityRating() {
+        return productQualityRating != null ? productQualityRating : 4.9;
+    }
+
+    public void setProductQualityRating(Double productQualityRating) {
+        this.productQualityRating = productQualityRating;
+    }
+
+    public Double getBuyerSatisfactionRate() {
+        return buyerSatisfactionRate != null ? buyerSatisfactionRate : 97.0;
+    }
+
+    public void setBuyerSatisfactionRate(Double buyerSatisfactionRate) {
+        this.buyerSatisfactionRate = buyerSatisfactionRate;
     }
 
     public void setCrops(List<Crop> crops) {

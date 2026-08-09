@@ -22,6 +22,8 @@ public interface CropRepository
             Pageable pageable
     );
 
+    java.util.List<Crop> findByFarmerIdAndActiveTrue(Long farmerId);
+
     // ================== SEARCH ==================
 
     @EntityGraph(attributePaths = {"farmer"})

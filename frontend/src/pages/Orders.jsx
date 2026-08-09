@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
 import { ShoppingBag, Loader2, CheckCircle2, Clock, Truck, MapPin, ChevronDown, ChevronUp, Navigation, AlertCircle } from 'lucide-react';
+import { FarmerProfileModal } from '../components/FarmerProfileModal';
 
 const LOGISTICS_STAGES = [
   { key: 'PENDING', label: 'Buyer Orders' },
@@ -36,6 +37,7 @@ export const Orders = () => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState('');
+  const [selectedFarmer, setSelectedFarmer] = useState(null);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -242,7 +244,19 @@ export const Orders = () => {
                           <MapPin className="w-3.5 h-3.5 text-emerald-600" /> Pickup (Farmer)
                         </span>
                         <p className="font-extrabold text-slate-800 text-sm">{order.pickupLocation || 'Homagama'}</p>
-                        <p className="text-[11px] text-slate-500">Producer: {order.farmerName || 'Farmer'}</p>
+                        <p className="text-[11px] text-slate-500">
+                          Producer:{' '}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedFarmer({ id: order.farmerId, name: order.farmerName });
+                            }}
+                            className="text-emerald-700 font-bold hover:underline"
+                          >
+                            {order.farmerName || 'Nimal Perera'} ⭐
+                          </button>
+                        </p>
                       </div>
 
                       <div className="space-y-1">
@@ -327,6 +341,14 @@ export const Orders = () => {
             );
           })}
         </div>
+      )}
+
+      {selectedFarmer && (
+        <FarmerProfileModal
+          farmerId={selectedFarmer.id}
+          farmerName={selectedFarmer.name}
+          onClose={() => setSelectedFarmer(null)}
+        />
       )}
     </div>
   );

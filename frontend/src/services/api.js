@@ -69,4 +69,8 @@ export const adminAPI = {
   resolveEscrowDispute: (id, data) => api.post(`/admin/escrow/${id}/resolve`, data),
 };
 
+export const farmersAPI = {
+  getProfile: (id) => api.get(`/farmers/${id}/profile`),
+};
+
 export default api;

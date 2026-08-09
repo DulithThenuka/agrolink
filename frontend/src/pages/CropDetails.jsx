@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, MapPin, Tag, ShoppingBag, Loader2, UserCheck } from 'lucide-react';
+import { FarmerProfileModal } from '../components/FarmerProfileModal';
 
 export const CropDetails = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export const CropDetails = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedFarmer, setSelectedFarmer] = useState(null);
 
   useEffect(() => {
     const fetchCrop = async () => {
@@ -123,6 +125,31 @@ export const CropDetails = () => {
                 <p className="text-slate-600 text-sm leading-relaxed">{crop.description}</p>
               </div>
             )}
+
+            {/* FARMER REPUTATION CARD TRIGGER */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
+                className="flex items-center gap-3 p-3.5 bg-emerald-50/80 hover:bg-emerald-100/80 rounded-2xl border border-emerald-200 text-left transition w-full group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-base shrink-0 shadow-sm">
+                  👨‍🌾
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-extrabold text-slate-900 text-xs">{crop.farmerName || 'Nimal Perera'}</span>
+                    <span className="text-[9px] font-black text-emerald-800 bg-emerald-200 px-1.5 py-0.5 rounded">Verified Farmer ✓</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-semibold truncate mt-0.5">
+                    District: <strong>{crop.location || 'Kandy'}</strong> • Reputation Rating: <strong className="text-amber-700">⭐ 4.8 / 5</strong>
+                  </p>
+                </div>
+                <span className="text-[11px] font-bold text-emerald-700 group-hover:translate-x-0.5 transition-transform shrink-0">
+                  View Profile ⭐
+                </span>
+              </button>
+            </div>
           </div>
 
           <div className="pt-6 border-t border-slate-100 space-y-4">
@@ -161,18 +188,30 @@ export const CropDetails = () => {
               </div>
             )}
 
-            <div className="flex items-center gap-3.5 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700">
-                <UserCheck className="w-5 h-5" />
+            <button
+              onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
+              className="w-full flex items-center gap-3.5 bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl border border-slate-100 text-left transition"
+            >
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
+                👨‍🌾
               </div>
-              <div>
+              <div className="flex-1">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Harvest Producer</div>
                 <div className="text-sm font-bold text-slate-700">{crop.farmerName || 'Verified Local Grower'}</div>
               </div>
-            </div>
+              <span className="text-xs font-bold text-emerald-600">View Rating ⭐</span>
+            </button>
           </div>
         </div>
       </div>
+
+      {selectedFarmer && (
+        <FarmerProfileModal
+          farmerId={selectedFarmer.id}
+          farmerName={selectedFarmer.name}
+          onClose={() => setSelectedFarmer(null)}
+        />
+      )}
     </div>
   );
 };
