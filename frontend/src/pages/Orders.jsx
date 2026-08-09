@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
-import { ShoppingBag, Loader2, CheckCircle2, Clock, Truck, MapPin, ChevronDown, ChevronUp, Navigation, AlertCircle } from 'lucide-react';
+import { ShoppingBag, Loader2, CheckCircle2, Clock, Truck, MapPin, ChevronDown, ChevronUp, Navigation, AlertCircle, QrCode } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
+import { TraceabilityModal } from '../components/TraceabilityModal';
 
 const LOGISTICS_STAGES = [
   { key: 'PENDING', label: 'Buyer Orders' },
@@ -38,6 +39,7 @@ export const Orders = () => {
   const [actionLoading, setActionLoading] = useState(null);
   const [msg, setMsg] = useState('');
   const [selectedFarmer, setSelectedFarmer] = useState(null);
+  const [selectedTraceOrder, setSelectedTraceOrder] = useState(null);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -190,7 +192,19 @@ export const Orders = () => {
                       <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 block">
                         {order.statusLabel || order.status}
                       </span>
-                      {renderEscrowBadge(order.escrowStatus)}
+                      <div className="flex items-center gap-2">
+                        {renderEscrowBadge(order.escrowStatus)}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTraceOrder(order);
+                          }}
+                          className="px-2.5 py-1 bg-emerald-950 hover:bg-slate-900 text-emerald-300 text-[10px] font-extrabold rounded-lg flex items-center gap-1 transition shadow-sm border border-emerald-800"
+                        >
+                          <QrCode className="w-3 h-3 text-emerald-400" /> QR Trace 🔎
+                        </button>
+                      </div>
                     </div>
 
                     <div className="text-slate-400">
@@ -348,6 +362,14 @@ export const Orders = () => {
           farmerId={selectedFarmer.id}
           farmerName={selectedFarmer.name}
           onClose={() => setSelectedFarmer(null)}
+        />
+      )}
+
+      {selectedTraceOrder && (
+        <TraceabilityModal
+          cropId={selectedTraceOrder.cropId || selectedTraceOrder.crop?.id}
+          batchCode={selectedTraceOrder.batchCode || 'BATCH-2026-NWR-0941'}
+          onClose={() => setSelectedTraceOrder(null)}
         />
       )}
     </div>

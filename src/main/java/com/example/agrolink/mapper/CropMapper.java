@@ -34,7 +34,8 @@ public final class CropMapper {
                 crop.getImageUrl(),
                 getFarmerName(crop),
                 getFarmerId(crop),
-                crop.isActive()
+                crop.isActive(),
+                crop.getBatchCode()
         );
     }
 

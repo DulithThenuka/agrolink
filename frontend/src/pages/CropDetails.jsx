@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, MapPin, Tag, ShoppingBag, Loader2, UserCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, Tag, ShoppingBag, Loader2, UserCheck, QrCode } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
+import { TraceabilityModal } from '../components/TraceabilityModal';
 
 export const CropDetails = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export const CropDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
+  const [showTraceModal, setShowTraceModal] = useState(false);
 
   useEffect(() => {
     const fetchCrop = async () => {
@@ -149,6 +151,16 @@ export const CropDetails = () => {
                   View Profile ⭐
                 </span>
               </button>
+
+              {/* TRACEABILITY QR PASSPORT BUTTON */}
+              <button
+                type="button"
+                onClick={() => setShowTraceModal(true)}
+                className="w-full py-3 bg-emerald-950 hover:bg-slate-900 text-white font-extrabold text-xs rounded-2xl shadow-md transition flex items-center justify-center gap-2 border border-emerald-500/40"
+              >
+                <QrCode className="w-4 h-4 text-emerald-400" />
+                <span>AGROLINK TRACE 🔎 Scan Batch QR Code</span>
+              </button>
             </div>
           </div>
 
@@ -210,6 +222,14 @@ export const CropDetails = () => {
           farmerId={selectedFarmer.id}
           farmerName={selectedFarmer.name}
           onClose={() => setSelectedFarmer(null)}
+        />
+      )}
+
+      {showTraceModal && (
+        <TraceabilityModal
+          cropId={crop.id}
+          batchCode={crop.batchCode}
+          onClose={() => setShowTraceModal(false)}
         />
       )}
     </div>

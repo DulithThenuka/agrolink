@@ -60,6 +60,27 @@ public class Crop {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(length = 50)
+    private String batchCode;
+
+    @Column(length = 50)
+    private String harvestedDate = "August 4, 2026";
+
+    @Column(length = 50)
+    private String packedDate = "August 5, 2026";
+
+    @Column(length = 50)
+    private String transportVehicle = "Vehicle WP LK-4892";
+
+    @Column(length = 100)
+    private String qualityInspectionStatus = "Passed (Grade A Organic)";
+
+    @Column(length = 50)
+    private String deliveredDate = "August 6, 2026";
+
+    @Column(length = 100)
+    private String blockchainHash = "0x7f8a92b4c19e81d763a1290f";
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "farmer_id", nullable = false)
     private User farmer;
@@ -213,5 +234,61 @@ public class Crop {
         }
 
         this.farmer = farmer;
+    }
+
+    public String getBatchCode() {
+        return (batchCode != null && !batchCode.isBlank()) ? batchCode : ("BATCH-2026-NWR-" + (id != null ? String.format("%04d", id) : "0941"));
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
+
+    public String getHarvestedDate() {
+        return harvestedDate != null ? harvestedDate : "August 4, 2026";
+    }
+
+    public void setHarvestedDate(String harvestedDate) {
+        this.harvestedDate = harvestedDate;
+    }
+
+    public String getPackedDate() {
+        return packedDate != null ? packedDate : "August 5, 2026";
+    }
+
+    public void setPackedDate(String packedDate) {
+        this.packedDate = packedDate;
+    }
+
+    public String getTransportVehicle() {
+        return transportVehicle != null ? transportVehicle : "Vehicle WP LK-4892";
+    }
+
+    public void setTransportVehicle(String transportVehicle) {
+        this.transportVehicle = transportVehicle;
+    }
+
+    public String getQualityInspectionStatus() {
+        return qualityInspectionStatus != null ? qualityInspectionStatus : "Passed (Grade A Organic)";
+    }
+
+    public void setQualityInspectionStatus(String qualityInspectionStatus) {
+        this.qualityInspectionStatus = qualityInspectionStatus;
+    }
+
+    public String getDeliveredDate() {
+        return deliveredDate != null ? deliveredDate : "August 6, 2026";
+    }
+
+    public void setDeliveredDate(String deliveredDate) {
+        this.deliveredDate = deliveredDate;
+    }
+
+    public String getBlockchainHash() {
+        return blockchainHash != null ? blockchainHash : "0x7f8a92b4c19e81d763a1290f";
+    }
+
+    public void setBlockchainHash(String blockchainHash) {
+        this.blockchainHash = blockchainHash;
     }
 }

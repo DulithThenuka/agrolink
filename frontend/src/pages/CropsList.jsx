@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2 } from 'lucide-react';
+import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2, QrCode } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
+import { TraceabilityModal } from '../components/TraceabilityModal';
 
 export const CropsList = () => {
   const { isBuyer, isFarmer } = useAuth();
@@ -12,6 +13,7 @@ export const CropsList = () => {
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
+  const [selectedTraceCrop, setSelectedTraceCrop] = useState(null);
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
@@ -250,7 +252,16 @@ export const CropsList = () => {
                     <span className="font-bold text-amber-500 text-xs">
                       ★★★★★ 4.8
                     </span>
-                    <span className="text-slate-400 font-semibold text-[10px]">327 transactions</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTraceCrop(crop);
+                      }}
+                      className="text-[10px] font-extrabold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2 py-0.5 rounded-md flex items-center gap-1 transition"
+                    >
+                      <QrCode className="w-3 h-3 text-emerald-600" /> Scan QR 🔎
+                    </button>
                   </div>
 
                   <div className="mt-3 p-2.5 bg-slate-50 rounded-2xl border border-slate-100 space-y-0.5">
@@ -338,6 +349,14 @@ export const CropsList = () => {
           farmerId={selectedFarmer.id}
           farmerName={selectedFarmer.name}
           onClose={() => setSelectedFarmer(null)}
+        />
+      )}
+
+      {selectedTraceCrop && (
+        <TraceabilityModal
+          cropId={selectedTraceCrop.id}
+          batchCode={selectedTraceCrop.batchCode}
+          onClose={() => setSelectedTraceCrop(null)}
         />
       )}
     </div>

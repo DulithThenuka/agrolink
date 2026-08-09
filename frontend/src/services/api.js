@@ -77,4 +77,9 @@ export const buyersAPI = {
   getProfile: (id) => api.get(`/buyers/${id}/profile`),
 };
 
+export const traceabilityAPI = {
+  getTrace: (batchCode) => api.get(`/trace/${batchCode}`),
+  getByCropId: (cropId) => api.get(`/trace/crop/${cropId}`),
+};
+
 export default api;

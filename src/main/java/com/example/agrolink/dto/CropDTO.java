@@ -14,11 +14,12 @@ public final class CropDTO {
 
     private final String farmerName;
     private final Long farmerId;
+    private final String batchCode;
 
     private final boolean inStock;
     private final boolean active;
 
-    public CropDTO(Long id, String name, String category, String location, BigDecimal price, int quantity, String imageUrl, String farmerName, Long farmerId, boolean active) {
+    public CropDTO(Long id, String name, String category, String location, BigDecimal price, int quantity, String imageUrl, String farmerName, Long farmerId, boolean active, String batchCode) {
 
         this.id = id;
         this.name = name;
@@ -29,8 +30,13 @@ public final class CropDTO {
         this.imageUrl = imageUrl;
         this.farmerName = farmerName;
         this.farmerId = farmerId;
+        this.batchCode = batchCode != null && !batchCode.isBlank() ? batchCode : ("BATCH-2026-NWR-" + (id != null ? String.format("%04d", id) : "0941"));
         this.active = active;
         this.inStock = quantity > 0;
+    }
+
+    public CropDTO(Long id, String name, String category, String location, BigDecimal price, int quantity, String imageUrl, String farmerName, Long farmerId, boolean active) {
+        this(id, name, category, location, price, quantity, imageUrl, farmerName, farmerId, active, null);
     }
 
     public Long getId() { return id; }
@@ -50,6 +56,8 @@ public final class CropDTO {
     public String getFarmerName() { return farmerName; }
 
     public Long getFarmerId() { return farmerId; }
+
+    public String getBatchCode() { return batchCode; }
 
     public boolean isInStock() { return inStock; }
 
