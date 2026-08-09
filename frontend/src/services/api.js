@@ -115,4 +115,12 @@ export const rentalsAPI = {
   getOwnerBookings: () => api.get('/rentals/bookings/owner'),
 };
 
+export const communityAPI = {
+  getPosts: (category, district) => api.get('/community/posts', { params: { category, district } }),
+  createPost: (data) => api.post('/community/posts', data),
+  addComment: (id, commentText) => api.post(`/community/posts/${id}/comments`, { commentText }),
+  likePost: (id) => api.post(`/community/posts/${id}/like`),
+  getAiSummary: (id) => api.get(`/community/posts/${id}/ai-summary`),
+};
+
 export default api;

@@ -26,6 +26,7 @@ import { TraceabilityPage } from './pages/TraceabilityPage';
 import { ExpertModule } from './pages/ExpertModule';
 import { SupplierMarketplace } from './pages/SupplierMarketplace';
 import { EquipmentRental } from './pages/EquipmentRental';
+import { CommunityPlatform } from './pages/CommunityPlatform';
 
 const ProtectedRoute = ({ children, requireFarmer, requireBuyer, requireLogistics }) => {
   const { isAuthenticated, isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
@@ -78,6 +79,7 @@ function AppContent() {
             <Route path="/experts" element={<ExpertModule />} />
             <Route path="/supplier-marketplace" element={<SupplierMarketplace />} />
             <Route path="/equipment-rental" element={<EquipmentRental />} />
+            <Route path="/community" element={<CommunityPlatform />} />
 
             <Route
               path="/crops/add"

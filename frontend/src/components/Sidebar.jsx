@@ -140,6 +140,19 @@ export const Sidebar = () => {
           </Link>
         )}
 
+        {/* Community Forum for all users */}
+        <Link
+          to="/community"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            isActive('/community')
+              ? 'bg-emerald-50 text-emerald-700 font-bold'
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          <span className="text-lg">👥</span>
+          <span>Community Forum 👥</span>
+        </Link>
+
         {/* Profile settings for all users */}
         <Link
           to="/profile"

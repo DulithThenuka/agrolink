@@ -134,6 +134,15 @@ export const Navbar = () => {
               >
                 Rentals 🚜
               </Link>
+
+              <Link
+                to="/community"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/community') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Community 👥
+              </Link>
             </>
           )}
 
