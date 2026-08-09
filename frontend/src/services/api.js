@@ -107,4 +107,12 @@ export const suppliersAPI = {
   getSupplierOrders: () => api.get('/suppliers/orders/supplier'),
 };
 
+export const rentalsAPI = {
+  getAvailable: (category, location) => api.get('/rentals', { params: { category, location } }),
+  createListing: (data) => api.post('/rentals', data),
+  bookEquipment: (id, startDate, endDate) => api.post(`/rentals/${id}/book`, null, { params: { startDate, endDate } }),
+  getFarmerBookings: () => api.get('/rentals/bookings/farmer'),
+  getOwnerBookings: () => api.get('/rentals/bookings/owner'),
+};
+
 export default api;

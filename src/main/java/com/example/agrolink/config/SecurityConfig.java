@@ -38,6 +38,7 @@ public class SecurityConfig {
             "/api/v1/iot/**",
             "/api/v1/experts/**",
             "/api/v1/suppliers/**",
+            "/api/v1/rentals/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html"
