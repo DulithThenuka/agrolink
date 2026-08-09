@@ -123,4 +123,8 @@ export const communityAPI = {
   getAiSummary: (id) => api.get(`/community/posts/${id}/ai-summary`),
 };
 
+export const aiAssistantAPI = {
+  chat: (data) => api.post('/ai/chat', data),
+};
+
 export default api;

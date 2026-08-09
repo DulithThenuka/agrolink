@@ -143,6 +143,15 @@ export const Navbar = () => {
               >
                 Community 👥
               </Link>
+
+              <Link
+                to="/ai-assistant"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/ai-assistant') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                AI Bot 🤖
+              </Link>
             </>
           )}
 

@@ -153,6 +153,19 @@ export const Sidebar = () => {
           <span>Community Forum 👥</span>
         </Link>
 
+        {/* Tri-Lingual AI Assistant for all users */}
+        <Link
+          to="/ai-assistant"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            isActive('/ai-assistant')
+              ? 'bg-emerald-50 text-emerald-700 font-bold'
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          <span className="text-lg">🤖</span>
+          <span>AI Assistant 🤖💬</span>
+        </Link>
+
         {/* Profile settings for all users */}
         <Link
           to="/profile"
