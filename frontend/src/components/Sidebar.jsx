@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, Sprout, ShoppingBag, PlusCircle, User, Truck, LogOut } from 'lucide-react';
 
 export const Sidebar = () => {
-  const { isFarmer, isBuyer, isLogistics, isExpert, isSupplier, isAdmin, logout } = useAuth();
+  const { isFarmer, isBuyer, isBusinessBuyer, isLogistics, isExpert, isSupplier, isAdmin, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -35,8 +35,8 @@ export const Sidebar = () => {
           <span>Dashboard</span>
         </Link>
 
-        {/* Crops catalog for Buyer, Farmer, Admin */}
-        {(isBuyer || isFarmer || isAdmin) && (
+        {/* Crops catalog for Buyer, Business Buyer, Farmer, Admin */}
+        {(isBuyer || isBusinessBuyer || isFarmer || isAdmin) && (
           <Link
             to="/crops"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
@@ -50,8 +50,8 @@ export const Sidebar = () => {
           </Link>
         )}
 
-        {/* My Orders for Buyer and Admin */}
-        {(isBuyer || isAdmin) && (
+        {/* My Orders for Buyer, Business Buyer, and Admin */}
+        {(isBuyer || isBusinessBuyer || isAdmin) && (
           <Link
             to="/orders"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${

@@ -123,23 +123,25 @@ export const Register = () => {
 
             <div>
               <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                Account Role
+                Account Role / Actor Type
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
               >
-                <option value="BUYER">🛒 Buyer / Wholesale Purchaser</option>
-                <option value="FARMER">🌾 Farmer / Harvest Grower</option>
-                <option value="LOGISTICS">🚚 Logistics Driver / Fleet Operator</option>
-                <option value="EXPERT">👨‍🔬 Agricultural Expert / Agronomist / Vet</option>
-                <option value="SUPPLIER">🧰 Supplier / Agricultural Input Provider</option>
+                <option value="FARMER">🌾 Farmer (Crop & Harvest Producer)</option>
+                <option value="BUYER">🛒 Retail Buyer (Individual Consumer)</option>
+                <option value="BUSINESS_BUYER">🏢 Business Buyer (B2B - Hotel, Supermarket, Exporter)</option>
+                <option value="LOGISTICS_PROVIDER">🚚 Logistics Provider (Driver / Transport Operator)</option>
+                <option value="AGRICULTURAL_EXPERT">👨‍🔬 Agricultural Expert (Agronomist / Extension Officer)</option>
+                <option value="SUPPLIER">🧰 Input Supplier (Fertilizer, Seeds, Equipment)</option>
+                <option value="ADMIN">🏛️ Government Officer / System Admin</option>
               </select>
             </div>
 
             <div className="p-3 bg-emerald-50/60 border border-emerald-100 rounded-xl text-xs text-emerald-800 font-semibold">
-              Select your role to access customized dashboards and feature suites.
+              Select your role to access customized dashboards, specialized tools, and network permissions.
             </div>
 
             <button

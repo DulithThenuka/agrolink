@@ -54,9 +54,15 @@ export const Profile = () => {
           </div>
 
           <div className="space-y-1">
-            <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Platform Role</span>
+            <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Platform Role &amp; Actor Type</span>
             <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-              {user?.role || 'BUYER'}
+              {user?.role === 'BUSINESS_BUYER' ? '🏢 Commercial Business Buyer (B2B)' :
+               user?.role === 'LOGISTICS_PROVIDER' || user?.role === 'LOGISTICS' ? '🚚 Logistics Provider' :
+               user?.role === 'AGRICULTURAL_EXPERT' || user?.role === 'EXPERT' ? '👨‍🔬 Agricultural Expert' :
+               user?.role === 'FARMER' ? '🌾 Farmer (Producer)' :
+               user?.role === 'SUPPLIER' ? '🧰 Input Supplier' :
+               user?.role === 'ADMIN' ? '🏛️ System Admin & Policymaker' :
+               '🛒 Retail Buyer'}
             </span>
           </div>
 

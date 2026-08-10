@@ -63,8 +63,11 @@ export const AuthProvider = ({ children }) => {
 
   const isFarmer = user?.role === 'FARMER' || user?.role === 'ROLE_FARMER';
   const isBuyer = user?.role === 'BUYER' || user?.role === 'ROLE_BUYER';
-  const isLogistics = user?.role === 'LOGISTICS' || user?.role === 'ROLE_LOGISTICS';
-  const isExpert = user?.role === 'EXPERT' || user?.role === 'ROLE_EXPERT';
+  const isBusinessBuyer = user?.role === 'BUSINESS_BUYER' || user?.role === 'ROLE_BUSINESS_BUYER';
+  const isLogistics = user?.role === 'LOGISTICS' || user?.role === 'ROLE_LOGISTICS' || user?.role === 'LOGISTICS_PROVIDER' || user?.role === 'ROLE_LOGISTICS_PROVIDER';
+  const isLogisticsProvider = isLogistics;
+  const isExpert = user?.role === 'EXPERT' || user?.role === 'ROLE_EXPERT' || user?.role === 'AGRICULTURAL_EXPERT' || user?.role === 'ROLE_AGRICULTURAL_EXPERT';
+  const isAgriculturalExpert = isExpert;
   const isSupplier = user?.role === 'SUPPLIER' || user?.role === 'ROLE_SUPPLIER';
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'ROLE_ADMIN';
 
@@ -77,8 +80,11 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!token,
         isFarmer,
         isBuyer,
+        isBusinessBuyer,
         isLogistics,
+        isLogisticsProvider,
         isExpert,
+        isAgriculturalExpert,
         isSupplier,
         isAdmin,
         login,
