@@ -29,6 +29,7 @@ import { EquipmentRental } from './pages/EquipmentRental';
 import { CommunityPlatform } from './pages/CommunityPlatform';
 import { AgroLinkAiAssistant } from './pages/AgroLinkAiAssistant';
 import { GovernmentIntelligence } from './pages/GovernmentIntelligence';
+import { WasteReductionModule } from './pages/WasteReductionModule';
 
 const ProtectedRoute = ({ children, requireFarmer, requireBuyer, requireLogistics }) => {
   const { isAuthenticated, isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
@@ -85,6 +86,8 @@ function AppContent() {
             <Route path="/ai-assistant" element={<AgroLinkAiAssistant />} />
             <Route path="/gov-intelligence" element={<GovernmentIntelligence />} />
             <Route path="/admin/intelligence" element={<GovernmentIntelligence />} />
+            <Route path="/waste-reduction" element={<WasteReductionModule />} />
+            <Route path="/farmer/waste-reduction" element={<WasteReductionModule />} />
 
             <Route
               path="/crops/add"

@@ -161,6 +161,15 @@ export const Navbar = () => {
               >
                 Gov Intel 🇱🇰
               </Link>
+
+              <Link
+                to="/waste-reduction"
+                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+                  isActive('/waste-reduction') ? 'text-emerald-600 font-bold' : ''
+                }`}
+              >
+                Waste Rescue ♻️
+              </Link>
             </>
           )}
 

@@ -132,4 +132,11 @@ export const govIntelligenceAPI = {
   simulatePolicy: (data) => api.post('/gov-intelligence/simulate', data),
 };
 
+export const wasteReductionAPI = {
+  analyzeRisk: (params) => api.get('/waste-reduction/analyze', { params }),
+  applyDiscount: (data) => api.post('/waste-reduction/apply-discount', data),
+  dispatchOffer: (data) => api.post('/waste-reduction/dispatch-offer', data),
+  initiateDonation: (data) => api.post('/waste-reduction/donate', data),
+};
+
 export default api;

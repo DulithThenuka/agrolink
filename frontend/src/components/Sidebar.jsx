@@ -179,6 +179,19 @@ export const Sidebar = () => {
           <span>Gov Intelligence 🇱🇰</span>
         </Link>
 
+        {/* Waste Reduction Module */}
+        <Link
+          to="/waste-reduction"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            isActive('/waste-reduction')
+              ? 'bg-emerald-50 text-emerald-700 font-bold'
+              : 'text-slate-600 hover:bg-slate-50'
+          }`}
+        >
+          <span className="text-lg">♻️</span>
+          <span>Waste Reduction ♻️</span>
+        </Link>
+
         {/* Profile settings for all users */}
         <Link
           to="/profile"

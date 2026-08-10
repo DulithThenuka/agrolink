@@ -181,8 +181,8 @@ export const FarmerDashboard = () => {
           </div>
 
           <div className="p-3 bg-emerald-950/70 rounded-2xl border border-emerald-800/60">
-            <span className="text-[10px] font-bold text-emerald-300 uppercase block">Soil pH</span>
-            <span className="text-xl font-black text-emerald-100 font-display">6.4</span>
+            <span className="text-[10px] font-bold text-emerald-300 uppercase block">Motor Status</span>
+            <span className="text-sm font-extrabold text-emerald-300">AUTO-OFF</span>
           </div>
 
           <div className="p-3 bg-purple-950/70 rounded-2xl border border-purple-800/60 col-span-2 sm:col-span-1">
@@ -198,6 +198,45 @@ export const FarmerDashboard = () => {
           <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700">
             Automatic Irrigation Ready
           </span>
+        </div>
+      </div>
+
+      {/* WASTE REDUCTION & PRODUCE RESCUE WIDGET */}
+      <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border border-emerald-700/80 shadow-xl text-white space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+              ♻️ AgroLink Waste Reduction Engine
+            </span>
+            <span className="text-xs font-bold text-amber-300">Produce Risk Flagged: HIGH</span>
+          </div>
+
+          <Link
+            to="/waste-reduction"
+            className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+          >
+            Launch Produce Rescue ♻️
+          </Link>
+        </div>
+
+        <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+          <div>
+            <h4 className="text-sm font-extrabold text-white font-display">
+              ⚠ 500kg Tomatoes • Expiry in 2 Days
+            </h4>
+            <p className="text-slate-300 text-xs mt-0.5">
+              Automated Rescue Recommendations ready: <strong>Reduce price 15%</strong> • Match <strong>Restaurant A, Hotel B, Supermarket C</strong> • Donate <strong>Food Bank D</strong> • Process <strong>Sauce Factory E</strong>.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              to="/waste-reduction"
+              className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition"
+            >
+              Apply 15% Price Reduction
+            </Link>
+          </div>
         </div>
       </div>
 
