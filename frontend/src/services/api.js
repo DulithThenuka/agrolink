@@ -139,4 +139,14 @@ export const wasteReductionAPI = {
   initiateDonation: (data) => api.post('/waste-reduction/donate', data),
 };
 
+export const reviewsAPI = {
+  getByCropId: (cropId) => api.get(`/reviews/crop/${cropId}`),
+  create: (data) => api.post('/reviews', data),
+};
+
+export const notificationsAPI = {
+  getAll: () => api.get('/notifications'),
+  markRead: (id) => api.post(`/notifications/${id}/read`),
+};
+
 export default api;

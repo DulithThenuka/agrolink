@@ -6,6 +6,7 @@ import { Sprout, LogOut, User as UserIcon, LayoutDashboard, ShoppingBag, PlusCir
 export const Navbar = () => {
   const { isAuthenticated, user, logout, isBuyer, isFarmer, isLogistics, isAdmin } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -216,38 +217,109 @@ export const Navbar = () => {
               </Link>
             </div>
           ) : (
-            <div className="relative">
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50 text-slate-800 font-semibold transition"
-              >
-                <span>{user?.email}</span>
-                <ChevronDown className="w-4 h-4 text-slate-500" />
-              </button>
-
-              {userMenuOpen && (
-                <div
-                  onMouseLeave={() => setUserMenuOpen(false)}
-                  className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1 animate-fade-in"
+            <div className="flex items-center gap-3">
+              {/* NOTIFICATION BELL DRAWER */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setNotifDrawerOpen(!notifDrawerOpen);
+                    setUserMenuOpen(false);
+                  }}
+                  className="p-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50 text-slate-700 hover:text-emerald-600 transition relative"
+                  title="System Notifications"
                 >
-                  <Link
-                    to="/profile"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl font-medium transition"
-                  >
-                    <UserIcon className="w-4 h-4 text-emerald-600" /> Profile Settings
-                  </Link>
+                  <span className="text-base">🔔</span>
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
+                    2
+                  </span>
+                </button>
 
-                  <div className="h-px bg-slate-100 my-1" />
+                {notifDrawerOpen && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 animate-fade-in">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 font-display">
+                        Notifications (2 Unread)
+                      </h4>
+                      <button
+                        onClick={() => setNotifDrawerOpen(false)}
+                        className="text-[10px] text-emerald-600 font-bold hover:underline"
+                      >
+                        Close
+                      </button>
+                    </div>
 
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl font-medium transition"
+                    <div className="space-y-2 max-h-64 overflow-y-auto text-xs">
+                      <div className="p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-bold text-emerald-800">
+                          <span>🚚 Order Dispatched!</span>
+                          <span className="text-slate-400">Just now</span>
+                        </div>
+                        <p className="text-slate-600 text-[11px] leading-tight">
+                          Vehicle WP LK-4892 picked up 150kg Samba Rice from Nuwara Eliya.
+                        </p>
+                      </div>
+
+                      <div className="p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-bold text-sky-800">
+                          <span>🔒 Escrow Secured</span>
+                          <span className="text-slate-400">12m ago</span>
+                        </div>
+                        <p className="text-slate-600 text-[11px] leading-tight">
+                          Payment of Rs 34,500.00 is safely locked in Escrow vault.
+                        </p>
+                      </div>
+
+                      <div className="p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-bold text-amber-800">
+                          <span>♻️ Waste Risk Flagged</span>
+                          <span className="text-slate-400">2h ago</span>
+                        </div>
+                        <p className="text-slate-600 text-[11px] leading-tight">
+                          500kg Tomatoes near 2-day expiry. 15% discount recommended.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* USER ACCOUNT DROPDOWN */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(!userMenuOpen);
+                    setNotifDrawerOpen(false);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50 text-slate-800 font-semibold transition"
+                >
+                  <span>{user?.email}</span>
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
+                </button>
+
+                {userMenuOpen && (
+                  <div
+                    onMouseLeave={() => setUserMenuOpen(false)}
+                    className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1 animate-fade-in"
                   >
-                    <LogOut className="w-4 h-4" /> Logout
-                  </button>
-                </div>
-              )}
+                    <Link
+                      to="/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl font-medium transition"
+                    >
+                      <UserIcon className="w-4 h-4 text-emerald-600" /> Profile Settings
+                    </Link>
+
+                    <div className="h-px bg-slate-100 my-1" />
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl font-medium transition"
+                    >
+                      <LogOut className="w-4 h-4" /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

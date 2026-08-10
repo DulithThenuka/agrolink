@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { cropsAPI, ordersAPI } from '../services/api';
+import { cropsAPI, ordersAPI, reviewsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, MapPin, Tag, ShoppingBag, Loader2, UserCheck, QrCode } from 'lucide-react';
+import { ArrowLeft, MapPin, Tag, ShoppingBag, Loader2, UserCheck, QrCode, Star, MessageSquare, Send } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
 
@@ -16,6 +16,23 @@ export const CropDetails = () => {
   const [submitting, setSubmitting] = useState(false);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [showTraceModal, setShowTraceModal] = useState(false);
+
+  // Review state
+  const [reviews, setReviews] = useState([]);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await reviewsAPI.getByCropId(id);
+      if (res && res.data) {
+        setReviews(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load reviews:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchCrop = async () => {
@@ -31,7 +48,27 @@ export const CropDetails = () => {
       }
     };
     fetchCrop();
+    fetchReviews();
   }, [id]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      await reviewsAPI.create({ cropId: id, rating: newRating, comment: newComment });
+      setNewComment('');
+      fetchReviews();
+      alert('Thank you! Your 5-star review has been posted.');
+    } catch (err) {
+      alert('Failed to submit review.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   const handleOrder = async (e) => {
     e.preventDefault();
@@ -213,6 +250,74 @@ export const CropDetails = () => {
               </div>
               <span className="text-xs font-bold text-emerald-600">View Rating ⭐</span>
             </button>
+          </div>
+        </div>
+
+        {/* REVIEWS & RATINGS SECTION */}
+        <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-md space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-lg font-extrabold text-slate-900 font-display flex items-center gap-2">
+              <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+              Verified Customer Reviews &amp; Ratings
+            </h3>
+            <span className="text-xs font-bold text-slate-400">5.0 Star Producer Score</span>
+          </div>
+
+          {/* SUBMIT REVIEW FORM */}
+          <form onSubmit={handleReviewSubmit} className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-3">
+            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Leave a Verified Review</h4>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-slate-600">Rating:</span>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setNewRating(star)}
+                    className="p-1 hover:scale-110 transition"
+                  >
+                    <Star className={`w-5 h-5 ${star <= newRating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Share details about harvest freshness, packaging, and logistics experience..."
+              required
+              rows={2}
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500"
+            />
+
+            <button
+              type="submit"
+              disabled={submittingReview}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5 disabled:opacity-50"
+            >
+              {submittingReview ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Send className="w-3.5 h-3.5" /> Submit Review</>}
+            </button>
+          </form>
+
+          {/* REVIEW REVIEWS LIST */}
+          <div className="space-y-3">
+            {reviews.map((rev) => (
+              <div key={rev.id} className="p-4 bg-slate-50/70 rounded-2xl border border-slate-100 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-800">{rev.buyerEmail}</span>
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Verified Buyer</span>
+                  </div>
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(rev.rating)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 font-medium">{rev.comment}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
