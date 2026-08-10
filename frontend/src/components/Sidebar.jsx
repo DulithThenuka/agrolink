@@ -166,6 +166,19 @@ export const Sidebar = () => {
           <span>AI Assistant 🤖💬</span>
         </Link>
 
+        {/* Government Policy Intelligence for Policymakers & Admin */}
+        <Link
+          to="/gov-intelligence"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            isActive('/gov-intelligence')
+              ? 'bg-emerald-900 text-emerald-300 font-bold shadow-sm'
+              : 'text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/70 font-semibold'
+          }`}
+        >
+          <span className="text-lg">🏛️</span>
+          <span>Gov Intelligence 🇱🇰</span>
+        </Link>
+
         {/* Profile settings for all users */}
         <Link
           to="/profile"

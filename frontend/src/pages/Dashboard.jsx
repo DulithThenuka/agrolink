@@ -142,6 +142,13 @@ export const Dashboard = () => {
         <h2 className="text-base font-bold text-slate-800 font-display mb-4">Quick Management Actions</h2>
         
         <div className="flex flex-wrap gap-3">
+          <Link
+            to="/gov-intelligence"
+            className="px-5 py-3 bg-slate-900 hover:bg-slate-950 text-emerald-400 font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2 border border-slate-800"
+          >
+            <span className="text-base">🏛️</span> Sri Lanka Agricultural Overview 🇱🇰
+          </Link>
+
           {isFarmer && (
             <Link
               to="/crops/add"

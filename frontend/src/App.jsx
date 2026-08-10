@@ -28,6 +28,7 @@ import { SupplierMarketplace } from './pages/SupplierMarketplace';
 import { EquipmentRental } from './pages/EquipmentRental';
 import { CommunityPlatform } from './pages/CommunityPlatform';
 import { AgroLinkAiAssistant } from './pages/AgroLinkAiAssistant';
+import { GovernmentIntelligence } from './pages/GovernmentIntelligence';
 
 const ProtectedRoute = ({ children, requireFarmer, requireBuyer, requireLogistics }) => {
   const { isAuthenticated, isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
@@ -82,6 +83,8 @@ function AppContent() {
             <Route path="/equipment-rental" element={<EquipmentRental />} />
             <Route path="/community" element={<CommunityPlatform />} />
             <Route path="/ai-assistant" element={<AgroLinkAiAssistant />} />
+            <Route path="/gov-intelligence" element={<GovernmentIntelligence />} />
+            <Route path="/admin/intelligence" element={<GovernmentIntelligence />} />
 
             <Route
               path="/crops/add"

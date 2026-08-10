@@ -127,4 +127,9 @@ export const aiAssistantAPI = {
   chat: (data) => api.post('/ai/chat', data),
 };
 
+export const govIntelligenceAPI = {
+  getOverview: () => api.get('/gov-intelligence/overview'),
+  simulatePolicy: (data) => api.post('/gov-intelligence/simulate', data),
+};
+
 export default api;

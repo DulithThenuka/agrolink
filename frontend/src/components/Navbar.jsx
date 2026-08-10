@@ -152,6 +152,15 @@ export const Navbar = () => {
               >
                 AI Bot 🤖
               </Link>
+
+              <Link
+                to="/gov-intelligence"
+                className={`whitespace-nowrap transition duration-150 ease-in-out px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 ${
+                  isActive('/gov-intelligence') ? 'bg-emerald-600 text-white font-bold' : 'font-bold'
+                }`}
+              >
+                Gov Intel 🇱🇰
+              </Link>
             </>
           )}
 
