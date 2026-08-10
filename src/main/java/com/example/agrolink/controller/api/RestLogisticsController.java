@@ -12,8 +12,11 @@ import com.example.agrolink.service.OrderService;
 
 import java.security.Principal;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/v1/logistics")
+@PreAuthorize("hasAnyRole('LOGISTICS', 'LOGISTICS_PROVIDER', 'ADMIN')")
 public class RestLogisticsController {
 
     private static final Logger logger = LoggerFactory.getLogger(RestLogisticsController.class);
