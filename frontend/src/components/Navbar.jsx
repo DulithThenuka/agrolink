@@ -31,153 +31,94 @@ export const Navbar = () => {
           <span>Agro<span className="text-emerald-600">Link</span></span>
         </Link>
 
-        {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center space-x-2 lg:space-x-4 text-xs font-semibold text-slate-600 overflow-x-auto py-1">
-          {(!isLogistics) && (
-            <Link
-              to="/crops"
-              className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                isActive('/crops') ? 'text-emerald-600 font-bold' : ''
-              }`}
-            >
-              Crops
-            </Link>
-          )}
-
-          {(!isLogistics) && (
-            <>
-              <Link
-                to="/analytics"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/analytics') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Analytics
+        {/* DESKTOP MENU - CATEGORIZED ROLE DROPDOWNS */}
+        <div className="hidden md:flex items-center space-x-2 lg:space-x-4 text-xs font-semibold text-slate-700">
+          
+          {/* MARKETPLACE DROPDOWN */}
+          <div className="relative group py-2">
+            <button className="flex items-center gap-1 hover:text-emerald-600 font-bold transition py-1">
+              <span>🌾 Marketplace</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
+            </button>
+            <div className="absolute left-0 mt-1 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
+              <Link to="/crops" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-bold hover:text-emerald-700 transition">
+                🌾 Produce Marketplace
               </Link>
-
-              <Link
-                to="/advisor"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/advisor') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                AI Advisor 🤖
+              <Link to="/contracts" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                📑 B2B Purchase Contracts
               </Link>
-
-              <Link
-                to="/price-prediction"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/price-prediction') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Price Predictor 📈
+              <Link to="/supplier-marketplace" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                🧰 Pre-Production Supplies
               </Link>
-
-              <Link
-                to="/demand-forecasting"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/demand-forecasting') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Demand Forecast 📊
+              <Link to="/equipment-rental" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                🚜 Machinery Rentals
               </Link>
+            </div>
+          </div>
 
-              <Link
-                to="/disease-detection"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/disease-detection') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Disease Scanner 📷
+          {/* AI & SMART INTELLIGENCE DROPDOWN */}
+          <div className="relative group py-2">
+            <button className="flex items-center gap-1 hover:text-emerald-600 font-bold transition py-1">
+              <span>🤖 AI Intelligence</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
+            </button>
+            <div className="absolute left-0 mt-1 w-60 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
+              <Link to="/advisor" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-bold hover:text-emerald-700 transition">
+                🤖 AI Agronomist Advisor
               </Link>
+              <Link to="/disease-detection" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                📷 AI Disease Scanner
+              </Link>
+              <Link to="/price-prediction" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                📈 Price Predictor
+              </Link>
+              <Link to="/demand-forecasting" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                📊 Demand Forecasting
+              </Link>
+              <Link to="/ai-assistant" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                💬 Multilingual AI Bot
+              </Link>
+            </div>
+          </div>
 
-              <Link
-                to="/negotiation"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/negotiation') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Negotiations 💬
+          {/* ECOSYSTEM & GOVERNANCE DROPDOWN */}
+          <div className="relative group py-2">
+            <button className="flex items-center gap-1 hover:text-emerald-600 font-bold transition py-1">
+              <span>🏛️ Governance &amp; Ecosystem</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
+            </button>
+            <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
+              <Link to="/gov-intelligence" className="block px-3.5 py-2.5 rounded-xl bg-emerald-50 text-emerald-800 font-extrabold hover:bg-emerald-100 transition">
+                🏛️ Government Intelligence 🇱🇰
               </Link>
+              <Link to="/waste-reduction" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                ♻️ Waste Reduction &amp; Rescue
+              </Link>
+              <Link to="/negotiation" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                💬 Trade Negotiations
+              </Link>
+              <Link to="/experts" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                👨‍🔬 Expert Advisory Hub
+              </Link>
+              <Link to="/community" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-semibold hover:text-emerald-700 transition">
+                👥 Farmer Community
+              </Link>
+            </div>
+          </div>
 
-              <Link
-                to="/contracts"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/contracts') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Contracts 📑
-              </Link>
-
-              <Link
-                to="/experts"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/experts') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Expert Advisory 👨‍🔬
-              </Link>
-
-              <Link
-                to="/supplier-marketplace"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/supplier-marketplace') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Supplies 🧰
-              </Link>
-
-              <Link
-                to="/equipment-rental"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/equipment-rental') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Rentals 🚜
-              </Link>
-
-              <Link
-                to="/community"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/community') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Community 👥
-              </Link>
-
-              <Link
-                to="/ai-assistant"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/ai-assistant') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                AI Bot 🤖
-              </Link>
-
-              <Link
-                to="/gov-intelligence"
-                className={`whitespace-nowrap transition duration-150 ease-in-out px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 ${
-                  isActive('/gov-intelligence') ? 'bg-emerald-600 text-white font-bold' : 'font-bold'
-                }`}
-              >
-                Gov Intel 🇱🇰
-              </Link>
-
-              <Link
-                to="/waste-reduction"
-                className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
-                  isActive('/waste-reduction') ? 'text-emerald-600 font-bold' : ''
-                }`}
-              >
-                Waste Rescue ♻️
-              </Link>
-            </>
-          )}
+          <Link
+            to="/analytics"
+            className={`transition duration-150 ease-in-out hover:text-emerald-600 font-bold ${
+              isActive('/analytics') ? 'text-emerald-600 font-bold' : ''
+            }`}
+          >
+            Analytics 📊
+          </Link>
 
           {(isLogistics || isAdmin) && (
             <Link
               to="/logistics"
-              className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 ${
+              className={`whitespace-nowrap transition duration-150 ease-in-out hover:text-emerald-600 font-bold ${
                 isActive('/logistics') ? 'text-emerald-600 font-bold' : ''
               }`}
             >
@@ -188,7 +129,7 @@ export const Navbar = () => {
           {(isBuyer || isAdmin) && (
             <Link
               to="/orders"
-              className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              className={`transition duration-150 ease-in-out hover:text-emerald-600 font-bold ${
                 isActive('/orders') ? 'text-emerald-600 font-bold' : ''
               }`}
             >
@@ -199,7 +140,7 @@ export const Navbar = () => {
           {isAuthenticated && (
             <Link
               to="/dashboard"
-              className={`transition duration-150 ease-in-out hover:text-emerald-600 ${
+              className={`transition duration-150 ease-in-out hover:text-emerald-600 font-bold ${
                 isActive('/dashboard') ? 'text-emerald-600 font-bold' : ''
               }`}
             >

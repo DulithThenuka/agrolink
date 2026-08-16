@@ -130,59 +130,94 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
-      <section className="py-16 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">Platform Capabilities</span>
-            <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 font-display">Engineered for Agricultural Excellence</h2>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">Modern tools designed to deliver max profits for growers and fresh quality for commercial buyers.</p>
+      {/* ROLE-BASED PORTAL MATRIX SECTION */}
+      <section className="py-12 bg-slate-100/70 border-y border-slate-200/60">
+        <div className="max-w-7xl mx-auto px-6 space-y-10">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">Tailored Ecosystem Access</span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-display">Built for Every Agricultural Stakeholder</h2>
+            <p className="text-slate-600 text-sm leading-relaxed">AgroLink provides customized tools depending on your registered account role.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="premium-card p-8 flex flex-col justify-between group">
-              <div className="space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/60 text-emerald-600 flex items-center justify-center text-3xl font-bold shadow-sm group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition duration-300">
-                  🌾
-                </div>
-                <h3 className="font-bold text-xl text-slate-900 font-display">Direct Farm Sourcing</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Access real-time crop availability directly from registered local fields with verified origin coordinates.
-                </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* FARMERS */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold">
+                🧑‍🌾
               </div>
-              <div className="pt-6 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600 group-hover:text-emerald-700">
-                <Link to="/crops">Explore Listings →</Link>
+              <div>
+                <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Role 1: Producers</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display">Farmers &amp; Growers</h3>
               </div>
+              <ul className="space-y-2 text-xs font-semibold text-slate-600">
+                <li className="flex items-center gap-2">✓ Post Harvest Listings (+ Quick Modal)</li>
+                <li className="flex items-center gap-2">✓ AI Disease Scanner &amp; Advisory</li>
+                <li className="flex items-center gap-2">✓ Crop Price Predictor &amp; Demand Map</li>
+                <li className="flex items-center gap-2">✓ Pre-Production Supplies &amp; Machinery</li>
+              </ul>
+              <Link to="/register" className="inline-block pt-2 text-xs font-extrabold text-emerald-600 hover:underline">
+                Join as Farmer →
+              </Link>
             </div>
 
-            <div className="premium-card p-8 flex flex-col justify-between group">
-              <div className="space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-teal-50 border border-teal-200/60 text-teal-600 flex items-center justify-center text-3xl font-bold shadow-sm group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-white transition duration-300">
-                  ⚡
-                </div>
-                <h3 className="font-bold text-xl text-slate-900 font-display">Automated Settlement</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Secure instant online order creation with automated quantity computation and transparent pricing structures.
-                </p>
+            {/* COMMERCIAL BUYERS */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl font-bold">
+                🏬
               </div>
-              <div className="pt-6 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-teal-600 group-hover:text-teal-700">
-                <Link to="/crops">Order Workflow →</Link>
+              <div>
+                <span className="text-[10px] font-black uppercase text-teal-600 tracking-wider">Role 2: Buyers</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display">Supermarkets &amp; B2B</h3>
               </div>
+              <ul className="space-y-2 text-xs font-semibold text-slate-600">
+                <li className="flex items-center gap-2">✓ Bulk Quantity Escrow Orders</li>
+                <li className="flex items-center gap-2">✓ B2B Purchase Request Tenders</li>
+                <li className="flex items-center gap-2">✓ Live 9-Stage Fleet Tracking</li>
+                <li className="flex items-center gap-2">✓ Verified Grower Origin Passports</li>
+              </ul>
+              <Link to="/crops" className="inline-block pt-2 text-xs font-extrabold text-teal-600 hover:underline">
+                Browse Marketplace →
+              </Link>
             </div>
 
-            <div className="premium-card p-8 flex flex-col justify-between group">
-              <div className="space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200/60 text-amber-600 flex items-center justify-center text-3xl font-bold shadow-sm group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition duration-300">
-                  📊
-                </div>
-                <h3 className="font-bold text-xl text-slate-900 font-display">Farmer Insights</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
-                  Comprehensive management dashboard enabling farmers to monitor earnings, list yield batches, and track pending dispatches.
-                </p>
+            {/* LOGISTICS DRIVERS */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">
+                🚚
               </div>
-              <div className="pt-6 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-600 group-hover:text-amber-700">
-                <Link to="/dashboard">View Analytics →</Link>
+              <div>
+                <span className="text-[10px] font-black uppercase text-amber-600 tracking-wider">Role 3: Logistics</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display">Fleet Drivers</h3>
               </div>
+              <ul className="space-y-2 text-xs font-semibold text-slate-600">
+                <li className="flex items-center gap-2">✓ Dispatch Order Assignment</li>
+                <li className="flex items-center gap-2">✓ Route Pickup &amp; Transit Updates</li>
+                <li className="flex items-center gap-2">✓ Escrow Delivery Settlement</li>
+                <li className="flex items-center gap-2">✓ Vehicle Registration &amp; Mileage</li>
+              </ul>
+              <Link to="/login" className="inline-block pt-2 text-xs font-extrabold text-amber-600 hover:underline">
+                Logistics Portal →
+              </Link>
+            </div>
+
+            {/* GOVERNMENT ADMINS */}
+            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl font-bold">
+                🏛️
+              </div>
+              <div>
+                <span className="text-[10px] font-black uppercase text-sky-600 tracking-wider">Role 4: Officers</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display">Gov Intelligence</h3>
+              </div>
+              <ul className="space-y-2 text-xs font-semibold text-slate-600">
+                <li className="flex items-center gap-2">✓ District Overproduction Risk Alerts</li>
+                <li className="flex items-center gap-2">✓ Tariff &amp; Policy Impact Simulator</li>
+                <li className="flex items-center gap-2">✓ Buffer Stock Health Tracking</li>
+                <li className="flex items-center gap-2">✓ Food Security Heatmaps</li>
+              </ul>
+              <Link to="/gov-intelligence" className="inline-block pt-2 text-xs font-extrabold text-sky-600 hover:underline">
+                View Gov Intelligence →
+              </Link>
             </div>
           </div>
         </div>
