@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2, QrCode } from 'lucide-react';
+import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2, QrCode, PlusCircle } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
 import { BuyCropModal } from '../components/BuyCropModal';
+import { PostHarvestModal } from '../components/PostHarvestModal';
 
 const MOCK_CROPS = [
   {
@@ -97,6 +98,7 @@ export const CropsList = () => {
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [selectedTraceCrop, setSelectedTraceCrop] = useState(null);
   const [selectedBuyCrop, setSelectedBuyCrop] = useState(null);
+  const [showPostModal, setShowPostModal] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
@@ -208,22 +210,32 @@ export const CropsList = () => {
           <p className="text-slate-500 text-sm mt-1">Discover, order, or sell fresh organic agriculture harvests directly.</p>
         </div>
 
-        {/* SEARCH BAR */}
-        <form onSubmit={handleSearchSubmit} className="flex gap-2">
-          <div className="relative flex-1 md:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Search crops..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
-            />
-          </div>
-          <button type="submit" className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-sm transition">
-            Search
+        {/* SEARCH BAR & POST HARVEST BUTTON */}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setShowPostModal(true)}
+            className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>+ Post New Harvest</span>
           </button>
-        </form>
+
+          <form onSubmit={handleSearchSubmit} className="flex gap-2">
+            <div className="relative flex-1 md:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+              <input
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Search crops..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
+              />
+            </div>
+            <button type="submit" className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-sm transition">
+              Search
+            </button>
+          </form>
+        </div>
       </div>
 
       {/* QUICK CATEGORY PILLS & SORT CONTROLS */}
@@ -534,6 +546,16 @@ export const CropsList = () => {
           crop={selectedBuyCrop}
           onClose={() => setSelectedBuyCrop(null)}
           onOrderPlaced={fetchCrops}
+        />
+      )}
+
+      {showPostModal && (
+        <PostHarvestModal
+          onClose={() => setShowPostModal(false)}
+          onCropCreated={(newCrop) => {
+            setCrops((prev) => [newCrop, ...prev]);
+            fetchCrops();
+          }}
         />
       )}
     </div>
