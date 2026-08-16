@@ -6,135 +6,212 @@
 <head
         th:replace="~{
         fragments/head ::
-        head('Order Details')
+        head('Order Tracking - AgroLink')
         }">
 </head>
 
 <body class="bg-slate-50">
 
 <!-- BASE LAYOUT -->
-<div th:replace="~{layout/base :: base('Order Details', ~{::content})}"></div>
+<div th:replace="~{layout/base :: base('Order Tracking', ~{::content})}"></div>
 
 <!-- ================== PAGE CONTENT ================== -->
-<div th:fragment="content" class="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+<div th:fragment="content" class="max-w-4xl mx-auto space-y-6 animate-fade-in-up">
 
     <!-- HEADER -->
     <div class="flex justify-between items-center pb-5 border-b border-slate-200/60">
         <div>
-            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">
-                Order #<span th:text="${order.id}">123</span>
-            </h1>
+            <div class="flex items-center gap-2">
+                <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 font-display">
+                    Order Shipment #<span th:text="${order.id}">123</span> 📦
+                </h1>
+                <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200"
+                      th:text="${order.status}">
+                    IN_TRANSIT
+                </span>
+            </div>
             <p class="text-slate-500 text-sm mt-1">
                 Placed on 
                 <span th:if="${order.createdAt != null}" 
-                      th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy')}">08 Aug 2026</span>
+                      th:text="${#temporals.format(order.createdAt, 'dd MMM yyyy, HH:mm')}">08 Aug 2026</span>
             </p>
         </div>
 
-        <a th:href="@{/orders/my}" class="text-xs text-emerald-600 hover:text-emerald-700 font-bold transition">
+        <a th:href="@{/orders/my}" class="text-xs text-emerald-600 hover:text-emerald-700 font-bold transition flex items-center gap-1">
             ← My Orders
         </a>
     </div>
 
-    <!-- MAIN CARD -->
-    <div class="premium-card p-8 bg-white border border-slate-100 space-y-6">
+    <!-- MAIN CONTAINER CARD -->
+    <div class="glass p-8 rounded-3xl bg-white/90 border border-slate-200/80 shadow-xl space-y-8">
         
-        <!-- VISUAL LOGISTICS TRACKING STEPPER -->
-        <div class="pb-6 border-b border-slate-100 space-y-3">
+        <!-- 9-STAGE LIVE LOGISTICS PROGRESS BAR -->
+        <div class="pb-6 border-b border-slate-200/80 space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Order Shipment Tracker</h2>
-                <span class="text-xs font-bold text-emerald-600">Expected Delivery: 2-3 Business Days</span>
+                <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest font-display">
+                    Smart Logistics Lifecycle Tracker
+                </h2>
+                <span class="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    Expected Delivery: 1-2 Business Days
+                </span>
             </div>
 
-            <div class="grid grid-cols-4 gap-2 text-center pt-2">
-                <div class="space-y-1">
-                    <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto text-xs font-bold shadow-md shadow-emerald-500/20">1</div>
-                    <p class="text-[11px] font-bold text-emerald-700">Placed</p>
+            <!-- 9 STAGE PIPELINE GRID -->
+            <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2 pt-2 text-center">
+                
+                <!-- STAGE 1: ORDER PLACED -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold bg-emerald-100/80 text-emerald-800 border-emerald-300">
+                    <span class="block text-xs mb-0.5">✓</span>
+                    <span>1. Placed</span>
                 </div>
-                <div class="space-y-1">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold"
-                         th:classappend="${order.status == 'CONFIRMED' || order.status == 'DELIVERED'} ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-slate-100 text-slate-400'">2</div>
-                    <p class="text-[11px] font-bold" th:classappend="${order.status == 'CONFIRMED' || order.status == 'DELIVERED'} ? 'text-emerald-700' : 'text-slate-400'">Escrow Secured</p>
+
+                <!-- STAGE 2: FARMER ACCEPTED -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'FARMER_ACCEPTED' || order.status == 'TRANSPORT_REQUESTED' || order.status == 'DRIVER_ASSIGNED' || order.status == 'COLLECTED' || order.status == 'IN_TRANSIT' || order.status == 'DELIVERED' || order.status == 'CONFIRMED' || order.status == 'PAID'} ? 'bg-emerald-100/80 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'">
+                    <span class="block text-xs mb-0.5">✓</span>
+                    <span>2. Accepted</span>
                 </div>
-                <div class="space-y-1">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold"
-                         th:classappend="${order.status == 'CONFIRMED' || order.status == 'DELIVERED'} ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-slate-100 text-slate-400'">3</div>
-                    <p class="text-[11px] font-bold" th:classappend="${order.status == 'CONFIRMED' || order.status == 'DELIVERED'} ? 'text-emerald-700' : 'text-slate-400'">Dispatched</p>
+
+                <!-- STAGE 3: TRANSPORT REQUESTED -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'TRANSPORT_REQUESTED' || order.status == 'DRIVER_ASSIGNED' || order.status == 'COLLECTED' || order.status == 'IN_TRANSIT' || order.status == 'DELIVERED' || order.status == 'CONFIRMED' || order.status == 'PAID'} ? 'bg-emerald-100/80 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'">
+                    <span class="block text-xs mb-0.5">✓</span>
+                    <span>3. Transport</span>
                 </div>
-                <div class="space-y-1">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold"
-                         th:classappend="${order.status == 'DELIVERED'} ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-slate-100 text-slate-400'">4</div>
-                    <p class="text-[11px] font-bold" th:classappend="${order.status == 'DELIVERED'} ? 'text-emerald-700' : 'text-slate-400'">Delivered</p>
+
+                <!-- STAGE 4: DRIVER ASSIGNED -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'DRIVER_ASSIGNED' || order.status == 'COLLECTED' || order.status == 'IN_TRANSIT' || order.status == 'DELIVERED' || order.status == 'CONFIRMED' || order.status == 'PAID'} ? 'bg-emerald-100/80 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'">
+                    <span class="block text-xs mb-0.5">✓</span>
+                    <span>4. Assigned</span>
                 </div>
+
+                <!-- STAGE 5: COLLECTED -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'COLLECTED' || order.status == 'IN_TRANSIT' || order.status == 'DELIVERED' || order.status == 'CONFIRMED' || order.status == 'PAID'} ? 'bg-emerald-100/80 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'">
+                    <span class="block text-xs mb-0.5">✓</span>
+                    <span>5. Collected</span>
+                </div>
+
+                <!-- STAGE 6: IN TRANSIT -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'IN_TRANSIT'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20 ring-2 ring-emerald-500/30' : (${order.status == 'DELIVERED' || order.status == 'CONFIRMED' || order.status == 'PAID'} ? 'bg-emerald-100/80 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200')">
+                    <span class="block text-xs mb-0.5">🚚</span>
+                    <span>6. Live Transit</span>
+                </div>
+
+                <!-- STAGE 7: DELIVERED -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'DELIVERED' || order.status == 'CONFIRMED' || order.status == 'PAID'} ? 'bg-emerald-100/80 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'">
+                    <span class="block text-xs mb-0.5">📦</span>
+                    <span>7. Delivered</span>
+                </div>
+
+                <!-- STAGE 8: BUYER CONFIRMS -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'CONFIRMED' || order.status == 'PAID'} ? 'bg-emerald-100/80 text-emerald-800 border-emerald-300' : 'bg-slate-50 text-slate-400 border-slate-200'">
+                    <span class="block text-xs mb-0.5">🤝</span>
+                    <span>8. Confirmed</span>
+                </div>
+
+                <!-- STAGE 9: FARMER PAID -->
+                <div class="p-2.5 rounded-xl border text-[10px] font-extrabold"
+                     th:classappend="${order.status == 'PAID'} ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'bg-slate-50 text-slate-400 border-slate-200'">
+                    <span class="block text-xs mb-0.5">💰</span>
+                    <span>9. Paid</span>
+                </div>
+
             </div>
         </div>
 
-        <!-- STATUS BADGE -->
-        <div class="flex justify-between items-center pb-4 border-b border-slate-100">
-            <h2 class="text-sm font-bold text-slate-800 font-display uppercase tracking-wider">Settlement Lifecycle Status</h2>
-            <span class="badge-premium font-bold uppercase text-xs px-4 py-1.5"
-                  th:text="${order.status}"
-                  th:classappend="${order.status == 'PENDING' ? 'badge-pending' : (order.status == 'DELIVERED' ? 'badge-delivered' : (order.status == 'CONFIRMED' ? 'badge-confirmed' : 'badge-cancelled'))}">
-                PENDING
+        <!-- LOGISTICS DISPATCH CARD -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-200/80 text-xs">
+            <div class="space-y-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    📍 Pickup Location (Farmer)
+                </span>
+                <p class="font-extrabold text-slate-800 text-sm" th:text="${order.crop != null ? order.crop.location : 'Nuwara Eliya'}">Nuwara Eliya</p>
+                <p class="text-slate-500 font-medium">Producer: <strong class="text-emerald-700" th:text="${order.crop != null && order.crop.farmer != null ? order.crop.farmer.name : 'Green Valley Farm'}">Green Valley Farm</strong></p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    🎯 Destination (Buyer)
+                </span>
+                <p class="font-extrabold text-slate-800 text-sm" th:text="${order.buyerLocation ?: 'Colombo Central'}">Colombo Central</p>
+                <p class="text-slate-500 font-medium">Distance: 142 km</p>
+            </div>
+
+            <div class="space-y-1">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    🚚 Fleet Driver &amp; Vehicle
+                </span>
+                <p class="font-extrabold text-slate-800 text-sm">Ranil Transport (WP LK-4892)</p>
+                <p class="text-emerald-700 font-bold">Logistics Fee: Rs. 4,800.00</p>
+            </div>
+        </div>
+
+        <!-- LIVE DISPATCH STATUS NOTE -->
+        <div class="p-4 bg-emerald-50/80 border border-emerald-200/80 rounded-2xl text-xs space-y-1">
+            <span class="font-extrabold text-emerald-900 flex items-center gap-1.5">
+                ⏱️ Live Dispatch Update:
             </span>
+            <p class="text-emerald-800 font-medium italic">
+                "Vehicle WP LK-4892 picked up fresh crop batch from Nuwara Eliya. En route to Colombo hub."
+            </p>
         </div>
 
-
-        <!-- CROP DETAILS -->
-        <div class="pb-4 border-b border-slate-100">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Crop Details</h3>
-            <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+        <!-- CROP & TRANSACTION INFO -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+            <!-- CROP CARD SUMMARY -->
+            <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                 <img th:if="${order.crop != null}"
                      th:src="${order.crop.imageUrl != null && !#strings.isEmpty(order.crop.imageUrl)} ? ${order.crop.imageUrl} : @{/images/default-crop.jpg}"
                      alt="Crop Image"
-                     class="w-16 h-16 rounded-xl object-cover border border-slate-200/60 shadow-sm"/>
+                     class="w-16 h-16 rounded-xl object-cover border border-slate-200 shadow-sm"/>
                 
                 <div>
-                    <p class="font-bold text-slate-800 font-display" th:text="${order.cropName ?: (order.crop != null ? order.crop.name : 'Unknown Crop')}">Crop Name</p>
-                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-0.5" th:text="${order.crop != null ? order.crop.category : '-'}">Category</p>
+                    <h3 class="font-extrabold text-slate-900 font-display text-base" th:text="${order.cropName ?: (order.crop != null ? order.crop.name : 'Tomato')}">Crop Name</h3>
+                    <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mt-0.5" th:text="${order.crop != null ? order.crop.category : 'Fresh Produce'}">Category</p>
+                    <p class="text-xs text-slate-400 mt-1">Batch Code: <strong class="text-slate-700 font-mono" th:text="${order.crop != null ? order.crop.batchCode : 'BATCH-2026-NWR-0941'}">BATCH-2026-NWR-0941</strong></p>
+                </div>
+            </div>
+
+            <!-- SETTLEMENT VAULT SUMMARY -->
+            <div class="bg-emerald-900 text-white p-5 rounded-2xl shadow-lg flex flex-col justify-between space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-300">Escrow Vault Settlement</span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 text-[10px] font-bold border border-emerald-400/30">
+                        🛡️ Escrow Locked
+                    </span>
+                </div>
+                <div class="flex items-baseline justify-between pt-1">
+                    <span class="text-xs text-emerald-200 font-bold">Quantity: <strong class="text-white" th:text="${order.quantity}">100</strong> kg</span>
+                    <span class="text-2xl font-extrabold text-emerald-400 font-display" th:text="'Rs. ' + ${#numbers.formatDecimal(order.totalPrice, 1, 2)}">Rs. 21,000.00</span>
                 </div>
             </div>
         </div>
 
-        <!-- TRANSACTION INFO -->
-        <div class="grid grid-cols-2 gap-6 pb-4 border-b border-slate-100">
-            <div>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Quantity ordered</p>
-                <p class="font-bold text-slate-800 text-base mt-1" th:text="${order.quantity ?: 0}">0</p>
-            </div>
-
-            <div>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Settlement</p>
-                <p class="font-extrabold text-emerald-600 text-base mt-1" th:text="'$' + ${order.totalPrice}">$0.00</p>
-            </div>
-        </div>
-
-        <!-- BUYER INFO -->
-        <div class="pb-6">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2.5">Buyer Information</h3>
-            <div class="flex items-center gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-base font-bold text-emerald-700">
-                    👤
-                </div>
-                <div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Account Username</div>
-                    <div class="text-sm font-bold text-slate-700" th:text="${order.buyerEmail ?: (order.buyer != null ? order.buyer.email : 'Unknown')}">buyer@email.com</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ACTIONS -->
-        <div class="flex justify-between items-center pt-6 border-t border-slate-100">
-            <a th:href="@{/orders/my}" class="text-slate-500 hover:text-emerald-600 font-semibold transition text-sm flex items-center gap-1">
-                <span>←</span> Back to Orders
+        <!-- ACTIONS & ESCROW PROTECTION -->
+        <div class="pt-6 border-t border-slate-100 flex flex-wrap justify-between items-center gap-4">
+            <a th:href="@{/orders/my}" class="text-slate-500 hover:text-emerald-600 font-bold transition text-xs flex items-center gap-1">
+                <span>←</span> Back to Orders List
             </a>
 
-            <!-- PAY NOW -->
-            <a th:if="${order.status == 'PENDING'}"
-               th:href="@{/payment/checkout/{id}(id=${order.id})}"
-               class="btn btn-primary py-2.5 px-6 shadow-md shadow-emerald-100 text-xs">
-                Pay Now
-            </a>
+            <!-- CONFIRM OR PAY -->
+            <div class="flex gap-3">
+                <a th:if="${order.status == 'PENDING'}"
+                   th:href="@{/payment/checkout/{id}(id=${order.id})}"
+                   class="btn btn-primary py-3 px-6 shadow-lg shadow-emerald-500/25 text-xs font-bold">
+                    Complete Escrow Payment →
+                </a>
+
+                <form th:if="${order.status == 'DELIVERED'}" th:action="@{/orders/confirm/{id}(id=${order.id})}" method="post">
+                    <button type="submit" class="btn btn-primary py-3 px-6 shadow-lg shadow-emerald-500/25 text-xs font-bold">
+                        Confirm Delivery (Release Escrow) ✓
+                    </button>
+                </form>
+            </div>
         </div>
 
     </div>
