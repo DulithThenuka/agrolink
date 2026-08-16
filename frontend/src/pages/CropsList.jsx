@@ -237,49 +237,83 @@ export const CropsList = () => {
 
 
       {/* FILTER BAR */}
-      <div className="premium-card p-6 bg-white border border-slate-100">
+      <div className="premium-card p-6 bg-white border border-slate-100 shadow-md">
         <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 items-end">
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Category</label>
-            <input
-              type="text"
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Produce Category</label>
+            <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. Vegetables"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
-            />
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 bg-white transition cursor-pointer"
+            >
+              <option value="">All Categories 🌾</option>
+              <option value="Vegetables">🥬 Vegetables</option>
+              <option value="Grains">🌾 Grains &amp; Cereals</option>
+              <option value="Fruits">🍎 Fresh Fruits</option>
+              <option value="Spices">🌶️ Spices &amp; Tea</option>
+            </select>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Location</label>
-            <input
-              type="text"
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Agricultural District 🇱🇰</label>
+            <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g. California"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
-            />
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 bg-white transition cursor-pointer"
+            >
+              <option value="">All Sri Lanka Districts 📍</option>
+              {[
+                'Nuwara Eliya',
+                'Jaffna',
+                'Kandy',
+                'Galle',
+                'Hambantota',
+                'Anuradhapura',
+                'Polonnaruwa',
+                'Badulla',
+                'Dambulla',
+                'Matale',
+                'Kurunegala',
+                'Ratnapura',
+                'Kegalle',
+                'Ampara',
+                'Batticaloa',
+                'Trincomalee',
+                'Kilinochchi',
+                'Mannar',
+                'Vavuniya',
+                'Mullaitivu',
+                'Monaragala',
+                'Puttalam',
+                'Kalutara',
+                'Colombo'
+              ].map((dist) => (
+                <option key={dist} value={dist}>
+                  📍 {dist}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Min Price ($)</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Min Price (Rs.)</label>
             <input
               type="number"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
               placeholder="0"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Max Price ($)</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Max Price (Rs.)</label>
             <input
               type="number"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="1000"
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
+              placeholder="2000"
+              className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
             />
           </div>
 

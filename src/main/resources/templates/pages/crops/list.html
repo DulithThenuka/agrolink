@@ -77,9 +77,23 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Location</label>
-                <input type="text" name="location" th:value="${location}" placeholder="e.g. Nuwara Eliya"
-                       class="input-premium">
+                <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase tracking-wider">Agricultural District 🇱🇰</label>
+                <select name="location" class="input-premium bg-white cursor-pointer">
+                    <option value="" th:selected="${location == null || location == ''}">All Sri Lanka Districts 📍</option>
+                    <option value="Nuwara Eliya" th:selected="${location == 'Nuwara Eliya'}">📍 Nuwara Eliya</option>
+                    <option value="Jaffna" th:selected="${location == 'Jaffna'}">📍 Jaffna</option>
+                    <option value="Kandy" th:selected="${location == 'Kandy'}">📍 Kandy</option>
+                    <option value="Galle" th:selected="${location == 'Galle'}">📍 Galle</option>
+                    <option value="Hambantota" th:selected="${location == 'Hambantota'}">📍 Hambantota</option>
+                    <option value="Anuradhapura" th:selected="${location == 'Anuradhapura'}">📍 Anuradhapura</option>
+                    <option value="Polonnaruwa" th:selected="${location == 'Polonnaruwa'}">📍 Polonnaruwa</option>
+                    <option value="Badulla" th:selected="${location == 'Badulla'}">📍 Badulla</option>
+                    <option value="Dambulla" th:selected="${location == 'Dambulla'}">📍 Dambulla</option>
+                    <option value="Matale" th:selected="${location == 'Matale'}">📍 Matale</option>
+                    <option value="Kurunegala" th:selected="${location == 'Kurunegala'}">📍 Kurunegala</option>
+                    <option value="Ratnapura" th:selected="${location == 'Ratnapura'}">📍 Ratnapura</option>
+                    <option value="Kegalle" th:selected="${location == 'Kegalle'}">📍 Kegalle</option>
+                </select>
             </div>
 
             <div>
