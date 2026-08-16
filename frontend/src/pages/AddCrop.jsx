@@ -87,25 +87,25 @@ export const AddCrop = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Price ($)</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Price (Rs./Kg)</label>
               <input
                 type="number"
-                step="0.01"
+                step="0.5"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="0.00"
+                placeholder="240.00"
                 required
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Stock Quantity</label>
+              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Stock Quantity (Kg)</label>
               <input
                 type="number"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                placeholder="e.g. 100"
+                placeholder="e.g. 500"
                 required
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
               />
@@ -113,15 +113,45 @@ export const AddCrop = () => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Location / Farm Region</label>
-            <input
-              type="text"
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Agricultural District 🇱🇰</label>
+            <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g. California"
               required
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
-            />
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition cursor-pointer"
+            >
+              <option value="">Select District 📍</option>
+              {[
+                'Nuwara Eliya',
+                'Jaffna',
+                'Kandy',
+                'Galle',
+                'Hambantota',
+                'Anuradhapura',
+                'Polonnaruwa',
+                'Badulla',
+                'Dambulla',
+                'Matale',
+                'Kurunegala',
+                'Ratnapura',
+                'Kegalle',
+                'Ampara',
+                'Batticaloa',
+                'Trincomalee',
+                'Kilinochchi',
+                'Mannar',
+                'Vavuniya',
+                'Mullaitivu',
+                'Monaragala',
+                'Puttalam',
+                'Kalutara',
+                'Colombo'
+              ].map((dist) => (
+                <option key={dist} value={dist}>
+                  📍 {dist}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

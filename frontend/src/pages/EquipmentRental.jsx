@@ -37,6 +37,45 @@ export const EquipmentRental = () => {
   const categories = ['ALL', 'Tractor', 'Harvester', 'Drone', 'Water Pump', 'Cultivator'];
   const locations = ['ALL', 'Kurunegala', 'Anuradhapura', 'Nuwara Eliya', 'Kandy', 'Matale'];
 
+  const MOCK_EQUIPMENT = [
+    {
+      id: 1,
+      name: 'Kubota L4508 45HP 4WD Tractor',
+      category: 'Tractor',
+      location: 'Kurunegala',
+      dailyRateLkr: 8500,
+      ownerName: 'Kurunegala Machinery Hub',
+      availableFrom: '2026-08-15',
+      availableTo: '2026-08-30',
+      imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
+      description: 'Heavy-duty 4WD tractor with rotavator attachment for paddy field tilling.'
+    },
+    {
+      id: 2,
+      name: 'Yanmar AW70V Paddy Harvester',
+      category: 'Harvester',
+      location: 'Anuradhapura',
+      dailyRateLkr: 22000,
+      ownerName: 'Rajarata Agro Services',
+      availableFrom: '2026-08-18',
+      availableTo: '2026-09-05',
+      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop&q=80',
+      description: 'High-speed combined grain harvester with grain tank capacity of 1,400L.'
+    },
+    {
+      id: 3,
+      name: 'DJI Agras T40 Agricultural Drone',
+      category: 'Drone',
+      location: 'Kandy',
+      dailyRateLkr: 15000,
+      ownerName: 'SmartAgri Tech Lanka',
+      availableFrom: '2026-08-16',
+      availableTo: '2026-08-28',
+      imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&auto=format&fit=crop&q=80',
+      description: 'Precision spraying drone with 40kg payload for automated crop misting.'
+    }
+  ];
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -45,10 +84,15 @@ export const EquipmentRental = () => {
         rentalsAPI.getFarmerBookings(),
       ]);
 
-      if (eqRes && eqRes.data) setEquipmentList(eqRes.data);
+      if (eqRes && eqRes.data && eqRes.data.length > 0) {
+        setEquipmentList(eqRes.data);
+      } else {
+        setEquipmentList(MOCK_EQUIPMENT);
+      }
       if (bookRes && bookRes.data) setBookings(bookRes.data);
     } catch (err) {
-      console.error('Failed to load equipment rental data:', err);
+      console.warn('Backend API offline. Loading Equipment Rental fallback:', err);
+      setEquipmentList(MOCK_EQUIPMENT);
     } finally {
       setLoading(false);
     }

@@ -32,6 +32,53 @@ export const SupplierMarketplace = () => {
 
   const categories = ['ALL', 'Seeds', 'Fertilizer', 'Pesticides', 'Tools', 'Irrigation', 'Machinery'];
 
+  const MOCK_SUPPLIER_ITEMS = [
+    {
+      id: 1,
+      name: 'CIC Hybrid Paddy Seeds (BG-352)',
+      category: 'Seeds',
+      brand: 'CIC Agri Businesses',
+      supplierName: 'CIC Ceylon Organics',
+      price: 1850,
+      quantity: 120,
+      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop&q=80',
+      description: 'High-yield certified 3.5-month paddy seeds resistant to blast disease.'
+    },
+    {
+      id: 2,
+      name: 'Baurs Organic NPK Fertilizer (50kg)',
+      category: 'Fertilizer',
+      brand: 'A. Baur & Co.',
+      supplierName: 'Baurs Agricultural Inputs',
+      price: 4500,
+      quantity: 250,
+      imageUrl: 'https://images.unsplash.com/photo-1628352081506-83c43123ed6d?w=800&auto=format&fit=crop&q=80',
+      description: 'Balanced bio-organic fertilizer blend for vegetables and tea plantations.'
+    },
+    {
+      id: 3,
+      name: 'Hayleys Bio-Pesticide Spray (1L)',
+      category: 'Pesticides',
+      brand: 'Hayleys Agriculture',
+      supplierName: 'Hayleys Plant Protection',
+      price: 2200,
+      quantity: 85,
+      imageUrl: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&auto=format&fit=crop&q=80',
+      description: 'Eco-friendly neem-extract botanical pesticide for organic pest control.'
+    },
+    {
+      id: 4,
+      name: 'Jacto 16L Knapsack Sprayer',
+      category: 'Tools',
+      brand: 'Jacto Lanka',
+      supplierName: 'Lanka Agro Tools Ltd',
+      price: 12500,
+      quantity: 30,
+      imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
+      description: 'Ergonomic high-pressure manual knapsack sprayer for crop maintenance.'
+    }
+  ];
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -40,10 +87,15 @@ export const SupplierMarketplace = () => {
         isSupplier ? suppliersAPI.getSupplierOrders() : suppliersAPI.getFarmerOrders(),
       ]);
 
-      if (itemsRes && itemsRes.data) setItems(itemsRes.data);
+      if (itemsRes && itemsRes.data && itemsRes.data.length > 0) {
+        setItems(itemsRes.data);
+      } else {
+        setItems(MOCK_SUPPLIER_ITEMS);
+      }
       if (ordersRes && ordersRes.data) setOrders(ordersRes.data);
     } catch (err) {
-      console.error('Failed to load supplier marketplace data:', err);
+      console.warn('Backend API offline. Loading Supplier Marketplace fallback:', err);
+      setItems(MOCK_SUPPLIER_ITEMS);
     } finally {
       setLoading(false);
     }

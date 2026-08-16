@@ -102,15 +102,15 @@ export const PostHarvestModal = ({ onClose, onCropCreated }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto min-h-screen">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+          className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[88vh] flex flex-col my-auto"
         >
           {/* HEADER */}
-          <div className="p-6 bg-gradient-to-r from-emerald-700 to-emerald-600 text-white flex items-center justify-between">
+          <div className="p-5 sm:p-6 bg-gradient-to-r from-emerald-700 to-emerald-600 text-white flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center font-bold">
                 <Sprout className="w-5 h-5" />
@@ -123,13 +123,14 @@ export const PostHarvestModal = ({ onClose, onCropCreated }) => {
             <button
               onClick={onClose}
               className="p-2 rounded-xl text-emerald-200 hover:text-white hover:bg-emerald-800/50 transition"
+              title="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* FORM */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* SCROLLABLE FORM BODY CONTAINER */}
+          <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
             {successMsg && (
               <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-fade-in">
                 <Check className="w-4 h-4 text-emerald-600" />

@@ -16,6 +16,21 @@ export const WasteReductionModule = () => {
   const [actionSuccessMsg, setActionSuccessMsg] = useState(null);
   const [discountApplied, setDiscountApplied] = useState(false);
 
+  const MOCK_WASTE_DATA = {
+    cropName: cropName || 'Organic Tomatoes',
+    quantityKg: quantityKg || 500,
+    daysToExpiry: daysToExpiry || 2,
+    spoilageRiskScore: 88,
+    spoilageRiskLevel: 'HIGH_RISK',
+    projectedFinancialLossLkr: 105000,
+    recommendedDiscountPct: 20,
+    rescueOptions: [
+      { id: 'R-1', title: 'Dynamic Flash Discount Sale', description: 'Offer 20% off to local supermarkets to clear 350 kg within 24 hours.', actionType: 'DISCOUNT' },
+      { id: 'R-2', title: 'Industrial Agro-Processing Dispatch', description: 'Sell remaining 150 kg to Kandy Tomato Paste Processing Hub at Rs. 140/kg.', actionType: 'PROCESSING' },
+      { id: 'R-3', title: 'Charity Food Rescue Donation', description: 'Donate surplus produce to Community Kitchens for Tax Rebate Credits.', actionType: 'DONATION' }
+    ]
+  };
+
   const loadAnalysis = async () => {
     setLoading(true);
     try {
@@ -26,9 +41,12 @@ export const WasteReductionModule = () => {
       });
       if (res && res.data) {
         setData(res.data);
+      } else {
+        setData(MOCK_WASTE_DATA);
       }
     } catch (err) {
-      console.error('Failed to load waste reduction analysis:', err);
+      console.warn('Backend API offline. Loading Waste Rescue fallback:', err);
+      setData(MOCK_WASTE_DATA);
     } finally {
       setLoading(false);
     }

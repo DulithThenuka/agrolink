@@ -68,15 +68,15 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto min-h-screen">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+          className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[88vh] flex flex-col my-auto"
         >
           {/* HEADER */}
-          <div className="p-6 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
+          <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center font-bold">
                 <ShoppingBag className="w-5 h-5" />
@@ -89,36 +89,39 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
             <button
               onClick={onClose}
               className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700/50 transition"
+              title="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* CROP BRIEF CARD */}
-          <div className="p-5 bg-slate-50 border-b border-slate-100 flex items-center gap-4">
-            <img
-              src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
-              alt={crop.name}
-              className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shadow-sm"
-            />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">
-                  {crop.category || 'Produce'}
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
-                  {maxStock} kg Stock
-                </span>
+          {/* SCROLLABLE BODY CONTAINER */}
+          <div className="overflow-y-auto flex-1 divide-y divide-slate-100">
+            {/* CROP BRIEF CARD */}
+            <div className="p-5 bg-slate-50 flex items-center gap-4">
+              <img
+                src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
+                alt={crop.name}
+                className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shadow-sm"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">
+                    {crop.category || 'Produce'}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
+                    {maxStock} kg Stock
+                  </span>
+                </div>
+                <h4 className="font-extrabold text-slate-900 text-sm font-display truncate mt-0.5">{crop.name}</h4>
+                <p className="text-xs text-slate-500 font-semibold">
+                  Unit Rate: <span className="text-emerald-600 font-extrabold">Rs. {unitPrice}/kg</span> • Location: {crop.location || 'Nuwara Eliya'}
+                </p>
               </div>
-              <h4 className="font-extrabold text-slate-900 text-sm font-display truncate mt-0.5">{crop.name}</h4>
-              <p className="text-xs text-slate-500 font-semibold">
-                Unit Rate: <span className="text-emerald-600 font-extrabold">Rs. {unitPrice}/kg</span> • Location: {crop.location || 'Nuwara Eliya'}
-              </p>
             </div>
-          </div>
 
-          {/* FORM & CALCULATOR */}
-          <form onSubmit={handleConfirmOrder} className="p-6 space-y-5">
+            {/* FORM & CALCULATOR */}
+            <form onSubmit={handleConfirmOrder} className="p-6 space-y-5">
             {successMsg && (
               <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-fade-in">
                 <span>{successMsg}</span>
@@ -236,6 +239,7 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
               )}
             </button>
           </form>
+        </div>
         </motion.div>
       </div>
     </AnimatePresence>
