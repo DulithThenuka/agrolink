@@ -44,7 +44,7 @@ const MOCK_CROPS = [
     quantity: 120,
     farmerName: 'Sunil Perera (Green Valley)',
     farmerId: 2,
-    imageUrl: 'https://images.unsplash.com/photo-1509358271058-acd05cc93280?w=800&auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&auto=format&fit=crop&q=80',
     description: 'Authentic Alba-grade Ceylon quills. Hand-peeled in Southern Sri Lanka with certified low coumarin.',
     batchCode: 'BATCH-2026-GAL-0519'
   },
@@ -317,19 +317,19 @@ export const CropsList = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-70" />
 
-                <div className="absolute top-3 left-3 flex flex-col gap-1 items-start z-10">
+                <div className="absolute top-3 left-3 right-16 flex flex-col gap-1 items-start z-10">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName });
                     }}
-                    className="badge-premium badge-delivered shadow-md text-[10px] hover:scale-105 transition font-bold"
+                    className="px-2.5 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold border border-white/20 shadow-lg truncate max-w-[130px] hover:bg-slate-900 transition"
                   >
-                    🧑‍🌾 {crop.farmerName || 'Nimal Perera'} ✓
+                    🧑‍🌾 {crop.farmerName || 'Sunil Perera'} ✓
                   </button>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-950/80 backdrop-blur-md text-emerald-200 text-[9px] font-bold border border-emerald-400/30">
-                    🌱 Organic: Yes
+                    🌱 Organic
                   </span>
                 </div>
 
@@ -387,7 +387,7 @@ export const CropsList = () => {
                 </div>
 
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                  {isBuyer && (
+                  {!isFarmer && (
                     <div className="grid grid-cols-2 gap-2 w-full">
                       <button
                         onClick={() => setSelectedBuyCrop(crop)}
@@ -396,22 +396,13 @@ export const CropsList = () => {
                       >
                         <ShoppingBag className="w-3.5 h-3.5" /> Buy Now
                       </button>
-                      <button
-                        onClick={() => alert('Offer submitted to farmer for negotiation!')}
-                        className="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center"
+                      <Link
+                        to={`/crops/${crop.id}`}
+                        className="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition text-center flex items-center justify-center"
                       >
-                        Make Offer
-                      </button>
+                        Details
+                      </Link>
                     </div>
-                  )}
-
-                  {!isBuyer && !isFarmer && (
-                    <Link
-                      to={`/crops/${crop.id}`}
-                      className="w-full text-center py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition"
-                    >
-                      View Crop Details
-                    </Link>
                   )}
 
                   {isFarmer && (
