@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2, QrCode } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
+import { BuyCropModal } from '../components/BuyCropModal';
 
 const MOCK_CROPS = [
   {
@@ -95,6 +96,7 @@ export const CropsList = () => {
   const [loading, setLoading] = useState(true);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [selectedTraceCrop, setSelectedTraceCrop] = useState(null);
+  const [selectedBuyCrop, setSelectedBuyCrop] = useState(null);
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
@@ -388,7 +390,7 @@ export const CropsList = () => {
                   {isBuyer && (
                     <div className="grid grid-cols-2 gap-2 w-full">
                       <button
-                        onClick={() => handleBuy(crop.id)}
+                        onClick={() => setSelectedBuyCrop(crop)}
                         disabled={crop.quantity <= 0}
                         className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition disabled:opacity-50 flex items-center justify-center gap-1"
                       >
@@ -465,6 +467,14 @@ export const CropsList = () => {
           cropId={selectedTraceCrop.id}
           batchCode={selectedTraceCrop.batchCode}
           onClose={() => setSelectedTraceCrop(null)}
+        />
+      )}
+
+      {selectedBuyCrop && (
+        <BuyCropModal
+          crop={selectedBuyCrop}
+          onClose={() => setSelectedBuyCrop(null)}
+          onOrderPlaced={fetchCrops}
         />
       )}
     </div>

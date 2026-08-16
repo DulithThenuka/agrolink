@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, MapPin, Tag, ShoppingBag, Loader2, UserCheck, QrCode, Star, MessageSquare, Send } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
+import { BuyCropModal } from '../components/BuyCropModal';
 
 export const CropDetails = () => {
   const { id } = useParams();
@@ -16,6 +17,7 @@ export const CropDetails = () => {
   const [submitting, setSubmitting] = useState(false);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [showTraceModal, setShowTraceModal] = useState(false);
+  const [showBuyModal, setShowBuyModal] = useState(false);
 
   // Review state
   const [reviews, setReviews] = useState([]);
@@ -289,29 +291,14 @@ export const CropDetails = () => {
 
           <div className="pt-6 border-t border-slate-100 space-y-4">
             {isBuyer && (
-              <form onSubmit={handleOrder} className="flex gap-3 items-center">
-                <div className="w-24">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Qty</label>
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                    min="1"
-                    max={crop.quantity}
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-center font-bold focus:outline-none focus:border-emerald-500 text-sm"
-                  />
-                </div>
-
-                <div className="flex-1 pt-4">
-                  <button
-                    type="submit"
-                    disabled={crop.quantity <= 0 || submitting}
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-200 transition disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShoppingBag className="w-4 h-4" /> Place Order</>}
-                  </button>
-                </div>
-              </form>
+              <button
+                type="button"
+                onClick={() => setShowBuyModal(true)}
+                disabled={crop.quantity <= 0}
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <ShoppingBag className="w-4 h-4" /> Calculate &amp; Place Bulk Order
+              </button>
             )}
 
             {!isAuthenticated && (
@@ -421,6 +408,13 @@ export const CropDetails = () => {
           cropId={crop.id}
           batchCode={crop.batchCode}
           onClose={() => setShowTraceModal(false)}
+        />
+      )}
+
+      {showBuyModal && (
+        <BuyCropModal
+          crop={crop}
+          onClose={() => setShowBuyModal(false)}
         />
       )}
     </div>
