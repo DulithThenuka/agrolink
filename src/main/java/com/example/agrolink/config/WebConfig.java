@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
     private static final Logger logger = LoggerFactory.getLogger(WebConfig.class);
     private static final String RESOURCE_HANDLER = "/uploads/**";
 
-    @Value("${file.upload-dir:uploads}")
+    @Value("${file.upload-dir:${upload.path:uploads}}")
     private String uploadDir;
 
     private Path uploadPath;
@@ -34,6 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         try {
             Files.createDirectories(uploadPath);
+            Files.createDirectories(uploadPath.resolve("crops"));
             logger.info("Upload directory initialized at: {}", uploadPath);
         } catch (Exception ex) {
             logger.error("Failed to initialize upload directory: {}", uploadPath, ex);
@@ -58,7 +59,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     private String buildResourceLocation() {
-        // ✅ FIX: add file: prefix
-        return "file:" + uploadPath.toString() + "/";
+        String formattedPath = uploadPath.toString().replace('\\', '/');
+        if (!formattedPath.endsWith("/")) {
+            formattedPath += "/";
+        }
+        return "file:///" + formattedPath;
     }
 }

@@ -106,11 +106,78 @@
                         <span>📑 Contracts</span>
                     </a>
 
+                    <!-- EXPERTS -->
+                    <a th:href="@{/experts}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/experts')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>👨‍🔬 Expert Advisory</span>
+                    </a>
 
+                    <!-- SUPPLIES -->
+                    <a th:href="@{/supplier-marketplace}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/supplier-marketplace')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>🧰 Supplies</span>
+                    </a>
 
+                    <!-- RENTALS -->
+                    <a th:href="@{/equipment-rental}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/equipment-rental')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>🚜 Rentals</span>
+                    </a>
 
+                    <!-- COMMUNITY -->
+                    <a th:href="@{/community}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/community')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>👥 Community</span>
+                    </a>
 
+                    <!-- AI BOT -->
+                    <a th:href="@{/ai-assistant}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/ai-assistant')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>🤖 AI Bot</span>
+                    </a>
 
+                    <!-- GOV INTEL -->
+                    <a th:href="@{/gov-intelligence}"
+                       class="px-3 py-1.5 rounded-xl transition-all duration-200 flex items-center gap-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/gov-intelligence')}
+                           ? ' bg-emerald-600 text-white font-bold'
+                           : ''">
+                        <span>🏛️ Gov Intel 🇱🇰</span>
+                    </a>
+
+                    <!-- WASTE RESCUE -->
+                    <a th:href="@{/waste-reduction}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/waste-reduction')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>♻️ Waste Rescue</span>
+                    </a>
+
+                    <!-- SMART LOGISTICS -->
+                    <a sec:authorize="hasAnyRole('LOGISTICS', 'ADMIN')"
+                       th:href="@{/logistics}"
+                       class="px-4 py-2 rounded-xl transition-all duration-200 flex items-center gap-1.5 hover:text-emerald-600 hover:bg-emerald-50/60"
+                       th:classappend="${currentUri != null && currentUri.startsWith('/logistics')}
+                           ? ' text-emerald-700 bg-emerald-50 font-bold border border-emerald-200/50'
+                           : ''">
+                        <span>🚚 Smart Logistics</span>
+                    </a>
 
                     <!-- DASHBOARD -->
                     <a sec:authorize="isAuthenticated()"
