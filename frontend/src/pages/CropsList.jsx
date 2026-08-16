@@ -102,6 +102,7 @@ export const CropsList = () => {
   const [location, setLocation] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [sortBy, setSortBy] = useState('DEFAULT');
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -122,6 +123,18 @@ export const CropsList = () => {
     if (maxPrice) {
       result = result.filter(c => c.price <= Number(maxPrice));
     }
+
+    // Apply Sorting Controls
+    if (sortBy === 'PRICE_LOW') {
+      result.sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortBy === 'PRICE_HIGH') {
+      result.sort((a, b) => Number(b.price) - Number(a.price));
+    } else if (sortBy === 'QTY_HIGH') {
+      result.sort((a, b) => Number(b.quantity) - Number(a.quantity));
+    } else if (sortBy === 'NEWEST') {
+      result.sort((a, b) => Number(b.id) - Number(a.id));
+    }
+
     return result;
   };
 
@@ -158,7 +171,7 @@ export const CropsList = () => {
 
   useEffect(() => {
     fetchCrops();
-  }, [page]);
+  }, [page, sortBy]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -213,26 +226,47 @@ export const CropsList = () => {
         </form>
       </div>
 
-      {/* QUICK CATEGORY PILLS */}
-      <div className="flex flex-wrap gap-2.5 items-center">
-        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mr-1">Category Pill Filters:</span>
-        {['', 'Vegetables', 'Grains', 'Fruits', 'Spices'].map((cat) => (
-          <button
-            key={cat}
-            onClick={() => {
-              setCategory(cat);
+      {/* QUICK CATEGORY PILLS & SORT CONTROLS */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2.5 items-center">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mr-1">Category Pill Filters:</span>
+          {['', 'Vegetables', 'Grains', 'Fruits', 'Spices'].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => {
+                setCategory(cat);
+                setPage(0);
+                fetchCrops();
+              }}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition border ${
+                category === cat
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
+                  : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'
+              }`}
+            >
+              {cat === '' ? 'All Produce' : cat}
+            </button>
+          ))}
+        </div>
+
+        {/* SORT BY CONTROLS */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">Sort By:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => {
+              setSortBy(e.target.value);
               setPage(0);
-              fetchCrops();
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition border ${
-              category === cat
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
-                : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'
-            }`}
+            className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer"
           >
-            {cat === '' ? 'All Produce' : cat}
-          </button>
-        ))}
+            <option value="DEFAULT">⭐ Featured Produce</option>
+            <option value="PRICE_LOW">💲 Price: Low to High</option>
+            <option value="PRICE_HIGH">💲 Price: High to Low</option>
+            <option value="QTY_HIGH">🌾 Stock: High to Low</option>
+            <option value="NEWEST">🕒 Harvest: Newest First</option>
+          </select>
+        </div>
       </div>
 
 
