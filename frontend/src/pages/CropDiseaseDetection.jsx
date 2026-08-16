@@ -1,36 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, ShieldAlert, CheckCircle2, Phone, AlertCircle, Sparkles, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { diseaseDetectionAPI } from '../services/api';
 
 export const CropDiseaseDetection = () => {
   const [selectedCrop, setSelectedCrop] = useState('Tomato');
+  const [imageUrl, setImageUrl] = useState('');
   const [scanning, setScanning] = useState(false);
+  const [resultData, setResultData] = useState(null);
+
+  const fetchScan = async (crop, img) => {
+    setScanning(true);
+    try {
+      const res = await diseaseDetectionAPI.scan({ sampleCrop: crop, imageUrl: img || 'leaf_sample.jpg' });
+      if (res && res.data) {
+        setResultData(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to run crop disease scan:', err);
+    } finally {
+      setScanning(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchScan(selectedCrop, imageUrl);
+  }, [selectedCrop]);
+
+  const handleScan = () => {
+    fetchScan(selectedCrop, imageUrl);
+  };
 
   const result = {
-    detectedDisease: selectedCrop === 'Rice' ? 'Rice Leaf Blast' : selectedCrop === 'Potato' ? 'Potato Late Blight' : 'Tomato Early Blight',
-    scientificName: selectedCrop === 'Rice' ? 'Magnaporthe oryzae' : selectedCrop === 'Potato' ? 'Phytophthora infestans' : 'Alternaria solani',
-    confidencePercentage: selectedCrop === 'Rice' ? 92.8 : selectedCrop === 'Potato' ? 96.1 : 94.3,
-    severityLevel: selectedCrop === 'Tomato' ? 'Moderate' : 'High',
-    recommendedActions: [
+    detectedDisease: resultData?.detectedDisease || (selectedCrop === 'Rice' ? 'Rice Leaf Blast' : selectedCrop === 'Potato' ? 'Potato Late Blight' : 'Tomato Early Blight'),
+    scientificName: resultData?.scientificName || (selectedCrop === 'Rice' ? 'Magnaporthe oryzae' : selectedCrop === 'Potato' ? 'Phytophthora infestans' : 'Alternaria solani'),
+    confidencePercentage: resultData?.confidencePercentage || (selectedCrop === 'Rice' ? 92.8 : selectedCrop === 'Potato' ? 96.1 : 94.3),
+    severityLevel: resultData?.severityLevel || (selectedCrop === 'Tomato' ? 'Moderate' : 'High'),
+    recommendedActions: resultData?.recommendedActions || [
       'Remove severely infected leaves from plant canopy immediately',
       'Avoid overhead sprinkler watering; transition to drip irrigation',
       'Improve field row ventilation and sunlight exposure',
       'Apply organic copper fungicide or consult an agricultural extension officer',
     ],
-    nearbyExpert: {
+    nearbyExpert: resultData?.nearbyExpert || {
       name: 'Dr. K. L. Perera',
       title: 'Senior Agricultural Extension Specialist',
       phone: '+94 77 123 4567',
       officeLocation: 'Regional Agricultural Office, Anuradhapura',
     },
-  };
-
-  const handleScan = () => {
-    setScanning(true);
-    setTimeout(() => {
-      setScanning(false);
-    }, 700);
   };
 
   return (

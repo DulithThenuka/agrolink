@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/demand-forecasting")
+@RequestMapping("/api/v1/demand-forecasting")
 public class RestDemandForecastController {
 
     private final DemandForecastService demandForecastService;

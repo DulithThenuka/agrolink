@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/negotiation")
+@RequestMapping("/api/v1/negotiation")
 public class RestNegotiationController {
 
     private final NegotiationService negotiationService;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/price-prediction")
+@RequestMapping("/api/v1/price-prediction")
 public class RestPricePredictionController {
 
     private final PricePredictionService pricePredictionService;

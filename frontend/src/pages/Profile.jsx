@@ -1,14 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Shield, MapPin, Mail, ArrowLeft, Award, Lock, CheckCircle2 } from 'lucide-react';
+import { farmersAPI, buyersAPI } from '../services/api';
 
 export const Profile = () => {
-  const { user } = useAuth();
+  const { user, isFarmer, isBuyer } = useAuth();
+  const [profileData, setProfileData] = useState(null);
   const [passwordModal, setPasswordModal] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      try {
+        if (isFarmer) {
+          const res = await farmersAPI.getProfile(user.id || 1);
+          if (res && res.data) setProfileData(res.data);
+        } else if (isBuyer) {
+          const res = await buyersAPI.getProfile(user.id || 1);
+          if (res && res.data) setProfileData(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch detailed profile:', err);
+      }
+    };
+    fetchProfile();
+  }, [user, isFarmer, isBuyer]);
 
   const handlePasswordChange = (e) => {
     e.preventDefault();

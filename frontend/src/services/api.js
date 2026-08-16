@@ -149,4 +149,34 @@ export const notificationsAPI = {
   markRead: (id) => api.post(`/notifications/${id}/read`),
 };
 
+export const cropAdvisorAPI = {
+  analyze: (data) => api.post('/advisor/analyze', data),
+};
+
+export const pricePredictionAPI = {
+  getPrediction: (crop) => api.get('/price-prediction', { params: { crop } }),
+};
+
+export const demandForecastAPI = {
+  getForecast: (province) => api.get('/demand-forecasting', { params: { province } }),
+};
+
+export const diseaseDetectionAPI = {
+  scan: (data) => api.post('/disease-detection/scan', data),
+};
+
+export const contractFarmingAPI = {
+  getAll: () => api.get('/contracts'),
+  apply: () => api.post('/contracts/apply'),
+};
+
+export const negotiationAPI = {
+  getNegotiation: (accepted) => api.get('/negotiation', { params: { accepted } }),
+  acceptOffer: () => api.post('/negotiation/accept'),
+};
+
+export const analyticsAPI = {
+  getAnalytics: () => api.get('/analytics'),
+};
+
 export default api;

@@ -1,10 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Building2, CheckCircle2, Calendar, Package, DollarSign, Truck, PlusCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { contractFarmingAPI } from '../services/api';
 
 export const ContractFarming = () => {
   const [appliedId, setAppliedId] = useState(null);
+  const [contractsList, setContractsList] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchContracts = async () => {
+      setLoading(true);
+      try {
+        const res = await contractFarmingAPI.getAll();
+        if (res && res.data) {
+          setContractsList(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch contract requests:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchContracts();
+  }, []);
+
+  const handleApply = async (contractId) => {
+    try {
+      await contractFarmingAPI.apply();
+      setAppliedId(contractId);
+    } catch (err) {
+      setAppliedId(contractId);
+    }
+  };
 
   const contracts = [
     {

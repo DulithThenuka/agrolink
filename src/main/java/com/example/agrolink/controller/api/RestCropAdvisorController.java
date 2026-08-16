@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/advisor")
+@RequestMapping("/api/v1/advisor")
 public class RestCropAdvisorController {
 
     private final CropAdvisorService cropAdvisorService;

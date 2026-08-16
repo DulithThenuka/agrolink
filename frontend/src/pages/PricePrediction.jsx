@@ -1,19 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, DollarSign, Calendar, AlertCircle, ArrowUpRight, CheckCircle2, CloudRain, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { pricePredictionAPI } from '../services/api';
 
 export const PricePrediction = () => {
   const [selectedCrop, setSelectedCrop] = useState('Tomato');
+  const [predictionData, setPredictionData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPrediction = async () => {
+      setLoading(true);
+      try {
+        const res = await pricePredictionAPI.getPrediction(selectedCrop);
+        if (res && res.data) {
+          setPredictionData(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch price prediction:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPrediction();
+  }, [selectedCrop]);
 
   const prediction = {
-    cropName: selectedCrop,
-    todaysMarketPriceLkr: 210.00,
-    predictedFairPriceLkr: 225.00,
-    sevenDayChangePercentage: 8.0,
-    recommendation: 'WAIT 3–4 DAYS BEFORE SELLING',
-    bestActionWindow: 'Optimal Sell Window: Day 4 – Day 5',
-    factorBreakdown: [
+    cropName: predictionData?.cropName || selectedCrop,
+    todaysMarketPriceLkr: predictionData?.todaysMarketPriceLkr || 210.00,
+    predictedFairPriceLkr: predictionData?.predictedFairPriceLkr || 225.00,
+    sevenDayChangePercentage: predictionData?.sevenDayChangePercentage || 8.0,
+    recommendation: predictionData?.recommendation || 'WAIT 3–4 DAYS BEFORE SELLING',
+    bestActionWindow: predictionData?.bestActionWindow || 'Optimal Sell Window: Day 4 – Day 5',
+    factorBreakdown: predictionData?.factorImpacts?.map(f => ({
+      name: f.factorName,
+      impact: f.impactDescription,
+      positive: f.positive
+    })) || [
       { name: 'Weather Forecast', impact: '+3.2% (Rainfall in Producing Belt)', positive: true },
       { name: 'Festival Demand Surge', impact: '+4.8% (Upcoming Cultural Festival)', positive: true },
       { name: 'Regional Wholesale Supply', impact: '-1.0% (Stable Inventory Inflow)', positive: false },

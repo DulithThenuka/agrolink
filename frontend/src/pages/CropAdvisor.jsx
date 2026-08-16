@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Bot, CheckCircle2, TrendingUp, DollarSign, Calendar, AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { cropAdvisorAPI } from '../services/api';
 
 export const CropAdvisor = () => {
   const [form, setForm] = useState({
@@ -14,26 +15,29 @@ export const CropAdvisor = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState({
-    bestRecommendation: 'Chili',
-    expectedHarvestingPeriod: '90–120 days',
-    estimatedCostLkr: 110000,
-    minEstimatedRevenueLkr: 230000,
-    maxEstimatedRevenueLkr: 290000,
-    riskLevel: 'Medium',
-    recommendedCrops: [
-      { cropName: 'Chili', suitabilityPercentage: 92 },
-      { cropName: 'Onion', suitabilityPercentage: 88 },
-      { cropName: 'Groundnut', suitabilityPercentage: 81 },
-    ],
-  });
+  const [result, setResult] = useState(null);
+
+  const fetchAnalysis = async (formData) => {
+    setLoading(true);
+    try {
+      const res = await cropAdvisorAPI.analyze(formData || form);
+      if (res && res.data) {
+        setResult(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch Crop Advisor analysis:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnalysis(form);
+  }, []);
 
   const handleAnalyze = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 600);
+    fetchAnalysis(form);
   };
 
   return (

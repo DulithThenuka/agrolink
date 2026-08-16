@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/disease-detection")
+@RequestMapping("/api/v1/disease-detection")
 public class RestDiseaseDetectionController {
 
     private final DiseaseDetectionService diseaseDetectionService;

@@ -1,16 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, TrendingUp, ShieldCheck, AlertCircle, ArrowUpRight, ArrowDownRight, MapPin, CheckCircle2, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { demandForecastAPI } from '../services/api';
 
 export const DemandForecasting = () => {
   const [selectedProvince, setSelectedProvince] = useState('Western Province');
+  const [forecastData, setForecastData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchForecast = async () => {
+      setLoading(true);
+      try {
+        const res = await demandForecastAPI.getForecast(selectedProvince);
+        if (res && res.data) {
+          setForecastData(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch demand forecast:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchForecast();
+  }, [selectedProvince]);
 
   const forecast = {
-    provinceName: selectedProvince,
-    overallMarketBalance: 'Balanced Supply Allocation',
-    socialImpactNotice: `Preventing Harvest Crashes: By diversifying away from Beans and towards Chili & Tomatoes, AgroLink protects local farmer incomes while ensuring consumer price stability in ${selectedProvince}.`,
-    cropDemands: [
+    provinceName: forecastData?.provinceName || selectedProvince,
+    overallMarketBalance: forecastData?.overallMarketBalance || 'Balanced Supply Allocation',
+    socialImpactNotice: forecastData?.socialImpactNotice || `Preventing Harvest Crashes in ${selectedProvince}.`,
+    cropDemands: forecastData?.cropDemands?.map(d => ({
+      name: d.cropName,
+      level: d.demandLevel,
+      surge: d.surgePercentage,
+      positive: d.positiveTrend,
+      status: d.recommendationStatus
+    })) || [
       { name: 'Chili', level: 'VERY HIGH', surge: 31, positive: true, status: 'High Priority Planting 🚀' },
       { name: 'Tomato', level: 'HIGH', surge: 24, positive: true, status: 'Favorable Market Market 📈' },
       { name: 'Carrot', level: 'MEDIUM', surge: 7, positive: true, status: 'Balanced Production ⚖️' },

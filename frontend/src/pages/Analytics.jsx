@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, BarChart2, DollarSign, Sprout, ShoppingBag, PieChart, Calculator, CheckCircle2, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { analyticsAPI } from '../services/api';
 
 export const Analytics = () => {
   const [yieldKg, setYieldKg] = useState(500);
   const [suggestedPrice, setSuggestedPrice] = useState(2.50);
+  const [analyticsData, setAnalyticsData] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const res = await analyticsAPI.getAnalytics();
+        if (res && res.data) {
+          setAnalyticsData(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch analytics data:', err);
+      }
+    };
+    fetchAnalytics();
+  }, []);
 
   const totalRevenue = (yieldKg * suggestedPrice).toFixed(2);
   const directProfit = (yieldKg * suggestedPrice * 0.92).toFixed(2);

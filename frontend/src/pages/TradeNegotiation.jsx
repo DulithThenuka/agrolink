@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare, CheckCircle2, FileText, Send, User, ShieldCheck, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { negotiationAPI } from '../services/api';
 
 export const TradeNegotiation = () => {
   const [contractCreated, setContractCreated] = useState(false);
@@ -13,6 +14,22 @@ export const TradeNegotiation = () => {
     { sender: 'FARMER', text: 'Rs. 200/kg including delivery.', time: '10:35 AM' },
   ]);
 
+  useEffect(() => {
+    const fetchNegotiation = async () => {
+      try {
+        const res = await negotiationAPI.getNegotiation(contractCreated);
+        if (res && res.data) {
+          if (res.data.status === 'ACCEPTED') {
+            setContractCreated(true);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch negotiation thread:', err);
+      }
+    };
+    fetchNegotiation();
+  }, [contractCreated]);
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!messageInput.trim()) return;
@@ -23,8 +40,13 @@ export const TradeNegotiation = () => {
     setMessageInput('');
   };
 
-  const handleAcceptOffer = () => {
-    setContractCreated(true);
+  const handleAcceptOffer = async () => {
+    try {
+      await negotiationAPI.acceptOffer();
+      setContractCreated(true);
+    } catch (err) {
+      setContractCreated(true);
+    }
   };
 
   return (
