@@ -89,9 +89,9 @@
                         </button>
                     </form>
 
-                    <button onclick="alert('Offer submission modal opened for price negotiation')" class="btn btn-secondary py-2.5 px-3 text-xs font-bold w-full">
+                    <a th:href="@{/negotiation(cropId=${crop.id})}" class="btn btn-secondary py-2.5 px-3 text-xs font-bold w-full text-center flex items-center justify-center">
                         Make Offer
-                    </button>
+                    </a>
                 </div>
 
                 <!-- GUEST / ANONYMOUS -->

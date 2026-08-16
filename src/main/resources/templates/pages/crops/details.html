@@ -85,15 +85,15 @@
                     <div>
                         <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Unit Price</div>
                         <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-3xl font-extrabold text-emerald-600 font-display" th:text="'$' + ${#numbers.formatDecimal(crop.price, 1, 2)}">$0.00</span>
+                            <span class="text-3xl font-extrabold text-emerald-600 font-display" th:text="'Rs. ' + ${#numbers.formatDecimal(crop.price, 1, 2)}">Rs. 0.00</span>
                             <span class="text-xs text-slate-400 font-bold">/ Kg</span>
                         </div>
                     </div>
 
                     <div sec:authorize="hasRole('BUYER')" class="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-100">
                         <div class="text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider">Estimated Total</div>
-                        <div class="text-2xl font-extrabold text-emerald-700 font-display mt-0.5" x-text="'$' + total">
-                            $0.00
+                        <div class="text-2xl font-extrabold text-emerald-700 font-display mt-0.5" x-text="'Rs. ' + total">
+                            Rs. 0.00
                         </div>
                     </div>
                 </div>

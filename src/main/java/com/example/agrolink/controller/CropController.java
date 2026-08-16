@@ -123,6 +123,21 @@ public class CropController {
         return "pages/crops/list";
     }
 
+    // ================== CROP DETAILS ==================
+
+    @GetMapping({"/details/{id}", "/{id}"})
+    public String cropDetails(@PathVariable Long id, Model model) {
+        logger.info("Fetching details for crop id: {}", id);
+        try {
+            CropDTO crop = cropService.getCropById(id);
+            model.addAttribute("crop", crop);
+            return "pages/crops/details";
+        } catch (IllegalArgumentException ex) {
+            logger.warn("Crop details not found for id: {}", id);
+            return "redirect:/crops";
+        }
+    }
+
     // ================== ADD PAGE ==================
 
     @PreAuthorize("hasRole('FARMER')")

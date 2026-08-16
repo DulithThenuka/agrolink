@@ -63,7 +63,7 @@
                 <!-- PRICE -->
                 <div th:replace="~{
                     components/forms/input ::
-                    input('Price ($)', 'price', 'number', '0.00', *{price}, ${#fields.hasErrors('price')} ? #fields.errors('price')[0] : null)
+                    input('Price (Rs./kg)', 'price', 'number', '0.00', *{price}, ${#fields.hasErrors('price')} ? #fields.errors('price')[0] : null)
                 }">
                 </div>
 
