@@ -34,15 +34,101 @@ export const CropDetails = () => {
     }
   };
 
+  const MOCK_CROPS = [
+    {
+      id: 1,
+      name: 'Organic Nuwara Eliya Tomatoes',
+      category: 'Vegetables',
+      location: 'Nuwara Eliya',
+      price: 210,
+      quantity: 450,
+      farmerName: 'Sunil Perera (Green Valley)',
+      farmerId: 2,
+      imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
+      description: 'Fresh grade-A vine-ripened organic tomatoes grown in high-altitude soil. Zero chemical pesticides.',
+      batchCode: 'BATCH-2026-NWR-0941'
+    },
+    {
+      id: 2,
+      name: 'Jaffna Red Onions (Grade A)',
+      category: 'Vegetables',
+      location: 'Jaffna',
+      price: 340,
+      quantity: 800,
+      farmerName: 'Kamal Fernando (Jaffna Organics)',
+      farmerId: 3,
+      imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=800&auto=format&fit=crop&q=80',
+      description: 'Pungent, sun-cured Jaffna shallots with high oil content. Ideal for long-term commercial storage.',
+      batchCode: 'BATCH-2026-JAF-0822'
+    },
+    {
+      id: 3,
+      name: 'Ceylon Organic Cinnamon Bark',
+      category: 'Spices',
+      location: 'Galle',
+      price: 1450,
+      quantity: 120,
+      farmerName: 'Sunil Perera (Green Valley)',
+      farmerId: 2,
+      imageUrl: 'https://images.unsplash.com/photo-1509358271058-acd05cc93280?w=800&auto=format&fit=crop&q=80',
+      description: 'Authentic Alba-grade Ceylon quills. Hand-peeled in Southern Sri Lanka with certified low coumarin.',
+      batchCode: 'BATCH-2026-GAL-0519'
+    },
+    {
+      id: 4,
+      name: 'Hambantota Sweet Watermelons',
+      category: 'Fruits',
+      location: 'Hambantota',
+      price: 180,
+      quantity: 650,
+      farmerName: 'Kamal Fernando (Jaffna Organics)',
+      farmerId: 3,
+      imageUrl: 'https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?w=800&auto=format&fit=crop&q=80',
+      description: 'Juicy, high-brix sugar-baby watermelons harvested fresh from dry zone farms. Direct dispatch.',
+      batchCode: 'BATCH-2026-HMB-0312'
+    },
+    {
+      id: 5,
+      name: 'Anuradhapura White Samba Rice',
+      category: 'Grains',
+      location: 'Anuradhapura',
+      price: 260,
+      quantity: 1500,
+      farmerName: 'Sunil Perera (Green Valley)',
+      farmerId: 2,
+      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop&q=80',
+      description: 'Aromatic long-grain paddy harvested from Ancient Tank Irrigation zones. Aged 6 months for premium texture.',
+      batchCode: 'BATCH-2026-ANU-1104'
+    },
+    {
+      id: 6,
+      name: 'Kandy Ceylon Green Tea Leaves',
+      category: 'Spices',
+      location: 'Kandy',
+      price: 890,
+      quantity: 350,
+      farmerName: 'Sunil Perera (Green Valley)',
+      farmerId: 2,
+      imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&auto=format&fit=crop&q=80',
+      description: 'Hand-picked two-leaves-and-a-bud fresh tea flush from central hill slopes. Rich in natural antioxidants.',
+      batchCode: 'BATCH-2026-KDY-0731'
+    }
+  ];
+
   useEffect(() => {
     const fetchCrop = async () => {
       try {
         const res = await cropsAPI.getById(id);
         if (res && res.data) {
           setCrop(res.data);
+        } else {
+          const fallback = MOCK_CROPS.find(c => String(c.id) === String(id)) || MOCK_CROPS[0];
+          setCrop(fallback);
         }
       } catch (err) {
-        console.error('Failed to load crop:', err);
+        console.warn('Backend API offline. Loading fallback crop details:', err);
+        const fallback = MOCK_CROPS.find(c => String(c.id) === String(id)) || MOCK_CROPS[0];
+        setCrop(fallback);
       } finally {
         setLoading(false);
       }
