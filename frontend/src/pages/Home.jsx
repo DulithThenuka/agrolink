@@ -35,7 +35,7 @@ export const Home = () => {
             Direct to <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500">Your Doorstep.</span>
           </h1>
 
-          <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
             Bypass traditional middleman markups. AgroLink connects registered growers directly with commercial &amp; retail buyers for transparent, farm-fresh trade.
           </p>
 

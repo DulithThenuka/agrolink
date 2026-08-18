@@ -274,81 +274,128 @@ export const Navbar = () => {
 
       {/* MOBILE MENU DRAWER */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-slate-100 p-4 space-y-3 mt-4 rounded-2xl shadow-xl">
-          {(!isLogistics) && (
-            <Link
-              to="/crops"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
-            >
-              <ShoppingBag className="w-4 h-4 text-emerald-600" /> Crops Catalog
-            </Link>
-          )}
-
-          {(isLogistics || isAdmin) && (
-            <Link
-              to="/logistics"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
-            >
-              <ShoppingBag className="w-4 h-4 text-emerald-600" /> Smart Logistics 🚚
-            </Link>
-          )}
-
-          {(isBuyer || isAdmin) && (
-            <Link
-              to="/orders"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
-            >
-              <ShoppingBag className="w-4 h-4 text-emerald-600" /> My Orders
-            </Link>
-          )}
-
+        <div className="md:hidden bg-white/98 backdrop-blur-xl border-t border-slate-200/80 p-5 space-y-5 mt-4 rounded-3xl shadow-2xl max-h-[80vh] overflow-y-auto animate-fade-in">
+          
           {isAuthenticated && (
             <Link
               to="/dashboard"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-emerald-50 text-emerald-800 font-extrabold text-sm shadow-xs"
             >
-              <LayoutDashboard className="w-4 h-4 text-emerald-600" /> Dashboard
+              <LayoutDashboard className="w-5 h-5 text-emerald-600" />
+              <span>User Dashboard</span>
             </Link>
           )}
 
-          {isAuthenticated && (
-            <Link
-              to="/profile"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold"
-            >
-              <UserIcon className="w-4 h-4 text-emerald-600" /> Profile
-            </Link>
-          )}
+          {/* MARKETPLACE SECTION */}
+          <div className="space-y-1.5">
+            <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-400 font-display px-2">
+              🌾 Marketplace &amp; Trade
+            </h4>
+            <div className="grid grid-cols-1 gap-1 text-xs font-bold text-slate-700">
+              <Link to="/crops" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                🌾 Produce Marketplace
+              </Link>
+              <Link to="/contracts" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                📑 B2B Purchase Contracts
+              </Link>
+              <Link to="/supplier-marketplace" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                🧰 Pre-Production Supplies
+              </Link>
+              <Link to="/equipment-rental" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                🚜 Machinery Rentals
+              </Link>
+              {(isBuyer || isAdmin) && (
+                <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                  🛍️ My Orders
+                </Link>
+              )}
+              {(isLogistics || isAdmin) && (
+                <Link to="/logistics" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                  🚚 Smart Logistics
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* AI SUITE SECTION */}
+          <div className="space-y-1.5">
+            <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-400 font-display px-2">
+              🤖 AI Agronomy Suite
+            </h4>
+            <div className="grid grid-cols-1 gap-1 text-xs font-bold text-slate-700">
+              <Link to="/advisor" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                🤖 AI Agronomist Advisor
+              </Link>
+              <Link to="/disease-detection" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                📷 AI Disease Scanner
+              </Link>
+              <Link to="/price-prediction" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                📈 Price Predictor
+              </Link>
+              <Link to="/demand-forecasting" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                📊 Demand Forecasting
+              </Link>
+              <Link to="/ai-assistant" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                💬 Multilingual AI Bot
+              </Link>
+            </div>
+          </div>
+
+          {/* GOVERNANCE & COMMUNITY */}
+          <div className="space-y-1.5">
+            <h4 className="text-[11px] font-black uppercase tracking-wider text-slate-400 font-display px-2">
+              🏛️ Governance &amp; Community
+            </h4>
+            <div className="grid grid-cols-1 gap-1 text-xs font-bold text-slate-700">
+              <Link to="/gov-intelligence" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl bg-emerald-50 text-emerald-800 font-extrabold flex items-center gap-2">
+                🏛️ Gov Intelligence 🇱🇰
+              </Link>
+              <Link to="/waste-reduction" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                ♻️ Waste Rescue
+              </Link>
+              <Link to="/community" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                👥 Farmer Community
+              </Link>
+              <Link to="/experts" onClick={() => setMobileMenuOpen(false)} className="px-3.5 py-2.5 rounded-xl hover:bg-slate-100 flex items-center gap-2">
+                👨‍🔬 Expert Advisory Hub
+              </Link>
+            </div>
+          </div>
 
           {!isAuthenticated ? (
-            <div className="pt-2 space-y-2 border-t border-slate-100">
+            <div className="pt-3 space-y-2 border-t border-slate-100">
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-center px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold"
+                className="block text-center px-4 py-3 rounded-2xl border border-slate-200 text-slate-700 font-bold text-sm"
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-center px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold"
+                className="block text-center px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-extrabold text-sm shadow-md"
               >
                 Get Started
               </Link>
             </div>
           ) : (
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-bold"
-            >
-              <LogOut className="w-4 h-4" /> Logout
-            </button>
+            <div className="pt-3 space-y-2 border-t border-slate-100">
+              <Link
+                to="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-slate-700 hover:bg-slate-50 font-bold text-xs"
+              >
+                <UserIcon className="w-4 h-4 text-emerald-600" /> Profile Settings
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-bold text-xs"
+              >
+                <LogOut className="w-4 h-4" /> Logout Account
+              </button>
+            </div>
           )}
         </div>
       )}

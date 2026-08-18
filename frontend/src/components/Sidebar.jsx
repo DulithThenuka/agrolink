@@ -1,7 +1,26 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, Sprout, ShoppingBag, PlusCircle, User, Truck, LogOut } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Sprout,
+  ShoppingBag,
+  PlusCircle,
+  User,
+  Truck,
+  LogOut,
+  Bot,
+  BrainCircuit,
+  TrendingUp,
+  BarChart3,
+  Landmark,
+  Recycle,
+  MessageSquare,
+  Users,
+  Wrench,
+  Tractor,
+  FileText
+} from 'lucide-react';
 
 export const Sidebar = () => {
   const { isFarmer, isBuyer, isBusinessBuyer, isLogistics, isExpert, isSupplier, isAdmin, logout } = useAuth();
@@ -15,208 +34,169 @@ export const Sidebar = () => {
 
   const isActive = (path) => location.pathname === path;
 
+  const linkClass = (path, accent = false) => `
+    flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 relative group
+    ${
+      isActive(path)
+        ? accent
+          ? 'bg-emerald-900 text-emerald-200 font-extrabold shadow-sm'
+          : 'bg-emerald-50 text-emerald-700 font-bold shadow-xs'
+        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+    }
+  `;
+
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 min-h-screen p-4 space-y-6">
-      <div className="px-3 text-xs font-bold uppercase tracking-wider text-slate-400 font-display">
-        Navigation
+    <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200/80 sticky top-[73px] h-[calc(100vh-73px)] overflow-y-auto shrink-0 p-4 space-y-6 z-40 select-none scrollbar-thin">
+      
+      {/* CORE NAVIGATION SECTION */}
+      <div className="space-y-1">
+        <div className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-400 font-display">
+          Overview
+        </div>
+        <nav className="space-y-1">
+          <Link to="/dashboard" className={linkClass('/dashboard')}>
+            <LayoutDashboard className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Dashboard</span>
+          </Link>
+          <Link to="/analytics" className={linkClass('/analytics')}>
+            <BarChart3 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Analytics & Intelligence</span>
+          </Link>
+        </nav>
       </div>
 
-      <nav className="space-y-1.5 font-semibold text-sm">
-        {/* Dashboard available for all logged-in users */}
-        <Link
-          to="/dashboard"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/dashboard')
-              ? 'bg-emerald-50 text-emerald-700 font-bold'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <LayoutDashboard className="w-5 h-5 text-emerald-600" />
-          <span>Dashboard</span>
-        </Link>
-
-        {/* Crops catalog for Buyer, Business Buyer, Farmer, Admin */}
-        {(isBuyer || isBusinessBuyer || isFarmer || isAdmin) && (
-          <Link
-            to="/crops"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              isActive('/crops')
-                ? 'bg-emerald-50 text-emerald-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Sprout className="w-5 h-5 text-emerald-600" />
-            <span>Browse Crops</span>
+      {/* MARKETPLACE & TRADE SECTION */}
+      <div className="space-y-1">
+        <div className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-400 font-display">
+          Trade & Marketplace
+        </div>
+        <nav className="space-y-1">
+          <Link to="/crops" className={linkClass('/crops')}>
+            <Sprout className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Produce Marketplace</span>
           </Link>
-        )}
 
-        {/* My Orders for Buyer, Business Buyer, and Admin */}
-        {(isBuyer || isBusinessBuyer || isAdmin) && (
-          <Link
-            to="/orders"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              isActive('/orders')
-                ? 'bg-emerald-50 text-emerald-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <ShoppingBag className="w-5 h-5 text-emerald-600" />
-            <span>My Orders</span>
+          {(isFarmer || isAdmin) && (
+            <Link to="/crops/add" className={linkClass('/crops/add')}>
+              <PlusCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Post New Harvest</span>
+            </Link>
+          )}
+
+          {(isBuyer || isBusinessBuyer || isAdmin) && (
+            <Link to="/orders" className={linkClass('/orders')}>
+              <ShoppingBag className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>My Orders</span>
+            </Link>
+          )}
+
+          <Link to="/contracts" className={linkClass('/contracts')}>
+            <FileText className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>B2B Purchase Contracts</span>
           </Link>
-        )}
 
-        {/* Add Crop Listing for Farmer and Admin */}
-        {(isFarmer || isAdmin) && (
-          <Link
-            to="/crops/add"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              isActive('/crops/add')
-                ? 'bg-emerald-50 text-emerald-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <PlusCircle className="w-5 h-5 text-emerald-600" />
-            <span>Add Crop Listing</span>
+          {(isFarmer || isSupplier || isAdmin) && (
+            <>
+              <Link to="/supplier-marketplace" className={linkClass('/supplier-marketplace')}>
+                <Wrench className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Supplier Marketplace</span>
+              </Link>
+              <Link to="/equipment-rental" className={linkClass('/equipment-rental')}>
+                <Tractor className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Machinery Rentals</span>
+              </Link>
+            </>
+          )}
+
+          {(isLogistics || isAdmin) && (
+            <Link to="/logistics" className={linkClass('/logistics')}>
+              <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Smart Logistics</span>
+            </Link>
+          )}
+        </nav>
+      </div>
+
+      {/* AI & SMART INTELLIGENCE SECTION */}
+      <div className="space-y-1">
+        <div className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-400 font-display">
+          AI Agronomy Suite
+        </div>
+        <nav className="space-y-1">
+          <Link to="/advisor" className={linkClass('/advisor')}>
+            <BrainCircuit className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>AI Crop Agronomist</span>
           </Link>
-        )}
-
-        {/* Smart Logistics for Driver/Logistics Provider and Admin */}
-        {(isLogistics || isAdmin) && (
-          <Link
-            to="/logistics"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              isActive('/logistics')
-                ? 'bg-emerald-50 text-emerald-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Truck className="w-5 h-5 text-emerald-600" />
-            <span>Smart Logistics 🚚</span>
+          <Link to="/disease-detection" className={linkClass('/disease-detection')}>
+            <span className="text-sm shrink-0">📷</span>
+            <span>AI Disease Scanner</span>
           </Link>
-        )}
-
-        {/* Expert Advisory for Farmer, Expert, Admin */}
-        {(isFarmer || isExpert || isAdmin) && (
-          <Link
-            to="/experts"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              isActive('/experts')
-                ? 'bg-emerald-50 text-emerald-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <span className="text-lg">👨‍🔬</span>
-            <span>Expert Advisory 👨‍🔬</span>
+          <Link to="/price-prediction" className={linkClass('/price-prediction')}>
+            <TrendingUp className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Price Predictor</span>
           </Link>
-        )}
-
-        {/* Supplier Marketplace for Farmer, Supplier, Admin */}
-        {(isFarmer || isSupplier || isAdmin) && (
-          <Link
-            to="/supplier-marketplace"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              isActive('/supplier-marketplace')
-                ? 'bg-emerald-50 text-emerald-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <span className="text-lg">🧰</span>
-            <span>Supplier Marketplace 🧰</span>
+          <Link to="/demand-forecasting" className={linkClass('/demand-forecasting')}>
+            <span className="text-sm shrink-0">📊</span>
+            <span>Demand Forecasting</span>
           </Link>
-        )}
-
-        {/* Equipment Rental for Farmer, Supplier, Admin */}
-        {(isFarmer || isSupplier || isAdmin) && (
-          <Link
-            to="/equipment-rental"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-              isActive('/equipment-rental')
-                ? 'bg-emerald-50 text-emerald-700 font-bold'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <span className="text-lg">🚜</span>
-            <span>Equipment Rental 🚜</span>
+          <Link to="/ai-assistant" className={linkClass('/ai-assistant')}>
+            <Bot className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Multilingual AI Bot</span>
           </Link>
-        )}
+        </nav>
+      </div>
 
-        {/* Community Forum for all users */}
-        <Link
-          to="/community"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/community')
-              ? 'bg-emerald-50 text-emerald-700 font-bold'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <span className="text-lg">👥</span>
-          <span>Community Forum 👥</span>
-        </Link>
+      {/* GOVERNANCE & COMMUNITY SECTION */}
+      <div className="space-y-1">
+        <div className="px-3 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-400 font-display">
+          Ecosystem &amp; Support
+        </div>
+        <nav className="space-y-1">
+          <Link to="/gov-intelligence" className={linkClass('/gov-intelligence', true)}>
+            <Landmark className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Gov Intelligence 🇱🇰</span>
+          </Link>
+          <Link to="/waste-reduction" className={linkClass('/waste-reduction')}>
+            <Recycle className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Waste Reduction &amp; Rescue</span>
+          </Link>
+          <Link to="/negotiation" className={linkClass('/negotiation')}>
+            <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Trade Negotiations</span>
+          </Link>
+          {(isFarmer || isExpert || isAdmin) && (
+            <Link to="/experts" className={linkClass('/experts')}>
+              <span className="text-sm shrink-0">👨‍🔬</span>
+              <span>Expert Advisory Hub</span>
+            </Link>
+          )}
+          <Link to="/community" className={linkClass('/community')}>
+            <Users className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Community Forum</span>
+          </Link>
+        </nav>
+      </div>
 
-        {/* Tri-Lingual AI Assistant for all users */}
-        <Link
-          to="/ai-assistant"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/ai-assistant')
-              ? 'bg-emerald-50 text-emerald-700 font-bold'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <span className="text-lg">🤖</span>
-          <span>AI Assistant 🤖💬</span>
-        </Link>
-
-        {/* Government Policy Intelligence for Policymakers & Admin */}
-        <Link
-          to="/gov-intelligence"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/gov-intelligence')
-              ? 'bg-emerald-900 text-emerald-300 font-bold shadow-sm'
-              : 'text-emerald-700 bg-emerald-50/70 hover:bg-emerald-100/70 font-semibold'
-          }`}
-        >
-          <span className="text-lg">🏛️</span>
-          <span>Gov Intelligence 🇱🇰</span>
-        </Link>
-
-        {/* Waste Reduction Module */}
-        <Link
-          to="/waste-reduction"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/waste-reduction')
-              ? 'bg-emerald-50 text-emerald-700 font-bold'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <span className="text-lg">♻️</span>
-          <span>Waste Reduction ♻️</span>
-        </Link>
-
-        {/* Profile settings for all users */}
-        <Link
-          to="/profile"
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition ${
-            isActive('/profile')
-              ? 'bg-emerald-50 text-emerald-700 font-bold'
-              : 'text-slate-600 hover:bg-slate-50'
-          }`}
-        >
-          <User className="w-5 h-5 text-emerald-600" />
+      {/* ACCOUNT SECTION */}
+      <div className="pt-4 border-t border-slate-100 space-y-1 mt-auto">
+        <Link to="/profile" className={linkClass('/profile')}>
+          <User className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>Profile Settings</span>
         </Link>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 font-bold transition mt-4"
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition"
         >
-          <LogOut className="w-5 h-5 text-red-500" />
+          <LogOut className="w-4 h-4 text-red-500 shrink-0" />
           <span>Logout</span>
         </button>
-      </nav>
+      </div>
 
-      <div className="mt-auto px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100 text-[10px] uppercase font-bold text-slate-400 text-center tracking-widest">
+      <div className="px-3 py-2 bg-slate-50 rounded-xl border border-slate-100 text-[10px] uppercase font-bold text-slate-400 text-center tracking-wider">
         AgroLink v1.0 • React
       </div>
     </aside>
   );
 };
+
