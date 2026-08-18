@@ -179,6 +179,25 @@ export const Sidebar = () => {
 
       {/* ACCOUNT SECTION */}
       <div className="pt-4 border-t border-slate-100 space-y-1 mt-auto">
+        <div className="px-3 py-2 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100/80 flex items-center justify-between mb-2">
+          <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">Role</span>
+          <span className="text-[11px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md shadow-2xs border border-emerald-100">
+            {isAdmin
+              ? 'Admin 👑'
+              : isFarmer
+              ? 'Farmer 🌱'
+              : isLogistics
+              ? 'Logistics 🚚'
+              : isBuyer
+              ? 'Buyer 🛒'
+              : isSupplier
+              ? 'Supplier 🧰'
+              : isExpert
+              ? 'Expert 👨‍🔬'
+              : 'Member 👤'}
+          </span>
+        </div>
+
         <Link to="/profile" className={linkClass('/profile')}>
           <User className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>Profile Settings</span>
@@ -193,7 +212,7 @@ export const Sidebar = () => {
         </button>
       </div>
 
-      <div className="px-3 py-2 bg-slate-50 rounded-xl border border-slate-100 text-[10px] uppercase font-bold text-slate-400 text-center tracking-wider">
+      <div className="px-3 py-2 bg-slate-50 rounded-xl border border-slate-100 text-[10px] uppercase font-bold text-slate-400 text-center tracking-wider font-display">
         AgroLink v1.0 • React
       </div>
     </aside>

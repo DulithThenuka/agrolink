@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2, QrCode, PlusCircle } from 'lucide-react';
+import { Search, Filter, Loader2, ShoppingBag, MapPin, Tag, Trash2, QrCode, PlusCircle, LayoutGrid, List } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
 import { BuyCropModal } from '../components/BuyCropModal';
@@ -105,6 +105,7 @@ export const CropsList = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [sortBy, setSortBy] = useState('DEFAULT');
+  const [viewMode, setViewMode] = useState('grid');
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -261,23 +262,46 @@ export const CropsList = () => {
           ))}
         </div>
 
-        {/* SORT BY CONTROLS */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">Sort By:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => {
-              setSortBy(e.target.value);
-              setPage(0);
-            }}
-            className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer"
-          >
-            <option value="DEFAULT">⭐ Featured Produce</option>
-            <option value="PRICE_LOW">💲 Price: Low to High</option>
-            <option value="PRICE_HIGH">💲 Price: High to Low</option>
-            <option value="QTY_HIGH">🌾 Stock: High to Low</option>
-            <option value="NEWEST">🕒 Harvest: Newest First</option>
-          </select>
+        {/* SORT & VIEW MODE CONTROLS */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => {
+                setSortBy(e.target.value);
+                setPage(0);
+              }}
+              className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer"
+            >
+              <option value="DEFAULT">⭐ Featured</option>
+              <option value="PRICE_LOW">💲 Price: Low to High</option>
+              <option value="PRICE_HIGH">💲 Price: High to Low</option>
+              <option value="QTY_HIGH">🌾 Stock: High to Low</option>
+              <option value="NEWEST">🕒 Newest First</option>
+            </select>
+          </div>
+
+          <div className="flex items-center p-1 bg-white border border-slate-200 rounded-xl shadow-xs">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                viewMode === 'grid' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              }`}
+              title="Grid View"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('table')}
+              className={`p-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
+                viewMode === 'table' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              }`}
+              title="Table View"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -369,7 +393,7 @@ export const CropsList = () => {
         </form>
       </div>
 
-      {/* CROP GRID */}
+      {/* CROP CATALOG DISPLAY (GRID vs TABLE VIEW) */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-3">
           <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
@@ -380,6 +404,83 @@ export const CropsList = () => {
           <div className="text-4xl">🌾</div>
           <h3 className="text-lg font-bold text-slate-800 font-display">No Crops Found</h3>
           <p className="text-slate-500 text-sm">Try adjusting your search query or filter parameters.</p>
+        </div>
+      ) : viewMode === 'table' ? (
+        <div className="premium-card overflow-hidden bg-white border border-slate-100 shadow-md">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs font-semibold text-slate-700">
+              <thead className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                <tr>
+                  <th className="px-6 py-4">Produce Harvest</th>
+                  <th className="px-4 py-4">Category</th>
+                  <th className="px-4 py-4">District</th>
+                  <th className="px-4 py-4">Farmer Grower</th>
+                  <th className="px-4 py-4">Direct Price</th>
+                  <th className="px-4 py-4">Stock Left</th>
+                  <th className="px-4 py-4">Traceability</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {crops.map((crop) => (
+                  <tr key={crop.id} className="hover:bg-slate-50/80 transition">
+                    <td className="px-6 py-4 font-bold text-slate-900 flex items-center gap-3">
+                      <img
+                        src={crop.imageUrl || 'https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&w=150&q=80'}
+                        alt={crop.name}
+                        className="w-10 h-10 rounded-xl object-cover border border-slate-200"
+                      />
+                      <div>
+                        <Link to={`/crops/${crop.id}`} className="hover:text-emerald-600 font-bold transition block text-sm">
+                          {crop.name}
+                        </Link>
+                        <span className="text-[10px] text-emerald-600 font-bold">🌱 Organic Grade A</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 font-medium text-slate-600">{crop.category || 'Vegetables'}</td>
+                    <td className="px-4 py-4 font-medium text-slate-600">📍 {crop.location || 'Nuwara Eliya'}</td>
+                    <td className="px-4 py-4">
+                      <button
+                        onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
+                        className="text-emerald-700 font-bold hover:underline"
+                      >
+                        🧑‍🌾 {crop.farmerName || 'Sunil Perera'}
+                      </button>
+                    </td>
+                    <td className="px-4 py-4 font-black text-emerald-600 text-sm">Rs. {crop.price}/kg</td>
+                    <td className="px-4 py-4 font-bold text-slate-700">{crop.quantity} kg</td>
+                    <td className="px-4 py-4">
+                      <button
+                        onClick={() => setSelectedTraceCrop(crop)}
+                        className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1 transition"
+                      >
+                        <QrCode className="w-3 h-3 text-emerald-600" /> Verify Batch
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {!isFarmer && (
+                          <button
+                            onClick={() => setSelectedBuyCrop(crop)}
+                            disabled={crop.quantity <= 0}
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
+                          >
+                            Buy
+                          </button>
+                        )}
+                        <Link
+                          to={`/crops/${crop.id}`}
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition"
+                        >
+                          Details
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
