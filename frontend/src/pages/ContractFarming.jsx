@@ -43,7 +43,9 @@ import {
   Zap,
   Globe,
   Bot,
-  Scan
+  Scan,
+  Shield,
+  CheckCircle
 } from 'lucide-react';
 import { contractFarmingAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -55,6 +57,7 @@ const DEFAULT_CONTRACTS = [
     buyerCategory: 'Supermarket Chain',
     cropName: 'Organic Tomato',
     category: 'Vegetables',
+    icon: '🍅',
     monthlyQuantityKg: 2000,
     durationMonths: 6,
     minPriceLkr: 180,
@@ -77,6 +80,7 @@ const DEFAULT_CONTRACTS = [
     buyerCategory: 'Supermarket Chain',
     cropName: 'Green Chillies',
     category: 'Vegetables',
+    icon: '🌶️',
     monthlyQuantityKg: 1500,
     durationMonths: 12,
     minPriceLkr: 350,
@@ -99,6 +103,7 @@ const DEFAULT_CONTRACTS = [
     buyerCategory: 'Hospitality Group',
     cropName: 'Samba Rice',
     category: 'Grains',
+    icon: '🌾',
     monthlyQuantityKg: 5000,
     durationMonths: 6,
     minPriceLkr: 210,
@@ -121,6 +126,7 @@ const DEFAULT_CONTRACTS = [
     buyerCategory: 'Exporter & Processor',
     cropName: 'Alba Cinnamon Quills',
     category: 'Spices',
+    icon: '🌿',
     monthlyQuantityKg: 350,
     durationMonths: 12,
     minPriceLkr: 1400,
@@ -143,6 +149,7 @@ const DEFAULT_CONTRACTS = [
     buyerCategory: 'Food & Beverage Corp',
     cropName: 'Sugar-Baby Watermelons',
     category: 'Fruits',
+    icon: '🍉',
     monthlyQuantityKg: 3000,
     durationMonths: 3,
     minPriceLkr: 160,
@@ -165,6 +172,7 @@ const DEFAULT_CONTRACTS = [
     buyerCategory: 'Supermarket Chain',
     cropName: 'Highland Carrots',
     category: 'Vegetables',
+    icon: '🥕',
     monthlyQuantityKg: 1200,
     durationMonths: 6,
     minPriceLkr: 240,
@@ -244,7 +252,7 @@ export const ContractFarming = () => {
   const [loading, setLoading] = useState(false);
 
   // Currency Toggle State (LKR vs USD)
-  const [currency, setCurrency] = useState('LKR'); // 'LKR' or 'USD'
+  const [currency, setCurrency] = useState('LKR');
   const LKR_TO_USD = 1 / 300;
 
   // Search & Filter States
@@ -331,7 +339,20 @@ export const ContractFarming = () => {
     if (currency === 'USD') {
       return `$${(priceLkr * LKR_TO_USD).toFixed(2)}`;
     }
-    return `Rs. ${priceLkr}`;
+    return `Rs. ${priceLkr.toLocaleString()}`;
+  };
+
+  const getCategoryBadgeClass = (categoryName) => {
+    switch (categoryName) {
+      case 'Supermarket Chain':
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200/80';
+      case 'Hospitality Group':
+        return 'bg-purple-50 text-purple-800 border-purple-200/80';
+      case 'Exporter & Processor':
+        return 'bg-amber-50 text-amber-800 border-amber-200/80';
+      default:
+        return 'bg-sky-50 text-sky-800 border-sky-200/80';
+    }
   };
 
   const handleApplySubmit = async (e) => {
@@ -550,6 +571,7 @@ export const ContractFarming = () => {
       buyerCategory: createForm.buyerCategory,
       cropName: createForm.cropName,
       category: createForm.category,
+      icon: createForm.category === 'Grains' ? '🌾' : createForm.category === 'Spices' ? '🌶️' : createForm.category === 'Fruits' ? '🍎' : '🥬',
       monthlyQuantityKg: Number(createForm.monthlyQuantityKg) || 1000,
       durationMonths: Number(createForm.durationMonths) || 6,
       minPriceLkr: Number(createForm.minPriceLkr) || 200,
@@ -639,47 +661,50 @@ export const ContractFarming = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
-      {/* HEADER */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 pb-6 border-b border-slate-200/60">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2.5 border border-emerald-200/80 shadow-xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-            <Building2 className="w-4 h-4 text-emerald-600" />
-            <span>Guaranteed B2B Contract Farming Ecosystem</span>
+      {/* HERO HEADER & ACTION TOOLBAR WITH BACKGROUND GRID */}
+      <div className="p-8 rounded-3xl bg-gradient-to-r from-emerald-900 via-slate-900 to-teal-950 text-white shadow-2xl relative overflow-hidden border border-emerald-800/40">
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-extrabold uppercase tracking-wider border border-emerald-500/30">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+              <span>Direct Enterprise Procurement &amp; Escrow Guarantee</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
+              Contract Farming &amp; B2B Purchase Requests 📑
+            </h1>
+            <p className="text-slate-300 text-xs sm:text-sm max-w-3xl leading-relaxed">
+              Supermarkets, luxury hotel chains, and exporters publish long-term future harvest requirements. Farmers apply to lock in guaranteed prices backed 100% by AgroLink Bank Escrow.
+            </p>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 font-display flex items-center gap-2">
-            Contract Farming &amp; B2B Purchase Requests 📑
-          </h1>
-          <p className="text-slate-500 text-sm mt-1 max-w-3xl">
-            Commercial supermarkets, luxury hotel chains, and exporters publish long-term future harvest requirements. Farmers apply to secure guaranteed prices locked in AgroLink Escrow.
-          </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
-          {/* CURRENCY TOGGLE */}
-          <button
-            onClick={() => setCurrency(currency === 'LKR' ? 'USD' : 'LKR')}
-            className="px-3.5 py-2.5 bg-slate-900 text-white font-extrabold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer hover:bg-slate-800"
-            title="Toggle currency mode"
-          >
-            <Globe className="w-4 h-4 text-emerald-400" />
-            <span>Mode: {currency === 'LKR' ? '🇱🇰 LKR (Rs)' : '💵 USD ($)'}</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            {/* CURRENCY TOGGLE */}
+            <button
+              onClick={() => setCurrency(currency === 'LKR' ? 'USD' : 'LKR')}
+              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-extrabold text-xs rounded-xl border border-white/20 transition flex items-center gap-2 cursor-pointer"
+              title="Toggle currency view"
+            >
+              <Globe className="w-4 h-4 text-emerald-400" />
+              <span>{currency === 'LKR' ? '🇱🇰 LKR (Rs)' : '💵 USD ($)'}</span>
+            </button>
 
-          <button
-            onClick={handleExportCsv}
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer border border-slate-200"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" /> Export (CSV)
-          </button>
+            <button
+              onClick={handleExportCsv}
+              className="px-4 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-bold text-xs rounded-xl border border-white/20 transition flex items-center gap-2 cursor-pointer"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-400" /> Export CSV
+            </button>
 
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition cursor-pointer"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>+ Post Purchase Request</span>
-          </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition cursor-pointer"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>+ Post Purchase Request</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -701,63 +726,72 @@ export const ContractFarming = () => {
       )}
 
       {/* STATS HIGHLIGHT BAR */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-slate-900 text-white rounded-3xl shadow-xl border border-slate-800">
-        <div className="space-y-1">
-          <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Active Contract Value</span>
-          <h4 className="text-2xl sm:text-3xl font-extrabold font-display">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white rounded-3xl shadow-md border border-slate-100">
+        <div className="space-y-1 p-2">
+          <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Active Contract Value</span>
+          <h4 className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900">
             {currency === 'USD' ? '$228.3K+' : 'Rs 68.5M+'}
           </h4>
           <p className="text-[11px] text-slate-400">Guaranteed Enterprise Trade</p>
         </div>
-        <div className="space-y-1">
-          <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Registered Enterprise Buyers</span>
-          <h4 className="text-2xl sm:text-3xl font-extrabold font-display">24 Chains</h4>
+
+        <div className="space-y-1 p-2">
+          <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Registered Enterprise Buyers</span>
+          <h4 className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900">24 Chains</h4>
           <p className="text-[11px] text-slate-400">Supermarkets &amp; Exporters</p>
         </div>
-        <div className="space-y-1">
-          <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Escrow Security</span>
-          <h4 className="text-2xl sm:text-3xl font-extrabold font-display text-emerald-400">100% Locked</h4>
+
+        <div className="space-y-1 p-2">
+          <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Escrow Vault Security</span>
+          <h4 className="text-2xl sm:text-3xl font-extrabold font-display text-emerald-600">100% Locked</h4>
           <p className="text-[11px] text-slate-400">Zero Default Risk</p>
         </div>
-        <div className="space-y-1">
-          <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Contracted Growers</span>
-          <h4 className="text-2xl sm:text-3xl font-extrabold font-display">185 Farmers</h4>
+
+        <div className="space-y-1 p-2">
+          <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Contracted Growers</span>
+          <h4 className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900">185 Farmers</h4>
           <p className="text-[11px] text-slate-400">Across 16 Districts</p>
         </div>
       </div>
 
-      {/* MAIN NAVIGATION TABS */}
-      <div className="flex border-b border-slate-200 gap-8 text-sm font-extrabold">
+      {/* FLOATING PILL NAVIGATION TABS */}
+      <div className="flex flex-wrap gap-3">
         <button
           onClick={() => setActiveTab('active-tenders')}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition ${
+          className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition-all duration-200 flex items-center gap-2 cursor-pointer border ${
             activeTab === 'active-tenders'
-              ? 'border-emerald-600 text-emerald-700 font-extrabold'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
+              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <Building2 className="w-4 h-4" />
-          <span>Active B2B Purchase Tenders ({contractsList.length})</span>
+          <span>Active B2B Tenders</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'active-tenders' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'}`}>
+            {contractsList.length}
+          </span>
         </button>
 
         <button
           onClick={() => setActiveTab('my-applications')}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition ${
+          className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition-all duration-200 flex items-center gap-2 cursor-pointer border ${
             activeTab === 'my-applications'
-              ? 'border-emerald-600 text-emerald-700 font-extrabold'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
+              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <FileCheck className="w-4 h-4" />
-          <span>My Submitted Applications ({myApplications.length})</span>
+          <span>My Submitted Applications</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'my-applications' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'}`}>
+            {myApplications.length}
+          </span>
         </button>
 
         <button
           onClick={() => setActiveTab('buyer-manager')}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition ${
+          className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition-all duration-200 flex items-center gap-2 cursor-pointer border ${
             activeTab === 'buyer-manager'
-              ? 'border-emerald-600 text-emerald-700 font-extrabold'
-              : 'border-transparent text-slate-500 hover:text-slate-800'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
+              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <Briefcase className="w-4 h-4" />
@@ -770,31 +804,42 @@ export const ContractFarming = () => {
         <div className="space-y-6">
           {/* FILTER & SEARCH BAR */}
           <div className="premium-card p-5 bg-white border border-slate-100 shadow-md flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative w-full md:w-72">
+            <div className="relative w-full md:w-80">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="Search crop, buyer, or district..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
               />
+              {searchKeyword && (
+                <button onClick={() => setSearchKeyword('')} className="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
               {/* CATEGORY PILLS */}
               <div className="flex flex-wrap gap-1.5 items-center">
-                {['', 'Vegetables', 'Grains', 'Spices', 'Fruits'].map((cat) => (
+                {[
+                  { label: 'All', value: '' },
+                  { label: '🥬 Vegetables', value: 'Vegetables' },
+                  { label: '🌾 Grains', value: 'Grains' },
+                  { label: '🌶️ Spices', value: 'Spices' },
+                  { label: '🍎 Fruits', value: 'Fruits' }
+                ].map((cat) => (
                   <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
-                      selectedCategory === cat
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                    key={cat.value}
+                    onClick={() => setSelectedCategory(cat.value)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
+                      selectedCategory === cat.value
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'
                     }`}
                   >
-                    {cat === '' ? 'All Produce' : cat}
+                    {cat.label}
                   </button>
                 ))}
               </div>
@@ -803,7 +848,7 @@ export const ContractFarming = () => {
               <select
                 value={selectedDistrict}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
               >
                 <option value="">All Districts 📍</option>
                 {['Nuwara Eliya', 'Jaffna', 'Kandy', 'Galle', 'Anuradhapura', 'Hambantota'].map((dist) => (
@@ -815,7 +860,7 @@ export const ContractFarming = () => {
               <select
                 value={selectedDuration}
                 onChange={(e) => setSelectedDuration(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
               >
                 <option value="">All Durations</option>
                 <option value="3">3 Months</option>
@@ -827,7 +872,7 @@ export const ContractFarming = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                className="px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
               >
                 <option value="DEFAULT">⭐ Featured</option>
                 <option value="QTY_HIGH">🌾 Volume: High to Low</option>
@@ -839,10 +884,21 @@ export const ContractFarming = () => {
 
           {/* TENDERS GRID */}
           {filteredContracts.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-3xl border border-slate-100 p-8 space-y-3">
+            <div className="text-center py-16 bg-white rounded-3xl border border-slate-100 p-8 space-y-3 shadow-md">
               <div className="text-4xl">📑</div>
               <h3 className="text-lg font-bold text-slate-800 font-display">No Contract Tenders Found</h3>
               <p className="text-slate-500 text-sm">Try adjusting your keyword query or category filters.</p>
+              <button
+                onClick={() => {
+                  setSearchKeyword('');
+                  setSelectedCategory('');
+                  setSelectedDistrict('');
+                  setSelectedDuration('');
+                }}
+                className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-xs transition"
+              >
+                Reset All Filters
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -851,14 +907,14 @@ export const ContractFarming = () => {
                 return (
                   <motion.div
                     key={item.id}
-                    whileHover={{ y: -4 }}
+                    whileHover={{ y: -6 }}
                     className="premium-card p-6 bg-white border border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-5"
                   >
                     <div className="space-y-4">
                       {/* BUYER HEADER */}
                       <div className="flex justify-between items-start">
                         <div>
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200/60">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getCategoryBadgeClass(item.buyerCategory)}`}>
                             {item.buyerCategory}
                           </span>
                           <h3 className="text-lg font-extrabold text-slate-900 font-display mt-1">
@@ -866,7 +922,7 @@ export const ContractFarming = () => {
                           </h3>
                           <p className="text-[10px] text-slate-400 font-bold mt-0.5">📍 Target District: {item.district}</p>
                         </div>
-                        <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/60 text-[10px] font-extrabold uppercase">
+                        <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/60 text-[10px] font-extrabold uppercase shrink-0">
                           {item.qualityGrade}
                         </span>
                       </div>
@@ -886,7 +942,7 @@ export const ContractFarming = () => {
                       {item.aiPriceBenchmark && (
                         <div className="p-2.5 bg-emerald-50/80 border border-emerald-200/80 rounded-xl flex items-center justify-between text-[11px]">
                           <span className="flex items-center gap-1 font-bold text-emerald-800">
-                            <Bot className="w-3.5 h-3.5 text-emerald-600" /> AI Price Benchmark:
+                            <Bot className="w-3.5 h-3.5 text-emerald-600" /> AI Market Price Benchmark:
                           </span>
                           <span className="font-extrabold text-emerald-700 font-display">
                             {formatPrice(item.aiPriceBenchmark)}/kg
@@ -894,17 +950,20 @@ export const ContractFarming = () => {
                         </div>
                       )}
 
-                      {/* REQUIREMENT CARD */}
-                      <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Harvest</span>
-                          <span className="text-sm font-extrabold text-emerald-700 font-display">
-                            🌾 {item.cropName}
-                          </span>
+                      {/* REQUIREMENT CARD WITH ICON */}
+                      <div className="p-3.5 bg-gradient-to-r from-emerald-50/80 to-teal-50/50 rounded-2xl border border-emerald-100/80 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-2xl">{item.icon || '🌾'}</span>
+                          <div>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Target Harvest</span>
+                            <span className="text-sm font-extrabold text-emerald-800 font-display">
+                              {item.cropName}
+                            </span>
+                          </div>
                         </div>
                         <div className="text-right">
                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Monthly Quota</span>
-                          <span className="text-xs font-black text-slate-800">
+                          <span className="text-xs font-black text-slate-900">
                             {item.monthlyQuantityKg.toLocaleString()} kg/mo
                           </span>
                         </div>
@@ -941,7 +1000,7 @@ export const ContractFarming = () => {
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => setSelectedTenderForView(item)}
-                          className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
+                          className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5 text-slate-600" /> Specs
                         </button>
@@ -955,7 +1014,7 @@ export const ContractFarming = () => {
                               frequency: item.deliveryFrequency
                             });
                           }}
-                          className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-[11px] rounded-xl border border-emerald-200 transition flex items-center justify-center gap-1 cursor-pointer"
+                          className="py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-[11px] rounded-xl border border-emerald-200 transition flex items-center justify-center gap-1 cursor-pointer"
                         >
                           <Calculator className="w-3.5 h-3.5 text-emerald-600" /> Revenue Calc
                         </button>
@@ -968,7 +1027,7 @@ export const ContractFarming = () => {
                         </span>
 
                         {isApplied ? (
-                          <span className="px-4 py-2 bg-emerald-100 text-emerald-800 font-extrabold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs border border-emerald-200">
+                          <span className="px-4 py-2.5 bg-emerald-100 text-emerald-800 font-extrabold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs border border-emerald-200">
                             <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Application Sent
                           </span>
                         ) : (
@@ -984,7 +1043,7 @@ export const ContractFarming = () => {
                                 notes: 'Verified grower with organic certification.'
                               });
                             }}
-                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+                            className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5 cursor-pointer"
                           >
                             Apply for Contract →
                           </button>
@@ -1003,7 +1062,7 @@ export const ContractFarming = () => {
       {activeTab === 'my-applications' && (
         <div className="space-y-6">
           {/* WEEKLY DISPATCH CALENDAR TIMELINE WIDGET */}
-          <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-xl space-y-4 border border-slate-800">
+          <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-xl space-y-4 border border-slate-800 relative overflow-hidden">
             <div className="flex justify-between items-center">
               <div>
                 <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold uppercase tracking-wider border border-emerald-500/30">
@@ -1015,7 +1074,7 @@ export const ContractFarming = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
+              <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10 space-y-1">
                 <div className="flex items-center justify-between text-emerald-400 font-bold">
                   <span>🗓️ Mon, Aug 24</span>
                   <span className="text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded-md">500 kg Pickup</span>
@@ -1023,7 +1082,7 @@ export const ContractFarming = () => {
                 <p className="text-slate-300 text-[11px]">Shangri-La Hotels • Aged Samba Rice</p>
               </div>
 
-              <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
+              <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10 space-y-1">
                 <div className="flex items-center justify-between text-amber-400 font-bold">
                   <span>🗓️ Fri, Aug 28</span>
                   <span className="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded-md">300 kg Pickup</span>
@@ -1031,7 +1090,7 @@ export const ContractFarming = () => {
                 <p className="text-slate-300 text-[11px]">Keells Supermarket • Organic Tomato</p>
               </div>
 
-              <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
+              <div className="p-3.5 bg-white/5 rounded-2xl border border-white/10 space-y-1">
                 <div className="flex items-center justify-between text-teal-400 font-bold">
                   <span>🗓️ Wed, Sep 02</span>
                   <span className="text-[10px] bg-teal-500/20 px-2 py-0.5 rounded-md">100 kg Pickup</span>
@@ -1124,7 +1183,7 @@ export const ContractFarming = () => {
                         {/* PROGRESS BAR */}
                         <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                            className="h-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 rounded-full transition-all duration-500"
                             style={{ width: `${fulfillmentPct}%` }}
                           />
                         </div>
@@ -1254,7 +1313,7 @@ export const ContractFarming = () => {
         </div>
       )}
 
-      {/* QR CODE BATCH SCANVERIFICATION MODAL */}
+      {/* QR CODE BATCH SCAN VERIFICATION MODAL */}
       <AnimatePresence>
         {selectedAppForQrScan && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
@@ -1510,7 +1569,7 @@ export const ContractFarming = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Agreed Price (Rs/kg)</label>
+                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Agreed Price ({currency === 'USD' ? '$' : 'Rs'}/kg)</label>
                     <input
                       type="number"
                       value={calcData.priceLkr}
