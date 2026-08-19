@@ -40,7 +40,10 @@ import {
   FileSpreadsheet,
   AlertTriangle,
   RotateCcw,
-  Zap
+  Zap,
+  Globe,
+  Bot,
+  Scan
 } from 'lucide-react';
 import { contractFarmingAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -56,6 +59,7 @@ const DEFAULT_CONTRACTS = [
     durationMonths: 6,
     minPriceLkr: 180,
     maxPriceLkr: 220,
+    aiPriceBenchmark: 205,
     qualityGrade: 'Grade A Organic',
     deliveryFrequency: 'Weekly',
     applicantCount: 14,
@@ -77,6 +81,7 @@ const DEFAULT_CONTRACTS = [
     durationMonths: 12,
     minPriceLkr: 350,
     maxPriceLkr: 400,
+    aiPriceBenchmark: 380,
     qualityGrade: 'Export Grade A',
     deliveryFrequency: 'Weekly',
     applicantCount: 8,
@@ -98,6 +103,7 @@ const DEFAULT_CONTRACTS = [
     durationMonths: 6,
     minPriceLkr: 210,
     maxPriceLkr: 230,
+    aiPriceBenchmark: 222,
     qualityGrade: 'Premium Aged Samba',
     deliveryFrequency: 'Bi-Weekly',
     applicantCount: 22,
@@ -119,6 +125,7 @@ const DEFAULT_CONTRACTS = [
     durationMonths: 12,
     minPriceLkr: 1400,
     maxPriceLkr: 1650,
+    aiPriceBenchmark: 1550,
     qualityGrade: 'Alba Export Grade',
     deliveryFrequency: 'Monthly',
     applicantCount: 11,
@@ -140,6 +147,7 @@ const DEFAULT_CONTRACTS = [
     durationMonths: 3,
     minPriceLkr: 160,
     maxPriceLkr: 190,
+    aiPriceBenchmark: 178,
     qualityGrade: 'Grade A High Brix',
     deliveryFrequency: 'Weekly',
     applicantCount: 19,
@@ -161,6 +169,7 @@ const DEFAULT_CONTRACTS = [
     durationMonths: 6,
     minPriceLkr: 240,
     maxPriceLkr: 280,
+    aiPriceBenchmark: 265,
     qualityGrade: 'Grade A Harvest',
     deliveryFrequency: 'Bi-Weekly',
     applicantCount: 7,
@@ -196,7 +205,8 @@ const INITIAL_APPLICATIONS = [
     iotTemp: '11.8°C',
     iotHumidity: '82%',
     iotEta: 'En-route to Colombo Dock (ETA 45m)',
-    isDisputed: false
+    isDisputed: false,
+    batchCode: 'BATCH-2026-ANU-8941'
   },
   {
     id: 'APP-902',
@@ -220,7 +230,8 @@ const INITIAL_APPLICATIONS = [
     iotTemp: '12.0°C',
     iotHumidity: '78%',
     iotEta: 'Pending Pickup',
-    isDisputed: false
+    isDisputed: false,
+    batchCode: 'BATCH-2026-NWR-0941'
   }
 ];
 
@@ -231,6 +242,10 @@ export const ContractFarming = () => {
   const [myApplications, setMyApplications] = useState(INITIAL_APPLICATIONS);
   const [appliedIds, setAppliedIds] = useState(['TENDER-803', 'TENDER-801']);
   const [loading, setLoading] = useState(false);
+
+  // Currency Toggle State (LKR vs USD)
+  const [currency, setCurrency] = useState('LKR'); // 'LKR' or 'USD'
+  const LKR_TO_USD = 1 / 300;
 
   // Search & Filter States
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -246,6 +261,7 @@ export const ContractFarming = () => {
   const [selectedAppForSign, setSelectedAppForSign] = useState(null);
   const [selectedAppForPdf, setSelectedAppForPdf] = useState(null);
   const [selectedAppForDispute, setSelectedAppForDispute] = useState(null);
+  const [selectedAppForQrScan, setSelectedAppForQrScan] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [applySuccessMsg, setApplySuccessMsg] = useState('');
 
@@ -311,6 +327,13 @@ export const ContractFarming = () => {
     fetchContracts();
   }, []);
 
+  const formatPrice = (priceLkr) => {
+    if (currency === 'USD') {
+      return `$${(priceLkr * LKR_TO_USD).toFixed(2)}`;
+    }
+    return `Rs. ${priceLkr}`;
+  };
+
   const handleApplySubmit = async (e) => {
     e.preventDefault();
     if (!selectedTenderForApply) return;
@@ -337,13 +360,14 @@ export const ContractFarming = () => {
       iotTemp: '12.0°C',
       iotHumidity: '80%',
       iotEta: 'Scheduled',
-      isDisputed: false
+      isDisputed: false,
+      batchCode: `BATCH-2026-${applyForm.district.substring(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`
     };
 
     try {
       await contractFarmingAPI.apply();
     } catch (err) {
-      // Fallback handling
+      // Fallback
     }
 
     setAppliedIds((prev) => [...prev, selectedTenderForApply.id]);
@@ -370,6 +394,33 @@ export const ContractFarming = () => {
       )
     );
     setApplySuccessMsg(`Application ${appId} approved & Escrow funds locked in vault!`);
+
+    setTimeout(() => {
+      setApplySuccessMsg('');
+    }, 4000);
+  };
+
+  const handleSimulateQrScanConfirm = () => {
+    if (!selectedAppForQrScan) return;
+    const appId = selectedAppForQrScan.id;
+    
+    setMyApplications((prev) =>
+      prev.map((app) => {
+        if (app.id === appId) {
+          const newDelivered = Math.min(app.offeredQtyKg, app.deliveredKg + 500);
+          const newReleased = newDelivered * app.offeredPrice;
+          return {
+            ...app,
+            deliveredKg: newDelivered,
+            escrowReleasedLkr: newReleased
+          };
+        }
+        return app;
+      })
+    );
+
+    setApplySuccessMsg(`QR Scan Verified! Batch Code ${selectedAppForQrScan.batchCode || 'BATCH-2026'} received. Escrow payout released! 🎉`);
+    setSelectedAppForQrScan(null);
 
     setTimeout(() => {
       setApplySuccessMsg('');
@@ -503,6 +554,7 @@ export const ContractFarming = () => {
       durationMonths: Number(createForm.durationMonths) || 6,
       minPriceLkr: Number(createForm.minPriceLkr) || 200,
       maxPriceLkr: Number(createForm.maxPriceLkr) || 250,
+      aiPriceBenchmark: Math.round((Number(createForm.minPriceLkr) + Number(createForm.maxPriceLkr)) / 2),
       qualityGrade: createForm.qualityGrade,
       deliveryFrequency: createForm.deliveryFrequency,
       applicantCount: 0,
@@ -604,16 +656,26 @@ export const ContractFarming = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 shrink-0">
+          {/* CURRENCY TOGGLE */}
+          <button
+            onClick={() => setCurrency(currency === 'LKR' ? 'USD' : 'LKR')}
+            className="px-3.5 py-2.5 bg-slate-900 text-white font-extrabold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5 cursor-pointer hover:bg-slate-800"
+            title="Toggle currency mode"
+          >
+            <Globe className="w-4 h-4 text-emerald-400" />
+            <span>Mode: {currency === 'LKR' ? '🇱🇰 LKR (Rs)' : '💵 USD ($)'}</span>
+          </button>
+
           <button
             onClick={handleExportCsv}
-            className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer border border-slate-200"
+            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer border border-slate-200"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" /> Export Tenders (CSV)
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600" /> Export (CSV)
           </button>
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-5 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition cursor-pointer"
+            className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
             <span>+ Post Purchase Request</span>
@@ -642,7 +704,9 @@ export const ContractFarming = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-slate-900 text-white rounded-3xl shadow-xl border border-slate-800">
         <div className="space-y-1">
           <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">Active Contract Value</span>
-          <h4 className="text-2xl sm:text-3xl font-extrabold font-display">Rs 68.5M+</h4>
+          <h4 className="text-2xl sm:text-3xl font-extrabold font-display">
+            {currency === 'USD' ? '$228.3K+' : 'Rs 68.5M+'}
+          </h4>
           <p className="text-[11px] text-slate-400">Guaranteed Enterprise Trade</p>
         </div>
         <div className="space-y-1">
@@ -818,6 +882,18 @@ export const ContractFarming = () => {
                         </div>
                       )}
 
+                      {/* AI MARKET BENCHMARK WIDGET */}
+                      {item.aiPriceBenchmark && (
+                        <div className="p-2.5 bg-emerald-50/80 border border-emerald-200/80 rounded-xl flex items-center justify-between text-[11px]">
+                          <span className="flex items-center gap-1 font-bold text-emerald-800">
+                            <Bot className="w-3.5 h-3.5 text-emerald-600" /> AI Price Benchmark:
+                          </span>
+                          <span className="font-extrabold text-emerald-700 font-display">
+                            {formatPrice(item.aiPriceBenchmark)}/kg
+                          </span>
+                        </div>
+                      )}
+
                       {/* REQUIREMENT CARD */}
                       <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
                         <div>
@@ -848,7 +924,9 @@ export const ContractFarming = () => {
 
                         <div className="flex justify-between items-center text-slate-600">
                           <span className="font-medium">Offered Price Range:</span>
-                          <span className="font-extrabold text-emerald-600">Rs. {item.minPriceLkr} – {item.maxPriceLkr}/kg</span>
+                          <span className="font-extrabold text-emerald-600">
+                            {formatPrice(item.minPriceLkr)} – {formatPrice(item.maxPriceLkr)}/kg
+                          </span>
                         </div>
 
                         <div className="flex justify-between items-center text-slate-600">
@@ -924,13 +1002,43 @@ export const ContractFarming = () => {
       {/* TAB 2: MY SUBMITTED APPLICATIONS */}
       {activeTab === 'my-applications' && (
         <div className="space-y-6">
-          <div className="premium-card p-6 bg-white border border-slate-100 shadow-md">
-            <h3 className="text-lg font-extrabold text-slate-900 font-display mb-1">
-              Your Submitted B2B Contract Proposals 📑
-            </h3>
-            <p className="text-slate-500 text-xs">
-              Track contract proposal statuses, escrow lock confirmations, IoT cold-chain telemetry, and log harvest dispatches.
-            </p>
+          {/* WEEKLY DISPATCH CALENDAR TIMELINE WIDGET */}
+          <div className="p-6 bg-slate-900 text-white rounded-3xl shadow-xl space-y-4 border border-slate-800">
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold uppercase tracking-wider border border-emerald-500/30">
+                  Monthly Supply Schedule Calendar
+                </span>
+                <h3 className="text-xl font-extrabold font-display mt-1">Upcoming Harvest Dispatches 📅</h3>
+              </div>
+              <span className="text-xs text-slate-400 font-mono">August - September 2026</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
+                <div className="flex items-center justify-between text-emerald-400 font-bold">
+                  <span>🗓️ Mon, Aug 24</span>
+                  <span className="text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded-md">500 kg Pickup</span>
+                </div>
+                <p className="text-slate-300 text-[11px]">Shangri-La Hotels • Aged Samba Rice</p>
+              </div>
+
+              <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
+                <div className="flex items-center justify-between text-amber-400 font-bold">
+                  <span>🗓️ Fri, Aug 28</span>
+                  <span className="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded-md">300 kg Pickup</span>
+                </div>
+                <p className="text-slate-300 text-[11px]">Keells Supermarket • Organic Tomato</p>
+              </div>
+
+              <div className="p-3 bg-white/5 rounded-2xl border border-white/10 space-y-1">
+                <div className="flex items-center justify-between text-teal-400 font-bold">
+                  <span>🗓️ Wed, Sep 02</span>
+                  <span className="text-[10px] bg-teal-500/20 px-2 py-0.5 rounded-md">100 kg Pickup</span>
+                </div>
+                <p className="text-slate-300 text-[11px]">Dilmah Spices • Alba Cinnamon</p>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -954,7 +1062,7 @@ export const ContractFarming = () => {
 
                     {app.isCounterOffer && (
                       <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold space-y-1">
-                        <span className="font-extrabold block">💬 Counter-Offer Submitted: Rs. {app.offeredPrice}/kg</span>
+                        <span className="font-extrabold block">💬 Counter-Offer Submitted: {formatPrice(app.offeredPrice)}/kg</span>
                         <p className="text-[11px] text-amber-800 line-clamp-2">{app.counterReason}</p>
                       </div>
                     )}
@@ -966,7 +1074,7 @@ export const ContractFarming = () => {
                       </div>
                       <div>
                         <span className="text-slate-400 text-[10px] uppercase block">Agreed Rate</span>
-                        <span className="text-emerald-600 font-extrabold">Rs. {app.offeredPrice} / kg</span>
+                        <span className="text-emerald-600 font-extrabold">{formatPrice(app.offeredPrice)} / kg</span>
                       </div>
                       <div>
                         <span className="text-slate-400 text-[10px] uppercase block">Contract Term</span>
@@ -1024,7 +1132,7 @@ export const ContractFarming = () => {
                         <div className="flex justify-between items-center text-xs pt-1 border-t border-slate-800 text-slate-300">
                           <span>Escrow Released to Account:</span>
                           <span className="text-emerald-400 font-extrabold font-display">
-                            Rs. {app.escrowReleasedLkr.toLocaleString()}.00
+                            {formatPrice(app.escrowReleasedLkr)}
                           </span>
                         </div>
                       </div>
@@ -1036,10 +1144,17 @@ export const ContractFarming = () => {
                     {app.status === 'APPROVED' && (
                       <>
                         <button
-                          onClick={() => handleLogDispatch(app.id)}
-                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                          onClick={() => setSelectedAppForQrScan(app)}
+                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1 cursor-pointer"
                         >
-                          <Truck className="w-3.5 h-3.5" /> Log Dispatch (+500kg)
+                          <Scan className="w-3.5 h-3.5" /> Scan QR 🔎
+                        </button>
+
+                        <button
+                          onClick={() => handleLogDispatch(app.id)}
+                          className="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition flex items-center gap-1 cursor-pointer"
+                        >
+                          <Truck className="w-3.5 h-3.5" /> +500kg
                         </button>
 
                         <button
@@ -1047,21 +1162,14 @@ export const ContractFarming = () => {
                           className="px-3 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-bold text-xs rounded-xl transition flex items-center gap-1 cursor-pointer"
                           title="Renew contract term"
                         >
-                          <RotateCcw className="w-3.5 h-3.5" /> Renew Term
+                          <RotateCcw className="w-3.5 h-3.5" /> Renew
                         </button>
 
                         <button
                           onClick={() => setSelectedAppForPdf(app)}
                           className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1 cursor-pointer"
                         >
-                          <FileText className="w-3.5 h-3.5 text-slate-600" /> Sealed PDF 📄
-                        </button>
-
-                        <button
-                          onClick={() => setSelectedAppForDispute(app)}
-                          className="px-2.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-[10px] rounded-xl transition flex items-center gap-1 cursor-pointer"
-                        >
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> Dispute ⚠️
+                          <FileText className="w-3.5 h-3.5 text-slate-600" /> PDF 📄
                         </button>
                       </>
                     )}
@@ -1117,7 +1225,7 @@ export const ContractFarming = () => {
                   </div>
                   <h4 className="text-base font-extrabold text-slate-900 font-display">Farmer: {app.farmerName}</h4>
                   <p className="text-xs text-slate-600">
-                    District: 📍 {app.district} • Offered Yield: <strong>{app.offeredQtyKg.toLocaleString()} kg/mo</strong> @ <strong className="text-emerald-600">Rs. {app.offeredPrice}/kg</strong>
+                    District: 📍 {app.district} • Offered Yield: <strong>{app.offeredQtyKg.toLocaleString()} kg/mo</strong> @ <strong className="text-emerald-600">{formatPrice(app.offeredPrice)}/kg</strong>
                   </p>
                   {app.counterReason && (
                     <p className="text-[11px] text-slate-500 italic mt-1 bg-slate-50 p-2 rounded-lg border border-slate-100">
@@ -1145,6 +1253,59 @@ export const ContractFarming = () => {
           </div>
         </div>
       )}
+
+      {/* QR CODE BATCH SCANVERIFICATION MODAL */}
+      <AnimatePresence>
+        {selectedAppForQrScan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full p-6 space-y-5 overflow-hidden relative text-center"
+            >
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase">
+                  Batch Delivery QR Scanner
+                </span>
+                <button
+                  onClick={() => setSelectedAppForQrScan(null)}
+                  className="p-2 hover:bg-slate-100 rounded-xl transition text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="w-32 h-32 mx-auto bg-slate-900 rounded-2xl p-3 shadow-inner flex items-center justify-center border-4 border-emerald-500 relative">
+                  <QrCode className="w-full h-full text-emerald-400 animate-pulse" />
+                </div>
+
+                <div>
+                  <h4 className="text-base font-extrabold text-slate-900 font-display">
+                    {selectedAppForQrScan.cropName} — {selectedAppForQrScan.buyerName}
+                  </h4>
+                  <p className="text-xs font-mono text-emerald-600 font-bold mt-0.5">
+                    Batch Code: {selectedAppForQrScan.batchCode || 'BATCH-2026-NWR-0941'}
+                  </p>
+                </div>
+
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 font-semibold space-y-1">
+                  <span>✓ 9-Stage Telemetry Verified</span>
+                  <p className="text-[11px] text-emerald-700">Refrigeration &amp; weight sensor check passed.</p>
+                </div>
+
+                <button
+                  onClick={handleSimulateQrScanConfirm}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <CheckCircle2 className="w-4 h-4" /> Confirm Reception &amp; Release Escrow 🔒
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* DISPUTE ARBITRATION MODAL */}
       <AnimatePresence>
@@ -1267,7 +1428,7 @@ export const ContractFarming = () => {
                   </div>
                   <div>
                     <span className="text-[10px] uppercase text-emerald-800 block font-bold">Agreed Quota &amp; Rate</span>
-                    <span className="text-emerald-700 font-extrabold">{selectedAppForPdf.offeredQtyKg.toLocaleString()} kg/mo @ Rs. {selectedAppForPdf.offeredPrice}/kg</span>
+                    <span className="text-emerald-700 font-extrabold">{selectedAppForPdf.offeredQtyKg.toLocaleString()} kg/mo @ {formatPrice(selectedAppForPdf.offeredPrice)}/kg</span>
                   </div>
                 </div>
 
@@ -1364,14 +1525,14 @@ export const ContractFarming = () => {
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-400 font-medium">Monthly Gross Revenue:</span>
                     <span className="text-base font-extrabold text-emerald-400 font-display">
-                      Rs. {monthlyRevenue.toLocaleString()}.00
+                      {formatPrice(monthlyRevenue)}.00
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-400 font-medium">Total {calcData.durationMonths}-Month Contract Value:</span>
                     <span className="text-lg font-extrabold text-emerald-300 font-display">
-                      Rs. {totalContractRevenue.toLocaleString()}.00
+                      {formatPrice(totalContractRevenue)}.00
                     </span>
                   </div>
 
@@ -1380,14 +1541,14 @@ export const ContractFarming = () => {
                       🔒 20% Advance Escrow Lock:
                     </span>
                     <span className="text-sm font-black text-emerald-400">
-                      Rs. {escrowAdvanceLock.toLocaleString()}.00
+                      {formatPrice(escrowAdvanceLock)}.00
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-400 font-medium">Est. Payout Per Dispatch:</span>
                     <span className="text-xs font-bold text-white">
-                      Rs. {perDispatchPayout.toLocaleString()}.00 / shipment
+                      {formatPrice(perDispatchPayout)}.00 / shipment
                     </span>
                   </div>
                 </div>
@@ -1441,7 +1602,7 @@ export const ContractFarming = () => {
                   </div>
                   <div className="flex justify-between text-[11px] text-slate-600">
                     <span>Quota: {selectedAppForSign.offeredQtyKg} kg/mo</span>
-                    <span>Rate: Rs. {selectedAppForSign.offeredPrice}/kg</span>
+                    <span>Rate: {formatPrice(selectedAppForSign.offeredPrice)}/kg</span>
                   </div>
                 </div>
 
@@ -1603,7 +1764,7 @@ export const ContractFarming = () => {
                 </div>
                 <div className="flex justify-between text-[11px] text-emerald-800">
                   <span>Duration: {selectedTenderForApply.durationMonths} Months</span>
-                  <span>Target Range: Rs. {selectedTenderForApply.minPriceLkr} - {selectedTenderForApply.maxPriceLkr}/kg</span>
+                  <span>Target Range: {formatPrice(selectedTenderForApply.minPriceLkr)} - {formatPrice(selectedTenderForApply.maxPriceLkr)}/kg</span>
                 </div>
               </div>
 
@@ -1632,7 +1793,7 @@ export const ContractFarming = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Proposed Price (Rs/kg)</label>
+                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Proposed Price ({currency === 'USD' ? '$' : 'Rs'}/kg)</label>
                     <input
                       type="number"
                       required
