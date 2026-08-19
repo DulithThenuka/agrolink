@@ -248,7 +248,7 @@ export const CropAdvisor = () => {
           <div className="p-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl text-white shadow-lg flex justify-between items-center">
             <div>
               <h4 className="font-bold text-base font-display">Ready to list your recommended harvest?</h4>
-              <p class="text-xs text-emerald-100 mt-0.5">Pre-fill listing details directly in the AgroLink marketplace.</p>
+              <p className="text-xs text-emerald-100 mt-0.5">Pre-fill listing details directly in the AgroLink marketplace.</p>
             </div>
             <Link to="/crops/add" className="px-5 py-2.5 bg-white text-emerald-950 font-bold text-xs rounded-xl shadow-md shrink-0 hover:bg-slate-50 transition">
               List Harvest Batch →

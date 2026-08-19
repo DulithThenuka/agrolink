@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -93,13 +93,16 @@ const MOCK_CROPS = [
 export const CropsList = () => {
   const { isBuyer, isFarmer } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialKeyword = searchParams.get('search') || '';
+
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [selectedTraceCrop, setSelectedTraceCrop] = useState(null);
   const [selectedBuyCrop, setSelectedBuyCrop] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState(initialKeyword);
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [minPrice, setMinPrice] = useState('');
@@ -109,39 +112,39 @@ export const CropsList = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  const filterMockData = () => {
+  const filterMockData = useCallback((kw, cat, loc, minP, maxP, sort) => {
     let result = [...MOCK_CROPS];
-    if (keyword) {
-      result = result.filter(c => c.name.toLowerCase().includes(keyword.toLowerCase()));
+    if (kw) {
+      result = result.filter(c => c.name.toLowerCase().includes(kw.toLowerCase()));
     }
-    if (category) {
-      result = result.filter(c => c.category.toLowerCase().includes(category.toLowerCase()));
+    if (cat) {
+      result = result.filter(c => c.category.toLowerCase().includes(cat.toLowerCase()));
     }
-    if (location) {
-      result = result.filter(c => c.location.toLowerCase().includes(location.toLowerCase()));
+    if (loc) {
+      result = result.filter(c => c.location.toLowerCase().includes(loc.toLowerCase()));
     }
-    if (minPrice) {
-      result = result.filter(c => c.price >= Number(minPrice));
+    if (minP) {
+      result = result.filter(c => c.price >= Number(minP));
     }
-    if (maxPrice) {
-      result = result.filter(c => c.price <= Number(maxPrice));
+    if (maxP) {
+      result = result.filter(c => c.price <= Number(maxP));
     }
 
     // Apply Sorting Controls
-    if (sortBy === 'PRICE_LOW') {
+    if (sort === 'PRICE_LOW') {
       result.sort((a, b) => Number(a.price) - Number(b.price));
-    } else if (sortBy === 'PRICE_HIGH') {
+    } else if (sort === 'PRICE_HIGH') {
       result.sort((a, b) => Number(b.price) - Number(a.price));
-    } else if (sortBy === 'QTY_HIGH') {
+    } else if (sort === 'QTY_HIGH') {
       result.sort((a, b) => Number(b.quantity) - Number(a.quantity));
-    } else if (sortBy === 'NEWEST') {
+    } else if (sort === 'NEWEST') {
       result.sort((a, b) => Number(b.id) - Number(a.id));
     }
 
     return result;
-  };
+  }, []);
 
-  const fetchCrops = async () => {
+  const fetchCrops = useCallback(async () => {
     setLoading(true);
     try {
       const params = {
@@ -158,23 +161,23 @@ export const CropsList = () => {
         setCrops(res.data.content);
         setTotalPages(res.data.totalPages || 1);
       } else {
-        const filtered = filterMockData();
+        const filtered = filterMockData(keyword, category, location, minPrice, maxPrice, sortBy);
         setCrops(filtered);
         setTotalPages(1);
       }
     } catch (err) {
       console.warn('Backend API offline or unreachable. Loading mock crops catalog:', err);
-      const filtered = filterMockData();
+      const filtered = filterMockData(keyword, category, location, minPrice, maxPrice, sortBy);
       setCrops(filtered);
       setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, keyword, category, location, minPrice, maxPrice, sortBy, filterMockData]);
 
   useEffect(() => {
     fetchCrops();
-  }, [page, sortBy]);
+  }, [fetchCrops]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -249,7 +252,6 @@ export const CropsList = () => {
               onClick={() => {
                 setCategory(cat);
                 setPage(0);
-                fetchCrops();
               }}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition border ${
                 category === cat

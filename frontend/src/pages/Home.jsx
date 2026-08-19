@@ -121,7 +121,7 @@ export const Home = () => {
           </div>
           <div className="space-y-1">
             <h4 className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-display">0%</h4>
-            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Intermediary Markup</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Intermediary Markup</p>
           </div>
           <div className="space-y-1">
             <h4 className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-display">99.2%</h4>

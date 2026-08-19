@@ -144,7 +144,7 @@ export const Register = () => {
             </div>
 
             <div className="p-3 bg-emerald-50/70 border border-emerald-100/80 rounded-2xl text-xs text-emerald-800 font-semibold flex items-center gap-2">
-              <span class="text-base">💡</span>
+              <span className="text-base">💡</span>
               <span>Your role provides tailored tools, dashboards, and network permissions.</span>
             </div>
 
