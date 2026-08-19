@@ -6,13 +6,15 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class ContractFarmingService {
 
-    public List<ContractRequestDTO> getAllContractRequests() {
-        List<ContractRequestDTO> list = new ArrayList<>();
-        list.add(new ContractRequestDTO(
+    private final List<ContractRequestDTO> contractsList = new CopyOnWriteArrayList<>();
+
+    public ContractFarmingService() {
+        contractsList.add(new ContractRequestDTO(
             "TENDER-801",
             "Keells Supermarket",
             "Supermarket Chain",
@@ -26,7 +28,7 @@ public class ContractFarmingService {
             "OPEN",
             14
         ));
-        list.add(new ContractRequestDTO(
+        contractsList.add(new ContractRequestDTO(
             "TENDER-802",
             "Cargills Food City",
             "Supermarket Chain",
@@ -40,7 +42,7 @@ public class ContractFarmingService {
             "OPEN",
             8
         ));
-        list.add(new ContractRequestDTO(
+        contractsList.add(new ContractRequestDTO(
             "TENDER-803",
             "Shangri-La Hotels & Resorts",
             "Hospitality Group",
@@ -54,6 +56,14 @@ public class ContractFarmingService {
             "OPEN",
             22
         ));
-        return list;
+    }
+
+    public List<ContractRequestDTO> getAllContractRequests() {
+        return new ArrayList<>(contractsList);
+    }
+
+    public ContractRequestDTO addContractRequest(ContractRequestDTO dto) {
+        contractsList.add(0, dto);
+        return dto;
     }
 }

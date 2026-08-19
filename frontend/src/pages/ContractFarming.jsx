@@ -30,7 +30,11 @@ import {
   CheckSquare,
   BadgeCheck,
   ArrowUpRight,
-  Lock
+  Lock,
+  QrCode,
+  Download,
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 import { contractFarmingAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -173,12 +177,16 @@ const INITIAL_APPLICATIONS = [
     cropName: 'Samba Rice',
     offeredQtyKg: 2500,
     offeredPrice: 220,
+    isCounterOffer: false,
     status: 'APPROVED',
     statusBadge: 'Approved - Escrow Locked 🔒',
     appliedDate: '2026-08-10',
     district: 'Anuradhapura',
     contractTerm: '6 Months',
-    signed: true
+    signed: true,
+    deliveredKg: 1250,
+    escrowReleasedLkr: 275000,
+    nextPickupDate: '2026-08-24'
   },
   {
     id: 'APP-902',
@@ -187,13 +195,18 @@ const INITIAL_APPLICATIONS = [
     farmerName: 'Kamal Fernando (Highland Organics)',
     cropName: 'Organic Tomato',
     offeredQtyKg: 1000,
-    offeredPrice: 200,
+    offeredPrice: 225,
+    isCounterOffer: true,
+    counterReason: 'Requesting +Rs 15/kg due to USDA Organic certification and greenhouse cultivation.',
     status: 'UNDER_REVIEW',
-    statusBadge: 'Under Review ⏳',
+    statusBadge: 'Counter-Offer Proposed 💬',
     appliedDate: '2026-08-18',
     district: 'Nuwara Eliya',
     contractTerm: '6 Months',
-    signed: false
+    signed: false,
+    deliveredKg: 0,
+    escrowReleasedLkr: 0,
+    nextPickupDate: 'Pending Signing'
   }
 ];
 
@@ -217,8 +230,12 @@ export const ContractFarming = () => {
   const [selectedTenderForView, setSelectedTenderForView] = useState(null);
   const [selectedTenderForCalc, setSelectedTenderForCalc] = useState(null);
   const [selectedAppForSign, setSelectedAppForSign] = useState(null);
+  const [selectedAppForPdf, setSelectedAppForPdf] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [applySuccessMsg, setApplySuccessMsg] = useState('');
+
+  // Counter-Offer Toggle State
+  const [isCounterOfferMode, setIsCounterOfferMode] = useState(false);
 
   // Calculator Form State
   const [calcData, setCalcData] = useState({
@@ -238,6 +255,7 @@ export const ContractFarming = () => {
     capacityKg: '',
     district: 'Nuwara Eliya',
     offerPrice: '',
+    counterReason: '',
     notes: ''
   });
 
@@ -274,7 +292,7 @@ export const ContractFarming = () => {
     fetchContracts();
   }, []);
 
-  const handleApplySubmit = (e) => {
+  const handleApplySubmit = async (e) => {
     e.preventDefault();
     if (!selectedTenderForApply) return;
     
@@ -286,18 +304,30 @@ export const ContractFarming = () => {
       cropName: selectedTenderForApply.cropName,
       offeredQtyKg: Number(applyForm.capacityKg) || 500,
       offeredPrice: Number(applyForm.offerPrice) || selectedTenderForApply.minPriceLkr,
+      isCounterOffer: isCounterOfferMode,
+      counterReason: applyForm.counterReason || '',
       status: 'UNDER_REVIEW',
-      statusBadge: 'Under Review ⏳',
+      statusBadge: isCounterOfferMode ? 'Counter-Offer Proposed 💬' : 'Under Review ⏳',
       appliedDate: new Date().toISOString().split('T')[0],
       district: applyForm.district,
       contractTerm: `${selectedTenderForApply.durationMonths} Months`,
-      signed: false
+      signed: false,
+      deliveredKg: 0,
+      escrowReleasedLkr: 0,
+      nextPickupDate: 'Pending Signing'
     };
+
+    try {
+      await contractFarmingAPI.apply();
+    } catch (err) {
+      // Graceful mock fallback
+    }
 
     setAppliedIds((prev) => [...prev, selectedTenderForApply.id]);
     setMyApplications((prev) => [newApp, ...prev]);
     setApplySuccessMsg(`Application for ${selectedTenderForApply.buyerName} submitted successfully!`);
     setSelectedTenderForApply(null);
+    setIsCounterOfferMode(false);
     
     setTimeout(() => {
       setApplySuccessMsg('');
@@ -316,7 +346,29 @@ export const ContractFarming = () => {
           : app
       )
     );
-    setApplySuccessMsg(`Application ${appId} has been Approved and Escrow funds locked!`);
+    setApplySuccessMsg(`Application ${appId} approved & Escrow funds locked in vault!`);
+
+    setTimeout(() => {
+      setApplySuccessMsg('');
+    }, 4000);
+  };
+
+  const handleLogDispatch = (appId) => {
+    setMyApplications((prev) =>
+      prev.map((app) => {
+        if (app.id === appId) {
+          const newDelivered = Math.min(app.offeredQtyKg, app.deliveredKg + 500);
+          const newReleased = newDelivered * app.offeredPrice;
+          return {
+            ...app,
+            deliveredKg: newDelivered,
+            escrowReleasedLkr: newReleased
+          };
+        }
+        return app;
+      })
+    );
+    setApplySuccessMsg(`Logged shipment dispatch of +500kg! Escrow payment automatically released to farmer account.`);
 
     setTimeout(() => {
       setApplySuccessMsg('');
@@ -743,6 +795,7 @@ export const ContractFarming = () => {
                                 capacityKg: Math.round(item.monthlyQuantityKg * 0.5),
                                 district: item.district.split('/')[0].trim(),
                                 offerPrice: Math.round((item.minPriceLkr + item.maxPriceLkr) / 2),
+                                counterReason: '',
                                 notes: 'Verified grower with organic certification.'
                               });
                             }}
@@ -769,71 +822,108 @@ export const ContractFarming = () => {
               Your Submitted B2B Contract Proposals 📑
             </h3>
             <p className="text-slate-500 text-xs">
-              Track contract proposal statuses, escrow lock confirmations, and enterprise buyer responses.
+              Track contract proposal statuses, escrow lock confirmations, milestone dispatches, and download sealed agreements.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {myApplications.map((app) => (
-              <div key={app.id} className="premium-card p-6 bg-white border border-slate-100 shadow-md space-y-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Application ID: {app.id}</span>
-                    <h4 className="text-lg font-extrabold text-slate-900 font-display mt-0.5">{app.buyerName}</h4>
-                    <p className="text-xs font-bold text-emerald-700">Harvest: 🌾 {app.cropName}</p>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
-                    app.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
-                  }`}>
-                    {app.statusBadge}
-                  </span>
-                </div>
-
-                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 grid grid-cols-2 gap-2 text-xs font-semibold">
-                  <div>
-                    <span className="text-slate-400 text-[10px] uppercase block">Submitted Capacity</span>
-                    <span className="text-slate-900 font-extrabold">{app.offeredQtyKg.toLocaleString()} kg / month</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[10px] uppercase block">Offered Rate</span>
-                    <span className="text-emerald-600 font-extrabold">Rs. {app.offeredPrice} / kg</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[10px] uppercase block">Contract Term</span>
-                    <span className="text-slate-800 font-bold">{app.contractTerm}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 text-[10px] uppercase block">Application Date</span>
-                    <span className="text-slate-800 font-bold">{app.appliedDate}</span>
-                  </div>
-                </div>
-
-                {app.status === 'APPROVED' && (
-                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-2">
-                    <div className="flex items-center justify-between text-emerald-800 font-bold text-xs">
-                      <span className="flex items-center gap-1.5">
-                        <ShieldCheck className="w-4 h-4 text-emerald-600" /> Escrow Locked: Rs. 550,000.00
+            {myApplications.map((app) => {
+              const fulfillmentPct = Math.min(100, Math.round((app.deliveredKg / app.offeredQtyKg) * 100));
+              return (
+                <div key={app.id} className="premium-card p-6 bg-white border border-slate-100 shadow-md space-y-4 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Application ID: {app.id}</span>
+                        <h4 className="text-lg font-extrabold text-slate-900 font-display mt-0.5">{app.buyerName}</h4>
+                        <p className="text-xs font-bold text-emerald-700">Harvest: 🌾 {app.cropName}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
+                        app.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
+                      }`}>
+                        {app.statusBadge}
                       </span>
-                      {app.signed ? (
-                        <span className="px-2 py-0.5 bg-emerald-700 text-white text-[10px] font-black rounded-md">
-                          Digitally Signed ✓
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => setSelectedAppForSign(app)}
-                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
-                        >
-                          Sign B2B Agreement ✍️
-                        </button>
-                      )}
                     </div>
-                    <p className="text-[11px] leading-tight text-emerald-700 font-medium">
-                      Enterprise buyer locked advance funds in Escrow. Deliveries scheduled via Smart Logistics.
-                    </p>
+
+                    {app.isCounterOffer && (
+                      <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 font-semibold space-y-1">
+                        <span className="font-extrabold block">💬 Counter-Offer Submitted: Rs. {app.offeredPrice}/kg</span>
+                        <p className="text-[11px] text-amber-800 line-clamp-2">{app.counterReason}</p>
+                      </div>
+                    )}
+
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 grid grid-cols-2 gap-2 text-xs font-semibold">
+                      <div>
+                        <span className="text-slate-400 text-[10px] uppercase block">Submitted Quota</span>
+                        <span className="text-slate-900 font-extrabold">{app.offeredQtyKg.toLocaleString()} kg / month</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 text-[10px] uppercase block">Agreed Rate</span>
+                        <span className="text-emerald-600 font-extrabold">Rs. {app.offeredPrice} / kg</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 text-[10px] uppercase block">Contract Term</span>
+                        <span className="text-slate-800 font-bold">{app.contractTerm}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-400 text-[10px] uppercase block">Next Pickup</span>
+                        <span className="text-slate-800 font-bold">{app.nextPickupDate}</span>
+                      </div>
+                    </div>
+
+                    {/* FULFILLMENT MILESTONE PROGRESS TRACKER */}
+                    {app.status === 'APPROVED' && (
+                      <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-3 shadow-inner">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-slate-300 font-bold">Monthly Supply Fulfillment:</span>
+                          <span className="text-emerald-400 font-extrabold">{app.deliveredKg.toLocaleString()} / {app.offeredQtyKg.toLocaleString()} kg ({fulfillmentPct}%)</span>
+                        </div>
+
+                        {/* PROGRESS BAR */}
+                        <div className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                            style={{ width: `${fulfillmentPct}%` }}
+                          />
+                        </div>
+
+                        <div className="flex justify-between items-center text-xs pt-1 border-t border-slate-800 text-slate-300">
+                          <span>Escrow Released to Account:</span>
+                          <span className="text-emerald-400 font-extrabold font-display">
+                            Rs. {app.escrowReleasedLkr.toLocaleString()}.00
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {/* ACTION BUTTONS */}
+                  <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                    {app.status === 'APPROVED' && (
+                      <>
+                        <button
+                          onClick={() => handleLogDispatch(app.id)}
+                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Truck className="w-3.5 h-3.5" /> Log Dispatch (+500kg)
+                        </button>
+
+                        <button
+                          onClick={() => setSelectedAppForPdf(app)}
+                          className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-slate-600" /> Sealed PDF 📄
+                        </button>
+                      </>
+                    )}
+
+                    {app.status !== 'APPROVED' && (
+                      <span className="text-xs text-slate-400 font-bold">Waiting for buyer approval &amp; Escrow lock</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -847,17 +937,17 @@ export const ContractFarming = () => {
                 <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-500/30">
                   Enterprise Buyer Control Center
                 </span>
-                <h3 className="text-xl font-extrabold font-display mt-2">Incoming Farmer Tenders &amp; Proposals</h3>
+                <h3 className="text-xl font-extrabold font-display mt-2">Incoming Farmer Tenders &amp; Counter-Offers</h3>
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" /> Post New Tender
               </button>
             </div>
             <p className="text-xs text-slate-300">
-              Review farmer capacity proposals for your published tenders. Approve proposals to automatically lock Escrow funds.
+              Review farmer capacity proposals and price counter-offers. Accept proposals to automatically lock Escrow funds.
             </p>
           </div>
 
@@ -870,14 +960,24 @@ export const ContractFarming = () => {
                     <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
                       🌾 {app.cropName}
                     </span>
+                    {app.isCounterOffer && (
+                      <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-black rounded-md">
+                        Counter-Offer Proposed 💬
+                      </span>
+                    )}
                   </div>
                   <h4 className="text-base font-extrabold text-slate-900 font-display">Farmer: {app.farmerName}</h4>
                   <p className="text-xs text-slate-600">
-                    District: 📍 {app.district} • Offered Yield: <strong>{app.offeredQtyKg.toLocaleString()} kg/mo</strong> @ <strong>Rs. {app.offeredPrice}/kg</strong>
+                    District: 📍 {app.district} • Offered Yield: <strong>{app.offeredQtyKg.toLocaleString()} kg/mo</strong> @ <strong className="text-emerald-600">Rs. {app.offeredPrice}/kg</strong>
                   </p>
+                  {app.counterReason && (
+                    <p className="text-[11px] text-slate-500 italic mt-1 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                      "{app.counterReason}"
+                    </p>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0">
                   {app.status === 'APPROVED' ? (
                     <span className="px-4 py-2 bg-emerald-100 text-emerald-800 font-extrabold text-xs rounded-xl flex items-center gap-1">
                       <Lock className="w-3.5 h-3.5 text-emerald-600" /> Escrow Locked &amp; Approved
@@ -896,6 +996,95 @@ export const ContractFarming = () => {
           </div>
         </div>
       )}
+
+      {/* SEALED PDF B2B AGREEMENT DOCUMENT VIEW MODAL */}
+      <AnimatePresence>
+        {selectedAppForPdf && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-2xl w-full p-8 space-y-6 overflow-hidden relative max-h-[90vh] overflow-y-auto"
+            >
+              {/* PDF HEADER */}
+              <div className="flex justify-between items-start pb-6 border-b border-slate-200">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold">
+                      🛡️
+                    </div>
+                    <h2 className="text-xl font-black text-slate-900 font-display">AgroLink B2B Escrow Agreement</h2>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">Official Legal Procurement Certificate • Ref: {selectedAppForPdf.id}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedAppForPdf(null)}
+                  className="p-2 hover:bg-slate-100 rounded-xl transition text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* AGREEMENT DETAILS */}
+              <div className="space-y-4 text-xs text-slate-700">
+                <div className="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200 grid grid-cols-2 gap-3 font-semibold">
+                  <div>
+                    <span className="text-[10px] uppercase text-emerald-800 block font-bold">Enterprise Contracting Party</span>
+                    <span className="text-sm font-extrabold text-slate-900">{selectedAppForPdf.buyerName}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-emerald-800 block font-bold">Registered Grower</span>
+                    <span className="text-sm font-extrabold text-slate-900">{selectedAppForPdf.farmerName}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-emerald-800 block font-bold">Harvest Commodity</span>
+                    <span className="text-slate-900 font-bold">🌾 {selectedAppForPdf.cropName}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-emerald-800 block font-bold">Agreed Quota &amp; Rate</span>
+                    <span className="text-emerald-700 font-extrabold">{selectedAppForPdf.offeredQtyKg.toLocaleString()} kg/mo @ Rs. {selectedAppForPdf.offeredPrice}/kg</span>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                  <h4 className="font-extrabold text-slate-900 font-display text-xs uppercase tracking-wider">Terms &amp; Settlement Warranty</h4>
+                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                    This agreement certifies that {selectedAppForPdf.buyerName} has deposited and locked full monthly escrow reserves for {selectedAppForPdf.cropName}. Delivery verification is governed by AgroLink 9-Stage Fleet Telemetry and QR Code scanning.
+                  </p>
+                </div>
+
+                {/* SIGNATURE STAMP SECTION */}
+                <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Digital Verification QR</span>
+                    <div className="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center border border-slate-200 text-xs font-bold text-slate-400">
+                      <QrCode className="w-10 h-10 text-slate-700" />
+                    </div>
+                  </div>
+
+                  <div className="text-right space-y-1">
+                    <div className="px-3 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase inline-block">
+                      OFFICIAL ESCROW SEALED 🛡️
+                    </div>
+                    <p className="text-[10px] text-slate-400 font-mono">HASH: 0x89F4...A21E</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* MODAL FOOTER */}
+              <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                <button
+                  onClick={() => window.print()}
+                  className="px-5 py-2.5 bg-slate-900 text-white hover:bg-slate-800 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Printer className="w-4 h-4" /> Download / Print Official PDF Sheet
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* REVENUE CALCULATOR MODAL */}
       <AnimatePresence>
@@ -1155,7 +1344,7 @@ export const ContractFarming = () => {
         )}
       </AnimatePresence>
 
-      {/* APPLY FOR CONTRACT MODAL */}
+      {/* APPLY FOR CONTRACT MODAL (WITH COUNTER-OFFER TOGGLE) */}
       <AnimatePresence>
         {selectedTenderForApply && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
@@ -1163,9 +1352,9 @@ export const ContractFarming = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-xl w-full p-6 space-y-6 overflow-hidden relative"
+              className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-xl w-full p-6 space-y-5 overflow-hidden relative max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
                 <div>
                   <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase">
                     B2B Application Form
@@ -1228,6 +1417,35 @@ export const ContractFarming = () => {
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500"
                     />
                   </div>
+                </div>
+
+                {/* COUNTER OFFER TOGGLE */}
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800">Propose Counter-Offer Rate 💬</span>
+                    <button
+                      type="button"
+                      onClick={() => setIsCounterOfferMode(!isCounterOfferMode)}
+                      className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
+                        isCounterOfferMode ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {isCounterOfferMode ? 'Counter-Offer Enabled ✓' : 'Enable Counter-Offer'}
+                    </button>
+                  </div>
+
+                  {isCounterOfferMode && (
+                    <div className="pt-2 space-y-2">
+                      <label className="block text-[10px] font-bold uppercase text-amber-800">Counter-Offer Justification Note</label>
+                      <textarea
+                        rows={2}
+                        value={applyForm.counterReason}
+                        onChange={(e) => setApplyForm({ ...applyForm, counterReason: e.target.value })}
+                        placeholder="Explain counter-offer justification (e.g., GAP organic certification, special variety)..."
+                        className="w-full px-3 py-2 rounded-xl border border-amber-300 text-xs font-semibold focus:outline-none bg-amber-50/50"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div>

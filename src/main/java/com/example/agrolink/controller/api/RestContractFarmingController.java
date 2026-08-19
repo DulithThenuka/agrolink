@@ -4,10 +4,7 @@ import com.example.agrolink.dto.ApiResponse;
 import com.example.agrolink.dto.ContractRequestDTO;
 import com.example.agrolink.service.ContractFarmingService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,6 +22,12 @@ public class RestContractFarmingController {
     public ResponseEntity<ApiResponse<List<ContractRequestDTO>>> getContracts() {
         List<ContractRequestDTO> list = contractFarmingService.getAllContractRequests();
         return ResponseEntity.ok(ApiResponse.success("B2B contract requests retrieved successfully", list));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<ContractRequestDTO>> createContract(@RequestBody ContractRequestDTO dto) {
+        ContractRequestDTO created = contractFarmingService.addContractRequest(dto);
+        return ResponseEntity.ok(ApiResponse.success("B2B purchase contract request created successfully!", created));
     }
 
     @PostMapping("/apply")
