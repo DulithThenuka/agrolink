@@ -24,7 +24,13 @@ import {
   Printer,
   ChevronRight,
   Clock,
-  Briefcase
+  Briefcase,
+  Calculator,
+  PenTool,
+  CheckSquare,
+  BadgeCheck,
+  ArrowUpRight,
+  Lock
 } from 'lucide-react';
 import { contractFarmingAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -45,6 +51,7 @@ const DEFAULT_CONTRACTS = [
     applicantCount: 14,
     district: 'Nuwara Eliya',
     escrowGuaranteed: true,
+    certifications: ['🌱 GAP Certified', '🇪🇺 EU Export Standard'],
     description: 'Weekly scheduled supply of Grade A vine-ripened organic tomatoes for 50+ retail supermarket branches.',
     qualityStandards: 'Grade A size min 55mm, zero synthetic chemical residues, firm texture, max 2% blemishes.',
     logisticsProtocol: 'Refrigerated transport at 12°C. Central Distribution Hub pickup in Dambulla every Monday 06:00 AM.',
@@ -65,6 +72,7 @@ const DEFAULT_CONTRACTS = [
     applicantCount: 8,
     district: 'Jaffna',
     escrowGuaranteed: true,
+    certifications: ['🌱 GAP Certified', '🔒 ISO 22000'],
     description: 'Long-term 12-month supply contract for high-spice green chillies with automated temperature-controlled logistics.',
     qualityStandards: 'Uniform dark green color, minimum length 7cm, crisp texture, maximum 3% moisture loss during transit.',
     logisticsProtocol: 'Ventilated crate transport. Direct regional collection center drop-off in Jaffna or Dambulla.',
@@ -85,6 +93,7 @@ const DEFAULT_CONTRACTS = [
     applicantCount: 22,
     district: 'Anuradhapura',
     escrowGuaranteed: true,
+    certifications: ['🌿 100% Organic', '🔒 ISO 22000'],
     description: 'Direct procurement of aged tank Samba rice for luxury hotel chain kitchen dining operations.',
     qualityStandards: 'Aged minimum 6 months, maximum 11% moisture content, zero foreign matter or broken grains > 2%.',
     logisticsProtocol: '25kg moisture-barrier sealed sacks. Delivery to Colombo Central Receiving Dock.',
@@ -105,6 +114,7 @@ const DEFAULT_CONTRACTS = [
     applicantCount: 11,
     district: 'Galle',
     escrowGuaranteed: true,
+    certifications: ['🇪🇺 EU Export Standard', '🌱 Organic Certified'],
     description: 'Export-grade thin quills Ceylon cinnamon with low coumarin certification for European retail distribution.',
     qualityStandards: 'Pencil-thin Alba quills diameter < 6mm, certified coumarin < 0.002%, hand-peeled smooth finish.',
     logisticsProtocol: 'Vacuum-sealed double cartons. Direct delivery to Galle Processing Facility.',
@@ -125,6 +135,7 @@ const DEFAULT_CONTRACTS = [
     applicantCount: 19,
     district: 'Hambantota',
     escrowGuaranteed: true,
+    certifications: ['🌱 GAP Certified'],
     description: 'High Brix natural sweetness watermelons for beverage processing and retail distribution.',
     qualityStandards: 'Minimum Brix sugar content 11.5°, fruit weight 3.5kg - 5.5kg, undamaged rind.',
     logisticsProtocol: 'Bulk padded crates. Weekly dispatch from Hambantota collection hub to Biyagama plant.',
@@ -145,6 +156,7 @@ const DEFAULT_CONTRACTS = [
     applicantCount: 7,
     district: 'Nuwara Eliya',
     escrowGuaranteed: true,
+    certifications: ['🌱 GAP Certified'],
     description: 'Washed and sorted crisp highland carrots for retail supermarket produce shelves.',
     qualityStandards: 'Washed, tops trimmed, length 12-18cm, smooth skin, zero soil accumulation.',
     logisticsProtocol: 'Perforated 10kg crates. Temperature maintained at 8°C during transit.',
@@ -157,6 +169,7 @@ const INITIAL_APPLICATIONS = [
     id: 'APP-901',
     tenderId: 'TENDER-803',
     buyerName: 'Shangri-La Hotels & Resorts',
+    farmerName: 'Sunil Perera (Green Valley Farm)',
     cropName: 'Samba Rice',
     offeredQtyKg: 2500,
     offeredPrice: 220,
@@ -164,12 +177,14 @@ const INITIAL_APPLICATIONS = [
     statusBadge: 'Approved - Escrow Locked 🔒',
     appliedDate: '2026-08-10',
     district: 'Anuradhapura',
-    contractTerm: '6 Months'
+    contractTerm: '6 Months',
+    signed: true
   },
   {
     id: 'APP-902',
     tenderId: 'TENDER-801',
     buyerName: 'Keells Supermarket',
+    farmerName: 'Kamal Fernando (Highland Organics)',
     cropName: 'Organic Tomato',
     offeredQtyKg: 1000,
     offeredPrice: 200,
@@ -177,7 +192,8 @@ const INITIAL_APPLICATIONS = [
     statusBadge: 'Under Review ⏳',
     appliedDate: '2026-08-18',
     district: 'Nuwara Eliya',
-    contractTerm: '6 Months'
+    contractTerm: '6 Months',
+    signed: false
   }
 ];
 
@@ -199,8 +215,22 @@ export const ContractFarming = () => {
   // Modal States
   const [selectedTenderForApply, setSelectedTenderForApply] = useState(null);
   const [selectedTenderForView, setSelectedTenderForView] = useState(null);
+  const [selectedTenderForCalc, setSelectedTenderForCalc] = useState(null);
+  const [selectedAppForSign, setSelectedAppForSign] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [applySuccessMsg, setApplySuccessMsg] = useState('');
+
+  // Calculator Form State
+  const [calcData, setCalcData] = useState({
+    monthlyKg: 1000,
+    priceLkr: 200,
+    durationMonths: 6,
+    frequency: 'Weekly'
+  });
+
+  // Digital Signature State
+  const [digitalSignature, setDigitalSignature] = useState('');
+  const [termsAgreed, setTermsAgreed] = useState(false);
 
   // Form States for Apply Modal
   const [applyForm, setApplyForm] = useState({
@@ -252,6 +282,7 @@ export const ContractFarming = () => {
       id: `APP-${Math.floor(900 + Math.random() * 100)}`,
       tenderId: selectedTenderForApply.id,
       buyerName: selectedTenderForApply.buyerName,
+      farmerName: applyForm.farmerName || 'Registered Farmer',
       cropName: selectedTenderForApply.cropName,
       offeredQtyKg: Number(applyForm.capacityKg) || 500,
       offeredPrice: Number(applyForm.offerPrice) || selectedTenderForApply.minPriceLkr,
@@ -259,7 +290,8 @@ export const ContractFarming = () => {
       statusBadge: 'Under Review ⏳',
       appliedDate: new Date().toISOString().split('T')[0],
       district: applyForm.district,
-      contractTerm: `${selectedTenderForApply.durationMonths} Months`
+      contractTerm: `${selectedTenderForApply.durationMonths} Months`,
+      signed: false
     };
 
     setAppliedIds((prev) => [...prev, selectedTenderForApply.id]);
@@ -267,6 +299,47 @@ export const ContractFarming = () => {
     setApplySuccessMsg(`Application for ${selectedTenderForApply.buyerName} submitted successfully!`);
     setSelectedTenderForApply(null);
     
+    setTimeout(() => {
+      setApplySuccessMsg('');
+    }, 4000);
+  };
+
+  const handleApproveApplication = (appId) => {
+    setMyApplications((prev) =>
+      prev.map((app) =>
+        app.id === appId
+          ? {
+              ...app,
+              status: 'APPROVED',
+              statusBadge: 'Approved - Escrow Locked 🔒'
+            }
+          : app
+      )
+    );
+    setApplySuccessMsg(`Application ${appId} has been Approved and Escrow funds locked!`);
+
+    setTimeout(() => {
+      setApplySuccessMsg('');
+    }, 4000);
+  };
+
+  const handleDigitalSignSubmit = (e) => {
+    e.preventDefault();
+    if (!selectedAppForSign || !digitalSignature || !termsAgreed) return;
+
+    setMyApplications((prev) =>
+      prev.map((app) =>
+        app.id === selectedAppForSign.id
+          ? { ...app, signed: true }
+          : app
+      )
+    );
+
+    setApplySuccessMsg(`B2B Escrow Supply Agreement digitally signed by ${digitalSignature}!`);
+    setSelectedAppForSign(null);
+    setDigitalSignature('');
+    setTermsAgreed(false);
+
     setTimeout(() => {
       setApplySuccessMsg('');
     }, 4000);
@@ -289,6 +362,7 @@ export const ContractFarming = () => {
       applicantCount: 0,
       district: createForm.district,
       escrowGuaranteed: true,
+      certifications: ['🌱 GAP Certified'],
       description: createForm.description || 'Enterprise contract procurement requirement.',
       qualityStandards: 'Grade A standard, zero synthetic pesticide residues.',
       logisticsProtocol: 'Standard temperature controlled transport.',
@@ -352,6 +426,12 @@ export const ContractFarming = () => {
   };
 
   const filteredContracts = getFilteredContracts();
+
+  // Calculator Math
+  const monthlyRevenue = calcData.monthlyKg * calcData.priceLkr;
+  const totalContractRevenue = monthlyRevenue * calcData.durationMonths;
+  const escrowAdvanceLock = totalContractRevenue * 0.20;
+  const perDispatchPayout = calcData.frequency === 'Weekly' ? monthlyRevenue / 4 : monthlyRevenue / 2;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
@@ -447,6 +527,18 @@ export const ContractFarming = () => {
         >
           <FileCheck className="w-4 h-4" />
           <span>My Submitted Applications ({myApplications.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('buyer-manager')}
+          className={`pb-3 flex items-center gap-2 border-b-2 transition ${
+            activeTab === 'buyer-manager'
+              ? 'border-emerald-600 text-emerald-700 font-extrabold'
+              : 'border-transparent text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Briefcase className="w-4 h-4" />
+          <span>Enterprise Buyer Portal</span>
         </button>
       </div>
 
@@ -556,6 +648,17 @@ export const ContractFarming = () => {
                         </span>
                       </div>
 
+                      {/* CERTIFICATION BADGES */}
+                      {item.certifications && (
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
+                          {item.certifications.map((c) => (
+                            <span key={c} className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[9px] font-extrabold border border-slate-200">
+                              {c}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
                       {/* REQUIREMENT CARD */}
                       <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
                         <div>
@@ -598,12 +701,28 @@ export const ContractFarming = () => {
 
                     {/* FOOTER ACTIONS */}
                     <div className="pt-4 border-t border-slate-100 space-y-3">
-                      <button
-                        onClick={() => setSelectedTenderForView(item)}
-                        className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5 text-slate-600" /> View Terms &amp; Inspection Protocol
-                      </button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => setSelectedTenderForView(item)}
+                          className="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-slate-600" /> Specs
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedTenderForCalc(item);
+                            setCalcData({
+                              monthlyKg: item.monthlyQuantityKg,
+                              priceLkr: Math.round((item.minPriceLkr + item.maxPriceLkr) / 2),
+                              durationMonths: item.durationMonths,
+                              frequency: item.deliveryFrequency
+                            });
+                          }}
+                          className="py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-[11px] rounded-xl border border-emerald-200 transition flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Calculator className="w-3.5 h-3.5 text-emerald-600" /> Revenue Calc
+                        </button>
+                      </div>
 
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-[11px] text-slate-400 font-semibold flex items-center gap-1">
@@ -690,13 +809,26 @@ export const ContractFarming = () => {
                 </div>
 
                 {app.status === 'APPROVED' && (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 font-medium space-y-1">
-                    <div className="flex items-center gap-1.5 font-bold text-emerald-800">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                      <span>Contract Approved &amp; Escrow Vault Locked!</span>
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl space-y-2">
+                    <div className="flex items-center justify-between text-emerald-800 font-bold text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <ShieldCheck className="w-4 h-4 text-emerald-600" /> Escrow Locked: Rs. 550,000.00
+                      </span>
+                      {app.signed ? (
+                        <span className="px-2 py-0.5 bg-emerald-700 text-white text-[10px] font-black rounded-md">
+                          Digitally Signed ✓
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => setSelectedAppForSign(app)}
+                          className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
+                        >
+                          Sign B2B Agreement ✍️
+                        </button>
+                      )}
                     </div>
-                    <p className="text-[11px] leading-tight text-emerald-700">
-                      Shangri-La Hotels locked Rs. 550,000.00 in AgroLink Escrow. Weekly dispatch pickup starts next Monday.
+                    <p className="text-[11px] leading-tight text-emerald-700 font-medium">
+                      Enterprise buyer locked advance funds in Escrow. Deliveries scheduled via Smart Logistics.
                     </p>
                   </div>
                 )}
@@ -705,6 +837,247 @@ export const ContractFarming = () => {
           </div>
         </div>
       )}
+
+      {/* TAB 3: ENTERPRISE BUYER PORTAL MANAGER */}
+      {activeTab === 'buyer-manager' && (
+        <div className="space-y-6">
+          <div className="premium-card p-6 bg-slate-900 text-white shadow-xl space-y-3">
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-500/30">
+                  Enterprise Buyer Control Center
+                </span>
+                <h3 className="text-xl font-extrabold font-display mt-2">Incoming Farmer Tenders &amp; Proposals</h3>
+              </div>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5"
+              >
+                <PlusCircle className="w-4 h-4" /> Post New Tender
+              </button>
+            </div>
+            <p className="text-xs text-slate-300">
+              Review farmer capacity proposals for your published tenders. Approve proposals to automatically lock Escrow funds.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {myApplications.map((app) => (
+              <div key={app.id} className="premium-card p-6 bg-white border border-slate-100 shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-400">Tender: {app.tenderId}</span>
+                    <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                      🌾 {app.cropName}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-extrabold text-slate-900 font-display">Farmer: {app.farmerName}</h4>
+                  <p className="text-xs text-slate-600">
+                    District: 📍 {app.district} • Offered Yield: <strong>{app.offeredQtyKg.toLocaleString()} kg/mo</strong> @ <strong>Rs. {app.offeredPrice}/kg</strong>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {app.status === 'APPROVED' ? (
+                    <span className="px-4 py-2 bg-emerald-100 text-emerald-800 font-extrabold text-xs rounded-xl flex items-center gap-1">
+                      <Lock className="w-3.5 h-3.5 text-emerald-600" /> Escrow Locked &amp; Approved
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleApproveApplication(app.id)}
+                      className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <ShieldCheck className="w-4 h-4" /> Approve &amp; Lock Escrow 🔒
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* REVENUE CALCULATOR MODAL */}
+      <AnimatePresence>
+        {selectedTenderForCalc && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-lg w-full p-6 space-y-5 overflow-hidden relative"
+            >
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase">
+                    Escrow Financial Simulator
+                  </span>
+                  <h3 className="text-xl font-extrabold text-slate-900 font-display mt-1">
+                    Contract Revenue Calculator 🧮
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setSelectedTenderForCalc(null)}
+                  className="p-2 hover:bg-slate-100 rounded-xl transition text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Monthly Supply Quota (kg)</label>
+                    <input
+                      type="number"
+                      value={calcData.monthlyKg}
+                      onChange={(e) => setCalcData({ ...calcData, monthlyKg: Number(e.target.value) })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Agreed Price (Rs/kg)</label>
+                    <input
+                      type="number"
+                      value={calcData.priceLkr}
+                      onChange={(e) => setCalcData({ ...calcData, priceLkr: Number(e.target.value) })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                {/* CALCULATED FINANCIAL MATRIX */}
+                <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-3 shadow-inner">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-400 font-medium">Monthly Gross Revenue:</span>
+                    <span className="text-base font-extrabold text-emerald-400 font-display">
+                      Rs. {monthlyRevenue.toLocaleString()}.00
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-400 font-medium">Total {calcData.durationMonths}-Month Contract Value:</span>
+                    <span className="text-lg font-extrabold text-emerald-300 font-display">
+                      Rs. {totalContractRevenue.toLocaleString()}.00
+                    </span>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-xs">
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                      🔒 20% Advance Escrow Lock:
+                    </span>
+                    <span className="text-sm font-black text-emerald-400">
+                      Rs. {escrowAdvanceLock.toLocaleString()}.00
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-400 font-medium">Est. Payout Per Dispatch:</span>
+                    <span className="text-xs font-bold text-white">
+                      Rs. {perDispatchPayout.toLocaleString()}.00 / shipment
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <button
+                  onClick={() => setSelectedTenderForCalc(null)}
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition"
+                >
+                  Close Calculator
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* DIGITAL SIGNATURE MODAL */}
+      <AnimatePresence>
+        {selectedAppForSign && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full p-6 space-y-5 overflow-hidden relative"
+            >
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase">
+                    Legal B2B Execution
+                  </span>
+                  <h3 className="text-xl font-extrabold text-slate-900 font-display mt-1">
+                    Digital Contract Signing ✍️
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setSelectedAppForSign(null)}
+                  className="p-2 hover:bg-slate-100 rounded-xl transition text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleDigitalSignSubmit} className="space-y-4">
+                <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs space-y-1.5">
+                  <div className="flex justify-between font-bold text-slate-900">
+                    <span>Buyer: {selectedAppForSign.buyerName}</span>
+                    <span>Harvest: {selectedAppForSign.cropName}</span>
+                  </div>
+                  <div className="flex justify-between text-[11px] text-slate-600">
+                    <span>Quota: {selectedAppForSign.offeredQtyKg} kg/mo</span>
+                    <span>Rate: Rs. {selectedAppForSign.offeredPrice}/kg</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">Type Full Authorized Signature</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Sunil Perera"
+                    value={digitalSignature}
+                    onChange={(e) => setDigitalSignature(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 font-display"
+                  />
+                </div>
+
+                <div className="flex items-start gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    required
+                    checked={termsAgreed}
+                    onChange={(e) => setTermsAgreed(e.target.checked)}
+                    className="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                  />
+                  <label htmlFor="terms" className="text-[11px] text-slate-600 font-semibold cursor-pointer">
+                    I confirm supply capacity and agree to AgroLink Escrow delivery protocols.
+                  </label>
+                </div>
+
+                <div className="pt-2 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedAppForSign(null)}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <PenTool className="w-4 h-4" /> Sign &amp; Seal Agreement
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* VIEW DETAILED SPECIFICATION & TERMS MODAL */}
       <AnimatePresence>
