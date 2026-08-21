@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sprout,
   ShoppingBag,
@@ -14,7 +14,15 @@ import {
   Sparkles,
   Award,
   ArrowUpRight,
-  Package
+  Package,
+  Cpu,
+  Scan,
+  FileCheck,
+  Activity,
+  CloudRain,
+  ShieldAlert,
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 import { cropsAPI } from '../services/api';
 import { BuyCropModal } from '../components/BuyCropModal';
@@ -24,6 +32,7 @@ export const Home = () => {
   const [featuredCrops, setFeaturedCrops] = useState([]);
   const [loadingCrops, setLoadingCrops] = useState(true);
   const [selectedCropForPurchase, setSelectedCropForPurchase] = useState(null);
+  const [activeAiTab, setActiveAiTab] = useState('price'); // 'price', 'disease', 'contract', 'intel'
   const navigate = useNavigate();
 
   const MOCK_FEATURED_CROPS = [
@@ -311,6 +320,274 @@ export const Home = () => {
               </div>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* POWERED BY AGROLINK AI FEATURE SHOWCASE HUB */}
+      <section className="max-w-7xl mx-auto px-6">
+        <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 space-y-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          {/* HEADER */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6 relative z-10">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black uppercase tracking-wider mb-2 border border-emerald-500/30">
+                <Cpu className="w-4 h-4 text-emerald-400 animate-spin-slow" /> AI-POWERED AGTECH MATRIX
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
+                Powered by AgroLink AI Intelligence 🚀
+              </h2>
+              <p className="text-slate-300 text-sm mt-1 max-w-xl font-medium">
+                Time-series market forecasting, computer vision plant pathology, and automated forward escrow agreements.
+              </p>
+            </div>
+
+            <span className="px-3.5 py-1.5 rounded-full bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 text-xs font-extrabold self-start md:self-auto">
+              ✦ 4 AI Engines Active
+            </span>
+          </div>
+
+          {/* AI INTERACTIVE TAB BAR */}
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 border-b border-slate-800/80 relative z-10">
+            <button
+              onClick={() => setActiveAiTab('price')}
+              className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 shrink-0 border ${
+                activeAiTab === 'price'
+                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/30'
+                  : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              <TrendingUp className="w-4 h-4" />
+              <span>1. AI Price Prediction 📈</span>
+            </button>
+
+            <button
+              onClick={() => setActiveAiTab('disease')}
+              className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 shrink-0 border ${
+                activeAiTab === 'disease'
+                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/30'
+                  : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              <Scan className="w-4 h-4" />
+              <span>2. AI Disease Scanner 🔬</span>
+            </button>
+
+            <button
+              onClick={() => setActiveAiTab('contract')}
+              className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 shrink-0 border ${
+                activeAiTab === 'contract'
+                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/30'
+                  : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              <FileCheck className="w-4 h-4" />
+              <span>3. Smart Contract Farming 📜</span>
+            </button>
+
+            <button
+              onClick={() => setActiveAiTab('intel')}
+              className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 shrink-0 border ${
+                activeAiTab === 'intel'
+                  ? 'bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/30'
+                  : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              <Activity className="w-4 h-4" />
+              <span>4. National Demand Map 🗺️</span>
+            </button>
+          </div>
+
+          {/* TAB PANELS */}
+          <div className="relative z-10">
+            <AnimatePresence mode="wait">
+              {activeAiTab === 'price' && (
+                <motion.div
+                  key="price"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid lg:grid-cols-12 gap-8 items-center bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-slate-800"
+                >
+                  <div className="lg:col-span-7 space-y-4">
+                    <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-extrabold text-[11px] border border-emerald-500/30">
+                      TIME-SERIES FORECASTING
+                    </span>
+                    <h3 className="text-2xl font-bold font-display text-white">
+                      Target Fair Price &amp; 7-Day Trend Benchmarks 📈
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                      AgroLink AI analyzes weather telemetry, Dambulla &amp; Pettah market arrivals, import tariff revisions, and fuel logistics costs to project fair crop prices.
+                    </p>
+                    <div className="pt-2">
+                      <Link
+                        to="/price-prediction"
+                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
+                      >
+                        <span>Launch AI Price forecaster →</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-400">🍅 Tomato (Grade A) Benchmark:</span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-extrabold text-[10px] border border-emerald-800">
+                        +19.4% Surge
+                      </span>
+                    </div>
+                    <div className="flex items-baseline justify-between pt-1">
+                      <span className="text-xs text-slate-400">Today's Wholesale:</span>
+                      <span className="text-lg font-black text-slate-200 font-display">Rs. 180.00/kg</span>
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-xs font-bold text-emerald-400">AI Target Fair Price:</span>
+                      <span className="text-2xl font-black text-emerald-400 font-display">Rs. 215.00/kg</span>
+                    </div>
+                    <div className="p-3 bg-emerald-950/60 rounded-xl border border-emerald-800/60 text-[11px] font-bold text-emerald-300">
+                      💡 Recommendation: WAIT 3–4 DAYS BEFORE SELLING (Post-Rain Quality Surge)
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeAiTab === 'disease' && (
+                <motion.div
+                  key="disease"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid lg:grid-cols-12 gap-8 items-center bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-slate-800"
+                >
+                  <div className="lg:col-span-7 space-y-4">
+                    <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-extrabold text-[11px] border border-emerald-500/30">
+                      COMPUTER VISION PATHOLOGY
+                    </span>
+                    <h3 className="text-2xl font-bold font-display text-white">
+                      Instant Crop Disease Detection &amp; Treatment 🔬
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                      Upload a photo of damaged leaves or crops. Our trained neural network diagnoses plant diseases instantly and suggests bio-organic treatments.
+                    </p>
+                    <div className="pt-2">
+                      <Link
+                        to="/disease-detection"
+                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
+                      >
+                        <span>Scan Crop Leaf Now →</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-400">🍂 Simulated Leaf Scan:</span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-extrabold text-[10px] border border-emerald-800">
+                        97.4% Match
+                      </span>
+                    </div>
+                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
+                      <p className="font-extrabold text-rose-400 text-sm">Tomato Early Blight (Alternaria solani)</p>
+                      <p className="text-[11px] text-slate-300">Concentric dark spots identified on lower foliage.</p>
+                    </div>
+                    <div className="p-3 bg-emerald-950/60 rounded-xl border border-emerald-800/60 text-[11px] font-bold text-emerald-300">
+                      🌿 Recommended Remedy: Spray Copper Hydroxide or Neem Extract every 7 days.
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeAiTab === 'contract' && (
+                <motion.div
+                  key="contract"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid lg:grid-cols-12 gap-8 items-center bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-slate-800"
+                >
+                  <div className="lg:col-span-7 space-y-4">
+                    <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-extrabold text-[11px] border border-emerald-500/30">
+                      GUARANTEED FORWARD ESCROW
+                    </span>
+                    <h3 className="text-2xl font-bold font-display text-white">
+                      Guaranteed Purchasing Price Contracts 📜
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                      Lock in guaranteed crop purchasing prices before sowing. Supermarkets and institutional buyers deposit 30% upfront escrow into smart contract vaults.
+                    </p>
+                    <div className="pt-2">
+                      <Link
+                        to="/contract-farming"
+                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
+                      >
+                        <span>Explore Contract Farming →</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-400">📜 Active Buyer Agreement:</span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 font-extrabold text-[10px] border border-emerald-800">
+                        30% Escrow Locked
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="font-extrabold text-white text-sm">Keells Supermarket Forward Contract</p>
+                      <p className="text-xs text-slate-400">Produce: Organic Samba Rice (5,000 kg)</p>
+                    </div>
+                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                      <span className="text-slate-400">Guaranteed Floor Price:</span>
+                      <span className="font-black text-emerald-400 text-base">Rs. 220.00/kg</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeAiTab === 'intel' && (
+                <motion.div
+                  key="intel"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid lg:grid-cols-12 gap-8 items-center bg-slate-900/90 rounded-2xl p-6 sm:p-8 border border-slate-800"
+                >
+                  <div className="lg:col-span-7 space-y-4">
+                    <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-extrabold text-[11px] border border-emerald-500/30">
+                      FOOD SECURITY &amp; POLICY SIMULATOR
+                    </span>
+                    <h3 className="text-2xl font-bold font-display text-white">
+                      National Food Security Heatmaps &amp; Alerts 🗺️
+                    </h3>
+                    <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                      Government officers and planners monitor district overproduction risks, buffer stock health, and simulate import tariff revisions.
+                    </p>
+                    <div className="pt-2">
+                      <Link
+                        to="/gov-intelligence"
+                        className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
+                      >
+                        <span>View Gov Intelligence →</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-5 bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-400">🚨 National Warning Alert:</span>
+                      <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-300 font-extrabold text-[10px] border border-rose-800">
+                        Supply Deficit
+                      </span>
+                    </div>
+                    <div className="p-3 bg-rose-950/40 rounded-xl border border-rose-900/60 text-[11px] space-y-1 text-rose-200">
+                      <p className="font-extrabold text-white">Potato Deficit Alert (Central Province)</p>
+                      <p className="text-[10px]">Welimada deluge reduced picking by 20%. Price spike expected.</p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </section>
 
