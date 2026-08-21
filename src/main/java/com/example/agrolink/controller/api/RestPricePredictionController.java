@@ -20,8 +20,11 @@ public class RestPricePredictionController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PricePredictionResponseDTO>> getPrediction(@RequestParam(value = "crop", required = false, defaultValue = "Tomato") String crop) {
-        PricePredictionResponseDTO data = pricePredictionService.getPrediction(crop);
+    public ResponseEntity<ApiResponse<PricePredictionResponseDTO>> getPrediction(
+            @RequestParam(value = "crop", required = false, defaultValue = "Tomato") String crop,
+            @RequestParam(value = "location", required = false, defaultValue = "Dambulla") String location,
+            @RequestParam(value = "grade", required = false, defaultValue = "Grade B") String grade) {
+        PricePredictionResponseDTO data = pricePredictionService.getPrediction(crop, location, grade);
         return ResponseEntity.ok(ApiResponse.success("AI Price prediction generated successfully", data));
     }
 }

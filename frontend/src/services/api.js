@@ -154,7 +154,7 @@ export const cropAdvisorAPI = {
 };
 
 export const pricePredictionAPI = {
-  getPrediction: (crop) => api.get('/price-prediction', { params: { crop } }),
+  getPrediction: (crop, location, grade) => api.get('/price-prediction', { params: { crop, location, grade } }),
 };
 
 export const demandForecastAPI = {

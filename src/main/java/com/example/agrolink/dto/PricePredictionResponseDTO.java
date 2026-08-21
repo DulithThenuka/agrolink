@@ -6,8 +6,13 @@ import java.util.List;
 public final class PricePredictionResponseDTO {
 
     private final String cropName;
+    private final String location;
+    private final String selectedGrade;
     private final BigDecimal todaysMarketPriceLkr;
     private final BigDecimal predictedFairPriceLkr;
+    private final BigDecimal gradeAPriceLkr;
+    private final BigDecimal gradeBPriceLkr;
+    private final BigDecimal gradeCPriceLkr;
     private final double sevenDayChangePercentage;
     private final String recommendation;
     private final String bestActionWindow;
@@ -15,6 +20,37 @@ public final class PricePredictionResponseDTO {
     private final List<Double> forecastPrices;
     private final List<FactorImpact> factorBreakdown;
 
+    public PricePredictionResponseDTO(String cropName,
+                                      String location,
+                                      String selectedGrade,
+                                      BigDecimal todaysMarketPriceLkr,
+                                      BigDecimal predictedFairPriceLkr,
+                                      BigDecimal gradeAPriceLkr,
+                                      BigDecimal gradeBPriceLkr,
+                                      BigDecimal gradeCPriceLkr,
+                                      double sevenDayChangePercentage,
+                                      String recommendation,
+                                      String bestActionWindow,
+                                      List<Double> historicalPrices,
+                                      List<Double> forecastPrices,
+                                      List<FactorImpact> factorBreakdown) {
+        this.cropName = cropName;
+        this.location = location;
+        this.selectedGrade = selectedGrade;
+        this.todaysMarketPriceLkr = todaysMarketPriceLkr;
+        this.predictedFairPriceLkr = predictedFairPriceLkr;
+        this.gradeAPriceLkr = gradeAPriceLkr;
+        this.gradeBPriceLkr = gradeBPriceLkr;
+        this.gradeCPriceLkr = gradeCPriceLkr;
+        this.sevenDayChangePercentage = sevenDayChangePercentage;
+        this.recommendation = recommendation;
+        this.bestActionWindow = bestActionWindow;
+        this.historicalPrices = historicalPrices != null ? List.copyOf(historicalPrices) : List.of();
+        this.forecastPrices = forecastPrices != null ? List.copyOf(forecastPrices) : List.of();
+        this.factorBreakdown = factorBreakdown != null ? List.copyOf(factorBreakdown) : List.of();
+    }
+
+    // Overloaded constructor for backwards compatibility
     public PricePredictionResponseDTO(String cropName,
                                       BigDecimal todaysMarketPriceLkr,
                                       BigDecimal predictedFairPriceLkr,
@@ -24,20 +60,21 @@ public final class PricePredictionResponseDTO {
                                       List<Double> historicalPrices,
                                       List<Double> forecastPrices,
                                       List<FactorImpact> factorBreakdown) {
-        this.cropName = cropName;
-        this.todaysMarketPriceLkr = todaysMarketPriceLkr;
-        this.predictedFairPriceLkr = predictedFairPriceLkr;
-        this.sevenDayChangePercentage = sevenDayChangePercentage;
-        this.recommendation = recommendation;
-        this.bestActionWindow = bestActionWindow;
-        this.historicalPrices = historicalPrices != null ? List.copyOf(historicalPrices) : List.of();
-        this.forecastPrices = forecastPrices != null ? List.copyOf(forecastPrices) : List.of();
-        this.factorBreakdown = factorBreakdown != null ? List.copyOf(factorBreakdown) : List.of();
+        this(cropName, "Dambulla", "Grade B", todaysMarketPriceLkr, predictedFairPriceLkr,
+             predictedFairPriceLkr.multiply(new BigDecimal("1.22")),
+             predictedFairPriceLkr,
+             predictedFairPriceLkr.multiply(new BigDecimal("0.82")),
+             sevenDayChangePercentage, recommendation, bestActionWindow, historicalPrices, forecastPrices, factorBreakdown);
     }
 
     public String getCropName() { return cropName; }
+    public String getLocation() { return location; }
+    public String getSelectedGrade() { return selectedGrade; }
     public BigDecimal getTodaysMarketPriceLkr() { return todaysMarketPriceLkr; }
     public BigDecimal getPredictedFairPriceLkr() { return predictedFairPriceLkr; }
+    public BigDecimal getGradeAPriceLkr() { return gradeAPriceLkr; }
+    public BigDecimal getGradeBPriceLkr() { return gradeBPriceLkr; }
+    public BigDecimal getGradeCPriceLkr() { return gradeCPriceLkr; }
     public double getSevenDayChangePercentage() { return sevenDayChangePercentage; }
     public String getRecommendation() { return recommendation; }
     public String getBestActionWindow() { return bestActionWindow; }
