@@ -2,7 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { suppliersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Package, ShoppingBag, PlusCircle, Filter, CheckCircle2, ShieldCheck, Truck, Loader2, Sparkles, Sprout, Wrench, Cpu, DollarSign, Layers } from 'lucide-react';
+import {
+  Package,
+  ShoppingBag,
+  PlusCircle,
+  Filter,
+  CheckCircle2,
+  ShieldCheck,
+  Truck,
+  Loader2,
+  Sparkles,
+  Sprout,
+  Wrench,
+  Cpu,
+  DollarSign,
+  Layers,
+  Search,
+  ArrowUpDown,
+  X,
+  SlidersHorizontal
+} from 'lucide-react';
 
 export const SupplierMarketplace = () => {
   const { user, isFarmer, isSupplier, isAdmin } = useAuth();
@@ -10,6 +29,8 @@ export const SupplierMarketplace = () => {
   const [items, setItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('POPULAR');
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState('');
 
@@ -57,7 +78,7 @@ export const SupplierMarketplace = () => {
     },
     {
       id: 3,
-      name: 'Hayleys Bio-Pesticide Spray (1L)',
+      name: 'Hayleys Bio-Pesticide Neem Spray (1L)',
       category: 'Pesticides',
       brand: 'Hayleys Agriculture',
       supplierName: 'Hayleys Plant Protection',
@@ -76,6 +97,50 @@ export const SupplierMarketplace = () => {
       quantity: 30,
       imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
       description: 'Ergonomic high-pressure manual knapsack sprayer for crop maintenance.'
+    },
+    {
+      id: 5,
+      name: 'DripLanka Micro-Drip Irrigation Kit (0.5 Acre)',
+      category: 'Irrigation',
+      brand: 'Drip Lanka Tech',
+      supplierName: 'Drip Lanka Systems',
+      price: 28500,
+      quantity: 15,
+      imageUrl: 'https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?w=800&auto=format&fit=crop&q=80',
+      description: 'Complete water-saving drip emitters, tubing, filter, and manifold valve.'
+    },
+    {
+      id: 6,
+      name: 'Mahindra 15HP Mini Power Tiller Cultivator',
+      category: 'Machinery',
+      brand: 'Mahindra Agri Lanka',
+      supplierName: 'Mahindra Machinery Division',
+      price: 345000,
+      quantity: 6,
+      imageUrl: 'https://images.unsplash.com/photo-1530267981608-bc70a2974b6f?w=800&auto=format&fit=crop&q=80',
+      description: 'Heavy-duty diesel power tiller with rotary blades for paddy and upland tilling.'
+    },
+    {
+      id: 7,
+      name: 'CIC Certified Keeri Samba Seeds (5kg)',
+      category: 'Seeds',
+      brand: 'CIC Agri Businesses',
+      supplierName: 'CIC Ceylon Organics',
+      price: 2400,
+      quantity: 90,
+      imageUrl: 'https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?w=800&auto=format&fit=crop&q=80',
+      description: 'Premium aromatic Keeri Samba certified seed grains with 98% germination rate.'
+    },
+    {
+      id: 8,
+      name: 'Baurs Triple Super Phosphate Granules (25kg)',
+      category: 'Fertilizer',
+      brand: 'A. Baur & Co.',
+      supplierName: 'Baurs Agricultural Inputs',
+      price: 3800,
+      quantity: 110,
+      imageUrl: 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?w=800&auto=format&fit=crop&q=80',
+      description: 'Concentrated phosphorus root booster fertilizer for early crop establishment.'
     }
   ];
 
@@ -104,6 +169,31 @@ export const SupplierMarketplace = () => {
   useEffect(() => {
     fetchData();
   }, [selectedCategory, isSupplier]);
+
+  // Live Filtering & Sorting Logic
+  const filteredAndSortedItems = items
+    .filter((item) => {
+      // Category match
+      const matchesCategory = selectedCategory === 'ALL' || item.category.toLowerCase() === selectedCategory.toLowerCase();
+      
+      // Search query match (search by item name, brand, supplierName, description, or category)
+      const q = searchQuery.trim().toLowerCase();
+      const matchesSearch = !q || (
+        item.name?.toLowerCase().includes(q) ||
+        item.brand?.toLowerCase().includes(q) ||
+        item.supplierName?.toLowerCase().includes(q) ||
+        item.description?.toLowerCase().includes(q) ||
+        item.category?.toLowerCase().includes(q)
+      );
+
+      return matchesCategory && matchesSearch;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'PRICE_LOW') return a.price - b.price;
+      if (sortBy === 'PRICE_HIGH') return b.price - a.price;
+      if (sortBy === 'NAME_ASC') return a.name.localeCompare(b.name);
+      return 0; // POPULAR / Default ID order
+    });
 
   const handlePurchase = async () => {
     if (!purchasingItem || quantity < 1) return;
@@ -301,31 +391,91 @@ export const SupplierMarketplace = () => {
         </motion.div>
       )}
 
-      {/* CATEGORY FILTER BAR */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
-        <span className="text-xs font-bold uppercase text-slate-400 mr-2 flex items-center gap-1">
-          <Filter className="w-3.5 h-3.5" /> Category:
-        </span>
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold transition shrink-0 ${
-              selectedCategory === cat
-                ? 'bg-emerald-600 text-white shadow-md'
-                : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            {cat === 'ALL' ? '📦 All Categories' : cat}
-          </button>
-        ))}
+      {/* SEARCH BAR & SORTING TOOLBAR */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          
+          {/* SEARCH INPUT */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search supplies by name or brand (e.g. CIC, Baurs, Hayleys, Knapsack)..."
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* SORT DROPDOWN */}
+          <div className="flex items-center gap-2 shrink-0">
+            <ArrowUpDown className="w-4 h-4 text-emerald-600" />
+            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400">Sort By:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3.5 py-2.5 rounded-xl text-xs font-extrabold bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
+            >
+              <option value="POPULAR">⭐ Featured / Popular</option>
+              <option value="PRICE_LOW">💲 Price: Low to High</option>
+              <option value="PRICE_HIGH">💰 Price: High to Low</option>
+              <option value="NAME_ASC">🔤 Name: A to Z</option>
+            </select>
+          </div>
+        </div>
+
+        {/* CATEGORY FILTER BAR */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+            <span className="text-xs font-bold uppercase text-slate-400 mr-1 flex items-center gap-1 shrink-0">
+              <Filter className="w-3.5 h-3.5" /> Category:
+            </span>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition shrink-0 ${
+                  selectedCategory === cat
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                {cat === 'ALL' ? '📦 All' : cat}
+              </button>
+            ))}
+          </div>
+
+          {/* ACTIVE FILTER SUMMARY & RESET */}
+          {(selectedCategory !== 'ALL' || searchQuery) && (
+            <button
+              onClick={() => {
+                setSelectedCategory('ALL');
+                setSearchQuery('');
+              }}
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 underline self-start sm:self-auto shrink-0"
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ITEMS CATALOG GRID */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h2 className="text-lg font-bold text-slate-900 font-display">
-            Available Supplies ({items.length} Products)
+          <h2 className="text-lg font-bold text-slate-900 font-display flex items-center gap-2">
+            Available Supplies
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold">
+              {filteredAndSortedItems.length} Products Found
+            </span>
           </h2>
           <span className="text-xs font-semibold text-slate-400">Direct Delivery to Farm Location</span>
         </div>
@@ -335,14 +485,25 @@ export const SupplierMarketplace = () => {
             <Loader2 className="w-6 h-6 animate-spin mx-auto text-emerald-600" />
             <p className="text-xs font-semibold">Loading marketplace catalog...</p>
           </div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-12 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-            <p className="text-sm font-bold text-slate-700">No Supply Items Found</p>
-            <p className="text-xs text-slate-500">Try selecting another category filter above.</p>
+        ) : filteredAndSortedItems.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
+            <p className="text-base font-extrabold text-slate-800">No Supply Items Found</p>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              No products match "{searchQuery}" under {selectedCategory === 'ALL' ? 'all categories' : selectedCategory}. Try clearing your search query or switching categories.
+            </p>
+            <button
+              onClick={() => {
+                setSelectedCategory('ALL');
+                setSearchQuery('');
+              }}
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow transition"
+            >
+              Clear All Search Filters
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item) => (
+            {filteredAndSortedItems.map((item) => (
               <motion.div
                 key={item.id}
                 whileHover={{ y: -3 }}
