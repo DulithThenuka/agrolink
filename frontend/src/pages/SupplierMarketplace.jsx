@@ -24,7 +24,10 @@ import {
   ChevronUp,
   FileText,
   BadgeCheck,
-  Award
+  Award,
+  Tag,
+  Percent,
+  TrendingDown
 } from 'lucide-react';
 
 export const SupplierMarketplace = () => {
@@ -223,6 +226,29 @@ export const SupplierMarketplace = () => {
       return 0;
     });
 
+  // Bulk Tier Calculator Function
+  const calculateBulkDiscount = (unitPrice, qty) => {
+    let discountPct = 0;
+    let tierName = 'Standard Rate';
+
+    if (qty >= 25) {
+      discountPct = 15;
+      tierName = 'Enterprise Wholesale (-15%)';
+    } else if (qty >= 10) {
+      discountPct = 10;
+      tierName = 'Cooperative Bulk (-10%)';
+    } else if (qty >= 5) {
+      discountPct = 5;
+      tierName = 'Smallholder Tier (-5%)';
+    }
+
+    const rawTotal = unitPrice * qty;
+    const discountAmount = rawTotal * (discountPct / 100);
+    const finalTotal = rawTotal - discountAmount;
+
+    return { discountPct, tierName, rawTotal, discountAmount, finalTotal };
+  };
+
   const handlePurchase = async () => {
     if (!purchasingItem || quantity < 1) return;
 
@@ -349,12 +375,12 @@ export const SupplierMarketplace = () => {
 
         <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-md flex items-center gap-4">
           <div className="p-3.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 shrink-0">
-            <Award className="w-6 h-6" />
+            <Percent className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Government Subsidy</p>
-            <h3 className="text-lg font-extrabold text-slate-900 font-display">Eligible Products</h3>
-            <p className="text-[11px] text-slate-500 font-medium">Fertilizer & machinery vouchers</p>
+            <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Bulk Tier Savings</p>
+            <h3 className="text-lg font-extrabold text-slate-900 font-display">Up to 15% Off</h3>
+            <p className="text-[11px] text-slate-500 font-medium">Cooperative orders (10+ units)</p>
           </div>
         </div>
       </div>
@@ -624,7 +650,12 @@ export const SupplierMarketplace = () => {
 
                     <div className="p-5 space-y-3">
                       <div className="space-y-1">
-                        <span className="text-[11px] font-bold text-slate-400 block">{item.brand} • {item.supplierName}</span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-slate-400 block">{item.brand} • {item.supplierName}</span>
+                          <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">
+                            💰 Bulk Tier Available
+                          </span>
+                        </div>
                         <h3 className="font-extrabold text-slate-900 text-base leading-snug">{item.name}</h3>
                         <p className="text-xs text-slate-500 font-medium line-clamp-2">{item.description}</p>
                       </div>
@@ -746,71 +777,182 @@ export const SupplierMarketplace = () => {
         )}
       </div>
 
-      {/* PURCHASE MODAL WITH TECHNICAL DATASHEET */}
-      {purchasingItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full border border-slate-100 p-6 space-y-5 relative">
-            <h3 className="text-lg font-black text-slate-900 font-display">Confirm Supply Purchase 🛒</h3>
-            
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 text-xs">
-              <div className="flex justify-between items-start">
-                <p className="font-extrabold text-slate-900 text-sm">{purchasingItem.name}</p>
-                {purchasingItem.badge && (
-                  <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
-                    {purchasingItem.badge}
+      {/* PURCHASE MODAL WITH BULK SAVINGS CALCULATOR & DATASHEET */}
+      {purchasingItem && (() => {
+        const bulkCalc = calculateBulkDiscount(purchasingItem.price, quantity);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full border border-slate-100 p-6 space-y-5 relative max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-lg font-black text-slate-900 font-display flex items-center gap-2">
+                  Confirm Supply Purchase 🛒
+                </h3>
+                <button
+                  onClick={() => setPurchasingItem(null)}
+                  className="p-1 rounded-full hover:bg-slate-100 text-slate-400"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2 text-xs">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-extrabold text-slate-900 text-sm">{purchasingItem.name}</p>
+                    <p className="text-slate-500 font-medium mt-0.5">Category: {purchasingItem.category} • Brand: {purchasingItem.brand}</p>
+                  </div>
+                  {purchasingItem.badge && (
+                    <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[10px] shrink-0">
+                      {purchasingItem.badge}
+                    </span>
+                  )}
+                </div>
+                <div className="pt-1 flex items-baseline justify-between border-t border-slate-200/80">
+                  <span className="text-slate-500 font-semibold">Standard Unit Price:</span>
+                  <span className="text-emerald-700 font-extrabold text-sm">Rs. {purchasingItem.price.toLocaleString()}</span>
+                </div>
+              </div>
+
+              {purchasingItem.dosageGuide && (
+                <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-[11px] space-y-1">
+                  <span className="font-extrabold text-emerald-900 block flex items-center gap-1">
+                    <FileText className="w-3.5 h-3.5 text-emerald-600" /> Application Dosage Instructions:
                   </span>
+                  <p className="text-slate-700 font-medium">{purchasingItem.dosageGuide}</p>
+                </div>
+              )}
+
+              {/* BULK DISCOUNT CALCULATOR & PRESETS */}
+              <div className="space-y-3 p-4 bg-slate-900 text-white rounded-2xl border border-slate-800">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-emerald-400" /> Select Order Quantity:
+                  </label>
+                  <span className="text-xs font-extrabold text-emerald-400">{bulkCalc.tierName}</span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-black text-lg flex items-center justify-center border border-slate-700"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    max={purchasingItem.quantity || 500}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                    className="flex-1 p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-center text-lg font-black text-emerald-400 focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-black text-lg flex items-center justify-center border border-slate-700"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* BULK TIER PRESETS */}
+                <div className="grid grid-cols-4 gap-2 pt-1 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(1)}
+                    className={`py-1.5 rounded-lg border font-bold text-center transition ${quantity === 1 ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'}`}
+                  >
+                    1 Unit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(5)}
+                    className={`py-1.5 rounded-lg border font-bold text-center transition ${quantity >= 5 && quantity < 10 ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'}`}
+                  >
+                    5 Units (-5%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(10)}
+                    className={`py-1.5 rounded-lg border font-bold text-center transition ${quantity >= 10 && quantity < 25 ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'}`}
+                  >
+                    10 Units (-10%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(25)}
+                    className={`py-1.5 rounded-lg border font-bold text-center transition ${quantity >= 25 ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'}`}
+                  >
+                    25 Units (-15%)
+                  </button>
+                </div>
+
+                {/* BULK SAVINGS PROGRESS INCENTIVE */}
+                {quantity < 5 && (
+                  <div className="p-2 rounded-lg bg-emerald-950/80 border border-emerald-700/60 text-[10px] text-emerald-300 font-semibold flex items-center justify-between">
+                    <span>💡 Tip: Add {5 - quantity} more unit{5 - quantity > 1 ? 's' : ''} to unlock 5% Smallholder Bulk Savings!</span>
+                  </div>
                 )}
+                {quantity >= 5 && quantity < 10 && (
+                  <div className="p-2 rounded-lg bg-emerald-950/80 border border-emerald-700/60 text-[10px] text-emerald-300 font-semibold flex items-center justify-between">
+                    <span>💡 Tip: Add {10 - quantity} more unit{10 - quantity > 1 ? 's' : ''} to unlock 10% Cooperative Bulk Savings!</span>
+                  </div>
+                )}
+                {quantity >= 10 && quantity < 25 && (
+                  <div className="p-2 rounded-lg bg-emerald-950/80 border border-emerald-700/60 text-[10px] text-emerald-300 font-semibold flex items-center justify-between">
+                    <span>🎉 10% Cooperative Bulk Discount Applied! (Add {25 - quantity} more for 15% Wholesale)</span>
+                  </div>
+                )}
+                {quantity >= 25 && (
+                  <div className="p-2 rounded-lg bg-emerald-950/80 border border-emerald-700/60 text-[10px] text-emerald-300 font-bold flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Maximum Enterprise Wholesale Discount (15% Off) Applied!
+                  </div>
+                )}
+
+                {/* FINAL COST BREAKDOWN */}
+                <div className="pt-3 border-t border-slate-800 space-y-1.5 text-xs">
+                  <div className="flex justify-between text-slate-400">
+                    <span>Subtotal ({quantity} units @ Rs. {purchasingItem.price.toLocaleString()}):</span>
+                    <span>Rs. {bulkCalc.rawTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  {bulkCalc.discountPct > 0 && (
+                    <div className="flex justify-between text-emerald-400 font-bold">
+                      <span>Bulk Savings ({bulkCalc.discountPct}% Tier Discount):</span>
+                      <span>- Rs. {bulkCalc.discountAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
+                  <div className="pt-2 border-t border-slate-800 flex justify-between items-baseline font-display">
+                    <span className="font-extrabold text-slate-200 text-sm">Final Total Cost:</span>
+                    <span className="text-2xl font-black text-emerald-400">
+                      Rs. {bulkCalc.finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <p className="text-slate-500 font-medium">Category: {purchasingItem.category} • Brand: {purchasingItem.brand}</p>
-              <p className="text-emerald-700 font-extrabold text-sm">Unit Price: Rs. {purchasingItem.price.toLocaleString()}</p>
-            </div>
 
-            {purchasingItem.dosageGuide && (
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-[11px] space-y-1">
-                <span className="font-extrabold text-emerald-900 block">📋 Application Dosage Instructions:</span>
-                <p className="text-slate-700 font-medium">{purchasingItem.dosageGuide}</p>
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setPurchasingItem(null)}
+                  className="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePurchase}
+                  disabled={processingPurchase}
+                  className="w-1/2 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-1.5"
+                >
+                  {processingPurchase ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Order 🛒'}
+                </button>
               </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Quantity</label>
-              <input
-                type="number"
-                min="1"
-                max={purchasingItem.quantity || 100}
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-                className="w-full p-3 rounded-xl border border-slate-200 text-sm font-extrabold"
-              />
-            </div>
-
-            <div className="p-3 bg-slate-900 text-white rounded-xl flex justify-between items-center text-xs shadow">
-              <span className="font-bold text-slate-300">Total Order Cost:</span>
-              <span className="text-xl font-black text-emerald-400 font-display">
-                Rs. {(purchasingItem.price * quantity).toLocaleString()}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setPurchasingItem(null)}
-                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handlePurchase}
-                disabled={processingPurchase}
-                className="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5"
-              >
-                {processingPurchase ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Order 🛒'}
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
     </div>
   );
