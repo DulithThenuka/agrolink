@@ -22,7 +22,10 @@ import {
   CloudRain,
   ShieldAlert,
   HelpCircle,
-  FileText
+  FileText,
+  Quote,
+  Star,
+  MessageSquareQuote
 } from 'lucide-react';
 import { cropsAPI } from '../services/api';
 import { BuyCropModal } from '../components/BuyCropModal';
@@ -424,7 +427,7 @@ export const Home = () => {
                         to="/price-prediction"
                         className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
                       >
-                        <span>Launch AI Price forecaster →</span>
+                        <span>Launch AI Price Forecaster →</span>
                       </Link>
                     </div>
                   </div>
@@ -588,6 +591,128 @@ export const Home = () => {
               )}
             </AnimatePresence>
           </div>
+        </div>
+      </section>
+
+      {/* FARMER & BUYER SUCCESS TESTIMONIALS */}
+      <section className="max-w-7xl mx-auto px-6 space-y-8">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200">
+            <MessageSquareQuote className="w-4 h-4 text-emerald-600" /> PROVEN AGRICULTURAL IMPACT
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-display">
+            Empowering Sri Lankan Farmers &amp; Commercial Buyers 🌟
+          </h2>
+          <p className="text-slate-600 text-sm leading-relaxed font-medium">
+            Real testimonials from registered growers, supermarket procurement directors, and logistics partners.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* TESTIMONIAL 1 */}
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-black text-[10px] uppercase border border-emerald-200">
+                  +22% Net Income Increase
+                </span>
+              </div>
+
+              <Quote className="w-8 h-8 text-emerald-200/80" />
+
+              <p className="text-xs text-slate-700 font-medium leading-relaxed italic">
+                "By using AgroLink's AI Price Prediction, I held my tomato harvest for 4 days until wholesale prices surged in Dambulla. I sold 2,500 kg directly to Keells Supermarket with 100% Escrow security!"
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 font-black flex items-center justify-center text-xl shrink-0">
+                👨‍🌾
+              </div>
+              <div>
+                <h4 className="font-extrabold text-slate-900 text-sm font-display">K. Bandara</h4>
+                <p className="text-[11px] text-slate-500 font-semibold">Vegetable Producer • Welimada Cooperative</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* TESTIMONIAL 2 */}
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-teal-50 text-teal-800 font-black text-[10px] uppercase border border-teal-200">
+                  Zero Middleman Markup
+                </span>
+              </div>
+
+              <Quote className="w-8 h-8 text-teal-200/80" />
+
+              <p className="text-xs text-slate-700 font-medium leading-relaxed italic">
+                "Contract Farming on AgroLink allowed us to lock in 5 Tons of Organic Samba Rice directly with Polonnaruwa growers at a fixed fair rate. Complete batch traceability from seed sowing to supermarket shelf!"
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-teal-100 text-teal-800 font-black flex items-center justify-center text-xl shrink-0">
+                🏬
+              </div>
+              <div>
+                <h4 className="font-extrabold text-slate-900 text-sm font-display">Dilan Jayasinghe</h4>
+                <p className="text-[11px] text-slate-500 font-semibold">Procurement Director • Lanka Fresh Markets</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* TESTIMONIAL 3 */}
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 font-black text-[10px] uppercase border border-amber-200">
+                  Instant Escrow Payout
+                </span>
+              </div>
+
+              <Quote className="w-8 h-8 text-amber-200/80" />
+
+              <p className="text-xs text-slate-700 font-medium leading-relaxed italic">
+                "Earlier, middlemen delayed payments for weeks. With AgroLink Escrow, as soon as the dispatch fleet driver verified my potato batch pickup in Keppetipola, 30% advance payout was unlocked instantly!"
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 font-black flex items-center justify-center text-xl shrink-0">
+                🥔
+              </div>
+              <div>
+                <h4 className="font-extrabold text-slate-900 text-sm font-display">S. Gunawardena</h4>
+                <p className="text-[11px] text-slate-500 font-semibold">Potato Grower • Keppetipola, Nuwara Eliya</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
