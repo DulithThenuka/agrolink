@@ -1,11 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sprout, ShoppingBag, ShieldCheck, Zap, TrendingUp, ArrowRight, Search, CheckCircle2 } from 'lucide-react';
+import {
+  Sprout,
+  ShoppingBag,
+  ShieldCheck,
+  Zap,
+  TrendingUp,
+  ArrowRight,
+  Search,
+  CheckCircle2,
+  MapPin,
+  Sparkles,
+  Award,
+  ArrowUpRight,
+  Package
+} from 'lucide-react';
+import { cropsAPI } from '../services/api';
+import { BuyCropModal } from '../components/BuyCropModal';
 
 export const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [featuredCrops, setFeaturedCrops] = useState([]);
+  const [loadingCrops, setLoadingCrops] = useState(true);
+  const [selectedCropForPurchase, setSelectedCropForPurchase] = useState(null);
   const navigate = useNavigate();
+
+  const MOCK_FEATURED_CROPS = [
+    {
+      id: 101,
+      name: 'Organic Red Tomatoes (Grade A)',
+      category: 'Vegetables',
+      price: 185,
+      quantity: 850,
+      location: 'Welimada, Badulla',
+      farmerName: 'K. Bandara (Welimada Farm Cooperative)',
+      grade: 'Grade A Premium',
+      imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
+      description: 'Fresh field-picked Grade A organic tomatoes. High firmness, ideal for commercial supermarket distribution.'
+    },
+    {
+      id: 102,
+      name: 'Certified Polonnaruwa Samba Paddy',
+      category: 'Grains',
+      price: 220,
+      quantity: 2500,
+      location: 'Polonnaruwa Central Belt',
+      farmerName: 'P. Ranasinghe (Polonnaruwa Growers)',
+      grade: 'DOA Seed Certified',
+      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop&q=80',
+      description: 'Aromatic high-purity Samba paddy grain. Cleaned, dried to 12% moisture content.'
+    },
+    {
+      id: 103,
+      name: 'Upcountry Red Potatoes (Fresh Harvest)',
+      category: 'Vegetables',
+      price: 280,
+      quantity: 1200,
+      location: 'Keppetipola, Nuwara Eliya',
+      farmerName: 'S. Gunawardena (Upcountry Producers)',
+      grade: 'Grade A Export',
+      imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800&auto=format&fit=crop&q=80',
+      description: 'High-density Nuwara Eliya potatoes. Uniform sizing, pest-free, directly from cold storage.'
+    },
+    {
+      id: 104,
+      name: 'Jaffna Green Chillies (High-Pungency)',
+      category: 'Spices',
+      price: 520,
+      quantity: 450,
+      location: 'Chavakachcheri, Jaffna',
+      farmerName: 'T. Vigneswaran (Northern Agri Network)',
+      grade: 'Grade A Supermarket',
+      imageUrl: 'https://images.unsplash.com/photo-1588879462806-07a5b61f8c0d?w=800&auto=format&fit=crop&q=80',
+      description: 'Sun-dusted fresh Jaffna green chillies with high pungency and extended shelf life.'
+    }
+  ];
+
+  useEffect(() => {
+    const fetchCrops = async () => {
+      setLoadingCrops(true);
+      try {
+        const res = await cropsAPI.getAll();
+        if (res && res.data && res.data.length > 0) {
+          setFeaturedCrops(res.data.slice(0, 4));
+        } else {
+          setFeaturedCrops(MOCK_FEATURED_CROPS);
+        }
+      } catch (err) {
+        console.warn('Backend API offline. Loading featured crops fallback:', err);
+        setFeaturedCrops(MOCK_FEATURED_CROPS);
+      } finally {
+        setLoadingCrops(false);
+      }
+    };
+    fetchCrops();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -130,6 +220,100 @@ export const Home = () => {
         </div>
       </section>
 
+      {/* FEATURED LIVE PRODUCE FEED GRID */}
+      <section className="max-w-7xl mx-auto px-6 space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider mb-2 border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Real-Time Harvest Feed
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 font-display flex items-center gap-2">
+              Featured Live Farm Produce 🌾
+            </h2>
+            <p className="text-slate-500 text-sm mt-1">
+              Directly from verified Sri Lankan growers — zero middleman markups, 100% Escrow protected.
+            </p>
+          </div>
+
+          <Link
+            to="/crops"
+            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
+          >
+            <span>Explore All Crop Listings →</span>
+          </Link>
+        </div>
+
+        {/* CROP CARDS GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featuredCrops.map((crop) => (
+            <motion.div
+              key={crop.id}
+              whileHover={{ y: -4 }}
+              className="premium-card bg-white border border-slate-200/80 shadow-lg rounded-3xl overflow-hidden flex flex-col justify-between"
+            >
+              <div>
+                <div className="relative h-48 bg-slate-100 overflow-hidden">
+                  <img
+                    src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea'}
+                    alt={crop.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea';
+                    }}
+                  />
+                  <div className="absolute top-3 left-3 px-3 py-1 bg-slate-900/80 backdrop-blur-md text-emerald-300 text-[10px] font-black uppercase tracking-wider rounded-full border border-white/20">
+                    {crop.category || 'Produce'}
+                  </div>
+
+                  {crop.grade && (
+                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-extrabold rounded-full border border-emerald-400/40 shadow">
+                      {crop.grade}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-5 space-y-3">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-extrabold text-emerald-700 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-emerald-600" /> {crop.location || 'Sri Lanka'}
+                    </span>
+                    <h3 className="font-extrabold text-slate-900 text-base leading-snug font-display line-clamp-1">
+                      {crop.name}
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium line-clamp-2">{crop.description}</p>
+                  </div>
+
+                  {crop.farmerName && (
+                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 font-semibold">
+                      <span className="truncate">🧑‍🌾 {crop.farmerName}</span>
+                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold text-[10px] shrink-0">
+                        📦 {crop.quantity || 500} kg
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-5 pt-0">
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Wholesale Rate</span>
+                    <span className="text-xl font-black text-emerald-600 font-display">Rs. {Number(crop.price).toFixed(2)}/kg</span>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedCropForPurchase(crop)}
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+                  >
+                    <ShoppingBag className="w-3.5 h-3.5" /> Buy 🛒
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* ROLE-BASED PORTAL MATRIX SECTION */}
       <section className="py-12 bg-slate-100/70 border-y border-slate-200/60">
         <div className="max-w-7xl mx-auto px-6 space-y-10">
@@ -249,8 +433,15 @@ export const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* PURCHASE MODAL TRIGGERED FROM HOME PAGE */}
+      {selectedCropForPurchase && (
+        <BuyCropModal
+          crop={selectedCropForPurchase}
+          onClose={() => setSelectedCropForPurchase(null)}
+          onOrderPlaced={() => setFeaturedCrops([...featuredCrops])}
+        />
+      )}
     </div>
   );
 };
-
-
