@@ -1,7 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Sprout, Sun, AlertTriangle, TrendingUp, ShoppingBag, PlusCircle, ArrowRight, ShieldCheck, DollarSign, Package, CheckCircle2, Loader2, CloudRain, Cpu, Wifi, Droplet, Thermometer } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Sprout,
+  Sun,
+  AlertTriangle,
+  TrendingUp,
+  ShoppingBag,
+  PlusCircle,
+  ArrowRight,
+  ShieldCheck,
+  DollarSign,
+  Package,
+  CheckCircle2,
+  Loader2,
+  CloudRain,
+  Cpu,
+  Wifi,
+  Droplet,
+  Thermometer,
+  PieChart,
+  BarChart3,
+  Award,
+  ArrowUpRight,
+  Sparkles,
+  Sliders
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
 import { BuyerProfileModal } from '../components/BuyerProfileModal';
@@ -19,6 +43,46 @@ export const FarmerDashboard = () => {
   const [selectedBuyer, setSelectedBuyer] = useState(null);
   const [showWeatherModal, setShowWeatherModal] = useState(false);
   const [showIoTModal, setShowIoTModal] = useState(false);
+
+  // Financial & Benchmark State
+  const [selectedSeason, setSelectedSeason] = useState('Yala 2026');
+
+  const SEASONAL_FINANCIALS = {
+    grossRevenue: 1480000,
+    fertilizerCost: 240000,
+    equipmentRentalCost: 120000,
+    logisticsCost: 85000,
+    irrigationCost: 45000,
+    netProfit: 990000,
+    profitMarginPct: 66.9
+  };
+
+  const YIELD_BENCHMARKS = [
+    {
+      crop: '🍅 Organic Tomatoes',
+      myYield: '9.2 MT / Acre',
+      districtAvg: '7.8 MT / Acre',
+      diffPct: 17.9,
+      status: 'TOP 10% PRODUCER',
+      color: 'emerald'
+    },
+    {
+      crop: '🌾 Polonnaruwa Samba Paddy',
+      myYield: '4.6 MT / Acre',
+      districtAvg: '4.1 MT / Acre',
+      diffPct: 12.2,
+      status: 'HIGH EFFICIENCY',
+      color: 'emerald'
+    },
+    {
+      crop: '🥔 Upcountry Red Potatoes',
+      myYield: '8.4 MT / Acre',
+      districtAvg: '8.0 MT / Acre',
+      diffPct: 5.0,
+      status: 'ABOVE AVERAGE',
+      color: 'blue'
+    }
+  ];
 
   const fetchFarmerOrders = async () => {
     setLoadingOrders(true);
@@ -54,33 +118,22 @@ export const FarmerDashboard = () => {
     }
   };
 
-  const lowStockAlerts = [
-    { name: 'Red Tomatoes (Batch A)', remaining: 12 },
-    { name: 'Green Chillies (Section B)', remaining: 8 },
-  ];
-
-  const cropBenchmarks = [
-    { crop: 'Samba Rice', current: 210, recommended: 240, demand: 'High 🔥' },
-    { crop: 'Red Tomatoes', current: 160, recommended: 185, demand: 'High 🔥' },
-    { crop: 'Nuwara Eliya Potatoes', current: 220, recommended: 240, demand: 'Moderate' },
-    { crop: 'Green Chillies', current: 350, recommended: 390, demand: 'High 🔥' },
-  ];
-
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
+      
       {/* TOP GREETING BANNER */}
       <div className="glass rounded-3xl p-8 border border-white/80 shadow-2xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 text-white relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
-              <Sprout className="w-4 h-4 text-emerald-400" /> Smart Agronomy & Order Dispatch Suite
+              <Sprout className="w-4 h-4 text-emerald-400" /> Smart Agronomy &amp; Financial Suite
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display">
-              Good Morning, <span className="capitalize">{farmerName}</span> 👨‍🌾
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
+              Welcome Back, <span className="capitalize">{farmerName}</span> 👨‍🌾
             </h1>
             <p className="text-emerald-100/80 text-sm max-w-xl">
-              Your farm health score is optimal. Review incoming buyer crop orders below to accept and dispatch transport.
+              Your farm health score is optimal. Review seasonal revenue breakdown, district yield benchmarks, and incoming crop orders.
             </p>
           </div>
 
@@ -102,146 +155,25 @@ export const FarmerDashboard = () => {
         </div>
       )}
 
-      {/* WEATHER INTELLIGENCE SEVERE WARNING BANNER */}
-      <div className="p-5 rounded-3xl bg-gradient-to-r from-red-950 via-amber-950 to-slate-900 border border-red-800/80 shadow-xl text-white space-y-3">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-red-500/30 text-red-300 border border-red-400/40 text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
-              <AlertTriangle className="w-3.5 h-3.5 text-red-400 animate-pulse" /> Severe Weather Risk
-            </span>
-            <span className="text-xs font-bold text-amber-300">Expected: Tomorrow 3 PM – 8 PM</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowWeatherModal(true)}
-            className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
-          >
-            <CloudRain className="w-4 h-4" /> 7-Day Climate &amp; Irrigation Advisory 🌧️
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs items-center">
-          <div className="md:col-span-2 space-y-1">
-            <h3 className="text-xl font-black text-white font-display flex items-center gap-2">
-              <span>⚠ Heavy Rain Warning</span>
-              <span className="text-xs font-extrabold bg-red-800 px-2 py-0.5 rounded-full text-red-100">82mm Rain</span>
+      {/* QUICK SMART ACTION TILES */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div
+          whileHover={{ y: -3 }}
+          onClick={() => setShowIoTModal(true)}
+          className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between cursor-pointer group"
+        >
+          <div className="space-y-1">
+            <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">IoT Farm Controller</p>
+            <h3 className="text-xl font-extrabold font-display text-emerald-700 flex items-center gap-1.5">
+              Online 📡
             </h3>
-            <p className="text-red-100/90 text-xs font-medium">
-              <strong>Affected Crops:</strong> Tomatoes, Chili • <strong>Recommendation:</strong> Avoid fertilizer application tomorrow.
-            </p>
+            <p className="text-[11px] text-emerald-800 font-semibold">ESP32 Soil &amp; Auto Valves</p>
           </div>
-
-          <div className="p-3 bg-red-950/70 rounded-2xl border border-red-800/60 text-center">
-            <span className="text-[10px] font-bold text-amber-300 uppercase block">Flooding Risk</span>
-            <span className="text-sm font-extrabold text-red-200">HIGH (Flash Flood Warning)</span>
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold border border-emerald-100 group-hover:scale-105 transition">
+            <Cpu className="w-6 h-6 text-emerald-600" />
           </div>
+        </motion.div>
 
-          <div className="p-3 bg-indigo-950/70 rounded-2xl border border-indigo-800/60 text-center">
-            <span className="text-[10px] font-bold text-indigo-300 uppercase block">Irrigation Advice</span>
-            <span className="text-sm font-extrabold text-indigo-200">Pause Drip Irrigation</span>
-          </div>
-        </div>
-      </div>
-
-      {/* IOT SMART FARM LIVE TELEMETRY WIDGET */}
-      <div className="p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950 to-teal-950 border border-emerald-800/80 shadow-xl text-white space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-              <Wifi className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> ESP32 IoT Live Telemetry Stream
-            </span>
-            <span className="text-xs font-mono font-bold text-slate-300">Device: ESP32-AGRO-8941</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowIoTModal(true)}
-            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
-          >
-            <Cpu className="w-4 h-4" /> Open IoT Irrigation Controller 🌱
-          </button>
-        </div>
-
-        {/* SENSOR VALUE TILES */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs text-center">
-          <div className="p-3 bg-amber-950/70 rounded-2xl border border-amber-800/60">
-            <span className="text-[10px] font-bold text-amber-300 uppercase block">Soil Moisture</span>
-            <span className="text-xl font-black text-amber-100 font-display">32% ⚠</span>
-          </div>
-
-          <div className="p-3 bg-slate-950/70 rounded-2xl border border-slate-800">
-            <span className="text-[10px] font-bold text-slate-400 uppercase block">Temperature</span>
-            <span className="text-xl font-black text-white font-display">29°C</span>
-          </div>
-
-          <div className="p-3 bg-blue-950/70 rounded-2xl border border-blue-800/60">
-            <span className="text-[10px] font-bold text-blue-300 uppercase block">Humidity</span>
-            <span className="text-xl font-black text-blue-100 font-display">71%</span>
-          </div>
-
-          <div className="p-3 bg-emerald-950/70 rounded-2xl border border-emerald-800/60">
-            <span className="text-[10px] font-bold text-emerald-300 uppercase block">Motor Status</span>
-            <span className="text-sm font-extrabold text-emerald-300">AUTO-OFF</span>
-          </div>
-
-          <div className="p-3 bg-purple-950/70 rounded-2xl border border-purple-800/60 col-span-2 sm:col-span-1">
-            <span className="text-[10px] font-bold text-purple-300 uppercase block">Water Tank</span>
-            <span className="text-xl font-black text-purple-100 font-display">38%</span>
-          </div>
-        </div>
-
-        <div className="p-3 bg-emerald-950/90 rounded-2xl border border-emerald-800/60 flex items-center justify-between text-xs flex-wrap gap-2">
-          <p className="text-emerald-200 font-bold">
-            🤖 <strong>AI IoT Recommendation:</strong> Irrigation required within the next 4 hours.
-          </p>
-          <span className="text-[10px] font-black uppercase text-emerald-400 bg-emerald-900 px-2 py-0.5 rounded border border-emerald-700">
-            Automatic Irrigation Ready
-          </span>
-        </div>
-      </div>
-
-      {/* WASTE REDUCTION & PRODUCE RESCUE WIDGET */}
-      <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-900 border border-emerald-700/80 shadow-xl text-white space-y-3">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-              ♻️ AgroLink Waste Reduction Engine
-            </span>
-            <span className="text-xs font-bold text-amber-300">Produce Risk Flagged: HIGH</span>
-          </div>
-
-          <Link
-            to="/waste-reduction"
-            className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-black text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
-          >
-            Launch Produce Rescue ♻️
-          </Link>
-        </div>
-
-        <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
-          <div>
-            <h4 className="text-sm font-extrabold text-white font-display">
-              ⚠ 500kg Tomatoes • Expiry in 2 Days
-            </h4>
-            <p className="text-slate-300 text-xs mt-0.5">
-              Automated Rescue Recommendations ready: <strong>Reduce price 15%</strong> • Match <strong>Restaurant A, Hotel B, Supermarket C</strong> • Donate <strong>Food Bank D</strong> • Process <strong>Sauce Factory E</strong>.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              to="/waste-reduction"
-              className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs transition"
-            >
-              Apply 15% Price Reduction
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* RISK & MARKET MATRIX */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <motion.div
           whileHover={{ y: -3 }}
           onClick={() => setShowWeatherModal(true)}
@@ -249,41 +181,197 @@ export const FarmerDashboard = () => {
         >
           <div className="space-y-1">
             <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Weather Intelligence</p>
-            <h3 className="text-2xl font-extrabold font-display text-red-600 flex items-center gap-1.5">
-              High Risk 🌧️
+            <h3 className="text-xl font-extrabold font-display text-amber-600 flex items-center gap-1.5">
+              82mm Rain 🌧️
             </h3>
-            <p className="text-[11px] text-red-700 font-semibold">82mm Heavy Rain Tomorrow • Click Details</p>
+            <p className="text-[11px] text-amber-700 font-semibold">Click for 7-Day Forecast</p>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl font-bold border border-red-100 group-hover:scale-105 transition">
-            <CloudRain className="w-6 h-6 text-red-600" />
+          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold border border-amber-100 group-hover:scale-105 transition">
+            <CloudRain className="w-6 h-6 text-amber-600" />
           </div>
         </motion.div>
 
-        <motion.div whileHover={{ y: -3 }} className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Crop Disease Risk</p>
-            <h3 className="text-2xl font-extrabold font-display text-amber-600 flex items-center gap-1.5">
-              Medium ⚠️
-            </h3>
-            <p className="text-[11px] text-amber-700 font-semibold">Fungal alert for Solanaceae</p>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold border border-amber-100">
-            <AlertTriangle className="w-6 h-6 text-amber-600" />
-          </div>
-        </motion.div>
+        <Link to="/crop-disease" className="block">
+          <motion.div whileHover={{ y: -3 }} className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between cursor-pointer group">
+            <div className="space-y-1">
+              <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">AI Disease Scanner</p>
+              <h3 className="text-xl font-extrabold font-display text-blue-600 flex items-center gap-1.5">
+                Scan Leaf 🔬
+              </h3>
+              <p className="text-[11px] text-blue-700 font-semibold">CNN Vision Pathology</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl font-bold border border-blue-100 group-hover:scale-105 transition">
+              <Sparkles className="w-6 h-6 text-blue-600" />
+            </div>
+          </motion.div>
+        </Link>
 
-        <motion.div whileHover={{ y: -3 }} className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Market Demand</p>
-            <h3 className="text-2xl font-extrabold font-display text-teal-600 flex items-center gap-1.5">
-              High 🔥
-            </h3>
-            <p className="text-[11px] text-teal-700 font-semibold">Strong commercial buyer interest</p>
+        <Link to="/contract-farming" className="block">
+          <motion.div whileHover={{ y: -3 }} className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between cursor-pointer group">
+            <div className="space-y-1">
+              <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Contract Farming</p>
+              <h3 className="text-xl font-extrabold font-display text-teal-600 flex items-center gap-1.5">
+                Escrow Terms 🌾
+              </h3>
+              <p className="text-[11px] text-teal-700 font-semibold">Guaranteed Buyback Tenders</p>
+            </div>
+            <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl font-bold border border-teal-100 group-hover:scale-105 transition">
+              <ShieldCheck className="w-6 h-6 text-teal-600" />
+            </div>
+          </motion.div>
+        </Link>
+      </div>
+
+      {/* 📊 NEW: SEASONAL REVENUE VS. INPUT COST BREAKDOWN & YIELD BENCHMARKS */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* FINANCIAL PROFIT & EXPENSE BREAKDOWN (7 Cols) */}
+        <div className="lg:col-span-7 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-lg space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100">
+                <BarChart3 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 font-display">
+                  Seasonal Revenue vs. Input Costs
+                </h3>
+                <p className="text-xs text-slate-400 font-medium">Real-time ledger tracking farm cashflow</p>
+              </div>
+            </div>
+
+            <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase">
+              {selectedSeason}
+            </span>
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl font-bold border border-teal-100">
-            <TrendingUp className="w-6 h-6 text-teal-600" />
+
+          {/* NET PROFIT HERO CARD */}
+          <div className="p-5 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white rounded-2xl border border-slate-800 shadow-md flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                Net Harvest Profit
+              </span>
+              <div className="text-3xl font-black font-display text-emerald-400">
+                Rs. {SEASONAL_FINANCIALS.netProfit.toLocaleString()}
+              </div>
+              <span className="text-xs text-slate-300 font-medium">
+                Overall Net Profit Margin: <strong>{SEASONAL_FINANCIALS.profitMarginPct}%</strong>
+              </span>
+            </div>
+
+            <div className="text-right">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Gross Sales</span>
+              <span className="text-lg font-extrabold text-white font-display">
+                Rs. {SEASONAL_FINANCIALS.grossRevenue.toLocaleString()}
+              </span>
+            </div>
           </div>
-        </motion.div>
+
+          {/* ITEMIZED EXPENSE PROGRESS BARS */}
+          <div className="space-y-3 text-xs font-semibold">
+            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">
+              Expense Allocation Breakdown:
+            </span>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-slate-600">
+                <span>🌱 Fertilizer &amp; Agronomic Inputs:</span>
+                <span className="font-bold text-slate-900">Rs. {SEASONAL_FINANCIALS.fertilizerCost.toLocaleString()} (16.2%)</span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full" style={{ width: '16.2%' }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-slate-600">
+                <span>🚜 Machinery &amp; Equipment Rental:</span>
+                <span className="font-bold text-slate-900">Rs. {SEASONAL_FINANCIALS.equipmentRentalCost.toLocaleString()} (8.1%)</span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full bg-teal-500 rounded-full" style={{ width: '8.1%' }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-slate-600">
+                <span>🚚 Flatbed Reefer Logistics:</span>
+                <span className="font-bold text-slate-900">Rs. {SEASONAL_FINANCIALS.logisticsCost.toLocaleString()} (5.7%)</span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full bg-sky-500 rounded-full" style={{ width: '5.7%' }} />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-slate-600">
+                <span>💧 IoT Drip Irrigation &amp; Power:</span>
+                <span className="font-bold text-slate-900">Rs. {SEASONAL_FINANCIALS.irrigationCost.toLocaleString()} (3.0%)</span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-full bg-purple-500 rounded-full" style={{ width: '3.0%' }} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* REGIONAL DISTRICT YIELD BENCHMARKS (5 Cols) */}
+        <div className="lg:col-span-5 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-lg space-y-5">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-100">
+                <Award className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 font-display">
+                  District Yield Benchmarks
+                </h3>
+                <p className="text-xs text-slate-400 font-medium">Comparison vs. Regional Average</p>
+              </div>
+            </div>
+
+            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[10px] font-black uppercase">
+              Top 10%
+            </span>
+          </div>
+
+          <div className="space-y-3.5">
+            {YIELD_BENCHMARKS.map((bench) => (
+              <div
+                key={bench.crop}
+                className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5"
+              >
+                <div className="flex justify-between items-center">
+                  <span className="font-extrabold text-slate-900 text-xs font-display">{bench.crop}</span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black">
+                    +{bench.diffPct}% vs Avg 🚀
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2.5 bg-white rounded-xl border border-slate-100">
+                    <span className="text-[10px] text-slate-400 font-bold block">Your Plot Yield:</span>
+                    <strong className="text-emerald-700 text-sm">{bench.myYield}</strong>
+                  </div>
+                  <div className="p-2.5 bg-white rounded-xl border border-slate-100">
+                    <span className="text-[10px] text-slate-400 font-bold block">District Average:</span>
+                    <strong className="text-slate-600 text-sm">{bench.districtAvg}</strong>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900 font-semibold space-y-0.5">
+            <span className="font-bold flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Agronomic Tip:
+            </span>
+            <p className="text-[11px] text-emerald-800">
+              Your drip irrigation timing improved tomato yield by 17.9% compared to the Welimada district mean.
+            </p>
+          </div>
+        </div>
+
       </div>
 
       {/* PENDING BUYER ORDERS & LOGISTICS DISPATCH TABLE */}
@@ -328,7 +416,7 @@ export const FarmerDashboard = () => {
                       <button
                         type="button"
                         onClick={() => setSelectedBuyer({ id: order.buyerId, name: order.buyerName, email: order.buyerEmail })}
-                        className="text-emerald-700 font-bold hover:underline flex items-center gap-1"
+                        className="text-emerald-700 font-bold hover:underline flex items-center gap-1 cursor-pointer"
                       >
                         <span>{order.buyerEmail || order.buyerName || 'Buyer'}</span>
                         <span className="text-[9px] bg-blue-100 text-blue-800 font-black px-1.5 py-0.5 rounded">Verified Buyer ⭐</span>
@@ -345,7 +433,7 @@ export const FarmerDashboard = () => {
                         <button
                           onClick={() => handleAcceptOrder(order.id)}
                           disabled={actionLoading === order.id}
-                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-xl transition flex items-center gap-1.5 disabled:opacity-50"
+                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-xl transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                         >
                           {actionLoading === order.id ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -396,3 +484,5 @@ export const FarmerDashboard = () => {
     </div>
   );
 };
+
+export default FarmerDashboard;
