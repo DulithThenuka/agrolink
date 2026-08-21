@@ -128,15 +128,6 @@ export const PricePrediction = () => {
         </motion.div>
       </div>
 
-      {/* INTERACTIVE 14-DAY PRICE TREND & FORECAST CHART */}
-      <PriceTrendChart
-        cropName={prediction.cropName}
-        historical={prediction.historicalPrices}
-        forecast={prediction.forecastPrices}
-        todaysPrice={prediction.todaysMarketPriceLkr}
-        bestWindow={prediction.bestActionWindow}
-      />
-
       {/* WHAT-IF HARVEST PROFIT CALCULATOR */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-700/80 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-700/60 pb-4">
@@ -231,6 +222,15 @@ export const PricePrediction = () => {
           </div>
         </div>
       </div>
+
+      {/* INTERACTIVE 14-DAY PRICE TREND & FORECAST CHART */}
+      <PriceTrendChart
+        cropName={prediction.cropName}
+        historical={prediction.historicalPrices}
+        forecast={prediction.forecastPrices}
+        todaysPrice={prediction.todaysMarketPriceLkr}
+        bestWindow={prediction.bestActionWindow}
+      />
 
       {/* MULTIFACTOR AI DRIVERS & ACTION */}
       <div className="grid lg:grid-cols-12 gap-8">
