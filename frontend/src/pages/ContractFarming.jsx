@@ -45,7 +45,13 @@ import {
   Bot,
   Scan,
   Shield,
-  CheckCircle
+  CheckCircle,
+  Percent,
+  CloudRain,
+  Layers,
+  Landmark,
+  ShieldAlert,
+  Scale
 } from 'lucide-react';
 import { contractFarmingAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -287,6 +293,23 @@ export const ContractFarming = () => {
     durationMonths: 6,
     frequency: 'Weekly'
   });
+
+  // Agreement Terms Simulator & Yield Guarantee State
+  const [simulatorData, setSimulatorData] = useState({
+    cropName: 'Organic Tomato',
+    category: 'Vegetables',
+    buyerType: 'Supermarket Chain (e.g. Keells, Cargills)',
+    acreage: 2.0,
+    expectedYieldPerAcre: 1500,
+    targetFloorPrice: 210,
+    durationMonths: 6,
+    advanceEscrowPct: 25,
+    dispatchFrequency: 'Weekly',
+    weatherRiskLevel: 'Moderate Risk',
+    guaranteeCommitmentPct: 90
+  });
+
+  const [activeTimelineStep, setActiveTimelineStep] = useState(1);
 
   // Digital Signature State
   const [digitalSignature, setDigitalSignature] = useState('');
@@ -796,6 +819,21 @@ export const ContractFarming = () => {
         >
           <Briefcase className="w-4 h-4" />
           <span>Enterprise Buyer Portal</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('terms-simulator')}
+          className={`px-5 py-3 rounded-2xl text-xs font-extrabold transition-all duration-200 flex items-center gap-2 cursor-pointer border ${
+            activeTab === 'terms-simulator'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
+              : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <Calculator className="w-4 h-4 text-emerald-500" />
+          <span>Agreement Simulator &amp; Yield Guarantee 🌾</span>
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-800 font-extrabold">
+            NEW
+          </span>
         </button>
       </div>
 
@@ -1310,6 +1348,405 @@ export const ContractFarming = () => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* TAB 4: AGREEMENT TERMS SIMULATOR, ESCROW MILESTONE TIMELINE & YIELD GUARANTEE */}
+      {activeTab === 'terms-simulator' && (
+        <div className="space-y-8 animate-fade-in">
+          
+          {/* TOP BANNER */}
+          <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white border border-emerald-800/50 shadow-xl space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                <Calculator className="w-3.5 h-3.5 text-emerald-400" /> B2B CONTRACT SIMULATOR &amp; RISK ENGINE
+              </span>
+              <span className="text-xs font-mono font-bold text-teal-200">• ESCROW BACKED</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white">
+              Agreement Terms Simulator &amp; Crop Yield Guarantee 🌾
+            </h2>
+            <p className="text-slate-300 text-xs sm:text-sm max-w-3xl leading-relaxed">
+              Model forward purchasing agreements, simulate buyer advance escrow deposits, map out your 4-stage fulfillment milestone timeline, and calculate weather buffer protection.
+            </p>
+          </div>
+
+          {/* SIMULATOR TWO-COLUMN LAYOUT: CONFIGURATOR + LIVE RESULTS */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* LEFT COLUMN: INTERACTIVE AGREEMENT CONFIGURATOR (7 Cols) */}
+            <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-lg space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <PenTool className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-extrabold text-slate-900 font-display">Contract Terms Configurator</h3>
+                    <p className="text-xs text-slate-500">Adjust variables to simulate guaranteed forward cashflows</p>
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">
+                  Interactive Model
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
+                {/* CROP SELECTOR */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Target Crop / Harvest</label>
+                  <select
+                    value={simulatorData.cropName}
+                    onChange={(e) => {
+                      const crop = e.target.value;
+                      let defaultPrice = 210;
+                      let defaultYield = 1500;
+                      if (crop === 'Samba Rice') { defaultPrice = 220; defaultYield = 1800; }
+                      else if (crop === 'Green Chillies') { defaultPrice = 380; defaultYield = 600; }
+                      else if (crop === 'Highland Carrots') { defaultPrice = 260; defaultYield = 1400; }
+                      else if (crop === 'Alba Cinnamon') { defaultPrice = 1550; defaultYield = 150; }
+                      else if (crop === 'Watermelons') { defaultPrice = 175; defaultYield = 2500; }
+                      setSimulatorData({
+                        ...simulatorData,
+                        cropName: crop,
+                        targetFloorPrice: defaultPrice,
+                        expectedYieldPerAcre: defaultYield
+                      });
+                    }}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-emerald-500 bg-white"
+                  >
+                    <option value="Organic Tomato">🍅 Organic Tomato</option>
+                    <option value="Samba Rice">🌾 Polonnaruwa Samba Rice</option>
+                    <option value="Green Chillies">🌶️ Jaffna Green Chillies</option>
+                    <option value="Highland Carrots">🥕 Highland Carrots</option>
+                    <option value="Alba Cinnamon">🌿 Alba Ceylon Cinnamon</option>
+                    <option value="Watermelons">🍉 Sugar-Baby Watermelons</option>
+                  </select>
+                </div>
+
+                {/* BUYER TYPE */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Enterprise Buyer Tier</label>
+                  <select
+                    value={simulatorData.buyerType}
+                    onChange={(e) => setSimulatorData({ ...simulatorData, buyerType: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-emerald-500 bg-white"
+                  >
+                    <option value="Supermarket Chain (e.g. Keells, Cargills)">🏬 Supermarket Retail Chain</option>
+                    <option value="Luxury Hospitality (e.g. Shangri-La, Cinnamon)">🏨 Luxury Hospitality Group</option>
+                    <option value="Exporter & Processor (e.g. Dilmah, Hayleys)">🌍 Exporter &amp; Processor</option>
+                    <option value="Food & Beverage Manufacturer">🏭 Food &amp; Beverage Manufacturer</option>
+                  </select>
+                </div>
+
+                {/* ACREAGE SLIDER */}
+                <div className="space-y-1 sm:col-span-2 p-3 bg-slate-50 rounded-2xl border border-slate-200/80">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">Cultivated Land Acreage:</span>
+                    <span className="font-black text-emerald-700 text-sm font-display">{simulatorData.acreage} Acres</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="10"
+                    step="0.5"
+                    value={simulatorData.acreage}
+                    onChange={(e) => setSimulatorData({ ...simulatorData, acreage: parseFloat(e.target.value) })}
+                    className="w-full accent-emerald-600 cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
+                    <span>0.5 Acre (Smallholder)</span>
+                    <span>5.0 Acres</span>
+                    <span>10.0 Acres (Commercial)</span>
+                  </div>
+                </div>
+
+                {/* TARGET FLOOR PRICE */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Guaranteed Floor Price (Rs/kg)</label>
+                  <input
+                    type="number"
+                    value={simulatorData.targetFloorPrice}
+                    onChange={(e) => setSimulatorData({ ...simulatorData, targetFloorPrice: Math.max(1, Number(e.target.value)) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-black text-emerald-600 focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                {/* CONTRACT DURATION */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Contract Duration</label>
+                  <select
+                    value={simulatorData.durationMonths}
+                    onChange={(e) => setSimulatorData({ ...simulatorData, durationMonths: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-emerald-500 bg-white"
+                  >
+                    <option value={3}>3 Months (Seasonal Trial)</option>
+                    <option value={6}>6 Months (Standard Season)</option>
+                    <option value={12}>12 Months (Annual Supply Contract)</option>
+                  </select>
+                </div>
+
+                {/* ADVANCE ESCROW PERCENTAGE */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Upfront Escrow Deposit Rate</label>
+                  <select
+                    value={simulatorData.advanceEscrowPct}
+                    onChange={(e) => setSimulatorData({ ...simulatorData, advanceEscrowPct: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-emerald-500 bg-white"
+                  >
+                    <option value={15}>15% Advance Lock</option>
+                    <option value={20}>20% Standard Escrow Lock</option>
+                    <option value={25}>25% Premium Escrow Lock</option>
+                    <option value={30}>30% Maximum Escrow Guarantee</option>
+                  </select>
+                </div>
+
+                {/* DISPATCH FREQUENCY */}
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Fleet Dispatch Frequency</label>
+                  <select
+                    value={simulatorData.dispatchFrequency}
+                    onChange={(e) => setSimulatorData({ ...simulatorData, dispatchFrequency: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-emerald-500 bg-white"
+                  >
+                    <option value="Weekly">Weekly Scheduled Dispatches (4x / mo)</option>
+                    <option value="Bi-Weekly">Bi-Weekly Scheduled Dispatches (2x / mo)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: SIMULATION FINANCIAL BREAKDOWN CARD (5 Cols) */}
+            <div className="lg:col-span-5 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl flex flex-col justify-between space-y-6">
+              <div className="space-y-5">
+                <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 flex items-center gap-1.5">
+                    <DollarSign className="w-4 h-4 text-emerald-400" /> GUARANTEED REVENUE MATRIX
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 font-extrabold text-[10px] border border-emerald-800">
+                    100% Escrow Protected
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-xs text-slate-400 font-medium">Total Multi-Month Contract Value:</span>
+                  <div className="text-3xl sm:text-4xl font-black font-display text-emerald-400">
+                    Rs. {((simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths) * simulatorData.targetFloorPrice).toLocaleString()}
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    For {(simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths).toLocaleString()} kg of {simulatorData.cropName} over {simulatorData.durationMonths} months.
+                  </p>
+                </div>
+
+                {/* BREAKDOWN METRICS */}
+                <div className="p-4 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Buyer Advance Escrow Locked:</span>
+                    <span className="font-extrabold text-white">
+                      Rs. {(((simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths) * simulatorData.targetFloorPrice) * (simulatorData.advanceEscrowPct / 100)).toLocaleString()} ({simulatorData.advanceEscrowPct}%)
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">Monthly Guaranteed Cashflow:</span>
+                    <span className="font-extrabold text-slate-200">
+                      Rs. {((((simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths) * simulatorData.targetFloorPrice)) / simulatorData.durationMonths).toLocaleString()}/mo
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-400">{simulatorData.dispatchFrequency} Dispatch Payout:</span>
+                    <span className="font-extrabold text-emerald-300">
+                      Rs. {Math.round((((simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths) * simulatorData.targetFloorPrice) / simulatorData.durationMonths) / (simulatorData.dispatchFrequency === 'Weekly' ? 4 : 2)).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-800 flex justify-between items-center text-emerald-400 font-bold">
+                    <span>Spot Market Premium Gain:</span>
+                    <span className="text-xs bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                      +Rs. {Math.round(((simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths) * simulatorData.targetFloorPrice) * 0.18).toLocaleString()} (+18% vs Open Market)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setCreateForm({
+                    ...createForm,
+                    cropName: simulatorData.cropName,
+                    monthlyQuantityKg: simulatorData.acreage * simulatorData.expectedYieldPerAcre,
+                    minPriceLkr: simulatorData.targetFloorPrice,
+                    maxPriceLkr: Math.round(simulatorData.targetFloorPrice * 1.15),
+                    durationMonths: simulatorData.durationMonths
+                  });
+                  setShowCreateModal(true);
+                }}
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <FileCheck className="w-4 h-4" />
+                <span>Generate Official B2B Tender from this Simulation 🚀</span>
+              </button>
+            </div>
+          </div>
+
+          {/* BUYER-FARMER ESCROW MILESTONE TIMELINE */}
+          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-lg space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2.5 rounded-2xl bg-teal-50 text-teal-700 border border-teal-100">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 font-display">Buyer-Farmer Escrow Milestone Timeline</h3>
+                  <p className="text-xs text-slate-500">4-Stage automated escrow disbursement protocol</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold text-slate-500">Click any milestone stage to view protocol:</span>
+            </div>
+
+            {/* 4-STAGE TIMELINE CARDS */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {[
+                {
+                  step: 1,
+                  title: 'Milestone 1: Smart Contract & Advance Vault',
+                  timing: 'Day 0 (Execution)',
+                  icon: '✍️',
+                  desc: 'Buyer deposits 20–30% advance escrow into AgroLink Vault. Digital signatures registered on immutable ledger.',
+                  payout: `${simulatorData.advanceEscrowPct}% Locked in Vault`
+                },
+                {
+                  step: 2,
+                  title: 'Milestone 2: IoT Telemetry & Farm Audit',
+                  timing: 'Month 1–2 (Mid-Growth)',
+                  icon: '🌱',
+                  desc: 'Soil moisture, temperature sensors, and DOA GAP standard verified via IoT telemetry and localized AI health check.',
+                  payout: 'Agronomy Certificate Issued'
+                },
+                {
+                  step: 3,
+                  title: 'Milestone 3: Fleet Dispatch & QR Scan',
+                  timing: `${simulatorData.dispatchFrequency} Schedule`,
+                  icon: '🚚',
+                  desc: 'Fleet driver scans crate QR code, validates temperature log (8–12°C), and confirms net weighbridge volume.',
+                  payout: 'Dispatch Receipt Locked'
+                },
+                {
+                  step: 4,
+                  title: 'Milestone 4: Instant Bank Settlement',
+                  timing: '< 2 Hours Post-Delivery',
+                  icon: '💳',
+                  desc: 'Smart contract automatically executes direct wire payment to farmer bank account upon store reception confirmation.',
+                  payout: '100% Final Settlement'
+                }
+              ].map((m) => (
+                <div
+                  key={m.step}
+                  onClick={() => setActiveTimelineStep(m.step)}
+                  className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
+                    activeTimelineStep === m.step
+                      ? 'bg-emerald-50/90 border-emerald-500 shadow-md ring-2 ring-emerald-500/20'
+                      : 'bg-slate-50 border-slate-200/80 hover:bg-slate-100/80'
+                  }`}
+                >
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl">{m.icon}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                        activeTimelineStep === m.step ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}>
+                        Stage {m.step}
+                      </span>
+                    </div>
+                    <h4 className="font-extrabold text-slate-900 text-sm font-display leading-tight">{m.title}</h4>
+                    <p className="text-[10px] text-slate-400 font-bold">{m.timing}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">{m.desc}</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] font-bold text-emerald-800">
+                    <span>{m.payout}</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-emerald-600" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CROP YIELD GUARANTEE & WEATHER RISK PROTECTION CALCULATOR */}
+          <div className="p-6 sm:p-8 bg-white rounded-3xl border border-slate-200/90 shadow-lg space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2.5 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100">
+                  <CloudRain className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 font-display">Crop Yield Guarantee &amp; Weather Risk Protection</h3>
+                  <p className="text-xs text-slate-500">AgroLink parametric weather insurance &amp; yield indemnification</p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 text-xs font-bold">
+                🛡️ Weather Buffer Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* COMMITMENT CARD */}
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">1. Yield Commitment</span>
+                <h4 className="text-base font-extrabold text-slate-900 font-display">90% Harvest Quota Commitment</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Farmer guarantees delivery of at least 90% of contracted quota. Minor variations (up to 10%) are automatically buffered by AgroLink cooperative pool.
+                </p>
+                <div className="p-2.5 bg-white rounded-xl border border-slate-200 font-bold text-xs text-slate-800">
+                  Guaranteed Volume: {Math.round((simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths) * 0.90).toLocaleString()} kg
+                </div>
+              </div>
+
+              {/* WEATHER RISK INDEX */}
+              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block">2. Regional Climate Risk</span>
+                <h4 className="text-base font-extrabold text-slate-900 font-display">Parametric Rain / Heat Index</h4>
+                <div className="flex gap-2">
+                  {['Low Risk', 'Moderate Risk', 'High Rain Zone'].map((risk) => (
+                    <button
+                      key={risk}
+                      type="button"
+                      onClick={() => setSimulatorData({ ...simulatorData, weatherRiskLevel: risk })}
+                      className={`flex-1 py-1.5 rounded-xl text-[11px] font-bold border transition ${
+                        simulatorData.weatherRiskLevel === risk
+                          ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50'
+                      }`}
+                    >
+                      {risk}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Linked to Department of Meteorology Doppler radar stations. Extreme rainfall triggers automated claim without paperwork.
+                </p>
+              </div>
+
+              {/* INDEMNITY COVERAGE */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200/80 space-y-2 flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-black uppercase text-emerald-700 tracking-wider block">3. Weather Escrow Protection</span>
+                  <h4 className="text-base font-extrabold text-emerald-950 font-display">Automatic Buffer Payout</h4>
+                  <p className="text-xs text-emerald-900/80 mt-1 leading-relaxed">
+                    In the event of unseasonal flood or drought causing &gt;15% crop loss, AgroLink Escrow covers up to:
+                  </p>
+                  <div className="text-2xl font-black text-emerald-700 font-display mt-2">
+                    Rs. {Math.round(((simulatorData.acreage * simulatorData.expectedYieldPerAcre * simulatorData.durationMonths) * simulatorData.targetFloorPrice) * 0.15).toLocaleString()}
+                  </div>
+                </div>
+                <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-lg border border-emerald-300/50 self-start">
+                  ✓ Zero Farmer Deductible
+                </span>
+              </div>
+            </div>
+          </div>
+
         </div>
       )}
 
