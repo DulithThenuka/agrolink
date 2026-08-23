@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Sprout,
-  Sun,
-  AlertTriangle,
-  TrendingUp,
-  ShoppingBag,
   PlusCircle,
-  ArrowRight,
   ShieldCheck,
-  DollarSign,
-  Package,
   CheckCircle2,
   Loader2,
   CloudRain,
   Cpu,
-  Wifi,
-  Droplet,
-  Thermometer,
-  PieChart,
   BarChart3,
   Award,
-  ArrowUpRight,
-  Sparkles,
-  Sliders
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
@@ -120,7 +107,7 @@ export const FarmerDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
-      
+
       {/* TOP GREETING BANNER */}
       <div className="glass rounded-3xl p-8 border border-white/80 shadow-2xl bg-gradient-to-r from-emerald-950 via-teal-950 to-slate-950 text-white relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
@@ -224,7 +211,7 @@ export const FarmerDashboard = () => {
 
       {/* 📊 NEW: SEASONAL REVENUE VS. INPUT COST BREAKDOWN & YIELD BENCHMARKS */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
+
         {/* FINANCIAL PROFIT & EXPENSE BREAKDOWN (7 Cols) */}
         <div className="lg:col-span-7 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-lg space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
