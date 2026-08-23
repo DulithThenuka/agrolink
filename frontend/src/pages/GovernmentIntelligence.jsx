@@ -29,7 +29,11 @@ import {
   Landmark,
   Scale,
   Sparkles,
-  PieChart
+  PieChart,
+  Package,
+  Calendar,
+  FileCheck2,
+  Info
 } from 'lucide-react';
 
 export const GovernmentIntelligence = () => {
@@ -45,7 +49,6 @@ export const GovernmentIntelligence = () => {
   const [fertilizerSubsidy, setFertilizerSubsidy] = useState(25);
   const [fuelSubsidy, setFuelSubsidy] = useState(20);
   const [simResult, setSimResult] = useState(null);
-  const [simulating, setSimulating] = useState(false);
 
   const DISTRICT_HEATMAP_DATA = [
     {
@@ -99,99 +102,103 @@ export const GovernmentIntelligence = () => {
       vulnerability: 'Moderate'
     },
     {
-      district: 'Kurunegala',
-      primaryCrop: 'Coconut, Fruits & Vegetables',
-      surplusPct: 6,
+      district: 'Hambantota',
+      primaryCrop: 'Watermelon, Banana & Papaya',
+      surplusPct: 5,
       status: 'OPTIMAL',
       securityScore: 91,
-      productionMT: '56,000 MT',
-      bufferWeeks: 11.5,
+      productionMT: '22,000 MT',
+      bufferWeeks: 9.1,
       vulnerability: 'Low'
     },
     {
-      district: 'Hambantota',
-      primaryCrop: 'Banana, Paddy & Vegetables',
+      district: 'Matale',
+      primaryCrop: 'Black Pepper, Spices & Cocoa',
+      surplusPct: 12,
+      status: 'OPTIMAL',
+      securityScore: 93,
+      productionMT: '14,500 MT',
+      bufferWeeks: 12.0,
+      vulnerability: 'Low'
+    },
+    {
+      district: 'Kurunegala',
+      primaryCrop: 'Coconut, Paddy & Vegetables',
       surplusPct: -12,
       status: 'DEFICIT_WARNING',
-      securityScore: 74,
-      productionMT: '22,000 MT',
+      securityScore: 84,
+      productionMT: '52,000 MT',
       bufferWeeks: 4.8,
-      vulnerability: 'High'
-    },
-    {
-      district: 'Kandy',
-      primaryCrop: 'Spices, Tea & Root Crops',
-      surplusPct: 4,
-      status: 'OPTIMAL',
-      securityScore: 88,
-      productionMT: '29,500 MT',
-      bufferWeeks: 9.0,
-      vulnerability: 'Low'
+      vulnerability: 'Moderate'
     }
   ];
 
   const BUFFER_STOCKS = [
     {
-      crop: 'Paddy Rice (Samba / Nadu / Keeri)',
+      crop: 'Paddy Rice (Samba / Keeri)',
+      targetWeeks: 16,
       currentReserveWeeks: 14.2,
-      targetWeeks: 12.0,
-      reserveQuantityMT: '385,000 MT',
+      reserveQuantityMT: '240,000 MT',
       healthStatus: 'HEALTHY',
-      pctFull: 95,
-      color: 'emerald'
+      pctFull: 88
     },
     {
-      crop: 'Big Onion & Red Onion',
-      currentReserveWeeks: 6.4,
-      targetWeeks: 8.0,
-      reserveQuantityMT: '42,000 MT',
+      crop: 'Nuwara Eliya Seed Potatoes',
+      targetWeeks: 8,
+      currentReserveWeeks: 7.8,
+      reserveQuantityMT: '12,500 MT',
+      healthStatus: 'HEALTHY',
+      pctFull: 97
+    },
+    {
+      crop: 'Red Shallots & Big Onion',
+      targetWeeks: 10,
+      currentReserveWeeks: 5.2,
+      reserveQuantityMT: '8,400 MT',
       healthStatus: 'MODERATE_DEFICIT',
-      pctFull: 68,
-      color: 'amber'
+      pctFull: 52
     },
     {
-      crop: 'Upcountry Red Potatoes',
-      currentReserveWeeks: 10.8,
-      targetWeeks: 10.0,
-      reserveQuantityMT: '65,000 MT',
+      crop: 'Feed Maize & Corn Grain',
+      targetWeeks: 12,
+      currentReserveWeeks: 10.5,
+      reserveQuantityMT: '45,000 MT',
       healthStatus: 'HEALTHY',
-      pctFull: 88,
-      color: 'emerald'
+      pctFull: 87
     },
     {
-      crop: 'Green Chillies & Dried Chillies',
-      currentReserveWeeks: 5.1,
-      targetWeeks: 6.5,
-      reserveQuantityMT: '14,500 MT',
-      healthStatus: 'CRITICAL_MONITORING',
-      pctFull: 54,
-      color: 'rose'
+      crop: 'Dried Green & Red Chillies',
+      targetWeeks: 8,
+      currentReserveWeeks: 3.8,
+      reserveQuantityMT: '2,900 MT',
+      healthStatus: 'CRITICAL_DEFICIT',
+      pctFull: 47
     }
   ];
 
   const MOCK_GOV_DATA = {
     overviewStats: {
-      activeFarmers: 42811,
-      activeBuyers: 8927,
-      currentListings: 73114,
-      todayTransactionLkr: 38450000,
-      monthlyGrowthRate: 14.2,
-      nationalFoodSecurityIndex: 88.4
+      activeFarmers: 1250,
+      activeBuyers: 84,
+      todayTransactionLkr: 4200000,
+      nationalFoodSecurityIndex: 94.2,
+      totalTrackedHectares: 18450,
+      activeEscrowLkr: 28500000
     },
     policyAlerts: [
       {
         id: 1,
-        title: 'Tomato Overproduction Alert (Welimada & Nuwara Eliya)',
+        title: 'Central Province Tomato Overproduction Alert',
         severity: 'CRITICAL',
-        category: 'OVERSUPPLY',
-        region: 'Central Upcountry',
-        impactMetric: '14,200 MT Surplus'
+        category: 'SURPLUS',
+        region: 'Welimada & Badulla Valley',
+        impactMetric: '+42% Expected Surplus (Aug 2026)'
       },
       {
         id: 2,
-        title: 'Fall Armyworm Infestation Advisory',
+        title: 'Fall Armyworm Infestation Risk Vector',
         severity: 'WARNING',
-        category: 'DISEASE',
+        category: 'PEST',
         region: 'Anuradhapura & Polonnaruwa',
         impactMetric: '1,450 Hectares Under Scan'
       },
@@ -228,7 +235,6 @@ export const GovernmentIntelligence = () => {
   }, []);
 
   const calculatePolicySimulation = () => {
-    // Dynamic macroeconomic calculation based on the 4 sliders
     const farmerIncomeImpact = +(12.0 + (fertilizerSubsidy * 0.25) + (fuelSubsidy * 0.20) + (tariffChange > 0 ? tariffChange * 0.3 : tariffChange * 0.15)).toFixed(1);
     const consumerInflationImpact = +(-2.0 - (tariffChange < 0 ? Math.abs(tariffChange) * 0.25 : -tariffChange * 0.3) - (storageSubsidy * 0.12)).toFixed(1);
     const selfSufficiencyIndex = +(82.0 + (fertilizerSubsidy * 0.15) + (storageSubsidy * 0.10)).toFixed(1);
@@ -260,40 +266,40 @@ export const GovernmentIntelligence = () => {
     : alerts.filter(a => a.category === filterAlertCategory);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-16 animate-fade-in print:bg-white print:text-black">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-16 animate-fade-in print:bg-white print:text-black">
       
-      {/* STICKY TOP HEADER */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-4 print:hidden">
+      {/* 1. CLEAN WHITE & GLASSMORPHIC STICKY TOP HEADER */}
+      <header className="sticky top-0 z-40 glass bg-white/90 backdrop-blur-xl border-b border-slate-200/80 px-6 py-4 print:hidden shadow-xs">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
               <Landmark className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase tracking-widest font-extrabold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
+                <span className="text-[10px] uppercase tracking-widest font-black text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 shadow-xs">
                   Government &amp; Policy Intelligence
                 </span>
-                <span className="text-xs text-slate-400">• Real-Time National Agrarian Telemetry</span>
+                <span className="text-xs text-slate-400 hidden sm:inline font-semibold">• National Agrarian Telemetry</span>
               </div>
-              <h1 className="text-2xl font-black tracking-tight text-white font-display">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 font-display mt-0.5">
                 SRI LANKA AGRICULTURAL INTELLIGENCE HUB 🏛️
               </h1>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 self-end md:self-auto">
+          <div className="flex items-center gap-2.5 self-end md:self-auto">
             <button
               onClick={loadOverview}
-              className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition cursor-pointer"
-              title="Refresh Data"
+              className="p-2.5 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 rounded-xl border border-slate-200 shadow-xs transition cursor-pointer"
+              title="Refresh Telemetry Data"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-emerald-600' : ''}`} />
             </button>
 
             <button
               onClick={handleExportReport}
-              className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/25 transition flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-2 cursor-pointer"
             >
               <Download className="w-4 h-4" />
               <span>Export Policy Briefing 📄</span>
@@ -302,73 +308,73 @@ export const GovernmentIntelligence = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 pt-8 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
         
-        {/* TOP NATIONAL STATS OVERVIEW CARDS */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-5 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-2">
+        {/* 2. TOP NATIONAL STATS OVERVIEW CARDS (CLEAN WHITE) */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="premium-card p-6 bg-white border border-slate-200/90 shadow-md rounded-3xl space-y-2">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs font-bold uppercase tracking-wider">Registered Farms</span>
-              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+              <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100">
                 <Users className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-3xl font-black font-display text-white">
+            <div className="text-3xl font-black font-display text-slate-900">
               {overview.activeFarmers.toLocaleString()}
             </div>
-            <div className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+            <div className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
               <ArrowUpRight className="w-3.5 h-3.5" /> +14.2% MoM Digital Onboarding
             </div>
           </div>
 
-          <div className="p-5 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-2">
+          <div className="premium-card p-6 bg-white border border-slate-200/90 shadow-md rounded-3xl space-y-2">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs font-bold uppercase tracking-wider">Commercial Buyers</span>
-              <div className="p-2 rounded-xl bg-sky-500/10 text-sky-400">
+              <div className="p-2.5 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100">
                 <ShoppingBag className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-3xl font-black font-display text-white">
+            <div className="text-3xl font-black font-display text-slate-900">
               {overview.activeBuyers.toLocaleString()}
             </div>
-            <div className="text-[11px] font-semibold text-sky-400 flex items-center gap-1">
+            <div className="text-[11px] font-bold text-sky-700 flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5" /> Keells, Cargills, SPAR &amp; Exporters
             </div>
           </div>
 
-          <div className="p-5 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-2">
+          <div className="premium-card p-6 bg-white border border-slate-200/90 shadow-md rounded-3xl space-y-2">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs font-bold uppercase tracking-wider">National Food Security</span>
-              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+              <div className="p-2.5 rounded-2xl bg-purple-50 text-purple-600 border border-purple-100">
                 <Activity className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-3xl font-black font-display text-purple-400">
+            <div className="text-3xl font-black font-display text-purple-700">
               {overview.nationalFoodSecurityIndex}%
             </div>
-            <div className="text-[11px] font-semibold text-purple-300">
+            <div className="text-[11px] font-bold text-purple-600">
               Optimal Island Supply Index
             </div>
           </div>
 
-          <div className="p-5 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-2">
+          <div className="premium-card p-6 bg-white border border-slate-200/90 shadow-md rounded-3xl space-y-2">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs font-bold uppercase tracking-wider">Daily Trade Velocity</span>
-              <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
+              <div className="p-2.5 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100">
                 <DollarSign className="w-5 h-5" />
               </div>
             </div>
-            <div className="text-3xl font-black font-display text-amber-400">
+            <div className="text-3xl font-black font-display text-amber-700">
               Rs. {(overview.todayTransactionLkr / 1000000).toFixed(1)}M
             </div>
-            <div className="text-[11px] font-semibold text-slate-400">
+            <div className="text-[11px] font-bold text-slate-500">
               Zero Intermediary Leakage
             </div>
           </div>
         </section>
 
-        {/* NAVIGATION TABS */}
-        <div className="flex flex-wrap gap-2.5">
+        {/* 3. NAVIGATION TABS (CLEAN WHITE) */}
+        <div className="flex flex-wrap gap-2.5 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200 w-fit">
           {[
             { id: 'overview', label: '1. National Risk Alerts 🚨', icon: AlertTriangle },
             { id: 'heatmap', label: '2. District Food Security Heatmap 🗺️', icon: MapPin },
@@ -376,17 +382,18 @@ export const GovernmentIntelligence = () => {
             { id: 'buffer', label: '4. National Strategic Buffer Stocks 🌾', icon: Database }
           ].map((tab) => {
             const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-5 py-2.5 rounded-2xl text-xs font-extrabold transition flex items-center gap-2 cursor-pointer border ${
-                  activeTab === tab.id
-                    ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
-                    : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
+                className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs font-extrabold transition flex items-center gap-2 cursor-pointer border ${
+                  isActive
+                    ? 'bg-white text-emerald-800 border-slate-200 shadow-sm ring-1 ring-emerald-500/20'
+                    : 'bg-transparent text-slate-600 border-transparent hover:bg-white/60 hover:text-slate-900'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -396,37 +403,37 @@ export const GovernmentIntelligence = () => {
         {/* TAB 1: NATIONAL RISK ALERTS */}
         {activeTab === 'overview' && (
           <section className="space-y-4 animate-fade-in">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-amber-400" /> Agrarian Risk &amp; Early Warning Stream
+            <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+              <h2 className="text-lg font-extrabold text-slate-900 font-display flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-amber-500" /> Agrarian Risk &amp; Early Warning Stream
               </h2>
-              <span className="text-xs text-slate-400 font-medium">Department of Agriculture Telemetry</span>
+              <span className="text-xs text-slate-500 font-semibold">Department of Agriculture Live Telemetry</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {filteredAlerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className="p-5 rounded-3xl bg-slate-900 border border-slate-800 space-y-3 flex flex-col justify-between"
+                  className="premium-card p-6 bg-white border border-slate-200/90 shadow-md rounded-3xl space-y-4 flex flex-col justify-between"
                 >
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex justify-between items-start">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
                         alert.severity === 'CRITICAL'
-                          ? 'bg-rose-500/20 text-rose-400 border border-rose-800'
-                          : 'bg-amber-500/20 text-amber-400 border border-amber-800'
+                          ? 'bg-rose-50 text-rose-800 border-rose-200'
+                          : 'bg-amber-50 text-amber-800 border-amber-200'
                       }`}>
                         {alert.severity}
                       </span>
-                      <span className="text-xs text-slate-400 font-bold">{alert.region}</span>
+                      <span className="text-xs text-slate-500 font-bold">{alert.region}</span>
                     </div>
 
-                    <h4 className="font-extrabold text-white text-base font-display">{alert.title}</h4>
+                    <h4 className="font-extrabold text-slate-900 text-base font-display">{alert.title}</h4>
                   </div>
 
-                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-semibold">Impact Assessment:</span>
-                    <span className="font-bold text-emerald-400">{alert.impactMetric}</span>
+                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs">
+                    <span className="text-slate-500 font-semibold">Impact Assessment:</span>
+                    <span className="font-extrabold text-emerald-700">{alert.impactMetric}</span>
                   </div>
                 </div>
               ))}
@@ -437,54 +444,54 @@ export const GovernmentIntelligence = () => {
         {/* TAB 2: DISTRICT FOOD SECURITY HEATMAP */}
         {activeTab === 'heatmap' && (
           <section className="space-y-4 animate-fade-in">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-emerald-400" /> Regional District Production &amp; Surplus Matrix
+            <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+              <h2 className="text-lg font-extrabold text-slate-900 font-display flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-emerald-600" /> Regional District Production &amp; Surplus Matrix
               </h2>
-              <span className="text-xs text-slate-400">8 Agricultural Agrarian Hubs Tracked</span>
+              <span className="text-xs text-slate-500 font-semibold">8 Agricultural Agrarian Hubs Tracked</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {DISTRICT_HEATMAP_DATA.map((dist) => (
                 <div
                   key={dist.district}
-                  className={`p-5 rounded-3xl bg-slate-900 border space-y-3 transition flex flex-col justify-between ${
+                  className={`premium-card p-6 bg-white border rounded-3xl space-y-4 transition flex flex-col justify-between shadow-md ${
                     dist.status === 'SURPLUS_RISK'
-                      ? 'border-amber-700/80 hover:border-amber-500'
+                      ? 'border-amber-300 hover:border-amber-500'
                       : dist.status === 'DEFICIT_WARNING'
-                      ? 'border-rose-700/80 hover:border-rose-500'
-                      : 'border-slate-800 hover:border-emerald-500'
+                      ? 'border-rose-300 hover:border-rose-500'
+                      : 'border-slate-200/90 hover:border-emerald-500'
                   }`}
                 >
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="font-extrabold text-white text-base font-display">{dist.district}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                      <span className="font-extrabold text-slate-900 text-base font-display">{dist.district}</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${
                         dist.status === 'SURPLUS_RISK'
-                          ? 'bg-amber-500/20 text-amber-300'
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
                           : dist.status === 'DEFICIT_WARNING'
-                          ? 'bg-rose-500/20 text-rose-300'
-                          : 'bg-emerald-500/20 text-emerald-300'
+                          ? 'bg-rose-50 text-rose-800 border-rose-200'
+                          : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                       }`}>
                         {dist.status.replace('_', ' ')}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-400 font-medium">Crops: <strong className="text-slate-200">{dist.primaryCrop}</strong></p>
+                    <p className="text-xs text-slate-500 font-medium">Crops: <strong className="text-slate-800">{dist.primaryCrop}</strong></p>
                   </div>
 
-                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800/80 space-y-1.5 text-xs">
-                    <div className="flex justify-between text-slate-400">
+                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
+                    <div className="flex justify-between text-slate-500 font-semibold">
                       <span>Annual Yield:</span>
-                      <strong className="text-slate-200">{dist.productionMT}</strong>
+                      <strong className="text-slate-900 font-bold">{dist.productionMT}</strong>
                     </div>
-                    <div className="flex justify-between text-slate-400">
+                    <div className="flex justify-between text-slate-500 font-semibold">
                       <span>Reserve Buffer:</span>
-                      <strong className="text-emerald-400">{dist.bufferWeeks} Weeks</strong>
+                      <strong className="text-emerald-700 font-bold">{dist.bufferWeeks} Weeks</strong>
                     </div>
-                    <div className="flex justify-between text-slate-400">
+                    <div className="flex justify-between text-slate-500 font-semibold">
                       <span>Surplus Shift:</span>
-                      <strong className={dist.surplusPct > 0 ? 'text-amber-400' : 'text-rose-400'}>
+                      <strong className={dist.surplusPct > 0 ? 'text-amber-700 font-bold' : 'text-rose-700 font-bold'}>
                         {dist.surplusPct > 0 ? `+${dist.surplusPct}%` : `${dist.surplusPct}%`}
                       </strong>
                     </div>
@@ -497,26 +504,26 @@ export const GovernmentIntelligence = () => {
 
         {/* TAB 3: MACROECONOMIC POLICY INTERVENTION SIMULATOR */}
         {activeTab === 'simulator' && (
-          <section className="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-emerald-800/60 shadow-2xl space-y-6 animate-fade-in">
-            <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-              <div className="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <section className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-xl space-y-6 animate-fade-in">
+            <div className="flex items-center gap-3 border-b border-slate-200/80 pb-4">
+              <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200">
                 <Sliders className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-xl font-black text-white font-display">
-                  Macroeconomic Agrarian Policy Simulator
+                <h2 className="text-xl font-black text-slate-900 font-display">
+                  Macroeconomic Agrarian Policy Simulator ⚡
                 </h2>
-                <p className="text-xs text-slate-400">Simulate tariff changes, input subsidies, and buffer storage grants to forecast national inflation</p>
+                <p className="text-xs text-slate-500">Simulate tariff revisions, input subsidies, and buffer storage grants to forecast national food inflation</p>
               </div>
             </div>
 
-            {/* 4 SLIDER CONTROLS */}
+            {/* 4 SLIDER CONTROLS (CLEAN WHITE) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Tariff Slider */}
-              <div className="space-y-2 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                <div className="flex justify-between text-xs font-bold text-slate-300">
+              <div className="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div className="flex justify-between text-xs font-bold text-slate-700">
                   <span>Import Tariff Adjustment</span>
-                  <span className="text-emerald-400 font-mono">{tariffChange > 0 ? `+${tariffChange}%` : `${tariffChange}%`}</span>
+                  <span className="text-emerald-700 font-mono font-black">{tariffChange > 0 ? `+${tariffChange}%` : `${tariffChange}%`}</span>
                 </div>
                 <input
                   type="range"
@@ -525,16 +532,16 @@ export const GovernmentIntelligence = () => {
                   step="5"
                   value={tariffChange}
                   onChange={(e) => setTariffChange(parseInt(e.target.value, 10))}
-                  className="w-full accent-emerald-500 cursor-pointer"
+                  className="w-full accent-emerald-600 cursor-pointer"
                 />
-                <span className="text-[10px] text-slate-500 block">Protect domestic vs. lower consumer prices</span>
+                <span className="text-[10px] text-slate-400 block font-medium">Protect domestic vs. lower consumer prices</span>
               </div>
 
               {/* Fertilizer Subsidy Slider */}
-              <div className="space-y-2 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                <div className="flex justify-between text-xs font-bold text-slate-300">
+              <div className="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div className="flex justify-between text-xs font-bold text-slate-700">
                   <span>Fertilizer Input Subsidy</span>
-                  <span className="text-purple-400 font-mono">{fertilizerSubsidy}%</span>
+                  <span className="text-purple-700 font-mono font-black">{fertilizerSubsidy}%</span>
                 </div>
                 <input
                   type="range"
@@ -543,16 +550,16 @@ export const GovernmentIntelligence = () => {
                   step="5"
                   value={fertilizerSubsidy}
                   onChange={(e) => setFertilizerSubsidy(parseInt(e.target.value, 10))}
-                  className="w-full accent-purple-500 cursor-pointer"
+                  className="w-full accent-purple-600 cursor-pointer"
                 />
-                <span className="text-[10px] text-slate-500 block">Boosts smallholder hectare yield</span>
+                <span className="text-[10px] text-slate-400 block font-medium">Boosts smallholder hectare yield</span>
               </div>
 
               {/* Fuel & Power Rebate */}
-              <div className="space-y-2 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                <div className="flex justify-between text-xs font-bold text-slate-300">
+              <div className="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div className="flex justify-between text-xs font-bold text-slate-700">
                   <span>Agri Diesel &amp; Power Rebate</span>
-                  <span className="text-amber-400 font-mono">{fuelSubsidy}%</span>
+                  <span className="text-amber-700 font-mono font-black">{fuelSubsidy}%</span>
                 </div>
                 <input
                   type="range"
@@ -561,16 +568,16 @@ export const GovernmentIntelligence = () => {
                   step="5"
                   value={fuelSubsidy}
                   onChange={(e) => setFuelSubsidy(parseInt(e.target.value, 10))}
-                  className="w-full accent-amber-500 cursor-pointer"
+                  className="w-full accent-amber-600 cursor-pointer"
                 />
-                <span className="text-[10px] text-slate-500 block">Reduces machinery &amp; irrigation costs</span>
+                <span className="text-[10px] text-slate-400 block font-medium">Reduces machinery &amp; irrigation costs</span>
               </div>
 
               {/* Storage Grant */}
-              <div className="space-y-2 bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                <div className="flex justify-between text-xs font-bold text-slate-300">
+              <div className="space-y-2 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div className="flex justify-between text-xs font-bold text-slate-700">
                   <span>Cold Warehouse Grant</span>
-                  <span className="text-sky-400 font-mono">Rs. {storageSubsidy}/kg</span>
+                  <span className="text-sky-700 font-mono font-black">Rs. {storageSubsidy}/kg</span>
                 </div>
                 <input
                   type="range"
@@ -579,58 +586,58 @@ export const GovernmentIntelligence = () => {
                   step="5"
                   value={storageSubsidy}
                   onChange={(e) => setStorageSubsidy(parseInt(e.target.value, 10))}
-                  className="w-full accent-sky-500 cursor-pointer"
+                  className="w-full accent-sky-600 cursor-pointer"
                 />
-                <span className="text-[10px] text-slate-500 block">Incentivizes buffer crop preservation</span>
+                <span className="text-[10px] text-slate-400 block font-medium">Incentivizes buffer crop preservation</span>
               </div>
             </div>
 
-            {/* SIMULATION OUTCOME MATRIX */}
+            {/* SIMULATION OUTCOME MATRIX (CLEAN WHITE GLASS GRADIENT) */}
             {simResult && (
-              <div className="p-6 bg-slate-950 rounded-3xl border border-emerald-500/50 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+              <div className="p-6 bg-gradient-to-br from-emerald-50/80 via-teal-50/40 to-white rounded-3xl border border-emerald-200 shadow-md space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-200/60 pb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-emerald-400" />
-                    <h3 className="text-base font-extrabold text-white font-display">
+                    <Sparkles className="w-5 h-5 text-emerald-600" />
+                    <h3 className="text-base font-extrabold text-slate-900 font-display">
                       Forecasted Policy Impact Assessment
                     </h3>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-black uppercase">
+                  <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-black uppercase">
                     {simResult.policyScore}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                  <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800">
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold uppercase text-slate-400 block">Farmer Net Profit</span>
-                    <span className="text-2xl font-black font-display text-emerald-400 mt-1 block">
+                    <span className="text-2xl font-black font-display text-emerald-600 mt-1 block">
                       +{simResult.farmerIncomeImpact}%
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800">
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold uppercase text-slate-400 block">Food Inflation Shift</span>
-                    <span className="text-2xl font-black font-display text-emerald-400 mt-1 block">
+                    <span className="text-2xl font-black font-display text-teal-700 mt-1 block">
                       {simResult.consumerInflationImpact}%
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800">
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
                     <span className="text-[10px] font-bold uppercase text-slate-400 block">Self-Sufficiency Index</span>
-                    <span className="text-2xl font-black font-display text-purple-400 mt-1 block">
+                    <span className="text-2xl font-black font-display text-purple-700 mt-1 block">
                       {simResult.selfSufficiencyIndex}%
                     </span>
                   </div>
 
-                  <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Buffer Stock Horizon</span>
-                    <span className="text-2xl font-black font-display text-sky-400 mt-1 block">
+                  <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs">
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Buffer Stock Runway</span>
+                    <span className="text-2xl font-black font-display text-sky-700 mt-1 block">
                       +{simResult.bufferExtensionWeeks} Wks
                     </span>
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-300 font-medium italic leading-relaxed">
+                <p className="text-xs text-slate-700 font-medium italic leading-relaxed pt-1">
                   💡 {simResult.recommendationSummary}
                 </p>
               </div>
@@ -641,31 +648,31 @@ export const GovernmentIntelligence = () => {
         {/* TAB 4: NATIONAL STRATEGIC BUFFER STOCKS */}
         {activeTab === 'buffer' && (
           <section className="space-y-4 animate-fade-in">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-                <Database className="w-5 h-5 text-emerald-400" /> National Strategic Commodity Buffer Stock
+            <div className="flex items-center justify-between border-b border-slate-200/80 pb-3">
+              <h2 className="text-lg font-extrabold text-slate-900 font-display flex items-center gap-2">
+                <Database className="w-5 h-5 text-emerald-600" /> National Strategic Commodity Buffer Stocks
               </h2>
-              <span className="text-xs text-slate-400 font-medium">Warehouse Reserve Silos Capacity</span>
+              <span className="text-xs text-slate-500 font-semibold">Warehouse Reserve Silos Capacity</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {BUFFER_STOCKS.map((stock) => (
                 <div
                   key={stock.crop}
-                  className="p-6 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-4"
+                  className="premium-card p-6 bg-white border border-slate-200/90 shadow-md rounded-3xl space-y-4"
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-extrabold text-white text-base font-display">{stock.crop}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">Physical Sized Reserve: <strong className="text-slate-200">{stock.reserveQuantityMT}</strong></p>
+                      <h4 className="font-extrabold text-slate-900 text-base font-display">{stock.crop}</h4>
+                      <p className="text-xs text-slate-500 mt-0.5">Physical Sized Reserve: <strong className="text-slate-800">{stock.reserveQuantityMT}</strong></p>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase border ${
                       stock.healthStatus === 'HEALTHY'
-                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-800'
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         : stock.healthStatus === 'MODERATE_DEFICIT'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-800'
-                        : 'bg-rose-500/20 text-rose-400 border border-rose-800'
+                        ? 'bg-amber-50 text-amber-800 border-amber-200'
+                        : 'bg-rose-50 text-rose-800 border-rose-200'
                     }`}>
                       {stock.healthStatus.replace('_', ' ')}
                     </span>
@@ -673,15 +680,15 @@ export const GovernmentIntelligence = () => {
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-xs font-semibold">
-                      <span className="text-slate-400">Current Runway vs. Target:</span>
-                      <span className="text-emerald-400 font-mono font-bold">
+                      <span className="text-slate-500">Current Runway vs. Target:</span>
+                      <span className="text-emerald-700 font-mono font-bold">
                         {stock.currentReserveWeeks} Weeks (Target: {stock.targetWeeks} Wks)
                       </span>
                     </div>
 
-                    <div className="w-full h-3 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                    <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
                       <div
-                        className={`h-full rounded-full ${
+                        className={`h-full rounded-full transition-all duration-700 ${
                           stock.pctFull >= 80 ? 'bg-emerald-500' : stock.pctFull >= 60 ? 'bg-amber-500' : 'bg-rose-500'
                         }`}
                         style={{ width: `${stock.pctFull}%` }}
