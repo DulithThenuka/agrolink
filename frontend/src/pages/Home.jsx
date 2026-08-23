@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { cropsAPI } from '../services/api';
 import { BuyCropModal } from '../components/BuyCropModal';
+import { MarketPriceTicker } from '../components/MarketPriceTicker';
 
 export const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -117,9 +118,12 @@ export const Home = () => {
   };
 
   return (
-    <div className="space-y-20 py-6">
+    <div className="space-y-16 pb-12">
+      {/* LIVE WHOLESALE MARKET COMMODITY TICKER RIBBON */}
+      <MarketPriceTicker />
+
       {/* HERO SECTION */}
-      <section className="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 items-center">
+      <section className="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 items-center pt-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
