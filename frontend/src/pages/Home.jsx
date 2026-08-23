@@ -25,7 +25,13 @@ import {
   FileText,
   Quote,
   Star,
-  MessageSquareQuote
+  MessageSquareQuote,
+  UploadCloud,
+  Lock,
+  Truck,
+  Scale,
+  Coins,
+  QrCode
 } from 'lucide-react';
 import { cropsAPI } from '../services/api';
 import { BuyCropModal } from '../components/BuyCropModal';
@@ -233,6 +239,176 @@ export const Home = () => {
             <h4 className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-display">99.2%</h4>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">On-Time Delivery Rate</p>
           </div>
+        </div>
+      </section>
+
+      {/* 4-STEP "HOW IT WORKS" VISUAL JOURNEY */}
+      <section className="max-w-7xl mx-auto px-6 space-y-10">
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200 shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Transparent Agri-Trade Lifecycle
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-display">
+            How AgroLink Works <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">From Farm to Doorstep</span> 🚜
+          </h2>
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-medium">
+            A frictionless 4-step pipeline that replaces opaque traditional middlemen with AI grading, fair pricing, and smart escrow security.
+          </p>
+        </div>
+
+        {/* STEP CARDS WITH DESKTOP CONNECTOR */}
+        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+          {/* STEP 1 */}
+          <motion.div
+            whileHover={{ y: -6 }}
+            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 flex items-center justify-center font-black text-xl">
+                  🌾
+                </div>
+                <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 font-display">
+                  STEP 01
+                </span>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider block">Origin Listing</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display mt-0.5">
+                  1. List Harvest &amp; AI Grade
+                </h3>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                Grower uploads harvest yield, photos, and location. AgroLink AI generates a certified origin passport and quality grade rating.
+              </p>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-100 relative z-10 flex items-center justify-between text-[11px] font-extrabold text-emerald-700">
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> DOA Quality Pass
+              </span>
+              <Link to="/crops/add" className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-emerald-700">
+                List <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* STEP 2 */}
+          <motion.div
+            whileHover={{ y: -6 }}
+            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-teal-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-700 flex items-center justify-center font-black text-xl">
+                  📈
+                </div>
+                <span className="text-xs font-black text-teal-600 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200 font-display">
+                  STEP 02
+                </span>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-black uppercase text-teal-600 tracking-wider block">Price Benchmark</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display mt-0.5">
+                  2. AI Fair-Price Benchmark
+                </h3>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                Time-series neural models analyze Pettah &amp; Dambulla wholesale prices and fuel rates to suggest fair target pricing with zero middleman deductions.
+              </p>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-100 relative z-10 flex items-center justify-between text-[11px] font-extrabold text-teal-700">
+              <span className="inline-flex items-center gap-1">
+                <Scale className="w-3.5 h-3.5 text-teal-500" /> 0% Intermediary Cut
+              </span>
+              <Link to="/price-prediction" className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-teal-700">
+                Forecast <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* STEP 3 */}
+          <motion.div
+            whileHover={{ y: -6 }}
+            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 flex items-center justify-center font-black text-xl">
+                  🔒
+                </div>
+                <span className="text-xs font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 font-display">
+                  STEP 03
+                </span>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-black uppercase text-amber-600 tracking-wider block">Escrow Vault</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display mt-0.5">
+                  3. Secure Escrow Order Lock
+                </h3>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                Supermarkets or institutional buyers lock 100% order funds into smart contract escrow vaults. Farmers are fully protected from delayed payments.
+              </p>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-100 relative z-10 flex items-center justify-between text-[11px] font-extrabold text-amber-700">
+              <span className="inline-flex items-center gap-1">
+                <Lock className="w-3.5 h-3.5 text-amber-500" /> 100% Escrow Protected
+              </span>
+              <Link to="/crops" className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-amber-700">
+                Marketplace <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* STEP 4 */}
+          <motion.div
+            whileHover={{ y: -6 }}
+            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-sky-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-700 flex items-center justify-center font-black text-xl">
+                  🚚
+                </div>
+                <span className="text-xs font-black text-sky-600 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200 font-display">
+                  STEP 04
+                </span>
+              </div>
+
+              <div>
+                <span className="text-[10px] font-black uppercase text-sky-600 tracking-wider block">Fleet &amp; Payout</span>
+                <h3 className="text-lg font-extrabold text-slate-900 font-display mt-0.5">
+                  4. Tracked Fleet &amp; Payout
+                </h3>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                Verified logistics fleet delivers batch with live 9-stage status tracking. Escrow payout is released instantly to farmer upon destination delivery scan.
+              </p>
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-slate-100 relative z-10 flex items-center justify-between text-[11px] font-extrabold text-sky-700">
+              <span className="inline-flex items-center gap-1">
+                <Coins className="w-3.5 h-3.5 text-sky-500" /> Instant Settlement
+              </span>
+              <Link to="/orders" className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-sky-700">
+                Track <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 
