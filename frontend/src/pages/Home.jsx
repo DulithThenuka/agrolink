@@ -31,7 +31,14 @@ import {
   Truck,
   Scale,
   Coins,
-  QrCode
+  QrCode,
+  ChevronDown,
+  ChevronUp,
+  Bot,
+  Wrench,
+  Recycle,
+  Users,
+  Layers
 } from 'lucide-react';
 import { cropsAPI } from '../services/api';
 import { BuyCropModal } from '../components/BuyCropModal';
@@ -43,7 +50,110 @@ export const Home = () => {
   const [loadingCrops, setLoadingCrops] = useState(true);
   const [selectedCropForPurchase, setSelectedCropForPurchase] = useState(null);
   const [activeAiTab, setActiveAiTab] = useState('price'); // 'price', 'disease', 'contract', 'intel'
+  const [openFaq, setOpenFaq] = useState(0); // default first FAQ open
   const navigate = useNavigate();
+
+  const ECOSYSTEM_MODULES = [
+    {
+      id: 'equipment',
+      title: 'Machinery & Equipment Rental',
+      tag: 'Hourly & Daily Fleet',
+      icon: '🚜',
+      desc: 'Rent 4WD tractors, combine harvesters, boom sprayers, and precision agri-drones from verified regional farm hubs.',
+      link: '/equipment-rental',
+      linkText: 'Rent Machinery',
+      gradient: 'from-amber-500/10 via-amber-500/5 to-transparent',
+      borderColor: 'border-amber-200/80 hover:border-amber-400',
+      badgeBg: 'bg-amber-100 text-amber-900 border-amber-300'
+    },
+    {
+      id: 'waste',
+      title: 'Cold-Chain & Waste Reduction',
+      tag: 'Zero-Spoilage Matrix',
+      icon: '♻️',
+      desc: 'AI-driven dynamic markdown engine, near-harvest bulk clearance, and cold storage pooling to eliminate post-harvest food waste.',
+      link: '/waste-reduction',
+      linkText: 'Reduce Waste',
+      gradient: 'from-rose-500/10 via-rose-500/5 to-transparent',
+      borderColor: 'border-rose-200/80 hover:border-rose-400',
+      badgeBg: 'bg-rose-100 text-rose-900 border-rose-300'
+    },
+    {
+      id: 'supplies',
+      title: 'Pre-Production Supply Hub',
+      tag: 'DOA Certified Inputs',
+      icon: '🧪',
+      desc: 'Order certified hybrid seeds, organic fertilizers, biocides, and smart drip-irrigation kits directly from verified suppliers.',
+      link: '/supplier-marketplace',
+      linkText: 'Browse Supplies',
+      gradient: 'from-emerald-500/10 via-emerald-500/5 to-transparent',
+      borderColor: 'border-emerald-200/80 hover:border-emerald-400',
+      badgeBg: 'bg-emerald-100 text-emerald-900 border-emerald-300'
+    },
+    {
+      id: 'experts',
+      title: 'Agronomy Expert Consultation',
+      tag: 'Accredited Specialists',
+      icon: '👨‍🔬',
+      desc: 'Book 1-on-1 virtual consultations with certified soil scientists, plant pathologists, and agricultural university researchers.',
+      link: '/experts',
+      linkText: 'Consult Experts',
+      gradient: 'from-sky-500/10 via-sky-500/5 to-transparent',
+      borderColor: 'border-sky-200/80 hover:border-sky-400',
+      badgeBg: 'bg-sky-100 text-sky-900 border-sky-300'
+    },
+    {
+      id: 'community',
+      title: 'Growers Community Network',
+      tag: 'Farmer-to-Farmer',
+      icon: '👥',
+      desc: 'Connect with growers across all 25 districts. Share localized pest warnings, monsoon forecasts, and high-yield farming strategies.',
+      link: '/community',
+      linkText: 'Join Community',
+      gradient: 'from-indigo-500/10 via-indigo-500/5 to-transparent',
+      borderColor: 'border-indigo-200/80 hover:border-indigo-400',
+      badgeBg: 'bg-indigo-100 text-indigo-900 border-indigo-300'
+    },
+    {
+      id: 'ai-assistant',
+      title: 'Multilingual AgroLink AI Copilot',
+      tag: '24/7 Voice & Chat',
+      icon: '🤖',
+      desc: 'Intelligent conversational assistant in English, Sinhala & Tamil. Get instant advice on fertilizer ratios, harvest timing & market trends.',
+      link: '/ai-assistant',
+      linkText: 'Launch Copilot',
+      gradient: 'from-teal-500/10 via-teal-500/5 to-transparent',
+      borderColor: 'border-teal-200/80 hover:border-teal-400',
+      badgeBg: 'bg-teal-100 text-teal-900 border-teal-300'
+    }
+  ];
+
+  const FAQS = [
+    {
+      question: 'How does AgroLink Escrow protect farmers and buyers from payment defaults?',
+      answer: 'When a buyer places an order, 100% of the funds are deposited into a secure automated Escrow Vault. Farmers receive instant verification of locked funds before dispatching their harvest. Once the verified logistics fleet delivers the batch and destination verification is completed, payout is transferred directly to the grower.'
+    },
+    {
+      question: 'How are crop quality and Department of Agriculture (DOA) standards graded?',
+      answer: 'Growers upload harvest photos and telemetry data. Our computer vision AI system analyzes leaf pathology and produce coloration to assign a preliminary DOA Grade (Grade A Export, DOA Certified, or Commercial Wholesale). Detailed batch passports ensure buyer transparency.'
+    },
+    {
+      question: 'How does the logistics, cold-chain, and fleet dispatch network operate?',
+      answer: 'AgroLink coordinates registered regional truck drivers and refrigerated cold-chain partners. Drivers manage route assignments, execute origin pickup inspections, report live temperature telemetry across transit, and conclude delivery with digital recipient confirmation.'
+    },
+    {
+      question: 'Can farmers rent machinery like tractors, harvesters, or drones?',
+      answer: 'Yes! AgroLink includes an Equipment & Machinery Rental portal where farmers can book 4WD tractors, combine harvesters, boom sprayers, and precision agri-drones by the hour or acre, drastically cutting farm capital expenditure.'
+    },
+    {
+      question: 'How does the Waste Reduction & Surplus Clearance engine prevent spoilage?',
+      answer: 'Perishable produce approaching harvest maturity is highlighted in our Waste Reduction dashboard with automated tiered discount markdowns. This enables food processors, canning factories, hotels, and community kitchens to buy bulk surplus before spoilage occurs.'
+    },
+    {
+      question: 'Is AgroLink free to register for smallholder farmers and cooperatives?',
+      answer: 'Yes, registration, AI disease scanning, price prediction forecasts, community forums, and standard harvest listings are 100% free for individual growers and rural cooperatives. AgroLink charges zero middleman markups.'
+    }
+  ];
 
   const MOCK_FEATURED_CROPS = [
     {
@@ -986,6 +1096,156 @@ export const Home = () => {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* FULL ECOSYSTEM FEATURE EXPLORER */}
+      <section className="max-w-7xl mx-auto px-6 space-y-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-slate-200/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider mb-2 border border-emerald-200 shadow-sm">
+              <Layers className="w-3.5 h-3.5 text-emerald-600" /> Integrated AgTech Hub
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-display">
+              Explore the Full <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500">AgroLink Ecosystem</span> 🌐
+            </h2>
+            <p className="text-slate-600 text-sm mt-1 max-w-2xl font-medium">
+              From heavy machinery rentals and zero-waste logistics to certified agronomy experts and AI farm copilots.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+            <span>6 Specialized Modules Active</span>
+          </div>
+        </div>
+
+        {/* 6 ECOSYSTEM MODULE CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {ECOSYSTEM_MODULES.map((mod) => (
+            <motion.div
+              key={mod.id}
+              whileHover={{ y: -6 }}
+              className={`p-6 sm:p-7 rounded-3xl bg-white border ${mod.borderColor} shadow-lg flex flex-col justify-between transition-all duration-300 relative overflow-hidden group`}
+            >
+              <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${mod.gradient} rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
+
+              <div className="space-y-4 relative z-10">
+                <div className="flex items-center justify-between">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-3xl shadow-sm group-hover:scale-110 transition-transform">
+                    {mod.icon}
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${mod.badgeBg}`}>
+                    {mod.tag}
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 font-display group-hover:text-emerald-700 transition-colors">
+                    {mod.title}
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    {mod.desc}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-5 mt-4 border-t border-slate-100 relative z-10 flex items-center justify-between">
+                <Link
+                  to={mod.link}
+                  className="px-5 py-2.5 bg-slate-900 group-hover:bg-emerald-600 text-white font-extrabold text-xs rounded-xl shadow transition-all duration-200 flex items-center gap-1.5"
+                >
+                  <span>{mod.linkText}</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+                <span className="text-[11px] font-bold text-slate-400">Direct Portal →</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* INTERACTIVE FAQ ACCORDION SECTION */}
+      <section className="max-w-4xl mx-auto px-6 space-y-8">
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200 shadow-sm">
+            <HelpCircle className="w-3.5 h-3.5 text-emerald-600" /> Got Questions? We Have Answers
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 font-display">
+            Frequently Asked Questions ❓
+          </h2>
+          <p className="text-slate-600 text-sm max-w-xl mx-auto leading-relaxed font-medium">
+            Everything you need to know about payments, logistics, AI diagnostics, and platform security.
+          </p>
+        </div>
+
+        {/* ACCORDION ITEMS */}
+        <div className="space-y-3.5">
+          {FAQS.map((faq, idx) => {
+            const isOpen = openFaq === idx;
+
+            return (
+              <div
+                key={idx}
+                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                  isOpen
+                    ? 'bg-white border-emerald-400 shadow-md ring-1 ring-emerald-400/30'
+                    : 'bg-white/80 hover:bg-white border-slate-200 shadow-sm'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-display font-bold text-slate-900 text-sm sm:text-base focus:outline-none"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${
+                      isOpen ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
+                    }`}>
+                      {idx + 1}
+                    </span>
+                    <span className={isOpen ? 'text-emerald-950 font-extrabold' : 'text-slate-800'}>
+                      {faq.question}
+                    </span>
+                  </span>
+                  <span className={`p-1.5 rounded-xl shrink-0 transition-transform duration-200 ${
+                    isOpen ? 'bg-emerald-50 text-emerald-700 rotate-180' : 'bg-slate-50 text-slate-400'
+                  }`}>
+                    <ChevronDown className="w-4 h-4" />
+                  </span>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <div className="px-6 pb-6 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100/80 font-medium pl-16">
+                        {faq.answer}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* FAQ FOOTER HELP NOTE */}
+        <div className="text-center pt-2">
+          <p className="text-xs text-slate-500">
+            Have more questions? Chat live with our{' '}
+            <Link to="/ai-assistant" className="font-extrabold text-emerald-600 hover:underline">
+              Multilingual AI Assistant
+            </Link>{' '}
+            or explore the{' '}
+            <Link to="/community" className="font-extrabold text-emerald-600 hover:underline">
+              Growers Community Forum
+            </Link>.
+          </p>
         </div>
       </section>
 
