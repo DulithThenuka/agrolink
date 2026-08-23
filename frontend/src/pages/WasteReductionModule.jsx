@@ -59,6 +59,29 @@ export const WasteReductionModule = () => {
     restaurants: false
   });
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [broadcastRecords, setBroadcastRecords] = useState(() => {
+    const saved = localStorage.getItem('agrolink_surplus_broadcasts');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return [
+      {
+        id: 'FLASH-2026-089',
+        cropName: 'Welimada Tomatoes',
+        quantityKg: 500,
+        discountPct: 25,
+        originalPrice: 200,
+        discountedPrice: 150,
+        recoveredRevenue: 75000,
+        channels: ['12 Local Supermarkets', 'Public Flash Feed', 'Priority Cold Fleet'],
+        status: 'ACTIVE',
+        viewsCount: 28,
+        inquiriesCount: 3,
+        createdAt: '25 mins ago',
+        expiresIn: '17 Hours'
+      }
+    ];
+  });
 
   // Direct Offer Modal States
   const [selectedBuyerForOffer, setSelectedBuyerForOffer] = useState(null);
@@ -156,8 +179,11 @@ export const WasteReductionModule = () => {
   };
 
   useEffect(() => {
-    loadAnalysis();
-  }, []);
+    const timer = setTimeout(() => {
+      loadAnalysis();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [cropName, quantityKg, daysToExpiry]);
 
   const handleOpenOfferModal = (buyer) => {
     setSelectedBuyerForOffer(buyer);
@@ -217,9 +243,43 @@ export const WasteReductionModule = () => {
     setIsBroadcasting(true);
     setTimeout(() => {
       setIsBroadcasting(false);
-      setActionSuccessMsg(`📡 Broadcast successful! Alert dispatched to 12 verified local supermarket procurement buyers + priority logistics assigned.`);
+      const newRecord = {
+        id: `FLASH-2026-${Math.floor(100 + Math.random() * 900)}`,
+        cropName: data?.cropName || cropName,
+        quantityKg: parseInt(quantityKg) || 500,
+        discountPct: customDiscountPct,
+        originalPrice: 200,
+        discountedPrice: discountedRate,
+        recoveredRevenue: recoveredRevenue,
+        channels: Object.entries(broadcastChannels)
+          .filter(([_, active]) => active)
+          .map(([key]) => key === 'supermarkets' ? '12 Supermarkets' : key === 'flashFeed' ? 'Public Flash Feed' : 'Priority Cold Fleet'),
+        status: 'ACTIVE',
+        viewsCount: 1,
+        inquiriesCount: 0,
+        createdAt: 'Just now',
+        expiresIn: '18 Hours'
+      };
+
+      const updated = [newRecord, ...broadcastRecords];
+      setBroadcastRecords(updated);
+      try {
+        localStorage.setItem('agrolink_surplus_broadcasts', JSON.stringify(updated));
+      } catch (e) {}
+
+      setActionSuccessMsg(`📡 Broadcast successful! Recorded active flash deal (${newRecord.id}) dispatched to 12 verified supermarket procurement buyers.`);
       setTimeout(() => setActionSuccessMsg(null), 6000);
-    }, 1200);
+    }, 1000);
+  };
+
+  const handleDelistBroadcast = (id) => {
+    const updated = broadcastRecords.filter(r => r.id !== id);
+    setBroadcastRecords(updated);
+    try {
+      localStorage.setItem('agrolink_surplus_broadcasts', JSON.stringify(updated));
+    } catch (e) {}
+    setActionSuccessMsg(`🛑 Flash broadcast (${id}) delisted successfully.`);
+    setTimeout(() => setActionSuccessMsg(null), 4000);
   };
 
   const handleRouteToCompost = (facility) => {
@@ -637,6 +697,77 @@ export const WasteReductionModule = () => {
               <p>Supermarkets receive 1.5x loyalty points for clearing certified rescue produce batches within 18 hours.</p>
             </div>
           </div>
+
+          {/* ACTIVE BROADCASTS RECORD LOG */}
+          <div className="lg:col-span-12 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/90 shadow-md space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
+                  <Radio className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-base font-extrabold text-slate-900 font-display">
+                    Active Surplus Flash Broadcasts &amp; Clearance Records 📡
+                  </h4>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {broadcastRecords.length} live flash markdown broadcasts currently active across Sri Lanka retail procurement desks
+                  </p>
+                </div>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black uppercase flex items-center gap-1.5 self-start sm:self-auto">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Active Feeds Live</span>
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {broadcastRecords.map((record) => (
+                <div
+                  key={record.id}
+                  className="p-4 bg-slate-50 rounded-2xl border border-slate-200/90 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs"
+                >
+                  <div className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono font-black text-slate-900 bg-white px-2.5 py-0.5 rounded-lg border border-slate-200">
+                        {record.id}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-black text-[10px] uppercase">
+                        {record.discountPct}% OFF FLASH SALE
+                      </span>
+                      <span className="text-slate-400 font-semibold">• {record.createdAt}</span>
+                    </div>
+
+                    <h5 className="font-extrabold text-slate-900 text-sm font-display">
+                      {record.quantityKg} kg {record.cropName} @ <strong className="text-emerald-700 font-mono">Rs. {record.discountedPrice.toFixed(2)}/kg</strong>
+                      <span className="text-slate-400 font-normal line-through ml-2">Rs. {record.originalPrice.toFixed(2)}/kg</span>
+                    </h5>
+
+                    <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-500 font-medium">
+                      <span>Channels: <strong className="text-slate-800">{record.channels.join(', ')}</strong></span>
+                      <span>• Total Lot: <strong className="text-slate-800">Rs. {record.recoveredRevenue.toLocaleString()}</strong></span>
+                      <span>• <strong className="text-amber-700">{record.expiresIn} Left</strong></span>
+                      <span>• 👁️ {record.viewsCount} Procurement Views • 💬 {record.inquiriesCount} Inquiries</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+                    <Link
+                      to="/crops"
+                      className="px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 shadow-xs transition"
+                    >
+                      View on Market →
+                    </Link>
+                    <button
+                      onClick={() => handleDelistBroadcast(record.id)}
+                      className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition cursor-pointer"
+                    >
+                      End Broadcast
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -784,17 +915,17 @@ export const WasteReductionModule = () => {
       {/* 3. DIRECT DISPATCH OFFER MODAL */}
       <AnimatePresence>
         {selectedBuyerForOffer && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 overflow-y-auto bg-slate-950/70 backdrop-blur-md animate-fade-in">
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              className="bg-white border border-slate-200 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden relative"
+              className="bg-white border border-slate-200 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden relative max-h-[90vh] flex flex-col my-auto"
             >
               {/* MODAL HEADER */}
-              <div className="p-6 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
+              <div className="p-5 sm:p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 border border-sky-200 flex items-center justify-center shrink-0">
                     <Send className="w-5 h-5" />
                   </div>
                   <div>
@@ -815,7 +946,7 @@ export const WasteReductionModule = () => {
               </div>
 
               {/* MODAL CONTENT */}
-              <div className="p-6 space-y-5">
+              <div className="p-5 sm:p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-80px)]">
                 {!offerSuccessReceipt ? (
                   <form onSubmit={handleSendDirectOffer} className="space-y-4">
                     
