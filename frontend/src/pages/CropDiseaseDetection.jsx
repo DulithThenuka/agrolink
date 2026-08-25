@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Camera,
   ShieldAlert,
+  ShieldCheck,
   CheckCircle2,
   Phone,
   AlertCircle,
