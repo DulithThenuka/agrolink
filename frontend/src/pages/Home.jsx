@@ -43,6 +43,7 @@ import {
 import { cropsAPI } from '../services/api';
 import { BuyCropModal } from '../components/BuyCropModal';
 import { MarketPriceTicker } from '../components/MarketPriceTicker';
+import { AgriHero3DCanvas } from '../components/AgriHero3DCanvas';
 
 export const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -295,38 +296,14 @@ export const Home = () => {
           </div>
         </motion.div>
 
-        {/* HERO VISUAL CARD */}
+        {/* 3D INTERACTIVE WEBGL HERO VISUAL */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="lg:col-span-5 relative w-full h-[460px] rounded-3xl bg-gradient-to-br from-slate-950 via-emerald-950 to-teal-950 p-8 flex flex-col justify-between overflow-hidden shadow-2xl border border-white/10 group"
+          className="lg:col-span-5 relative w-full"
         >
-          <div className="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700" />
-          
-          <div className="flex justify-between items-center z-10">
-            <span className="px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold rounded-full uppercase tracking-wider">
-              Live Harvest Network
-            </span>
-            <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
-          </div>
-
-          <div className="space-y-3 z-10">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-3xl border border-white/10 shadow-inner">
-              🌱
-            </div>
-            <h3 className="text-2xl font-extrabold text-white font-display">Direct Farm Trade Matrix</h3>
-            <p className="text-xs text-emerald-200/80 leading-relaxed max-w-sm">
-              Real-time crop inventory tracking, verified grower profiles, and automated settlement workflows.
-            </p>
-          </div>
-
-          <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-emerald-300/80 z-10 font-bold">
-            <span>1,250+ Local Producers</span>
-            <Link to="/crops" className="flex items-center gap-1 hover:text-white transition">
-              Explore Live Feed <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+          <AgriHero3DCanvas />
         </motion.div>
       </section>
 
