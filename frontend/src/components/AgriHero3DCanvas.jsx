@@ -1,11 +1,11 @@
 import React, { useRef, useState, useMemo, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Float, Html } from '@react-three/drei';
+import { OrbitControls, Float } from '@react-three/drei';
 import * as THREE from 'three';
-import { Sparkles, Layers, Activity, Radio, RefreshCw } from 'lucide-react';
+import { Sparkles, Layers, Activity, Radio, RefreshCw, Truck, Zap } from 'lucide-react';
 
 // Bioluminescent Agri-Particles Cloud
-const AgriParticles = ({ count = 900, mode = 'ecosystem' }) => {
+const AgriParticles = ({ count = 950, mode = 'ecosystem' }) => {
   const pointsRef = useRef();
 
   const [positions, colors] = useMemo(() => {
@@ -22,8 +22,7 @@ const AgriParticles = ({ count = 900, mode = 'ecosystem' }) => {
     const c3 = new THREE.Color('#a7f3d0');
 
     for (let i = 0; i < count; i++) {
-      // Golden spiral distribution with spherical radius
-      const radius = 2.0 + Math.random() * 2.8;
+      const radius = 1.9 + Math.random() * 2.8;
       const theta = Math.acos(2 * Math.random() - 1);
       const phi = 2 * Math.PI * Math.random();
 
@@ -74,6 +73,115 @@ const AgriParticles = ({ count = 900, mode = 'ecosystem' }) => {
   );
 };
 
+// Node coordinate conversion helper
+const latLonToVector3 = (lat, lon, radius = 1.55) => {
+  const x = radius * Math.cos(lat) * Math.sin(lon);
+  const y = radius * Math.sin(lat);
+  const z = radius * Math.cos(lat) * Math.cos(lon);
+  return new THREE.Vector3(x, y, z);
+};
+
+// Hub coordinates
+const FARM_HUBS = [
+  { id: 'badulla', name: 'Welimada Organic Hub', crop: 'Grade A Tomatoes', lat: 0.3, lon: 0.6, color: '#10b981' },
+  { id: 'polonnaruwa', name: 'Polonnaruwa Belt', crop: 'Samba Paddy Grain', lat: -0.2, lon: 2.1, color: '#34d399' },
+  { id: 'jaffna', name: 'Jaffna Agro Hub', crop: 'Pungent Green Chillies', lat: 0.8, lon: -1.2, color: '#f59e0b' },
+  { id: 'nuwaraeliya', name: 'Nuwara Eliya Cold Zone', crop: 'Export Potatoes', lat: -0.5, lon: -0.8, color: '#06b6d4' },
+  { id: 'kandy', name: 'Central Spices Cluster', crop: 'Organic Pepper & Cloves', lat: 0.1, lon: -2.5, color: '#10b981' }
+];
+
+// 3D Animated Curved Trade Arcs with Real-Time Cargo Pulses
+const TradeRouteArcs = ({ mode = 'ecosystem' }) => {
+  const routes = useMemo(() => {
+    const pairs = [
+      ['badulla', 'polonnaruwa'],
+      ['nuwaraeliya', 'badulla'],
+      ['jaffna', 'polonnaruwa'],
+      ['kandy', 'nuwaraeliya'],
+      ['kandy', 'jaffna']
+    ];
+
+    return pairs.map(([fromId, toId], idx) => {
+      const fromHub = FARM_HUBS.find((h) => h.id === fromId);
+      const toHub = FARM_HUBS.find((h) => h.id === toId);
+
+      const p1 = latLonToVector3(fromHub.lat, fromHub.lon, 1.55);
+      const p2 = latLonToVector3(toHub.lat, toHub.lon, 1.55);
+
+      // Elevated midpoint for dramatic 3D arc
+      const mid = p1.clone().add(p2).multiplyScalar(0.5);
+      const distance = p1.distanceTo(p2);
+      mid.normalize().multiplyScalar(1.55 + Math.min(distance * 0.45, 0.75));
+
+      const curve = new THREE.QuadraticBezierCurve3(p1, mid, p2);
+      const points = curve.getPoints(32);
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      return {
+        id: `${fromId}-${toId}`,
+        curve,
+        geometry,
+        speed: 0.35 + (idx % 3) * 0.1,
+        offset: idx * 0.22,
+        color: mode === 'heatmap' ? '#f59e0b' : mode === 'sensors' ? '#06b6d4' : '#34d399'
+      };
+    });
+  }, [mode]);
+
+  const pulsesRef = useRef([]);
+  const groupRef = useRef();
+
+  useFrame((state, delta) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y += delta * 0.15;
+    }
+
+    const t = state.clock.elapsedTime;
+    routes.forEach((route, idx) => {
+      const pulseMesh = pulsesRef.current[idx];
+      if (pulseMesh && route.curve) {
+        const progress = ((t * route.speed + route.offset) % 1);
+        const point = route.curve.getPointAt(progress);
+        pulseMesh.position.copy(point);
+        const pulseScale = 1 + Math.sin(progress * Math.PI) * 0.6;
+        pulseMesh.scale.set(pulseScale, pulseScale, pulseScale);
+      }
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      {routes.map((route, idx) => (
+        <group key={route.id}>
+          {/* Luminous Translucent Trade Arc Curve */}
+          <line geometry={route.geometry}>
+            <lineBasicMaterial
+              color={route.color}
+              transparent
+              opacity={0.55}
+              blending={THREE.AdditiveBlending}
+              linewidth={1}
+            />
+          </line>
+
+          {/* Traveling High-Speed Harvest/Trade Pulse Bead */}
+          <mesh
+            ref={(el) => (pulsesRef.current[idx] = el)}
+          >
+            <sphereGeometry args={[0.045, 16, 16]} />
+            <meshBasicMaterial
+              color="#ffffff"
+              transparent
+              opacity={0.95}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+};
+
 // Holographic Central World Globe & Wireframe
 const AgroGlobe = ({ mode = 'ecosystem' }) => {
   const meshRef = useRef();
@@ -107,7 +215,7 @@ const AgroGlobe = ({ mode = 'ecosystem' }) => {
           color={wireColor}
           wireframe
           transparent
-          opacity={0.45}
+          opacity={0.4}
           emissive={wireColor}
           emissiveIntensity={0.4}
         />
@@ -119,7 +227,7 @@ const AgroGlobe = ({ mode = 'ecosystem' }) => {
         <meshStandardMaterial
           color={coreColor}
           transparent
-          opacity={0.25}
+          opacity={0.22}
           roughness={0.1}
           metalness={0.8}
           emissive={coreColor}
@@ -131,27 +239,19 @@ const AgroGlobe = ({ mode = 'ecosystem' }) => {
       <group ref={ringsRef}>
         <mesh rotation={[Math.PI / 2.5, 0, 0]}>
           <torusGeometry args={[1.85, 0.012, 16, 64]} />
-          <meshBasicMaterial color="#34d399" transparent opacity={0.6} />
+          <meshBasicMaterial color="#34d399" transparent opacity={0.5} />
         </mesh>
         <mesh rotation={[Math.PI / 1.7, 0.5, 0]}>
           <torusGeometry args={[2.05, 0.008, 16, 64]} />
-          <meshBasicMaterial color="#6ee7b7" transparent opacity={0.4} />
+          <meshBasicMaterial color="#6ee7b7" transparent opacity={0.35} />
         </mesh>
       </group>
     </group>
   );
 };
 
-// 3D Interactive Farm Hub Pins
-const FarmNodes = ({ onSelectNode }) => {
-  const nodes = [
-    { id: 'badulla', name: 'Welimada Organic Hub', crop: 'Grade A Tomatoes', lat: 0.3, lon: 0.6, color: '#10b981' },
-    { id: 'polonnaruwa', name: 'Polonnaruwa Belt', crop: 'Samba Paddy Grain', lat: -0.2, lon: 2.1, color: '#34d399' },
-    { id: 'jaffna', name: 'Jaffna Agro Hub', crop: 'Pungent Green Chillies', lat: 0.8, lon: -1.2, color: '#f59e0b' },
-    { id: 'nuwaraeliya', name: 'Nuwara Eliya Cold Zone', crop: 'Export Potatoes', lat: -0.5, lon: -0.8, color: '#06b6d4' },
-    { id: 'kandy', name: 'Central Spices Cluster', crop: 'Organic Pepper & Cloves', lat: 0.1, lon: -2.5, color: '#10b981' }
-  ];
-
+// 3D Interactive Farm Hub Pins with Ripple HALO
+const FarmNodes = ({ onSelectNode, selectedNodeId }) => {
   const groupRef = useRef();
 
   useFrame((state, delta) => {
@@ -162,15 +262,13 @@ const FarmNodes = ({ onSelectNode }) => {
 
   return (
     <group ref={groupRef}>
-      {nodes.map((node) => {
-        const radius = 1.55;
-        const x = radius * Math.cos(node.lat) * Math.sin(node.lon);
-        const y = radius * Math.sin(node.lat);
-        const z = radius * Math.cos(node.lat) * Math.cos(node.lon);
+      {FARM_HUBS.map((node) => {
+        const isSelected = selectedNodeId === node.id;
+        const pos = latLonToVector3(node.lat, node.lon, 1.55);
 
         return (
           <Float key={node.id} speed={2} rotationIntensity={0.2} floatIntensity={0.2}>
-            <group position={[x, y, z]}>
+            <group position={[pos.x, pos.y, pos.z]}>
               <mesh
                 onPointerOver={(e) => {
                   e.stopPropagation();
@@ -180,20 +278,38 @@ const FarmNodes = ({ onSelectNode }) => {
                   document.body.style.cursor = 'auto';
                 }}
                 onClick={() => onSelectNode(node)}
+                scale={isSelected ? 1.4 : 1.0}
               >
                 <octahedronGeometry args={[0.08, 0]} />
                 <meshStandardMaterial
                   color={node.color}
                   emissive={node.color}
-                  emissiveIntensity={0.8}
+                  emissiveIntensity={isSelected ? 1.4 : 0.8}
                   roughness={0.2}
                 />
               </mesh>
               {/* Pulsing Beacon Halo */}
               <mesh>
                 <ringGeometry args={[0.1, 0.13, 16]} />
-                <meshBasicMaterial color={node.color} transparent opacity={0.7} side={THREE.DoubleSide} />
+                <meshBasicMaterial
+                  color={node.color}
+                  transparent
+                  opacity={isSelected ? 0.95 : 0.6}
+                  side={THREE.DoubleSide}
+                />
               </mesh>
+              {/* Extra Active Shockwave Ring for Selected Hub */}
+              {isSelected && (
+                <mesh>
+                  <ringGeometry args={[0.16, 0.18, 16]} />
+                  <meshBasicMaterial
+                    color="#ffffff"
+                    transparent
+                    opacity={0.8}
+                    side={THREE.DoubleSide}
+                  />
+                </mesh>
+              )}
             </group>
           </Float>
         );
@@ -202,49 +318,112 @@ const FarmNodes = ({ onSelectNode }) => {
   );
 };
 
-// 3D Orbiting Autonomous Agri-Drone
-const AgriDrone = () => {
+// 3D Orbiting Autonomous Agri-Drone with Holographic Downward Scanner Beam
+const AgriDrone = ({ mode = 'ecosystem' }) => {
   const droneRef = useRef();
+  const scanConeRef = useRef();
+  const groundRingRef = useRef();
 
-  useFrame((state) => {
-    const t = state.clock.elapsedTime * 0.6;
+  useFrame((state, delta) => {
+    const t = state.clock.elapsedTime * 0.55;
     if (droneRef.current) {
-      const radius = 2.3;
-      droneRef.current.position.x = Math.sin(t) * radius;
-      droneRef.current.position.z = Math.cos(t) * radius;
-      droneRef.current.position.y = Math.sin(t * 2) * 0.4 + 0.3;
+      const radius = 2.25;
+      const x = Math.sin(t) * radius;
+      const z = Math.cos(t) * radius;
+      const y = Math.sin(t * 2) * 0.35 + 0.4;
+
+      droneRef.current.position.set(x, y, z);
       droneRef.current.rotation.y = -t + Math.PI / 2;
+
+      // Pulse scan cone opacity and rotation
+      if (scanConeRef.current) {
+        scanConeRef.current.rotation.y += delta * 2;
+        const pulse = 0.25 + Math.sin(state.clock.elapsedTime * 4) * 0.12;
+        scanConeRef.current.material.opacity = pulse;
+      }
+
+      // Track ground scanning hotspot on globe surface directly below drone
+      if (groundRingRef.current) {
+        const dronePos = new THREE.Vector3(x, y, z);
+        const groundPos = dronePos.clone().normalize().multiplyScalar(1.52);
+        groundRingRef.current.position.copy(groundPos);
+        groundRingRef.current.lookAt(0, 0, 0);
+      }
     }
   });
 
+  const beamColor = mode === 'heatmap' ? '#f59e0b' : mode === 'sensors' ? '#06b6d4' : '#10b981';
+
   return (
-    <group ref={droneRef}>
-      {/* Central Chassis */}
-      <mesh>
-        <boxGeometry args={[0.16, 0.04, 0.16]} />
-        <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.8} />
-      </mesh>
-      {/* Sensor Beacon */}
-      <mesh position={[0, 0.04, 0]}>
-        <sphereGeometry args={[0.03, 16, 16]} />
-        <meshBasicMaterial color="#34d399" />
-      </mesh>
-      {/* Propeller Arms */}
-      <mesh position={[0.1, 0, 0.1]}>
-        <cylinderGeometry args={[0.006, 0.006, 0.08]} />
-        <meshBasicMaterial color="#64748b" />
-      </mesh>
-      <mesh position={[-0.1, 0, -0.1]}>
-        <cylinderGeometry args={[0.006, 0.006, 0.08]} />
-        <meshBasicMaterial color="#64748b" />
-      </mesh>
-      <mesh position={[0.1, 0, -0.1]}>
-        <cylinderGeometry args={[0.006, 0.006, 0.08]} />
-        <meshBasicMaterial color="#64748b" />
-      </mesh>
-      <mesh position={[-0.1, 0, 0.1]}>
-        <cylinderGeometry args={[0.006, 0.006, 0.08]} />
-        <meshBasicMaterial color="#64748b" />
+    <group>
+      {/* Moving Drone Chassis & Attached Downward Scanner Laser */}
+      <group ref={droneRef}>
+        {/* Central Carbon-Fiber Body */}
+        <mesh>
+          <boxGeometry args={[0.18, 0.045, 0.18]} />
+          <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.85} />
+        </mesh>
+        
+        {/* Top Telemetry Flasher */}
+        <mesh position={[0, 0.04, 0]}>
+          <sphereGeometry args={[0.035, 16, 16]} />
+          <meshBasicMaterial color="#34d399" />
+        </mesh>
+
+        {/* 4 Carbon Arms */}
+        <mesh position={[0.11, 0, 0.11]}>
+          <cylinderGeometry args={[0.007, 0.007, 0.09]} />
+          <meshBasicMaterial color="#64748b" />
+        </mesh>
+        <mesh position={[-0.11, 0, -0.11]}>
+          <cylinderGeometry args={[0.007, 0.007, 0.09]} />
+          <meshBasicMaterial color="#64748b" />
+        </mesh>
+        <mesh position={[0.11, 0, -0.11]}>
+          <cylinderGeometry args={[0.007, 0.007, 0.09]} />
+          <meshBasicMaterial color="#64748b" />
+        </mesh>
+        <mesh position={[-0.11, 0, 0.11]}>
+          <cylinderGeometry args={[0.007, 0.007, 0.09]} />
+          <meshBasicMaterial color="#64748b" />
+        </mesh>
+
+        {/* 4 Spinning Rotor Discs */}
+        {[[0.11, 0.02, 0.11], [-0.11, 0.02, -0.11], [0.11, 0.02, -0.11], [-0.11, 0.02, 0.11]].map((p, i) => (
+          <mesh key={i} position={p}>
+            <cylinderGeometry args={[0.045, 0.045, 0.004, 16]} />
+            <meshBasicMaterial color="#38bdf8" transparent opacity={0.7} />
+          </mesh>
+        ))}
+
+        {/* Holographic Downward Scanning Laser Cone Beam */}
+        <mesh
+          ref={scanConeRef}
+          position={[0, -0.45, 0]}
+          rotation={[Math.PI, 0, 0]}
+        >
+          <coneGeometry args={[0.38, 0.9, 24, 1, true]} />
+          <meshBasicMaterial
+            color={beamColor}
+            transparent
+            opacity={0.3}
+            side={THREE.DoubleSide}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      {/* Surface Projected Scanning Radar Ring */}
+      <mesh ref={groundRingRef}>
+        <ringGeometry args={[0.15, 0.22, 24]} />
+        <meshBasicMaterial
+          color={beamColor}
+          transparent
+          opacity={0.75}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
+        />
       </mesh>
     </group>
   );
@@ -284,11 +463,7 @@ const CenterSprout = () => {
 
 export const AgriHero3DCanvas = () => {
   const [activeMode, setActiveMode] = useState('ecosystem'); // 'ecosystem', 'sensors', 'heatmap'
-  const [selectedNode, setSelectedNode] = useState({
-    name: 'Welimada Organic Hub',
-    crop: 'Grade A Tomatoes',
-    color: '#10b981'
-  });
+  const [selectedNode, setSelectedNode] = useState(FARM_HUBS[0]);
   const controlsRef = useRef();
 
   const handleResetCamera = () => {
@@ -298,10 +473,10 @@ export const AgriHero3DCanvas = () => {
   };
 
   return (
-    <div className="relative w-full h-[480px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden shadow-2xl border border-white/10 select-none">
+    <div className="relative w-full h-[490px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden shadow-2xl border border-white/10 select-none">
       {/* Top Glassmorphic Mode HUD */}
       <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
-        <div className="flex items-center gap-1.5 p-1 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg">
+        <div className="flex items-center gap-1.5 p-1 bg-black/50 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg">
           <button
             onClick={() => setActiveMode('ecosystem')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
@@ -340,7 +515,7 @@ export const AgriHero3DCanvas = () => {
         {/* Live Status Badge */}
         <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-400/30 rounded-full text-emerald-300 text-xs font-bold backdrop-blur-md">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>WebGL 3D Active</span>
+          <span>Live Arcs &amp; Scanner Active</span>
         </div>
       </div>
 
@@ -366,36 +541,47 @@ export const AgriHero3DCanvas = () => {
           {/* 3D Scene Components */}
           <AgroGlobe mode={activeMode} />
           <CenterSprout />
-          <AgriParticles count={1100} mode={activeMode} />
-          <FarmNodes onSelectNode={(node) => setSelectedNode(node)} />
-          <AgriDrone />
+          <AgriParticles count={950} mode={activeMode} />
+          <TradeRouteArcs mode={activeMode} />
+          <FarmNodes
+            onSelectNode={(node) => setSelectedNode(node)}
+            selectedNodeId={selectedNode?.id}
+          />
+          <AgriDrone mode={activeMode} />
 
           <OrbitControls
             ref={controlsRef}
             enableZoom={false}
             enablePan={false}
             autoRotate
-            autoRotateSpeed={0.7}
+            autoRotateSpeed={0.6}
             maxPolarAngle={Math.PI / 1.7}
             minPolarAngle={Math.PI / 3.2}
           />
         </Canvas>
       </Suspense>
 
-      {/* Bottom Floating Telemetry Card */}
+      {/* Bottom Floating Telemetry Card & Trade Status */}
       <div className="absolute bottom-4 left-4 right-4 z-20 pointer-events-none flex items-end justify-between gap-3">
-        <div className="p-3.5 bg-slate-950/80 backdrop-blur-xl border border-white/10 rounded-2xl max-w-xs shadow-2xl pointer-events-auto transition-all">
+        <div className="p-3.5 bg-slate-950/85 backdrop-blur-xl border border-white/10 rounded-2xl max-w-xs shadow-2xl pointer-events-auto transition-all">
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className="text-[10px] uppercase font-black tracking-wider text-emerald-400 flex items-center gap-1">
-              <Activity className="w-3 h-3 text-emerald-400 animate-pulse" /> Live Hub Telemetry
+              <Activity className="w-3 h-3 text-emerald-400 animate-pulse" /> Live Node Telemetry
             </span>
-            <span className="text-[10px] font-bold text-slate-400">DOA Verified</span>
+            <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+              <Truck className="w-2.5 h-2.5 text-emerald-400" /> In-Transit
+            </span>
           </div>
           <h4 className="text-sm font-black text-white">{selectedNode.name}</h4>
-          <p className="text-xs text-slate-300 mt-0.5 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selectedNode.color }} />
-            {selectedNode.crop}
-          </p>
+          <div className="flex items-center justify-between mt-1 pt-1 border-t border-white/10 text-xs">
+            <span className="text-slate-300 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selectedNode.color }} />
+              {selectedNode.crop}
+            </span>
+            <span className="text-emerald-400 font-bold text-[11px] flex items-center gap-0.5">
+              <Zap className="w-3 h-3" /> 100% Sync
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 pointer-events-auto">
