@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Sprout,
   ShoppingBag,
@@ -38,12 +40,18 @@ import {
   Wrench,
   Recycle,
   Users,
-  Layers
+  Layers,
+  Globe,
+  Check
 } from 'lucide-react';
 import { cropsAPI } from '../services/api';
 import { BuyCropModal } from '../components/BuyCropModal';
 import { MarketPriceTicker } from '../components/MarketPriceTicker';
 import { AgriHero3DCanvas } from '../components/AgriHero3DCanvas';
+import { Card3D } from '../components/Card3D';
+import { Interactive3DBackground } from '../components/Interactive3DBackground';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,6 +61,17 @@ export const Home = () => {
   const [activeAiTab, setActiveAiTab] = useState('price'); // 'price', 'disease', 'contract', 'intel'
   const [openFaq, setOpenFaq] = useState(0); // default first FAQ open
   const navigate = useNavigate();
+
+  // GSAP animation container refs
+  const heroRef = useRef(null);
+  const statsRef = useRef(null);
+  const howItWorksRef = useRef(null);
+  const produceRef = useRef(null);
+  const aiSuiteRef = useRef(null);
+  const testimonialsRef = useRef(null);
+  const rolesRef = useRef(null);
+  const ecosystemRef = useRef(null);
+  const faqRef = useRef(null);
 
   const ECOSYSTEM_MODULES = [
     {
@@ -227,6 +246,97 @@ export const Home = () => {
     fetchCrops();
   }, []);
 
+  // GSAP Cinematic Entrance & ScrollTrigger Setup
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // 1. Hero Entrance Timeline
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      tl.from('.hero-badge-elem', { opacity: 0, y: -20, duration: 0.6, delay: 0.1 })
+        .from('.hero-title-elem', { opacity: 0, y: 30, duration: 0.8 }, '-=0.3')
+        .from('.hero-desc-elem', { opacity: 0, y: 20, duration: 0.6 }, '-=0.4')
+        .from('.hero-search-elem', { opacity: 0, y: 20, scale: 0.98, duration: 0.6 }, '-=0.3')
+        .from('.hero-trust-elem', { opacity: 0, y: 15, stagger: 0.1, duration: 0.5 }, '-=0.2')
+        .from('.hero-canvas-elem', { opacity: 0, scale: 0.92, duration: 1.0, ease: 'expo.out' }, '-=0.7');
+
+      // 2. Stats Ticker Reveal
+      if (statsRef.current) {
+        gsap.from(statsRef.current.children, {
+          scrollTrigger: {
+            trigger: statsRef.current,
+            start: 'top 85%'
+          },
+          opacity: 0,
+          y: 25,
+          stagger: 0.12,
+          duration: 0.7,
+          ease: 'power2.out'
+        });
+      }
+
+      // 3. How It Works Cards
+      if (howItWorksRef.current) {
+        gsap.from('.how-it-works-card', {
+          scrollTrigger: {
+            trigger: howItWorksRef.current,
+            start: 'top 80%'
+          },
+          opacity: 0,
+          y: 40,
+          stagger: 0.15,
+          duration: 0.8,
+          ease: 'power3.out'
+        });
+      }
+
+      // 4. Featured Produce Grid
+      if (produceRef.current) {
+        gsap.from('.produce-card-elem', {
+          scrollTrigger: {
+            trigger: produceRef.current,
+            start: 'top 80%'
+          },
+          opacity: 0,
+          y: 35,
+          stagger: 0.12,
+          duration: 0.7,
+          ease: 'power2.out'
+        });
+      }
+
+      // 5. Testimonial Cards
+      if (testimonialsRef.current) {
+        gsap.from('.testimonial-card', {
+          scrollTrigger: {
+            trigger: testimonialsRef.current,
+            start: 'top 80%'
+          },
+          opacity: 0,
+          y: 35,
+          stagger: 0.15,
+          duration: 0.75,
+          ease: 'power2.out'
+        });
+      }
+
+      // 6. Ecosystem Module Cards
+      if (ecosystemRef.current) {
+        gsap.from('.ecosystem-card', {
+          scrollTrigger: {
+            trigger: ecosystemRef.current,
+            start: 'top 80%'
+          },
+          opacity: 0,
+          y: 35,
+          stagger: 0.12,
+          duration: 0.75,
+          ease: 'power3.out'
+        });
+      }
+    });
+
+    return () => ctx.revert();
+  }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -235,35 +345,45 @@ export const Home = () => {
   };
 
   return (
-    <div className="space-y-16 pb-12">
+    <div className="relative space-y-16 pb-16 min-h-screen">
+      {/* 3D Ambient WebGL Background Field */}
+      <Interactive3DBackground />
+
       {/* LIVE WHOLESALE MARKET COMMODITY TICKER RIBBON */}
       <MarketPriceTicker />
 
-      {/* HERO SECTION */}
-      <section className="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 items-center pt-2">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="lg:col-span-7 space-y-8"
-        >
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-bold uppercase tracking-wider shadow-sm">
+      {/* 1. HERO SECTION WITH 3D WEBGL ENVIRONMENT */}
+      <section
+        ref={heroRef}
+        className="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 items-center pt-4 relative"
+      >
+        <div className="lg:col-span-7 space-y-8 relative z-10">
+          {/* BADGE */}
+          <div className="hero-badge-elem inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 text-xs font-extrabold uppercase tracking-wider shadow-sm backdrop-blur-md">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
             <Sprout className="w-4 h-4 text-emerald-600" />
             <span>Direct Farmer-to-Buyer Ecosystem</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.15] font-display">
+          {/* MAIN HEADLINE */}
+          <h1 className="hero-title-elem text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.15] font-display">
             Empowering Farmers. <br />
-            Direct to <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500">Your Doorstep.</span>
+            Direct to{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500">
+              Your Doorstep.
+            </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl">
+          {/* SUPPORTING DESCRIPTION */}
+          <p className="hero-desc-elem text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl font-medium">
             Bypass traditional middleman markups. AgroLink connects registered growers directly with commercial &amp; retail buyers for transparent, farm-fresh trade.
           </p>
 
           {/* QUICK SEARCH FORM */}
-          <form onSubmit={handleSearch} className="glass p-2.5 rounded-2xl shadow-xl border border-white/80 max-w-xl flex flex-col sm:flex-row gap-2">
+          <form
+            onSubmit={handleSearch}
+            className="hero-search-elem glass p-2.5 rounded-2xl shadow-xl shadow-slate-900/5 border border-white/80 max-w-xl flex flex-col sm:flex-row gap-2 transition-all focus-within:ring-2 focus-within:ring-emerald-500/30"
+          >
             <div className="relative flex-grow flex items-center px-3">
               <Search className="w-5 h-5 text-slate-400 mr-2" />
               <input
@@ -276,61 +396,60 @@ export const Home = () => {
             </div>
             <button
               type="submit"
-              className="px-7 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-500/25 hover:from-emerald-600 hover:to-emerald-700 transition shrink-0"
+              className="px-7 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-500/25 transition shrink-0 flex items-center justify-center gap-1.5"
             >
-              Find Produce
+              <span>Find Produce</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
           {/* TRUST BADGES */}
-          <div className="pt-2 flex flex-wrap items-center gap-6 text-xs font-semibold text-slate-500">
-            <div className="flex items-center gap-2">
+          <div className="hero-trust-elem pt-2 flex flex-wrap items-center gap-6 text-xs font-bold text-slate-600">
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/60 shadow-xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 100% Origin Verified
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/60 shadow-xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Zero Intermediary Markup
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/60 shadow-xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Secure Escrow Settlement
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* 3D INTERACTIVE WEBGL HERO VISUAL */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="lg:col-span-5 relative w-full"
-        >
+        <div className="hero-canvas-elem lg:col-span-5 relative w-full">
           <AgriHero3DCanvas />
-        </motion.div>
+        </div>
       </section>
 
-      {/* LIVE STATS TICKER BAR */}
+      {/* 2. LIVE STATS TICKER BAR */}
       <section className="max-w-7xl mx-auto px-6">
-        <div className="glass rounded-3xl p-6 sm:p-8 shadow-xl border border-white/80 grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x-0 md:divide-x divide-slate-200/60">
+        <div
+          ref={statsRef}
+          className="glass-card rounded-3xl p-6 sm:p-8 shadow-xl border border-white/80 grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x-0 md:divide-x divide-slate-200/60"
+        >
           <div className="space-y-1">
-            <h4 className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-display">$1.8M+</h4>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Direct Harvest Traded</p>
+            <h4 className="text-3xl sm:text-4xl font-black text-emerald-600 font-display">$1.8M+</h4>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Direct Harvest Traded</p>
           </div>
           <div className="space-y-1">
-            <h4 className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-display">1,250+</h4>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Verified Local Farms</p>
+            <h4 className="text-3xl sm:text-4xl font-black text-emerald-600 font-display">1,250+</h4>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Verified Local Farms</p>
           </div>
           <div className="space-y-1">
-            <h4 className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-display">0%</h4>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Intermediary Markup</p>
+            <h4 className="text-3xl sm:text-4xl font-black text-emerald-600 font-display">0%</h4>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Intermediary Markup</p>
           </div>
           <div className="space-y-1">
-            <h4 className="text-3xl sm:text-4xl font-extrabold text-emerald-600 font-display">99.2%</h4>
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">On-Time Delivery Rate</p>
+            <h4 className="text-3xl sm:text-4xl font-black text-emerald-600 font-display">99.2%</h4>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">On-Time Delivery Rate</p>
           </div>
         </div>
       </section>
 
-      {/* 4-STEP "HOW IT WORKS" VISUAL JOURNEY */}
-      <section className="max-w-7xl mx-auto px-6 space-y-10">
+      {/* 3. 4-STEP "HOW IT WORKS" VISUAL JOURNEY */}
+      <section ref={howItWorksRef} className="max-w-7xl mx-auto px-6 space-y-10">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Transparent Agri-Trade Lifecycle
@@ -343,13 +462,10 @@ export const Home = () => {
           </p>
         </div>
 
-        {/* STEP CARDS WITH DESKTOP CONNECTOR */}
+        {/* 4 3D STEP CARDS */}
         <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
           {/* STEP 1 */}
-          <motion.div
-            whileHover={{ y: -6 }}
-            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
-          >
+          <Card3D className="how-it-works-card premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
             <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
@@ -381,13 +497,10 @@ export const Home = () => {
                 List <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-          </motion.div>
+          </Card3D>
 
           {/* STEP 2 */}
-          <motion.div
-            whileHover={{ y: -6 }}
-            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
-          >
+          <Card3D className="how-it-works-card premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-teal-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
             <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
@@ -419,13 +532,10 @@ export const Home = () => {
                 Forecast <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-          </motion.div>
+          </Card3D>
 
           {/* STEP 3 */}
-          <motion.div
-            whileHover={{ y: -6 }}
-            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
-          >
+          <Card3D className="how-it-works-card premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
             <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
@@ -457,13 +567,10 @@ export const Home = () => {
                 Marketplace <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-          </motion.div>
+          </Card3D>
 
           {/* STEP 4 */}
-          <motion.div
-            whileHover={{ y: -6 }}
-            className="premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between relative overflow-hidden group"
-          >
+          <Card3D className="how-it-works-card premium-card bg-white p-6 rounded-3xl border border-slate-200/90 shadow-lg flex flex-col justify-between group">
             <div className="absolute top-0 right-0 w-24 h-24 bg-sky-50 rounded-bl-full -z-0 group-hover:scale-110 transition-transform" />
             <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
@@ -495,12 +602,12 @@ export const Home = () => {
                 Track <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
-          </motion.div>
+          </Card3D>
         </div>
       </section>
 
-      {/* FEATURED LIVE PRODUCE FEED GRID */}
-      <section className="max-w-7xl mx-auto px-6 space-y-8">
+      {/* 4. FEATURED LIVE PRODUCE FEED GRID */}
+      <section ref={produceRef} className="max-w-7xl mx-auto px-6 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200/80">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider mb-2 border border-emerald-200">
@@ -509,7 +616,7 @@ export const Home = () => {
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 font-display flex items-center gap-2">
               Featured Live Farm Produce 🌾
             </h2>
-            <p className="text-slate-500 text-sm mt-1">
+            <p className="text-slate-500 text-sm mt-1 font-medium">
               Directly from verified Sri Lankan growers — zero middleman markups, 100% Escrow protected.
             </p>
           </div>
@@ -522,20 +629,19 @@ export const Home = () => {
           </Link>
         </div>
 
-        {/* CROP CARDS GRID */}
+        {/* 3D CROP CARDS GRID */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredCrops.map((crop) => (
-            <motion.div
+            <Card3D
               key={crop.id}
-              whileHover={{ y: -4 }}
-              className="premium-card bg-white border border-slate-200/80 shadow-lg rounded-3xl overflow-hidden flex flex-col justify-between"
+              className="produce-card-elem premium-card bg-white border border-slate-200/80 shadow-lg rounded-3xl overflow-hidden flex flex-col justify-between"
             >
               <div>
                 <div className="relative h-48 bg-slate-100 overflow-hidden">
                   <img
                     src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea'}
                     alt={crop.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
                       e.target.src = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea';
                     }}
@@ -582,19 +688,19 @@ export const Home = () => {
 
                   <button
                     onClick={() => setSelectedCropForPurchase(crop)}
-                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-1.5"
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" /> Buy 🛒
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </Card3D>
           ))}
         </div>
       </section>
 
-      {/* POWERED BY AGROLINK AI FEATURE SHOWCASE HUB */}
-      <section className="max-w-7xl mx-auto px-6">
+      {/* 5. POWERED BY AGROLINK AI FEATURE SHOWCASE HUB */}
+      <section ref={aiSuiteRef} className="max-w-7xl mx-auto px-6">
         <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 space-y-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -787,7 +893,7 @@ export const Home = () => {
                     </p>
                     <div className="pt-2">
                       <Link
-                        to="/contract-farming"
+                        to="/contracts"
                         className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
                       >
                         <span>Explore Contract Farming →</span>
@@ -861,8 +967,8 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* FARMER & BUYER SUCCESS TESTIMONIALS */}
-      <section className="max-w-7xl mx-auto px-6 space-y-8">
+      {/* 6. FARMER & BUYER SUCCESS TESTIMONIALS */}
+      <section ref={testimonialsRef} className="max-w-7xl mx-auto px-6 space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200">
             <MessageSquareQuote className="w-4 h-4 text-emerald-600" /> PROVEN AGRICULTURAL IMPACT
@@ -877,10 +983,7 @@ export const Home = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* TESTIMONIAL 1 */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            className="p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between"
-          >
+          <Card3D className="testimonial-card p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-amber-400">
@@ -909,13 +1012,10 @@ export const Home = () => {
                 <p className="text-[11px] text-slate-500 font-semibold">Vegetable Producer • Welimada Cooperative</p>
               </div>
             </div>
-          </motion.div>
+          </Card3D>
 
           {/* TESTIMONIAL 2 */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            className="p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between"
-          >
+          <Card3D className="testimonial-card p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-amber-400">
@@ -944,13 +1044,10 @@ export const Home = () => {
                 <p className="text-[11px] text-slate-500 font-semibold">Procurement Director • Lanka Fresh Markets</p>
               </div>
             </div>
-          </motion.div>
+          </Card3D>
 
           {/* TESTIMONIAL 3 */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            className="p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between"
-          >
+          <Card3D className="testimonial-card p-6 bg-white rounded-3xl border border-slate-200/90 shadow-xl space-y-4 flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 text-amber-400">
@@ -979,12 +1076,12 @@ export const Home = () => {
                 <p className="text-[11px] text-slate-500 font-semibold">Potato Grower • Keppetipola, Nuwara Eliya</p>
               </div>
             </div>
-          </motion.div>
+          </Card3D>
         </div>
       </section>
 
-      {/* ROLE-BASED PORTAL MATRIX SECTION */}
-      <section className="py-12 bg-slate-100/70 border-y border-slate-200/60">
+      {/* 7. ROLE-BASED PORTAL MATRIX SECTION */}
+      <section ref={rolesRef} className="py-12 bg-slate-100/80 backdrop-blur-md border-y border-slate-200/60">
         <div className="max-w-7xl mx-auto px-6 space-y-10">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">Tailored Ecosystem Access</span>
@@ -994,7 +1091,7 @@ export const Home = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* FARMERS */}
-            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+            <Card3D className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
               <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl font-bold">
                 🧑‍🌾
               </div>
@@ -1011,10 +1108,10 @@ export const Home = () => {
               <Link to="/register" className="inline-block pt-2 text-xs font-extrabold text-emerald-600 hover:underline">
                 Join as Farmer →
               </Link>
-            </div>
+            </Card3D>
 
             {/* COMMERCIAL BUYERS */}
-            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+            <Card3D className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
               <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-2xl font-bold">
                 🏬
               </div>
@@ -1031,10 +1128,10 @@ export const Home = () => {
               <Link to="/crops" className="inline-block pt-2 text-xs font-extrabold text-teal-600 hover:underline">
                 Browse Marketplace →
               </Link>
-            </div>
+            </Card3D>
 
             {/* LOGISTICS DRIVERS */}
-            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+            <Card3D className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
               <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl font-bold">
                 🚚
               </div>
@@ -1051,10 +1148,10 @@ export const Home = () => {
               <Link to="/login" className="inline-block pt-2 text-xs font-extrabold text-amber-600 hover:underline">
                 Logistics Portal →
               </Link>
-            </div>
+            </Card3D>
 
             {/* GOVERNMENT ADMINS */}
-            <div className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
+            <Card3D className="p-6 bg-white rounded-3xl border border-slate-200 shadow-lg space-y-4 hover:border-emerald-500 transition">
               <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl font-bold">
                 🏛️
               </div>
@@ -1071,13 +1168,13 @@ export const Home = () => {
               <Link to="/gov-intelligence" className="inline-block pt-2 text-xs font-extrabold text-sky-600 hover:underline">
                 View Gov Intelligence →
               </Link>
-            </div>
+            </Card3D>
           </div>
         </div>
       </section>
 
-      {/* FULL ECOSYSTEM FEATURE EXPLORER */}
-      <section className="max-w-7xl mx-auto px-6 space-y-10">
+      {/* 8. FULL ECOSYSTEM FEATURE EXPLORER */}
+      <section ref={ecosystemRef} className="max-w-7xl mx-auto px-6 space-y-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-slate-200/80">
           <div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider mb-2 border border-emerald-200 shadow-sm">
@@ -1097,13 +1194,12 @@ export const Home = () => {
           </div>
         </div>
 
-        {/* 6 ECOSYSTEM MODULE CARDS */}
+        {/* 6 ECOSYSTEM MODULE 3D CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ECOSYSTEM_MODULES.map((mod) => (
-            <motion.div
+            <Card3D
               key={mod.id}
-              whileHover={{ y: -6 }}
-              className={`p-6 sm:p-7 rounded-3xl bg-white border ${mod.borderColor} shadow-lg flex flex-col justify-between transition-all duration-300 relative overflow-hidden group`}
+              className={`ecosystem-card p-6 sm:p-7 rounded-3xl bg-white border ${mod.borderColor} shadow-lg flex flex-col justify-between transition-all duration-300 relative overflow-hidden group`}
             >
               <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl ${mod.gradient} rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
 
@@ -1137,13 +1233,13 @@ export const Home = () => {
                 </Link>
                 <span className="text-[11px] font-bold text-slate-400">Direct Portal →</span>
               </div>
-            </motion.div>
+            </Card3D>
           ))}
         </div>
       </section>
 
-      {/* INTERACTIVE FAQ ACCORDION SECTION */}
-      <section className="max-w-4xl mx-auto px-6 space-y-8">
+      {/* 9. INTERACTIVE FAQ ACCORDION SECTION */}
+      <section ref={faqRef} className="max-w-4xl mx-auto px-6 space-y-8">
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200 shadow-sm">
             <HelpCircle className="w-3.5 h-3.5 text-emerald-600" /> Got Questions? We Have Answers
@@ -1226,10 +1322,12 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* CTA SECTION */}
-      <section className="py-20 bg-slate-900 text-white relative overflow-hidden my-12 mx-4 sm:mx-8 rounded-3xl shadow-2xl">
+      {/* 10. CTA SECTION */}
+      <section className="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white relative overflow-hidden my-12 mx-4 sm:mx-8 rounded-3xl shadow-2xl border border-white/10">
         <div className="max-w-4xl mx-auto px-6 text-center space-y-8 relative z-10">
-          <span className="px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-500/30">Get Started Today</span>
+          <span className="px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-500/30">
+            Get Started Today
+          </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-display">
             Ready to revolutionize your farm trade?
           </h2>
@@ -1264,3 +1362,5 @@ export const Home = () => {
     </div>
   );
 };
+
+export default Home;

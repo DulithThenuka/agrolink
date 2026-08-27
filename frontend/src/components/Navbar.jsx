@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Sprout, LogOut, User as UserIcon, LayoutDashboard, ShoppingBag, PlusCircle, Menu, X, ChevronDown } from 'lucide-react';
+import { Sprout, LogOut, User as UserIcon, LayoutDashboard, ShoppingBag, PlusCircle, Menu, X, ChevronDown, Bell, Sparkles } from 'lucide-react';
 
 export const Navbar = () => {
   const { isAuthenticated, user, logout, isBuyer, isFarmer, isLogistics, isAdmin } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -20,15 +29,21 @@ export const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="glass sticky top-0 z-50 px-6 py-4 border-b border-slate-200/50 backdrop-blur-md">
+    <nav
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-white/85 backdrop-blur-xl shadow-lg shadow-slate-900/5 py-3 border-b border-slate-200/80'
+          : 'bg-white/70 backdrop-blur-md py-4 border-b border-slate-200/40'
+      } px-6`}
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
         {/* LOGO */}
         <Link to="/" className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2 font-display group shrink-0 mr-4">
-          <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center shadow-md shadow-emerald-500/25 group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300">
             <Sprout className="w-5 h-5" />
           </div>
-          <span>Agro<span className="text-emerald-600">Link</span></span>
+          <span>Agro<span className="text-emerald-600 font-extrabold">Link</span></span>
         </Link>
 
         {/* DESKTOP MENU - CATEGORIZED ROLE DROPDOWNS */}
@@ -40,7 +55,7 @@ export const Navbar = () => {
               <span>🌾 Marketplace</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
             </button>
-            <div className="absolute left-0 mt-1 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
+            <div className="absolute left-0 mt-1 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
               <Link to="/crops" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-bold hover:text-emerald-700 transition">
                 🌾 Produce Marketplace
               </Link>
@@ -62,7 +77,7 @@ export const Navbar = () => {
               <span>🤖 AI Intelligence</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
             </button>
-            <div className="absolute left-0 mt-1 w-60 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
+            <div className="absolute left-0 mt-1 w-60 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
               <Link to="/advisor" className="block px-3.5 py-2.5 rounded-xl hover:bg-emerald-50 text-slate-800 font-bold hover:text-emerald-700 transition">
                 🤖 AI Agronomist Advisor
               </Link>
@@ -87,7 +102,7 @@ export const Navbar = () => {
               <span>🏛️ Governance &amp; Ecosystem</span>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:rotate-180 transition-transform" />
             </button>
-            <div className="absolute left-0 mt-1 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
+            <div className="absolute left-0 mt-1 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 space-y-1">
               <Link to="/gov-intelligence" className="block px-3.5 py-2.5 rounded-xl bg-emerald-50 text-emerald-800 font-extrabold hover:bg-emerald-100 transition">
                 🏛️ Government Intelligence 🇱🇰
               </Link>
@@ -153,7 +168,7 @@ export const Navbar = () => {
               <Link to="/login" className="px-4 py-2 text-slate-700 hover:text-emerald-600 transition font-semibold">
                 Sign In
               </Link>
-              <Link to="/register" className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-xl shadow-md shadow-emerald-200 hover:from-emerald-600 hover:to-emerald-700 transition">
+              <Link to="/register" className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-xl shadow-md shadow-emerald-500/25 hover:from-emerald-600 hover:to-emerald-700 transition">
                 Get Started
               </Link>
             </div>
@@ -169,14 +184,14 @@ export const Navbar = () => {
                   className="p-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50 text-slate-700 hover:text-emerald-600 transition relative"
                   title="System Notifications"
                 >
-                  <span className="text-base">🔔</span>
+                  <Bell className="w-4 h-4 text-slate-700" />
                   <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
                     2
                   </span>
                 </button>
 
                 {notifDrawerOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 space-y-3 animate-fade-in">
+                  <div className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-4 z-50 space-y-3 animate-fade-in">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                       <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 font-display">
                         Notifications (2 Unread)
@@ -240,7 +255,7 @@ export const Navbar = () => {
                 {userMenuOpen && (
                   <div
                     onMouseLeave={() => setUserMenuOpen(false)}
-                    className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1 animate-fade-in"
+                    className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1 animate-fade-in"
                   >
                     <Link
                       to="/profile"
@@ -402,3 +417,5 @@ export const Navbar = () => {
     </nav>
   );
 };
+
+export default Navbar;

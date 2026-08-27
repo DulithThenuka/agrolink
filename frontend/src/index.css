@@ -4,10 +4,11 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden selection:bg-emerald-500 selection:text-white;
+    @apply bg-slate-950 text-slate-900 font-sans antialiased overflow-x-hidden selection:bg-emerald-500 selection:text-white;
   }
 }
 
+/* Glassmorphism & High-End Visual Effects */
 .glass {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(24px);
@@ -16,10 +17,10 @@
 }
 
 .glass-dark {
-  background: rgba(15, 23, 42, 0.88);
+  background: rgba(15, 23, 42, 0.82);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glass-card {
@@ -52,8 +53,42 @@
   box-shadow: 0 24px 48px -12px rgba(16, 185, 129, 0.18), 0 0 0 1px rgba(16, 185, 129, 0.2);
 }
 
+/* 3D Perspective & Depth Helpers */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+
+/* Glow Effects */
 .glow-emerald {
   box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.35);
+}
+
+.glow-emerald-lg {
+  box-shadow: 0 0 60px -10px rgba(16, 185, 129, 0.45), 0 0 20px 0px rgba(52, 211, 153, 0.2);
 }
 
 .glow-amber {
@@ -69,6 +104,10 @@
   background-image: 
     linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+}
+
+.bg-radial-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0) 70%);
 }
 
 /* Animations */
@@ -87,6 +126,11 @@
   100% { transform: translateX(-50%); }
 }
 
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(0.5deg); }
+}
+
 .animate-marquee {
   display: flex;
   width: max-content;
@@ -97,9 +141,8 @@
   animation-play-state: paused;
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+.animate-float {
+  animation: floatGentle 5s ease-in-out infinite;
 }
 
 .animate-fade-in {
@@ -129,4 +172,12 @@
   background: #10b981;
 }
 
-
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

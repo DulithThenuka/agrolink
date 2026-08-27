@@ -2,7 +2,21 @@ import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float } from '@react-three/drei';
 import * as THREE from 'three';
-import { Sparkles, Layers, Activity, Radio, RefreshCw, Truck, Zap, Globe } from 'lucide-react';
+import {
+  Sparkles,
+  Layers,
+  Activity,
+  Radio,
+  RefreshCw,
+  Truck,
+  Zap,
+  Globe,
+  CheckCircle2,
+  ShieldCheck,
+  Cpu,
+  MapPin,
+  TrendingUp
+} from 'lucide-react';
 
 // Procedural High-Definition Photorealistic Earth & Topography Texture
 const createRealisticEarthTextures = () => {
@@ -147,13 +161,13 @@ const latLonToVector3 = (lat, lon, radius = 1.52) => {
 };
 
 // High-Precision Agricultural Hubs mapped to realistic geographic coordinates
-const REAL_FARM_HUBS = [
-  { id: 'badulla', name: 'Welimada Organic Hub', crop: 'Grade A Tomatoes', lat: 6.9, lon: 80.9, color: '#10b981', code: 'HUB-BDL' },
-  { id: 'polonnaruwa', name: 'Polonnaruwa Belt', crop: 'Samba Paddy Grain', lat: 7.9, lon: 81.0, color: '#34d399', code: 'HUB-PLN' },
-  { id: 'jaffna', name: 'Jaffna Agro Hub', crop: 'Pungent Green Chillies', lat: 9.6, lon: 80.0, color: '#f59e0b', code: 'HUB-JAF' },
-  { id: 'nuwaraeliya', name: 'Nuwara Eliya Cold Zone', crop: 'Export Potatoes', lat: 6.97, lon: 80.78, color: '#06b6d4', code: 'HUB-NWE' },
-  { id: 'kandy', name: 'Central Spices Cluster', crop: 'Organic Pepper & Cloves', lat: 7.29, lon: 80.63, color: '#10b981', code: 'HUB-KDY' },
-  { id: 'colombo', name: 'Colombo Export Terminal', crop: 'Escrow Trade Gateway', lat: 6.92, lon: 79.86, color: '#38bdf8', code: 'GATE-CMB' }
+export const REAL_FARM_HUBS = [
+  { id: 'badulla', name: 'Welimada Organic Hub', crop: 'Grade A Tomatoes', lat: 6.9, lon: 80.9, color: '#10b981', code: 'HUB-BDL', price: 'Rs. 185/kg', health: '98%' },
+  { id: 'polonnaruwa', name: 'Polonnaruwa Belt', crop: 'Samba Paddy Grain', lat: 7.9, lon: 81.0, color: '#34d399', code: 'HUB-PLN', price: 'Rs. 220/kg', health: '99%' },
+  { id: 'jaffna', name: 'Jaffna Agro Hub', crop: 'Pungent Green Chillies', lat: 9.6, lon: 80.0, color: '#f59e0b', code: 'HUB-JAF', price: 'Rs. 520/kg', health: '95%' },
+  { id: 'nuwaraeliya', name: 'Nuwara Eliya Cold Zone', crop: 'Export Potatoes', lat: 6.97, lon: 80.78, color: '#06b6d4', code: 'HUB-NWE', price: 'Rs. 280/kg', health: '97%' },
+  { id: 'kandy', name: 'Central Spices Cluster', crop: 'Organic Pepper & Cloves', lat: 7.29, lon: 80.63, color: '#10b981', code: 'HUB-KDY', price: 'Rs. 650/kg', health: '96%' },
+  { id: 'colombo', name: 'Colombo Export Terminal', crop: 'Escrow Trade Gateway', lat: 6.92, lon: 79.86, color: '#38bdf8', code: 'GATE-CMB', price: 'Settled Daily', health: '100%' }
 ];
 
 // Photorealistic 3D Earth Globe with Atmosphere and Cloud Shell
@@ -211,7 +225,7 @@ const RealEarthGlobe = ({ mode = 'ecosystem' }) => {
         <meshBasicMaterial
           color={glowColor}
           transparent
-          opacity={0.18}
+          opacity={0.2}
           side={THREE.BackSide}
           blending={THREE.AdditiveBlending}
         />
@@ -408,7 +422,7 @@ const RealEarthTradeArcs = ({ mode = 'ecosystem' }) => {
 };
 
 // 3D Bioluminescent Spores Cloud
-const BioluminescentSpores = ({ count = 750, mode = 'ecosystem' }) => {
+const BioluminescentSpores = ({ count = 650, mode = 'ecosystem' }) => {
   const pointsRef = useRef();
 
   const [positions, colors] = useMemo(() => {
@@ -563,6 +577,36 @@ const OrbitingDroneScanner = ({ mode = 'ecosystem' }) => {
   );
 };
 
+// Subtle cursor parallax container
+const InteractiveSceneContainer = ({ mode, selectedNode, onSelectNode }) => {
+  const sceneGroup = useRef();
+
+  useFrame(({ pointer }) => {
+    if (sceneGroup.current) {
+      sceneGroup.current.rotation.x = THREE.MathUtils.lerp(
+        sceneGroup.current.rotation.x,
+        -pointer.y * 0.18,
+        0.05
+      );
+      sceneGroup.current.rotation.y = THREE.MathUtils.lerp(
+        sceneGroup.current.rotation.y,
+        pointer.x * 0.22,
+        0.05
+      );
+    }
+  });
+
+  return (
+    <group ref={sceneGroup}>
+      <RealEarthGlobe mode={mode} />
+      <ActiveHubHalos onSelectNode={onSelectNode} selectedNodeId={selectedNode?.id} />
+      <RealEarthTradeArcs mode={mode} />
+      <BioluminescentSpores count={500} mode={mode} />
+      <OrbitingDroneScanner mode={mode} />
+    </group>
+  );
+};
+
 export const AgriHero3DCanvas = () => {
   const [activeMode, setActiveMode] = useState('ecosystem');
   const [selectedNode, setSelectedNode] = useState(REAL_FARM_HUBS[0]);
@@ -575,10 +619,10 @@ export const AgriHero3DCanvas = () => {
   };
 
   return (
-    <div className="relative w-full h-[500px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden shadow-2xl border border-white/10 select-none">
+    <div className="relative w-full h-[520px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden shadow-2xl border border-white/10 select-none group">
       {/* Top Glassmorphic Mode HUD */}
       <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
-        <div className="flex items-center gap-1.5 p-1 bg-black/55 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg">
+        <div className="flex items-center gap-1.5 p-1 bg-black/60 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg">
           <button
             onClick={() => setActiveMode('ecosystem')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
@@ -598,8 +642,8 @@ export const AgriHero3DCanvas = () => {
                 : 'text-slate-300 hover:text-white'
             }`}
           >
-            <Radio className="w-3.5 h-3.5" />
-            <span>Hub Telemetry</span>
+            <Cpu className="w-3.5 h-3.5" />
+            <span>IoT Sensors</span>
           </button>
           <button
             onClick={() => setActiveMode('heatmap')}
@@ -609,95 +653,82 @@ export const AgriHero3DCanvas = () => {
                 : 'text-slate-300 hover:text-white'
             }`}
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Yield Matrix</span>
+            <Activity className="w-3.5 h-3.5" />
+            <span>Supply Heatmap</span>
           </button>
         </div>
 
-        {/* Live Status Badge */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-400/30 rounded-full text-emerald-300 text-xs font-bold backdrop-blur-md">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>Real 3D Earth &amp; Halos</span>
-        </div>
+        <button
+          onClick={handleResetCamera}
+          title="Reset Camera Angle"
+          className="p-2 bg-black/60 hover:bg-black/80 backdrop-blur-md text-slate-300 hover:text-white rounded-xl border border-white/10 shadow transition"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+        </button>
       </div>
 
-      {/* 3D WebGL Canvas */}
-      <Suspense
-        fallback={
-          <div className="w-full h-full flex flex-col items-center justify-center text-emerald-400 text-sm gap-3">
-            <RefreshCw className="w-6 h-6 animate-spin text-emerald-400" />
-            <span>Loading Photorealistic 3D Earth...</span>
-          </div>
-        }
-      >
-        <Canvas
-          camera={{ position: [0, 0.7, 4.3], fov: 45 }}
-          dpr={[1, 2]}
-          className="w-full h-full cursor-grab active:cursor-grabbing"
-        >
-          <ambientLight intensity={0.85} />
-          <pointLight position={[12, 10, 12]} intensity={1.4} color="#e0f2fe" />
-          <pointLight position={[-12, -8, -8]} intensity={0.5} color="#059669" />
-          <directionalLight position={[5, 3, 5]} intensity={0.9} color="#ffffff" />
-
-          {/* Real Earth 3D Components */}
-          <RealEarthGlobe mode={activeMode} />
-          <ActiveHubHalos
-            onSelectNode={(node) => setSelectedNode(node)}
-            selectedNodeId={selectedNode?.id}
-          />
-          <RealEarthTradeArcs mode={activeMode} />
-          <BioluminescentSpores count={800} mode={activeMode} />
-          <OrbitingDroneScanner mode={activeMode} />
-
-          <OrbitControls
-            ref={controlsRef}
-            enableZoom={false}
-            enablePan={false}
-            autoRotate
-            autoRotateSpeed={0.55}
-            maxPolarAngle={Math.PI / 1.7}
-            minPolarAngle={Math.PI / 3.2}
-          />
-        </Canvas>
-      </Suspense>
-
-      {/* Bottom Floating Telemetry Card & Active Hub HUD */}
-      <div className="absolute bottom-4 left-4 right-4 z-20 pointer-events-none flex items-end justify-between gap-3">
-        <div className="p-3.5 bg-slate-950/90 backdrop-blur-xl border border-white/10 rounded-2xl max-w-xs shadow-2xl pointer-events-auto transition-all">
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-400 flex items-center gap-1">
-              <Activity className="w-3 h-3 text-emerald-400 animate-pulse" /> Active Hub Halo
-            </span>
-            <span className="text-[10px] font-extrabold text-cyan-400 bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-800/60">
+      {/* Floating 3D Telemetry Overlay Card */}
+      {selectedNode && (
+        <div className="absolute bottom-4 left-4 z-20 max-w-[280px] bg-slate-950/80 backdrop-blur-xl border border-emerald-500/30 p-3.5 rounded-2xl shadow-2xl space-y-2 pointer-events-auto animate-fade-in text-white">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1 text-[10px] font-black tracking-wider uppercase text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-800/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
               {selectedNode.code}
             </span>
+            <span className="text-[10px] font-bold text-slate-400">Yield Health: {selectedNode.health}</span>
           </div>
-          <h4 className="text-sm font-black text-white">{selectedNode.name}</h4>
-          <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-white/10 text-xs">
-            <span className="text-slate-300 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full shadow-sm" style={{ backgroundColor: selectedNode.color }} />
-              {selectedNode.crop}
-            </span>
-            <span className="text-emerald-400 font-bold text-[11px] flex items-center gap-0.5">
-              <Zap className="w-3 h-3" /> Live GPS
-            </span>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 pointer-events-auto">
-          <button
-            onClick={handleResetCamera}
-            title="Reset 3D Camera"
-            className="p-2.5 bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/10 text-slate-300 hover:text-white rounded-xl transition shadow-lg"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-          <span className="hidden sm:inline-block px-3 py-1.5 bg-black/40 backdrop-blur-md border border-white/10 rounded-xl text-[11px] font-semibold text-slate-300">
-            🖱️ Drag to rotate Earth
-          </span>
+          <div>
+            <h4 className="font-extrabold text-sm text-white flex items-center gap-1 font-display">
+              <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              {selectedNode.name}
+            </h4>
+            <p className="text-xs text-slate-300 font-medium">{selectedNode.crop}</p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-[11px] text-slate-400">Escrow Index</span>
+            <span className="font-bold text-emerald-400 font-display">{selectedNode.price}</span>
+          </div>
         </div>
+      )}
+
+      {/* Interactive Hint Indicator */}
+      <div className="absolute bottom-4 right-4 z-20 hidden sm:flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md rounded-xl text-[10px] font-bold text-slate-400 border border-white/10 pointer-events-none">
+        <Sparkles className="w-3 h-3 text-emerald-400" />
+        <span>Drag to orbit • Click hubs to inspect</span>
       </div>
+
+      {/* Three.js WebGL Canvas */}
+      <Canvas
+        camera={{ position: [0, 0, 4.2], fov: 45 }}
+        dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 2)]}
+        className="w-full h-full cursor-grab active:cursor-grabbing"
+      >
+        <ambientLight intensity={0.9} />
+        <pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
+        <pointLight position={[-10, -10, -5]} intensity={0.6} color="#10b981" />
+        <directionalLight position={[5, 3, 5]} intensity={1.0} color="#e0f2fe" />
+
+        <Suspense fallback={null}>
+          <InteractiveSceneContainer
+            mode={activeMode}
+            selectedNode={selectedNode}
+            onSelectNode={setSelectedNode}
+          />
+        </Suspense>
+
+        <OrbitControls
+          ref={controlsRef}
+          enableZoom={false}
+          enablePan={false}
+          autoRotate={false}
+          maxPolarAngle={Math.PI / 1.5}
+          minPolarAngle={Math.PI / 3}
+        />
+      </Canvas>
     </div>
   );
 };
+
+export default AgriHero3DCanvas;
