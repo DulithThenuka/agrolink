@@ -162,12 +162,12 @@ const latLonToVector3 = (lat, lon, radius = 1.52) => {
 
 // High-Precision Agricultural Hubs mapped to realistic geographic coordinates
 export const REAL_FARM_HUBS = [
-  { id: 'badulla', name: 'Welimada Organic Hub', crop: 'Grade A Tomatoes', lat: 6.9, lon: 80.9, color: '#10b981', code: 'HUB-BDL', price: 'Rs. 185/kg', health: '98%' },
-  { id: 'polonnaruwa', name: 'Polonnaruwa Belt', crop: 'Samba Paddy Grain', lat: 7.9, lon: 81.0, color: '#34d399', code: 'HUB-PLN', price: 'Rs. 220/kg', health: '99%' },
-  { id: 'jaffna', name: 'Jaffna Agro Hub', crop: 'Pungent Green Chillies', lat: 9.6, lon: 80.0, color: '#f59e0b', code: 'HUB-JAF', price: 'Rs. 520/kg', health: '95%' },
-  { id: 'nuwaraeliya', name: 'Nuwara Eliya Cold Zone', crop: 'Export Potatoes', lat: 6.97, lon: 80.78, color: '#06b6d4', code: 'HUB-NWE', price: 'Rs. 280/kg', health: '97%' },
-  { id: 'kandy', name: 'Central Spices Cluster', crop: 'Organic Pepper & Cloves', lat: 7.29, lon: 80.63, color: '#10b981', code: 'HUB-KDY', price: 'Rs. 650/kg', health: '96%' },
-  { id: 'colombo', name: 'Colombo Export Terminal', crop: 'Escrow Trade Gateway', lat: 6.92, lon: 79.86, color: '#38bdf8', code: 'GATE-CMB', price: 'Settled Daily', health: '100%' }
+  { id: 'badulla', name: 'Welimada Organic Hub', crop: 'Grade A Tomatoes', lat: 6.9, lon: 80.9, color: '#10b981', code: 'HUB-BDL', price: 'Rs. 185/kg', health: '98%', doa: 'DOA Grade A Certified' },
+  { id: 'polonnaruwa', name: 'Polonnaruwa Belt', crop: 'Samba Paddy Grain', lat: 7.9, lon: 81.0, color: '#34d399', code: 'HUB-PLN', price: 'Rs. 220/kg', health: '99%', doa: 'DOA Seed Certified' },
+  { id: 'jaffna', name: 'Jaffna Agro Hub', crop: 'Pungent Green Chillies', lat: 9.6, lon: 80.0, color: '#f59e0b', code: 'HUB-JAF', price: 'Rs. 520/kg', health: '95%', doa: 'DOA Commercial Pass' },
+  { id: 'nuwaraeliya', name: 'Nuwara Eliya Cold Zone', crop: 'Export Potatoes', lat: 6.97, lon: 80.78, color: '#06b6d4', code: 'HUB-NWE', price: 'Rs. 280/kg', health: '97%', doa: 'Export Grade Pass' },
+  { id: 'kandy', name: 'Central Spices Cluster', crop: 'Organic Pepper & Cloves', lat: 7.29, lon: 80.63, color: '#10b981', code: 'HUB-KDY', price: 'Rs. 650/kg', health: '96%', doa: 'Organic Cert. Sri Lanka' },
+  { id: 'colombo', name: 'Colombo Export Terminal', crop: 'Escrow Trade Gateway', lat: 6.92, lon: 79.86, color: '#38bdf8', code: 'GATE-CMB', price: 'Settled Daily', health: '100%', doa: 'National Escrow Verified' }
 ];
 
 // Photorealistic 3D Earth Globe with Atmosphere and Cloud Shell
@@ -235,7 +235,7 @@ const RealEarthGlobe = ({ mode = 'ecosystem' }) => {
 };
 
 // 3D Active Hub Halos & Pulsing Concentric Radar Beacons
-const ActiveHubHalos = ({ onSelectNode, selectedNodeId }) => {
+const ActiveHubHalos = ({ onSelectNode, selectedNodeId, hoveredNodeId, setHoveredNodeId }) => {
   const groupRef = useRef();
   const shockwavesRef = useRef([]);
 
@@ -262,6 +262,7 @@ const ActiveHubHalos = ({ onSelectNode, selectedNodeId }) => {
     <group ref={groupRef}>
       {REAL_FARM_HUBS.map((hub, idx) => {
         const isSelected = selectedNodeId === hub.id;
+        const isHovered = hoveredNodeId === hub.id;
         const pos = latLonToVector3(hub.lat, hub.lon, 1.52);
         const normal = pos.clone().normalize();
 
@@ -276,18 +277,20 @@ const ActiveHubHalos = ({ onSelectNode, selectedNodeId }) => {
               onPointerOver={(e) => {
                 e.stopPropagation();
                 document.body.style.cursor = 'pointer';
+                if (setHoveredNodeId) setHoveredNodeId(hub.id);
               }}
               onPointerOut={() => {
                 document.body.style.cursor = 'auto';
+                if (setHoveredNodeId) setHoveredNodeId(null);
               }}
               onClick={() => onSelectNode(hub)}
-              scale={isSelected ? 1.6 : 1.1}
+              scale={isSelected || isHovered ? 1.7 : 1.1}
             >
               <sphereGeometry args={[0.045, 16, 16]} />
               <meshStandardMaterial
                 color={hub.color}
                 emissive={hub.color}
-                emissiveIntensity={isSelected ? 2.0 : 1.2}
+                emissiveIntensity={isSelected || isHovered ? 2.2 : 1.2}
                 roughness={0.1}
               />
             </mesh>
@@ -298,7 +301,7 @@ const ActiveHubHalos = ({ onSelectNode, selectedNodeId }) => {
               <meshBasicMaterial
                 color={hub.color}
                 transparent
-                opacity={isSelected ? 0.9 : 0.6}
+                opacity={isSelected || isHovered ? 0.95 : 0.6}
                 blending={THREE.AdditiveBlending}
               />
             </mesh>
@@ -309,7 +312,7 @@ const ActiveHubHalos = ({ onSelectNode, selectedNodeId }) => {
               <meshBasicMaterial
                 color={hub.color}
                 transparent
-                opacity={isSelected ? 0.95 : 0.65}
+                opacity={isSelected || isHovered ? 0.95 : 0.65}
                 side={THREE.DoubleSide}
               />
             </mesh>
@@ -318,7 +321,7 @@ const ActiveHubHalos = ({ onSelectNode, selectedNodeId }) => {
             <mesh ref={(el) => (shockwavesRef.current[idx] = el)}>
               <ringGeometry args={[0.09, 0.11, 24]} />
               <meshBasicMaterial
-                color={isSelected ? '#ffffff' : hub.color}
+                color={isSelected || isHovered ? '#ffffff' : hub.color}
                 transparent
                 opacity={0.8}
                 side={THREE.DoubleSide}
@@ -578,7 +581,7 @@ const OrbitingDroneScanner = ({ mode = 'ecosystem' }) => {
 };
 
 // Subtle cursor parallax container
-const InteractiveSceneContainer = ({ mode, selectedNode, onSelectNode }) => {
+const InteractiveSceneContainer = ({ mode, selectedNode, onSelectNode, hoveredNodeId, setHoveredNodeId }) => {
   const sceneGroup = useRef();
 
   useFrame(({ pointer }) => {
@@ -599,7 +602,12 @@ const InteractiveSceneContainer = ({ mode, selectedNode, onSelectNode }) => {
   return (
     <group ref={sceneGroup}>
       <RealEarthGlobe mode={mode} />
-      <ActiveHubHalos onSelectNode={onSelectNode} selectedNodeId={selectedNode?.id} />
+      <ActiveHubHalos
+        onSelectNode={onSelectNode}
+        selectedNodeId={selectedNode?.id}
+        hoveredNodeId={hoveredNodeId}
+        setHoveredNodeId={setHoveredNodeId}
+      />
       <RealEarthTradeArcs mode={mode} />
       <BioluminescentSpores count={500} mode={mode} />
       <OrbitingDroneScanner mode={mode} />
@@ -610,6 +618,7 @@ const InteractiveSceneContainer = ({ mode, selectedNode, onSelectNode }) => {
 export const AgriHero3DCanvas = () => {
   const [activeMode, setActiveMode] = useState('ecosystem');
   const [selectedNode, setSelectedNode] = useState(REAL_FARM_HUBS[0]);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
   const controlsRef = useRef();
 
   const handleResetCamera = () => {
@@ -617,6 +626,13 @@ export const AgriHero3DCanvas = () => {
       controlsRef.current.reset();
     }
   };
+
+  const activeDisplayNode = useMemo(() => {
+    if (hoveredNodeId) {
+      return REAL_FARM_HUBS.find((h) => h.id === hoveredNodeId) || selectedNode;
+    }
+    return selectedNode;
+  }, [hoveredNodeId, selectedNode]);
 
   return (
     <div className="relative w-full h-[520px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden shadow-2xl border border-white/10 select-none group">
@@ -668,27 +684,32 @@ export const AgriHero3DCanvas = () => {
       </div>
 
       {/* Floating 3D Telemetry Overlay Card */}
-      {selectedNode && (
-        <div className="absolute bottom-4 left-4 z-20 max-w-[280px] bg-slate-950/80 backdrop-blur-xl border border-emerald-500/30 p-3.5 rounded-2xl shadow-2xl space-y-2 pointer-events-auto animate-fade-in text-white">
+      {activeDisplayNode && (
+        <div className="absolute bottom-4 left-4 z-20 max-w-[290px] bg-slate-950/85 backdrop-blur-xl border border-emerald-500/30 p-3.5 rounded-2xl shadow-2xl space-y-2 pointer-events-auto animate-fade-in text-white">
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1 text-[10px] font-black tracking-wider uppercase text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-800/60">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-              {selectedNode.code}
+              {activeDisplayNode.code}
             </span>
-            <span className="text-[10px] font-bold text-slate-400">Yield Health: {selectedNode.health}</span>
+            <span className="text-[10px] font-bold text-slate-400">Yield Health: {activeDisplayNode.health}</span>
           </div>
 
           <div>
             <h4 className="font-extrabold text-sm text-white flex items-center gap-1 font-display">
               <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              {selectedNode.name}
+              {activeDisplayNode.name}
             </h4>
-            <p className="text-xs text-slate-300 font-medium">{selectedNode.crop}</p>
+            <p className="text-xs text-slate-300 font-medium">{activeDisplayNode.crop}</p>
+            {activeDisplayNode.doa && (
+              <p className="text-[10px] text-emerald-400/90 font-semibold pt-0.5 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" /> {activeDisplayNode.doa}
+              </p>
+            )}
           </div>
 
           <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
             <span className="text-[11px] text-slate-400">Escrow Index</span>
-            <span className="font-bold text-emerald-400 font-display">{selectedNode.price}</span>
+            <span className="font-bold text-emerald-400 font-display">{activeDisplayNode.price}</span>
           </div>
         </div>
       )}
@@ -696,7 +717,7 @@ export const AgriHero3DCanvas = () => {
       {/* Interactive Hint Indicator */}
       <div className="absolute bottom-4 right-4 z-20 hidden sm:flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md rounded-xl text-[10px] font-bold text-slate-400 border border-white/10 pointer-events-none">
         <Sparkles className="w-3 h-3 text-emerald-400" />
-        <span>Drag to orbit • Click hubs to inspect</span>
+        <span>Drag to orbit • Hover hubs to inspect</span>
       </div>
 
       {/* Three.js WebGL Canvas */}
@@ -715,6 +736,8 @@ export const AgriHero3DCanvas = () => {
             mode={activeMode}
             selectedNode={selectedNode}
             onSelectNode={setSelectedNode}
+            hoveredNodeId={hoveredNodeId}
+            setHoveredNodeId={setHoveredNodeId}
           />
         </Suspense>
 

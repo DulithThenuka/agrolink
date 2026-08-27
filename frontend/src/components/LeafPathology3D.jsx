@@ -2,12 +2,13 @@ import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float } from '@react-three/drei';
 import * as THREE from 'three';
-import { Layers, Sparkles } from 'lucide-react';
+import { Layers, Sparkles, Scan, CheckCircle2, AlertTriangle, ShieldCheck } from 'lucide-react';
 
-// 3D Organic Leaf Blade with Lesion Spots & Spore Infiltration
+// 3D Organic Leaf Blade with Lesion Spots, Veins & Diagnostic Scanner Bar
 const LeafBlade = ({ severity = 'Moderate', showSpores = true }) => {
   const meshRef = useRef();
   const sporesRef = useRef();
+  const scanBarRef = useRef();
 
   // Create stylized curved leaf geometry
   const geometry = useMemo(() => {
@@ -50,6 +51,11 @@ const LeafBlade = ({ severity = 'Moderate', showSpores = true }) => {
     if (sporesRef.current) {
       const pulse = 1 + Math.sin(state.clock.elapsedTime * 3) * 0.1;
       sporesRef.current.scale.set(pulse, pulse, pulse);
+    }
+    if (scanBarRef.current) {
+      // Move holographic laser scan beam up and down smoothly
+      const scanY = Math.sin(state.clock.elapsedTime * 1.8) * 1.1;
+      scanBarRef.current.position.y = scanY;
     }
   });
 
@@ -115,6 +121,24 @@ const LeafBlade = ({ severity = 'Moderate', showSpores = true }) => {
         </mesh>
       </group>
 
+      {/* Dynamic Holographic Laser Diagnostic Scan Bar */}
+      <group ref={scanBarRef} position={[0, 0, 0.07]}>
+        <mesh>
+          <boxGeometry args={[1.8, 0.02, 0.02]} />
+          <meshBasicMaterial color="#38bdf8" transparent opacity={0.9} blending={THREE.AdditiveBlending} />
+        </mesh>
+        <mesh position={[0, 0, -0.01]}>
+          <planeGeometry args={[1.8, 0.15]} />
+          <meshBasicMaterial
+            color="#0284c7"
+            transparent
+            opacity={0.35}
+            side={THREE.DoubleSide}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      </group>
+
       {/* Active Fungal Spore Cloud */}
       {showSpores && (
         <points ref={sporesRef} position={[0.15, 0.15, 0]}>
@@ -141,21 +165,29 @@ const LeafBlade = ({ severity = 'Moderate', showSpores = true }) => {
 
 export const LeafPathology3D = ({ severity = 'Moderate' }) => {
   return (
-    <div className="relative w-full h-[320px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden border border-white/10 shadow-xl select-none">
-      {/* Top HUD Tag */}
-      <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md rounded-xl text-emerald-400 border border-white/10 text-[11px] font-extrabold">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>3D Foliage Pathology Hologram</span>
+    <div className="relative w-full h-[340px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden border border-white/10 shadow-2xl select-none">
+      {/* Top HUD Diagnostics Pipeline Bar */}
+      <div className="absolute top-3 left-3 right-3 z-10 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md rounded-xl text-emerald-400 border border-white/10 text-[11px] font-extrabold shadow-sm">
+          <Scan className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+          <span>AI Foliage Pathology Scan</span>
         </div>
-        <div className="flex items-center gap-1 px-2.5 py-1 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-[10px] font-black">
-          <span>● Active Necrotic Lesion</span>
+
+        {/* Workflow steps tag: Scan -> Analyze -> Detect -> Recommend */}
+        <div className="flex items-center gap-1 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-xl border border-white/10 text-[10px] font-extrabold text-slate-300">
+          <span className="text-cyan-400">SCAN</span>
+          <span className="text-slate-500">→</span>
+          <span className="text-emerald-400">ANALYZE</span>
+          <span className="text-slate-500">→</span>
+          <span className="text-amber-400">DETECT</span>
+          <span className="text-slate-500">→</span>
+          <span className="text-teal-300">RECOMMEND</span>
         </div>
       </div>
 
       <Canvas
         camera={{ position: [0, 0, 3.2], fov: 45 }}
-        dpr={[1, 2]}
+        dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 2)]}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
         <ambientLight intensity={0.8} />
@@ -178,13 +210,16 @@ export const LeafPathology3D = ({ severity = 'Moderate' }) => {
 
       {/* Bottom Controls Info */}
       <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between text-[10px] font-bold text-slate-400 pointer-events-none">
-        <span className="bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-emerald-300">
-          Epidermis • Mesophyll Necrosis
+        <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 text-emerald-300 flex items-center gap-1">
+          <AlertTriangle className="w-3 h-3 text-amber-400" />
+          Alternaria solani • Early Blight
         </span>
-        <span className="bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">
+        <span className="bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 hidden sm:inline-block">
           🖱️ Drag to rotate 3D leaf
         </span>
       </div>
     </div>
   );
 };
+
+export default LeafPathology3D;

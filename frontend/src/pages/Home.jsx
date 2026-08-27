@@ -246,7 +246,7 @@ export const Home = () => {
     fetchCrops();
   }, []);
 
-  // GSAP Cinematic Entrance & ScrollTrigger Setup
+  // GSAP Cinematic Entrance & ScrollTrigger Storytelling
   useEffect(() => {
     const ctx = gsap.context(() => {
       // 1. Hero Entrance Timeline
@@ -273,7 +273,7 @@ export const Home = () => {
         });
       }
 
-      // 3. How It Works Cards
+      // 3. How It Works Pipeline Flow
       if (howItWorksRef.current) {
         gsap.from('.how-it-works-card', {
           scrollTrigger: {
@@ -448,7 +448,7 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 3. 4-STEP "HOW IT WORKS" VISUAL JOURNEY */}
+      {/* 3. 4-STEP SUPPLY-CHAIN CONNECTED JOURNEY */}
       <section ref={howItWorksRef} className="max-w-7xl mx-auto px-6 space-y-10">
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200 shadow-sm">
