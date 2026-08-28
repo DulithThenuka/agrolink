@@ -11,27 +11,17 @@ import { BuyerProfileModal } from '../components/BuyerProfileModal';
 export const Dashboard = () => {
   const { user, isFarmer, isBuyer, isLogistics, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+
+  // ── All hooks MUST be declared unconditionally before any early return ──
   const [selectedBuyer, setSelectedBuyer] = useState(null);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-  
-  if (isFarmer) {
-    return <FarmerDashboard />;
-  }
-
-  if (isLogistics) {
-    return <Logistics />;
-  }
-
   const [stats, setStats] = useState({ totalUsers: 0, totalCrops: 0, totalOrders: 0 });
-
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Farmers and logistics users are redirected below — skip data fetching for them
+    if (isFarmer || isLogistics) return;
+
     const loadDashboardData = async () => {
       setLoading(true);
       try {
@@ -59,7 +49,16 @@ export const Dashboard = () => {
       }
     };
     loadDashboardData();
-  }, [isAdmin, isBuyer]);
+  }, [isAdmin, isBuyer, isFarmer, isLogistics]);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  // ── Role-based render delegation (after all hooks) ──
+  if (isFarmer) return <FarmerDashboard />;
+  if (isLogistics) return <Logistics />;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
