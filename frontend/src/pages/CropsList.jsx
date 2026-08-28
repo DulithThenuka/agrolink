@@ -160,7 +160,7 @@ const SRI_LANKA_DISTRICTS = [
 ];
 
 export const CropsList = () => {
-  const { isFarmer } = useAuth();
+  const { user, isFarmer, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialKeyword = searchParams.get('search') || '';
@@ -172,6 +172,24 @@ export const CropsList = () => {
   const [selectedBuyCrop, setSelectedBuyCrop] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
+
+  // Checks if the logged-in farmer owns this listing
+  const isCropOwner = (c) => Boolean(
+    isFarmer && (
+      (c.farmerId && user?.id && String(c.farmerId) === String(user.id)) ||
+      (c.farmerName && user?.email && c.farmerName.toLowerCase().includes(user.email.split('@')[0].toLowerCase())) ||
+      (c.farmerEmail && user?.email && c.farmerEmail.toLowerCase() === user.email.toLowerCase())
+    )
+  );
+
+  const handleBuyClick = (c) => {
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent('/crops')}`);
+      return;
+    }
+    if (isCropOwner(c)) return;
+    setSelectedBuyCrop(c);
+  };
 
   // Filters State
   const [keyword, setKeyword] = useState(initialKeyword);
@@ -665,13 +683,19 @@ export const CropsList = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => setSelectedBuyCrop(crop)}
-                          disabled={crop.quantity <= 0}
-                          className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition disabled:opacity-50"
-                        >
-                          Buy 🛒
-                        </button>
+                        {isCropOwner(crop) ? (
+                          <span className="px-3 py-1 bg-emerald-50 text-emerald-800 font-extrabold text-[11px] rounded-xl border border-emerald-200">
+                            Your Produce 🧑‍🌾
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleBuyClick(crop)}
+                            disabled={crop.quantity <= 0}
+                            className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition disabled:opacity-50"
+                          >
+                            {!isAuthenticated ? 'Sign In to Buy' : 'Buy 🛒'}
+                          </button>
+                        )}
                         <Link
                           to={`/crops/${crop.id}`}
                           className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition"
@@ -778,14 +802,20 @@ export const CropsList = () => {
 
                 {/* CARD FOOTER WITH PROMINENT ESCROW BUY BUTTON & MICRO ACTIONS */}
                 <div className="p-5 pt-0 space-y-2">
-                  <button
-                    onClick={() => setSelectedBuyCrop(crop)}
-                    disabled={crop.quantity <= 0}
-                    className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-xs font-extrabold rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Buy with Escrow 🛒</span>
-                  </button>
+                  {isCropOwner(crop) ? (
+                    <div className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 text-xs font-extrabold rounded-xl border border-slate-200 text-center flex items-center justify-center gap-1.5">
+                      <span>🧑‍🌾 Your Own Produce Listing</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleBuyClick(crop)}
+                      disabled={crop.quantity <= 0}
+                      className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-xs font-extrabold rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>{!isAuthenticated ? 'Sign In to Buy 🛒' : 'Buy with Escrow 🛒'}</span>
+                    </button>
+                  )}
 
                   <div className="flex items-center justify-between pt-1 text-xs">
                     <button

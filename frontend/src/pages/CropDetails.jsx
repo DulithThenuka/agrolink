@@ -10,7 +10,7 @@ import { BuyCropModal } from '../components/BuyCropModal';
 export const CropDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isBuyer, isAuthenticated } = useAuth();
+  const { user, isFarmer, isAuthenticated } = useAuth();
   const [crop, setCrop] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -18,6 +18,14 @@ export const CropDetails = () => {
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [showTraceModal, setShowTraceModal] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
+
+  const isCropOwner = Boolean(
+    isFarmer && crop && (
+      (crop.farmerId && user?.id && String(crop.farmerId) === String(user.id)) ||
+      (crop.farmerName && user?.email && crop.farmerName.toLowerCase().includes(user.email.split('@')[0].toLowerCase())) ||
+      (crop.farmerEmail && user?.email && crop.farmerEmail.toLowerCase() === user.email.toLowerCase())
+    )
+  );
 
   // Review state
   const [reviews, setReviews] = useState([]);
@@ -319,15 +327,31 @@ export const CropDetails = () => {
 
             {/* PRIMARY ACTION BUTTONS */}
             <div className="space-y-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowBuyModal(true)}
-                disabled={crop.quantity <= 0}
-                className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                <span>Calculate &amp; Place Bulk Order (Lock Escrow)</span>
-              </button>
+              {isCropOwner ? (
+                <div className="w-full py-4 bg-slate-100 text-slate-700 font-extrabold text-sm rounded-2xl border border-slate-200 text-center flex items-center justify-center gap-2">
+                  <span>🧑‍🌾 Your Own Produce Listing (Owner View)</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      navigate(`/login?redirect=${encodeURIComponent(`/crops/${id}`)}`);
+                      return;
+                    }
+                    setShowBuyModal(true);
+                  }}
+                  disabled={crop.quantity <= 0}
+                  className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  <span>
+                    {!isAuthenticated
+                      ? 'Sign In to Place Bulk Order (Lock Escrow)'
+                      : 'Calculate & Place Bulk Order (Lock Escrow)'}
+                  </span>
+                </button>
+              )}
 
               <button
                 type="button"

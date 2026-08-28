@@ -62,7 +62,15 @@ export const Home = () => {
   const [activeAiTab, setActiveAiTab] = useState('price'); // 'price', 'disease', 'contract', 'intel'
   const [openFaq, setOpenFaq] = useState(0); // default first FAQ open
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { user, isFarmer, isAuthenticated } = useAuth();
+
+  const isCropOwner = (c) => Boolean(
+    isFarmer && c && (
+      (c.farmerId && user?.id && String(c.farmerId) === String(user.id)) ||
+      (c.farmerName && user?.email && c.farmerName.toLowerCase().includes(user.email.split('@')[0].toLowerCase())) ||
+      (c.farmerEmail && user?.email && c.farmerEmail.toLowerCase() === user.email.toLowerCase())
+    )
+  );
 
   /**
    * Smart navigation: if the user is logged in go directly to the route,
@@ -710,12 +718,25 @@ export const Home = () => {
                     <span className="text-xl font-black text-emerald-600 font-display">Rs. {Number(crop.price).toFixed(2)}/kg</span>
                   </div>
 
-                  <button
-                    onClick={() => setSelectedCropForPurchase(crop)}
-                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5"
-                  >
-                    <ShoppingBag className="w-3.5 h-3.5" /> Buy 🛒
-                  </button>
+                  {isCropOwner(crop) ? (
+                    <span className="px-3 py-1.5 bg-slate-100 text-slate-700 font-extrabold text-[11px] rounded-xl border border-slate-200">
+                      Your Produce 🧑‍🌾
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          smartNavigate('/crops');
+                          return;
+                        }
+                        setSelectedCropForPurchase(crop);
+                      }}
+                      className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-1.5"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>{!isAuthenticated ? 'Sign In to Buy' : 'Buy 🛒'}</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </Card3D>

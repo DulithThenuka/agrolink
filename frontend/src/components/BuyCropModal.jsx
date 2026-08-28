@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, X, ShieldCheck, Truck, Calculator, MapPin, Loader2, ArrowRight } from 'lucide-react';
+import { ShoppingBag, X, ShieldCheck, Truck, Calculator, MapPin, Loader2, ArrowRight, AlertTriangle, Lock } from 'lucide-react';
 import { ordersAPI } from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, isAuthenticated, isFarmer, isBuyer, isBusinessBuyer, isAdmin } = useAuth();
+  
   const [quantity, setQuantity] = useState(Math.min(50, crop.quantity || 100));
   const [deliveryLocation, setDeliveryLocation] = useState('Colombo Wholesale Hub');
   const [loading, setLoading] = useState(false);
@@ -14,6 +18,15 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
 
   const unitPrice = Number(crop.price) || 210;
   const maxStock = crop.quantity || 500;
+
+  // Determine if the current logged-in user is the farmer who owns this listing
+  const isOwner = Boolean(
+    isFarmer && (
+      (crop.farmerId && user?.id && String(crop.farmerId) === String(user.id)) ||
+      (crop.farmerName && user?.email && crop.farmerName.toLowerCase().includes(user.email.split('@')[0].toLowerCase())) ||
+      (crop.farmerEmail && user?.email && crop.farmerEmail.toLowerCase() === user.email.toLowerCase())
+    )
+  );
 
   // Live Calculation Math
   const produceTotal = quantity * unitPrice;
@@ -33,6 +46,17 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
 
   const handleConfirmOrder = async (e) => {
     e.preventDefault();
+
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
+    }
+
+    if (isOwner) {
+      setErrorMsg('You cannot purchase your own crop listing.');
+      return;
+    }
+
     setLoading(true);
     setErrorMsg('');
     setSuccessMsg('');
@@ -54,13 +78,8 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
       }, 1500);
 
     } catch (err) {
-      console.warn('Backend order placement API offline. Simulating local order placement:', err);
-      setSuccessMsg('🎉 Order placed successfully! Escrow vault locked.');
-      setTimeout(() => {
-        if (onOrderPlaced) onOrderPlaced();
-        onClose();
-        navigate('/orders');
-      }, 1500);
+      console.warn('Backend order placement API response:', err);
+      setErrorMsg(typeof err === 'string' ? err : 'Failed to place order. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -219,10 +238,41 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
               </div>
             </div>
 
+            {/* AUTH / ROLE BANNER */}
+            {!isAuthenticated ? (
+              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-2">
+                <div className="flex items-center gap-2 font-bold">
+                  <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Authentication Required</span>
+                </div>
+                <p className="text-[11px] text-amber-700">
+                  You must be signed into a verified Buyer or Business Buyer account to lock escrow contracts and order harvests.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`)}
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition inline-flex items-center gap-1.5"
+                >
+                  <span>Sign In to Continue</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : isOwner ? (
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-1">
+                <div className="flex items-center gap-2 font-bold">
+                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>Your Own Produce Listing</span>
+                </div>
+                <p className="text-[11px] text-rose-700">
+                  You are registered as the farmer who published this batch. Farmers cannot buy their own crop listings.
+                </p>
+              </div>
+            ) : null}
+
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              disabled={loading || !!successMsg}
+              disabled={loading || !!successMsg || !isAuthenticated || isOwner}
               className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
@@ -231,6 +281,10 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
                 </>
               ) : successMsg ? (
                 'Order Locked Successfully!'
+              ) : !isAuthenticated ? (
+                'Sign In to Place Bulk Order'
+              ) : isOwner ? (
+                'Cannot Buy Own Produce Listing'
               ) : (
                 <>
                   <span>Confirm Bulk Order (Lock Escrow)</span>
