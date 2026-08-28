@@ -90,10 +90,12 @@ export const Sidebar = () => {
             </Link>
           )}
 
-          <Link to="/contracts" className={linkClass('/contracts')}>
-            <FileText className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>B2B Purchase Contracts</span>
-          </Link>
+          {(isFarmer || isBuyer || isBusinessBuyer || isAdmin) && (
+            <Link to="/contracts" className={linkClass('/contracts')}>
+              <FileText className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>B2B Purchase Contracts</span>
+            </Link>
+          )}
 
           {(isFarmer || isSupplier || isAdmin) && (
             <>
@@ -123,14 +125,20 @@ export const Sidebar = () => {
           AI Agronomy Suite
         </div>
         <nav className="space-y-1">
-          <Link to="/advisor" className={linkClass('/advisor')}>
-            <BrainCircuit className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>AI Crop Agronomist</span>
-          </Link>
-          <Link to="/disease-detection" className={linkClass('/disease-detection')}>
-            <span className="text-sm shrink-0">📷</span>
-            <span>AI Disease Scanner</span>
-          </Link>
+          {/* Agronomist tools — farmers & experts only */}
+          {(isFarmer || isExpert || isAdmin) && (
+            <>
+              <Link to="/advisor" className={linkClass('/advisor')}>
+                <BrainCircuit className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>AI Crop Agronomist</span>
+              </Link>
+              <Link to="/disease-detection" className={linkClass('/disease-detection')}>
+                <span className="text-sm shrink-0">📷</span>
+                <span>AI Disease Scanner</span>
+              </Link>
+            </>
+          )}
+          {/* Market intelligence — all roles */}
           <Link to="/price-prediction" className={linkClass('/price-prediction')}>
             <TrendingUp className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>Price Predictor</span>
@@ -156,14 +164,18 @@ export const Sidebar = () => {
             <Landmark className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>Gov Intelligence 🇱🇰</span>
           </Link>
-          <Link to="/waste-reduction" className={linkClass('/waste-reduction')}>
-            <Recycle className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Waste Reduction &amp; Rescue</span>
-          </Link>
-          <Link to="/negotiation" className={linkClass('/negotiation')}>
-            <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Trade Negotiations</span>
-          </Link>
+          {(isFarmer || isBuyer || isBusinessBuyer || isSupplier || isAdmin) && (
+            <Link to="/waste-reduction" className={linkClass('/waste-reduction')}>
+              <Recycle className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Waste Reduction &amp; Rescue</span>
+            </Link>
+          )}
+          {(isFarmer || isBuyer || isBusinessBuyer || isAdmin) && (
+            <Link to="/negotiation" className={linkClass('/negotiation')}>
+              <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Trade Negotiations</span>
+            </Link>
+          )}
           {(isFarmer || isExpert || isAdmin) && (
             <Link to="/experts" className={linkClass('/experts')}>
               <span className="text-sm shrink-0">👨‍🔬</span>

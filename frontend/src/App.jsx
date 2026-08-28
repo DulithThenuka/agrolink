@@ -31,22 +31,40 @@ import { AgroLinkAiAssistant } from './pages/AgroLinkAiAssistant';
 import { GovernmentIntelligence } from './pages/GovernmentIntelligence';
 import { WasteReductionModule } from './pages/WasteReductionModule';
 
-const ProtectedRoute = ({ children, requireFarmer, requireBuyer, requireLogistics }) => {
-  const { isAuthenticated, isFarmer, isBuyer, isLogistics, isAdmin } = useAuth();
+/**
+ * ProtectedRoute — guards a route behind authentication and optional role restrictions.
+ *
+ * Props:
+ *   allowedRoles: string[]  — if provided, only users whose role is in the list (or ADMIN) can access.
+ *                             Pass an empty array / omit for "any authenticated user".
+ */
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+  const {
+    isAuthenticated,
+    isFarmer, isBuyer, isBusinessBuyer,
+    isLogistics, isExpert, isSupplier, isAdmin,
+    user,
+  } = useAuth();
+  const location = useLocation();
 
+  // 1. Must be logged in
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
-  if (requireFarmer && !(isFarmer || isAdmin)) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // 2. If no role restriction, any authenticated user is fine
+  if (allowedRoles.length === 0) return children;
 
-  if (requireBuyer && !(isBuyer || isAdmin)) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // 3. Admins can always access everything
+  if (isAdmin) return children;
 
-  if (requireLogistics && !(isLogistics || isAdmin)) {
+  // 4. Build a set of the current user's role strings for O(1) lookup
+  const userRoles = new Set([user?.role, user?.role?.replace('ROLE_', '')]);
+
+  // 5. Check if the user's role is in the allowed list
+  const hasAccess = allowedRoles.some((r) => userRoles.has(r));
+
+  if (!hasAccess) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -69,71 +87,125 @@ function AppContent() {
 
         <main className={`flex-1 overflow-x-hidden min-h-[calc(100vh-140px)] ${!showSidebar ? 'w-full' : ''}`}>
           <Routes>
+            {/* ─── PUBLIC ROUTES ──────────────────────────────── */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
+            {/* Public crop browsing & traceability — no login required */}
             <Route path="/crops" element={<CropsList />} />
             <Route path="/crops/:id" element={<CropDetails />} />
             <Route path="/trace/:batchCode" element={<TraceabilityPage />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/advisor" element={<CropAdvisor />} />
-            <Route path="/price-prediction" element={<PricePrediction />} />
-            <Route path="/demand-forecasting" element={<DemandForecasting />} />
-            <Route path="/disease-detection" element={<CropDiseaseDetection />} />
-            <Route path="/negotiation" element={<TradeNegotiation />} />
-            <Route path="/contracts" element={<ContractFarming />} />
-            <Route path="/experts" element={<ExpertModule />} />
-            <Route path="/supplier-marketplace" element={<SupplierMarketplace />} />
-            <Route path="/equipment-rental" element={<EquipmentRental />} />
-            <Route path="/community" element={<CommunityPlatform />} />
-            <Route path="/ai-assistant" element={<AgroLinkAiAssistant />} />
-            <Route path="/gov-intelligence" element={<GovernmentIntelligence />} />
-            <Route path="/admin/intelligence" element={<GovernmentIntelligence />} />
-            <Route path="/waste-reduction" element={<WasteReductionModule />} />
-            <Route path="/farmer/waste-reduction" element={<WasteReductionModule />} />
 
+            {/* ─── AUTHENTICATED (any role) ────────────────────── */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/community" element={<ProtectedRoute><CommunityPlatform /></ProtectedRoute>} />
+            <Route path="/ai-assistant" element={<ProtectedRoute><AgroLinkAiAssistant /></ProtectedRoute>} />
+            <Route path="/gov-intelligence" element={<ProtectedRoute><GovernmentIntelligence /></ProtectedRoute>} />
+            <Route path="/admin/intelligence" element={<ProtectedRoute><GovernmentIntelligence /></ProtectedRoute>} />
+            <Route path="/price-prediction" element={<ProtectedRoute><PricePrediction /></ProtectedRoute>} />
+            <Route path="/demand-forecasting" element={<ProtectedRoute><DemandForecasting /></ProtectedRoute>} />
+
+            {/* ─── FARMER-ONLY ─────────────────────────────────── */}
             <Route
               path="/crops/add"
               element={
-                <ProtectedRoute requireFarmer>
+                <ProtectedRoute allowedRoles={['FARMER']}>
                   <AddCrop />
                 </ProtectedRoute>
               }
             />
-
             <Route
-              path="/dashboard"
+              path="/advisor"
               element={
-                <ProtectedRoute>
-                  <Dashboard />
+                <ProtectedRoute allowedRoles={['FARMER', 'EXPERT', 'AGRICULTURAL_EXPERT']}>
+                  <CropAdvisor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/disease-detection"
+              element={
+                <ProtectedRoute allowedRoles={['FARMER', 'EXPERT', 'AGRICULTURAL_EXPERT']}>
+                  <CropDiseaseDetection />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/waste-reduction"
+              element={
+                <ProtectedRoute allowedRoles={['FARMER', 'BUYER', 'BUSINESS_BUYER', 'SUPPLIER']}>
+                  <WasteReductionModule />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/farmer/waste-reduction"
+              element={
+                <ProtectedRoute allowedRoles={['FARMER', 'SUPPLIER']}>
+                  <WasteReductionModule />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/equipment-rental"
+              element={
+                <ProtectedRoute allowedRoles={['FARMER', 'SUPPLIER']}>
+                  <EquipmentRental />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/supplier-marketplace"
+              element={
+                <ProtectedRoute allowedRoles={['FARMER', 'SUPPLIER']}>
+                  <SupplierMarketplace />
                 </ProtectedRoute>
               }
             />
 
+            {/* ─── BUYER/TRADE ──────────────────────────────────── */}
             <Route
               path="/orders"
               element={
-                <ProtectedRoute requireBuyer>
+                <ProtectedRoute allowedRoles={['BUYER', 'BUSINESS_BUYER']}>
                   <Orders />
                 </ProtectedRoute>
               }
             />
-
             <Route
-              path="/logistics"
+              path="/contracts"
               element={
-                <ProtectedRoute requireLogistics>
-                  <Logistics />
+                <ProtectedRoute allowedRoles={['FARMER', 'BUYER', 'BUSINESS_BUYER']}>
+                  <ContractFarming />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/negotiation"
+              element={
+                <ProtectedRoute allowedRoles={['FARMER', 'BUYER', 'BUSINESS_BUYER']}>
+                  <TradeNegotiation />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/experts"
+              element={
+                <ProtectedRoute allowedRoles={['FARMER', 'BUYER', 'BUSINESS_BUYER', 'EXPERT', 'AGRICULTURAL_EXPERT']}>
+                  <ExpertModule />
                 </ProtectedRoute>
               }
             />
 
+            {/* ─── LOGISTICS-ONLY ───────────────────────────────── */}
             <Route
-              path="/profile"
+              path="/logistics"
               element={
-                <ProtectedRoute>
-                  <Profile />
+                <ProtectedRoute allowedRoles={['LOGISTICS', 'LOGISTICS_PROVIDER']}>
+                  <Logistics />
                 </ProtectedRoute>
               }
             />

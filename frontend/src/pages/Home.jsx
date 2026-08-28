@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -61,6 +62,20 @@ export const Home = () => {
   const [activeAiTab, setActiveAiTab] = useState('price'); // 'price', 'disease', 'contract', 'intel'
   const [openFaq, setOpenFaq] = useState(0); // default first FAQ open
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  /**
+   * Smart navigation: if the user is logged in go directly to the route,
+   * otherwise send them to /login with a redirect param so they land on
+   * the intended page after authenticating.
+   */
+  const smartNavigate = (path) => {
+    if (isAuthenticated) {
+      navigate(path);
+    } else {
+      navigate(`/login?redirect=${encodeURIComponent(path)}`);
+    }
+  };
 
   // GSAP animation container refs
   const heroRef = useRef(null);
@@ -493,9 +508,12 @@ export const Home = () => {
               <span className="inline-flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> DOA Quality Pass
               </span>
-              <Link to="/crops/add" className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-emerald-700">
+              <button
+                onClick={() => smartNavigate('/crops/add')}
+                className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-emerald-700 font-extrabold text-[11px] bg-transparent border-none cursor-pointer"
+              >
                 List <ArrowRight className="w-3 h-3" />
-              </Link>
+              </button>
             </div>
           </Card3D>
 
@@ -528,9 +546,12 @@ export const Home = () => {
               <span className="inline-flex items-center gap-1">
                 <Scale className="w-3.5 h-3.5 text-teal-500" /> 0% Intermediary Cut
               </span>
-              <Link to="/price-prediction" className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-teal-700">
+              <button
+                onClick={() => smartNavigate('/price-prediction')}
+                className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-teal-700 font-extrabold text-[11px] bg-transparent border-none cursor-pointer"
+              >
                 Forecast <ArrowRight className="w-3 h-3" />
-              </Link>
+              </button>
             </div>
           </Card3D>
 
@@ -598,9 +619,12 @@ export const Home = () => {
               <span className="inline-flex items-center gap-1">
                 <Coins className="w-3.5 h-3.5 text-sky-500" /> Instant Settlement
               </span>
-              <Link to="/orders" className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-sky-700">
+              <button
+                onClick={() => smartNavigate('/orders')}
+                className="hover:underline flex items-center gap-0.5 text-slate-700 group-hover:text-sky-700 font-extrabold text-[11px] bg-transparent border-none cursor-pointer"
+              >
                 Track <ArrowRight className="w-3 h-3" />
-              </Link>
+              </button>
             </div>
           </Card3D>
         </div>
@@ -796,12 +820,12 @@ export const Home = () => {
                       AgroLink AI analyzes weather telemetry, Dambulla &amp; Pettah market arrivals, import tariff revisions, and fuel logistics costs to project fair crop prices.
                     </p>
                     <div className="pt-2">
-                      <Link
-                        to="/price-prediction"
+                      <button
+                        onClick={() => smartNavigate('/price-prediction')}
                         className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
                       >
                         <span>Launch AI Price Forecaster →</span>
-                      </Link>
+                      </button>
                     </div>
                   </div>
 
@@ -846,12 +870,12 @@ export const Home = () => {
                       Upload a photo of damaged leaves or crops. Our trained neural network diagnoses plant diseases instantly and suggests bio-organic treatments.
                     </p>
                     <div className="pt-2">
-                      <Link
-                        to="/disease-detection"
+                      <button
+                        onClick={() => smartNavigate('/disease-detection')}
                         className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
                       >
                         <span>Scan Crop Leaf Now →</span>
-                      </Link>
+                      </button>
                     </div>
                   </div>
 
@@ -892,12 +916,12 @@ export const Home = () => {
                       Lock in guaranteed crop purchasing prices before sowing. Supermarkets and institutional buyers deposit 30% upfront escrow into smart contract vaults.
                     </p>
                     <div className="pt-2">
-                      <Link
-                        to="/contracts"
+                      <button
+                        onClick={() => smartNavigate('/contracts')}
                         className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
                       >
                         <span>Explore Contract Farming →</span>
-                      </Link>
+                      </button>
                     </div>
                   </div>
 
@@ -939,12 +963,12 @@ export const Home = () => {
                       Government officers and planners monitor district overproduction risks, buffer stock health, and simulate import tariff revisions.
                     </p>
                     <div className="pt-2">
-                      <Link
-                        to="/gov-intelligence"
+                      <button
+                        onClick={() => smartNavigate('/gov-intelligence')}
                         className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-lg transition inline-flex items-center gap-2"
                       >
                         <span>View Gov Intelligence →</span>
-                      </Link>
+                      </button>
                     </div>
                   </div>
 
@@ -1165,9 +1189,12 @@ export const Home = () => {
                 <li className="flex items-center gap-2">✓ Buffer Stock Health Tracking</li>
                 <li className="flex items-center gap-2">✓ Food Security Heatmaps</li>
               </ul>
-              <Link to="/gov-intelligence" className="inline-block pt-2 text-xs font-extrabold text-sky-600 hover:underline">
+              <button
+                onClick={() => smartNavigate('/gov-intelligence')}
+                className="inline-block pt-2 text-xs font-extrabold text-sky-600 hover:underline bg-transparent border-none cursor-pointer"
+              >
                 View Gov Intelligence →
-              </Link>
+              </button>
             </Card3D>
           </div>
         </div>
@@ -1224,14 +1251,14 @@ export const Home = () => {
               </div>
 
               <div className="pt-5 mt-4 border-t border-slate-100 relative z-10 flex items-center justify-between">
-                <Link
-                  to={mod.link}
+                <button
+                  onClick={() => smartNavigate(mod.link)}
                   className="px-5 py-2.5 bg-slate-900 group-hover:bg-emerald-600 text-white font-extrabold text-xs rounded-xl shadow transition-all duration-200 flex items-center gap-1.5"
                 >
                   <span>{mod.linkText}</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-                <span className="text-[11px] font-bold text-slate-400">Direct Portal →</span>
+                </button>
+                <span className="text-[11px] font-bold text-slate-400">{isAuthenticated ? 'Go to Portal →' : 'Login to Access →'}</span>
               </div>
             </Card3D>
           ))}

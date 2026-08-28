@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { Sprout, AlertCircle, Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
@@ -10,16 +10,22 @@ export const Login = () => {
   const [error, setError] = useState('');
   const { login, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // If ProtectedRoute attached a redirect param, honor it after login
+  const redirectTo = new URLSearchParams(location.search).get('redirect') || null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     const res = await login(email, password);
     if (res.success) {
-      if (res.role === 'LOGISTICS' || res.role === 'ROLE_LOGISTICS') {
-        navigate('/logistics');
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true });
+      } else if (res.role === 'LOGISTICS' || res.role === 'ROLE_LOGISTICS' || res.role === 'LOGISTICS_PROVIDER' || res.role === 'ROLE_LOGISTICS_PROVIDER') {
+        navigate('/logistics', { replace: true });
       } else {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     } else {
       setError(res.message || 'Failed to authenticate');
