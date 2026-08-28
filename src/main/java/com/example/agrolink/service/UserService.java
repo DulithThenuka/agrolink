@@ -167,6 +167,25 @@ public class UserService {
         );
     }
 
+    // ================== PASSWORD ==================
+
+    public void changePassword(String email, String oldPassword, String newPassword) {
+        User user = findByEmail(email);
+
+        if (!encoder.matches(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Current password does not match");
+        }
+
+        if (newPassword == null || newPassword.trim().length() < MIN_PASSWORD_LENGTH) {
+            throw new IllegalArgumentException("New password must be at least " + MIN_PASSWORD_LENGTH + " characters");
+        }
+
+        user.setPassword(encodePassword(newPassword.trim()));
+        repo.save(user);
+
+        logger.info("Password successfully updated for user: {}", email);
+    }
+
     // ================== HELPERS ==================
 
     private void validateRegisterRequest(

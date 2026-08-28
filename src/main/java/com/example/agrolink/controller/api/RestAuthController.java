@@ -59,6 +59,17 @@ public class RestAuthController {
         return ApiResponse.success("Logged out successfully");
     }
 
+    @PostMapping("/change-password")
+    public ApiResponse<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDTO request, java.security.Principal principal) {
+        if (principal == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Not authenticated");
+        }
+        String email = normalizeEmail(principal.getName());
+        logger.info("REST Change password attempt for email: {}", email);
+        userService.changePassword(email, request.getOldPassword(), request.getNewPassword());
+        return ApiResponse.success("Password updated successfully");
+    }
+
     private String normalizeEmail(String email) {
         return email == null ? "" : email.toLowerCase().trim();
     }

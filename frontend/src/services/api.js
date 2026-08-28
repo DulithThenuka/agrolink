@@ -37,6 +37,7 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   register: (data) => api.post('/auth/register', data),
   logout: () => api.post('/auth/logout'),
+  changePassword: (data) => api.post('/auth/change-password', data),
 };
 
 export const cropsAPI = {
