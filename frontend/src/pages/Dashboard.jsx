@@ -6,10 +6,13 @@ import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp
 import { useNavigate } from 'react-router-dom';
 import { FarmerDashboard } from './FarmerDashboard';
 import { Logistics } from './Logistics';
+import { ExpertDashboard } from './ExpertDashboard';
+import { SupplierDashboard } from './SupplierDashboard';
+import { BusinessBuyerDashboard } from './BusinessBuyerDashboard';
 import { BuyerProfileModal } from '../components/BuyerProfileModal';
 
 export const Dashboard = () => {
-  const { user, isFarmer, isBuyer, isLogistics, isAdmin, logout } = useAuth();
+  const { user, isFarmer, isBuyer, isBusinessBuyer, isLogistics, isExpert, isSupplier, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
   // ── All hooks MUST be declared unconditionally before any early return ──
@@ -19,8 +22,8 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Farmers and logistics users are redirected below — skip data fetching for them
-    if (isFarmer || isLogistics) return;
+    // Roles with dedicated dashboards skip default buyer/admin data fetching
+    if (isFarmer || isLogistics || isExpert || isSupplier || isBusinessBuyer) return;
 
     const loadDashboardData = async () => {
       setLoading(true);
@@ -49,7 +52,7 @@ export const Dashboard = () => {
       }
     };
     loadDashboardData();
-  }, [isAdmin, isBuyer, isFarmer, isLogistics]);
+  }, [isAdmin, isBuyer, isFarmer, isLogistics, isExpert, isSupplier, isBusinessBuyer]);
 
   const handleLogout = () => {
     logout();
@@ -59,6 +62,9 @@ export const Dashboard = () => {
   // ── Role-based render delegation (after all hooks) ──
   if (isFarmer) return <FarmerDashboard />;
   if (isLogistics) return <Logistics />;
+  if (isExpert) return <ExpertDashboard />;
+  if (isSupplier) return <SupplierDashboard />;
+  if (isBusinessBuyer) return <BusinessBuyerDashboard />;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">

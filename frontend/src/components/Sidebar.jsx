@@ -200,6 +200,8 @@ export const Sidebar = () => {
               ? 'Farmer 🌱'
               : isLogistics
               ? 'Logistics 🚚'
+              : isBusinessBuyer
+              ? 'Business Buyer 🏢'
               : isBuyer
               ? 'Buyer 🛒'
               : isSupplier
