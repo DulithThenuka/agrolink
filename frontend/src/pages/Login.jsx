@@ -12,8 +12,10 @@ export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If ProtectedRoute attached a redirect param, honor it after login
-  const redirectTo = new URLSearchParams(location.search).get('redirect') || null;
+  // If ProtectedRoute or 401 interceptor attached params, honor them
+  const queryParams = new URLSearchParams(location.search);
+  const redirectTo = queryParams.get('redirect') || null;
+  const isExpired = queryParams.get('expired') === 'true';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,6 +54,13 @@ export const Login = () => {
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-display">Welcome Back</h2>
             <p className="text-slate-500 text-xs sm:text-sm font-medium">Sign in to manage your AgroLink account</p>
           </div>
+
+          {isExpired && !error && (
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center gap-3 text-amber-800 text-xs font-semibold">
+              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
+              <span>Your session has expired. Please sign in again to continue.</span>
+            </div>
+          )}
 
           {error && (
             <div className="p-4 rounded-2xl bg-red-50 border border-red-100 flex items-center gap-3 text-red-600 text-xs font-bold">

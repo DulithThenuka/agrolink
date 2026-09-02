@@ -11,6 +11,29 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    };
+
+    const handleStorageChange = (e) => {
+      if (e.key === 'token' && !e.newValue) {
+        setToken(null);
+        setUser(null);
+      }
+    };
+
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('auth:unauthorized', handleUnauthorized);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   const login = async (email, password) => {
     setLoading(true);
     try {

@@ -28,6 +28,21 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+
+      const isLoginRequest = error.config?.url?.includes('/auth/login');
+      if (!isLoginRequest) {
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+        if (
+          typeof window !== 'undefined' &&
+          !window.location.pathname.startsWith('/login') &&
+          !window.location.pathname.startsWith('/register')
+        ) {
+          const currentPath = window.location.pathname + window.location.search;
+          const redirectParam = currentPath && currentPath !== '/' ? `redirect=${encodeURIComponent(currentPath)}` : '';
+          const queryStr = ['expired=true', redirectParam].filter(Boolean).join('&');
+          window.location.href = `/login?${queryStr}`;
+        }
+      }
     }
     return Promise.reject(error.response?.data?.message || error.message || 'An error occurred');
   }
