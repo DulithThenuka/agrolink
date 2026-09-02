@@ -1,8 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Sprout, Heart } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const Footer = () => {
+  const { isAuthenticated, isFarmer, isBuyer, isBusinessBuyer, isSupplier, isAdmin } = useAuth();
+
+  const canContract = isAdmin || isFarmer || isBuyer || isBusinessBuyer;
+  const canEquipment = isAdmin || isFarmer || isSupplier;
+
   return (
     <footer className="bg-white border-t border-emerald-100 mt-auto">
       <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -23,15 +29,30 @@ export const Footer = () => {
           <Link to="/crops" className="hover:text-emerald-600 transition">
             Marketplace
           </Link>
-          <Link to="/contracts" className="hover:text-emerald-600 transition">
-            Contract Farming
-          </Link>
-          <Link to="/equipment-rental" className="hover:text-emerald-600 transition">
-            Equipment
-          </Link>
-          <Link to="/dashboard" className="hover:text-emerald-600 transition">
-            Dashboard
-          </Link>
+          {isAuthenticated && canContract && (
+            <Link to="/contracts" className="hover:text-emerald-600 transition">
+              Contract Farming
+            </Link>
+          )}
+          {isAuthenticated && canEquipment && (
+            <Link to="/equipment-rental" className="hover:text-emerald-600 transition">
+              Machinery Rentals
+            </Link>
+          )}
+          {isAuthenticated ? (
+            <Link to="/dashboard" className="hover:text-emerald-600 transition">
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="hover:text-emerald-600 transition">
+                Sign In
+              </Link>
+              <Link to="/register" className="text-emerald-600 hover:text-emerald-700 font-extrabold transition">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
         {/* TECH STACK BADGE */}
