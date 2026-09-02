@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { Sprout, AlertCircle, Loader2, User, Mail, Lock, MapPin, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Sprout, AlertCircle, Loader2, User, Mail, Lock, MapPin, ShieldCheck, ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [location, setLocation] = useState('');
   const [role, setRole] = useState('BUYER');
   const [error, setError] = useState('');
@@ -17,9 +19,33 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const res = await register(name, email, password, location, role);
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter.');
+      return;
+    }
+
+    const res = await register(name.trim(), email.trim(), password, location.trim(), role);
     if (res.success) {
-      navigate('/login');
+      if (res.autoLoggedIn) {
+        if (
+          res.role === 'LOGISTICS' ||
+          res.role === 'ROLE_LOGISTICS' ||
+          res.role === 'LOGISTICS_PROVIDER' ||
+          res.role === 'ROLE_LOGISTICS_PROVIDER'
+        ) {
+          navigate('/logistics', { replace: true });
+        } else {
+          navigate('/dashboard', { replace: true });
+        }
+      } else {
+        navigate('/login', { replace: true });
+      }
     } else {
       setError(res.message || 'Registration failed');
     }
@@ -116,10 +142,34 @@ export const Register = () => {
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Create password"
+                  placeholder="Create password (min 6 chars)"
+                  required
+                  className="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-200 text-sm font-semibold bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm password"
                   required
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm font-semibold bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
                 />

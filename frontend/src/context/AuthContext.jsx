@@ -78,8 +78,13 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await authAPI.register({ name, email, password, location, role });
-      if (res && (res.success || res.data)) {
-        return { success: true };
+      if (res && (res.success || res.data || res.status === 200 || res.status === 201)) {
+        // Auto-login upon successful registration
+        const loginRes = await login(email, password);
+        if (loginRes.success) {
+          return { success: true, autoLoggedIn: true, role: loginRes.role || role };
+        }
+        return { success: true, autoLoggedIn: false };
       }
       return { success: false, message: res.message || 'Registration failed' };
     } catch (err) {
