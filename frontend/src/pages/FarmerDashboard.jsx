@@ -21,7 +21,7 @@ import { IoTFarmControlModal } from '../components/IoTFarmControlModal';
 
 export const FarmerDashboard = () => {
   const { user } = useAuth();
-  const farmerName = user?.email ? user.email.split('@')[0] : 'Farmer';
+  const farmerName = user?.name || (user?.email ? user.email.split('@')[0] : 'Farmer');
 
   const [farmerOrders, setFarmerOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);

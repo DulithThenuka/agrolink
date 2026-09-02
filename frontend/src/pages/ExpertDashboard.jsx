@@ -32,7 +32,7 @@ import { expertsAPI } from '../services/api';
 export const ExpertDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const expertName = user?.email ? user.email.split('@')[0] : 'Expert';
+  const expertName = user?.name || (user?.email ? user.email.split('@')[0] : 'Expert');
 
   const [consultations, setConsultations] = useState([]);
   const [loading, setLoading] = useState(true);

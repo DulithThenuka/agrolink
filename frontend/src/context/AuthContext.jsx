@@ -40,9 +40,18 @@ export const AuthProvider = ({ children }) => {
       const res = await authAPI.login({ email, password });
       if (res && res.data) {
         const jwtToken = res.data.accessToken || res.data.token;
-        const userEmail = res.data.email;
+        const userEmail = res.data.email || email;
+        const userName = res.data.name || res.data.fullName || (userEmail ? userEmail.split('@')[0] : 'User');
+        const userLocation = res.data.location || '';
         const role = res.data.role;
-        const userData = { email: userEmail, role };
+        const userId = res.data.id || res.data.userId;
+        const userData = {
+          id: userId,
+          email: userEmail,
+          name: userName,
+          location: userLocation,
+          role,
+        };
         setToken(jwtToken);
         setUser(userData);
         localStorage.setItem('token', jwtToken);
@@ -55,6 +64,14 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateUser = (updatedFields) => {
+    setUser((prev) => {
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const register = async (name, email, password, location, role = 'BUYER') => {
@@ -113,6 +130,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
+        updateUser,
       }}
     >
       {children}

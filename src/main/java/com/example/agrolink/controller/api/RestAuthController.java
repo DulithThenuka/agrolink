@@ -44,7 +44,7 @@ public class RestAuthController {
         long expiresIn = 3600;
 
         logger.info("REST Login successful for: {}", user.getEmail());
-        return ApiResponse.success("Login successful", new AuthResponseDTO(token, user.getEmail(), role, expiresIn));
+        return ApiResponse.success("Login successful", new AuthResponseDTO(token, user.getId(), user.getName(), user.getEmail(), user.getLocation(), role, expiresIn));
     }
 
     @PostMapping("/register")

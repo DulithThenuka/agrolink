@@ -32,7 +32,7 @@ import { BuyerProfileModal } from '../components/BuyerProfileModal';
 export const BusinessBuyerDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const companyName = user?.email ? user.email.split('@')[0] : 'Enterprise Buyer';
+  const companyName = user?.name || (user?.email ? user.email.split('@')[0] : 'Enterprise Buyer');
 
   const [orders, setOrders] = useState([]);
   const [contracts, setContracts] = useState([]);

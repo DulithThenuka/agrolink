@@ -116,8 +116,11 @@ public ResponseEntity<?> apiLogin(@Valid @RequestBody LoginRequestDTO request) {
                         "Login successful",
                         new AuthResponseDTO(
                                 token,
+                                user.getId(),
+                                user.getName(),
                                 user.getEmail(),
-                                role, // ✅ FIX
+                                user.getLocation(),
+                                role,
                                 expiresIn
                         )
                 )

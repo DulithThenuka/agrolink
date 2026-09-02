@@ -32,7 +32,7 @@ import { suppliersAPI, rentalsAPI } from '../services/api';
 export const SupplierDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const supplierName = user?.email ? user.email.split('@')[0] : 'Supplier';
+  const supplierName = user?.name || (user?.email ? user.email.split('@')[0] : 'Supplier');
 
   const [items, setItems] = useState([]);
   const [orders, setOrders] = useState([]);

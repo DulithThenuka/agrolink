@@ -303,14 +303,18 @@ export const Navbar = () => {
                   onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifDrawerOpen(false); }}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50 text-slate-800 font-semibold transition"
                 >
-                  <span>{user?.email}</span>
+                  <span className="max-w-[150px] truncate">{user?.name || user?.email}</span>
                   <ChevronDown className="w-4 h-4 text-slate-500" />
                 </button>
                 {userMenuOpen && (
                   <div
                     onMouseLeave={() => setUserMenuOpen(false)}
-                    className="absolute right-0 mt-2 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1 animate-fade-in"
+                    className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1 animate-fade-in"
                   >
+                    <div className="px-3 py-2 border-b border-slate-100/80 mb-1">
+                      <p className="text-xs font-bold text-slate-900 truncate">{user?.name || 'User'}</p>
+                      <p className="text-[11px] text-slate-400 font-medium truncate">{user?.email}</p>
+                    </div>
                     <Link
                       to="/profile"
                       onClick={() => setUserMenuOpen(false)}

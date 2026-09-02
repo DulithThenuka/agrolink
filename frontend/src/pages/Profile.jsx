@@ -94,10 +94,26 @@ export const Profile = () => {
 
         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
           <div className="space-y-1">
+            <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Full Name</span>
+            <div className="flex items-center gap-2 font-bold text-slate-900 text-base">
+              <User className="w-4 h-4 text-emerald-600" />
+              <span>{user?.name || (user?.email ? user.email.split('@')[0] : 'Member')}</span>
+            </div>
+          </div>
+
+          <div className="space-y-1">
             <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Email Address</span>
             <div className="flex items-center gap-2 font-bold text-slate-800 text-base">
               <Mail className="w-4 h-4 text-emerald-600" />
               <span>{user?.email}</span>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Registered Location / Region</span>
+            <div className="flex items-center gap-2 font-bold text-slate-800 text-sm">
+              <MapPin className="w-4 h-4 text-emerald-600" />
+              <span>{user?.location || 'Sri Lanka'}</span>
             </div>
           </div>
 
