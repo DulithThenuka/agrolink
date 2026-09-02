@@ -5,7 +5,16 @@ import { User, Shield, MapPin, Mail, ArrowLeft, Award, Lock, CheckCircle2, Loade
 import { farmersAPI, buyersAPI, authAPI } from '../services/api';
 
 export const Profile = () => {
-  const { user, isFarmer, isBuyer } = useAuth();
+  const {
+    user,
+    isFarmer,
+    isBuyer,
+    isBusinessBuyer,
+    isLogistics,
+    isExpert,
+    isSupplier,
+    isAdmin,
+  } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [passwordModal, setPasswordModal] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
@@ -15,13 +24,45 @@ export const Profile = () => {
   const [savingPassword, setSavingPassword] = useState(false);
 
   const roleEmoji =
-    user?.role === 'BUSINESS_BUYER' ? '🏢' :
-    user?.role === 'LOGISTICS_PROVIDER' || user?.role === 'LOGISTICS' ? '🚚' :
-    user?.role === 'AGRICULTURAL_EXPERT' || user?.role === 'EXPERT' ? '👨‍🔬' :
-    user?.role === 'FARMER' ? '🧑‍🌾' :
-    user?.role === 'SUPPLIER' ? '🧰' :
-    user?.role === 'ADMIN' ? '🏛️' :
+    isAdmin ? '🏛️' :
+    isFarmer ? '🌾' :
+    isSupplier ? '🧰' :
+    isLogistics ? '🚚' :
+    isExpert ? '👨‍🔬' :
+    isBusinessBuyer ? '🏢' :
     '🛒';
+
+  const roleTitle =
+    isAdmin ? 'System Administrator & Governance' :
+    isFarmer ? 'Registered Crop Producer (Farmer)' :
+    isSupplier ? 'Input & Machinery Supplier' :
+    isLogistics ? 'Verified Logistics Fleet Provider' :
+    isExpert ? 'Certified Agricultural Agronomist' :
+    isBusinessBuyer ? 'Commercial Enterprise Buyer (B2B)' :
+    'Retail Produce Purchaser (Buyer)';
+
+  const ratingLabel =
+    isAdmin ? 'Admin Security Clearance' :
+    isFarmer ? '5.0 Star Producer Score' :
+    isSupplier ? '5.0 Star Supply & Equipment Rating' :
+    isLogistics ? '5.0 Star Transit Reliability' :
+    isExpert ? '5.0 Star Agronomy Trust Score' :
+    isBusinessBuyer ? '5.0 Star Corporate Buyer Score' :
+    '5.0 Star Buyer Rating';
+
+  const getInitials = (name, email) => {
+    if (name && name.trim()) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      }
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    if (email) {
+      return email.slice(0, 2).toUpperCase();
+    }
+    return 'AL';
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -73,7 +114,7 @@ export const Profile = () => {
     <div className="max-w-4xl mx-auto px-6 py-8 space-y-6 animate-fade-in">
       <div className="flex justify-between items-center pb-5 border-b border-slate-200/60">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 font-display">Account Profile 👤</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 font-display">Account Profile {roleEmoji}</h1>
           <p className="text-slate-500 text-sm mt-1">Manage credentials, view account verification, and security settings.</p>
         </div>
 
@@ -84,8 +125,16 @@ export const Profile = () => {
 
       <div className="premium-card p-8 bg-white border border-slate-100/90 shadow-md flex flex-col md:flex-row gap-8 items-start">
         <div className="flex flex-col items-center gap-3 w-full md:w-auto">
-          <div className="w-24 h-24 rounded-3xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 text-4xl font-bold">
-            {roleEmoji}
+          <div className="relative">
+            <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 text-3xl font-black font-display tracking-tight border-2 border-white/60">
+              {getInitials(user?.name, user?.email)}
+            </div>
+            <div
+              title={`Role: ${roleTitle}`}
+              className="absolute -bottom-2 -right-2 w-9 h-9 rounded-2xl bg-white shadow-md border border-slate-100 flex items-center justify-center text-lg"
+            >
+              {roleEmoji}
+            </div>
           </div>
           <span className="badge-premium badge-delivered">
             <CheckCircle2 className="w-3.5 h-3.5" /> Account Verified
@@ -97,7 +146,7 @@ export const Profile = () => {
             <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Full Name</span>
             <div className="flex items-center gap-2 font-bold text-slate-900 text-base">
               <User className="w-4 h-4 text-emerald-600" />
-              <span>{user?.name || (user?.email ? user.email.split('@')[0] : 'Member')}</span>
+              <span className="capitalize">{user?.name || (user?.email ? user.email.split('@')[0] : 'Member')}</span>
             </div>
           </div>
 
@@ -119,14 +168,8 @@ export const Profile = () => {
 
           <div className="space-y-1">
             <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Platform Role &amp; Actor Type</span>
-            <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
-              {user?.role === 'BUSINESS_BUYER' ? '🏢 Commercial Business Buyer (B2B)' :
-               user?.role === 'LOGISTICS_PROVIDER' || user?.role === 'LOGISTICS' ? '🚚 Logistics Provider' :
-               user?.role === 'AGRICULTURAL_EXPERT' || user?.role === 'EXPERT' ? '👨‍🔬 Agricultural Expert' :
-               user?.role === 'FARMER' ? '🌾 Farmer (Producer)' :
-               user?.role === 'SUPPLIER' ? '🧰 Input Supplier' :
-               user?.role === 'ADMIN' ? '🏛️ System Admin & Policymaker' :
-               '🛒 Retail Buyer'}
+            <span className="inline-block px-3.5 py-1 rounded-full text-xs font-bold tracking-wide bg-emerald-100 text-emerald-800">
+              {roleEmoji} {roleTitle}
             </span>
           </div>
 
@@ -139,9 +182,9 @@ export const Profile = () => {
           </div>
 
           <div className="space-y-1">
-            <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Direct Trade Rating</span>
+            <span className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest block">Network Reputation</span>
             <span className="font-bold text-slate-800 text-sm flex items-center gap-1">
-              <Award className="w-4 h-4 text-amber-500" /> 5.0 Star Producer Score
+              <Award className="w-4 h-4 text-amber-500" /> {ratingLabel}
             </span>
           </div>
 
