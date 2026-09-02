@@ -278,7 +278,7 @@ export const SupplierMarketplace = () => {
     try {
       const res = await suppliersAPI.createItem({
         ...newItem,
-        supplierName: user?.email ? user.email.split('@')[0] : 'Lanka Agri-Supply',
+        supplierName: user?.name || (user?.email ? user.email.split('@')[0] : 'Lanka Agri-Supply'),
       });
 
       if (res && res.data) {

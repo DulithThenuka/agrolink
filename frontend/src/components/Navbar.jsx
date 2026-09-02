@@ -303,7 +303,7 @@ export const Navbar = () => {
                   onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifDrawerOpen(false); }}
                   className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50 text-slate-800 font-semibold transition"
                 >
-                  <span className="max-w-[150px] truncate">{user?.name || user?.email}</span>
+                  <span className="max-w-[150px] truncate capitalize">{user?.name || (user?.email ? user.email.split('@')[0] : 'Account')}</span>
                   <ChevronDown className="w-4 h-4 text-slate-500" />
                 </button>
                 {userMenuOpen && (

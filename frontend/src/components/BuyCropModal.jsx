@@ -21,9 +21,9 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
 
   // Determine if the current logged-in user is the farmer who owns this listing
   const isOwner = Boolean(
-    isFarmer && (
+    isFarmer && crop && (
       (crop.farmerId && user?.id && String(crop.farmerId) === String(user.id)) ||
-      (crop.farmerName && user?.email && crop.farmerName.toLowerCase().includes(user.email.split('@')[0].toLowerCase())) ||
+      (crop.farmerName && user?.name && crop.farmerName.toLowerCase() === user.name.toLowerCase()) ||
       (crop.farmerEmail && user?.email && crop.farmerEmail.toLowerCase() === user.email.toLowerCase())
     )
   );

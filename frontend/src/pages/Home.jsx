@@ -67,7 +67,7 @@ export const Home = () => {
   const isCropOwner = (c) => Boolean(
     isFarmer && c && (
       (c.farmerId && user?.id && String(c.farmerId) === String(user.id)) ||
-      (c.farmerName && user?.email && c.farmerName.toLowerCase().includes(user.email.split('@')[0].toLowerCase())) ||
+      (c.farmerName && user?.name && c.farmerName.toLowerCase() === user.name.toLowerCase()) ||
       (c.farmerEmail && user?.email && c.farmerEmail.toLowerCase() === user.email.toLowerCase())
     )
   );

@@ -1073,7 +1073,7 @@ export const ContractFarming = () => {
                             onClick={() => {
                               setSelectedTenderForApply(item);
                               setApplyForm({
-                                farmerName: user?.email ? user.email.split('@')[0] : 'Sunil Perera',
+                                farmerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Sunil Perera'),
                                 capacityKg: Math.round(item.monthlyQuantityKg * 0.5),
                                 district: item.district.split('/')[0].trim(),
                                 offerPrice: Math.round((item.minPriceLkr + item.maxPriceLkr) / 2),

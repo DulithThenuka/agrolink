@@ -253,7 +253,7 @@ export const EquipmentRental = () => {
     try {
       const res = await rentalsAPI.createListing({
         ...newMachinery,
-        ownerName: user?.email ? user.email.split('@')[0] : 'Fleet Owner',
+        ownerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Fleet Owner'),
       });
 
       if (res && res.data) {
