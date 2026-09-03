@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { Sprout, AlertCircle, Loader2, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Sprout, AlertCircle, Loader2, Mail, Lock, ArrowRight, Eye, EyeOff, ShieldAlert } from 'lucide-react';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -57,10 +57,21 @@ export const Login = () => {
           </div>
 
           {isExpired && !error && (
-            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200/80 flex items-center gap-3 text-amber-800 text-xs font-semibold">
-              <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
-              <span>Your session has expired. Please sign in again to continue.</span>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -6 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3.5 text-amber-900 shadow-sm"
+            >
+              <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+              <div className="space-y-0.5 text-left">
+                <h4 className="text-xs font-extrabold uppercase tracking-wide text-amber-900">Session Expired</h4>
+                <p className="text-xs text-amber-800/90 font-medium">
+                  Your login session has expired for your security. Please sign in again to continue.
+                </p>
+              </div>
+            </motion.div>
           )}
 
           {error && (

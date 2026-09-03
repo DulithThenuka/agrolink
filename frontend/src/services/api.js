@@ -9,11 +9,57 @@ const api = axios.create({
   },
 });
 
-// Attach JWT token to requests if available
+export const isTokenExpired = (token) => {
+  if (!token) return true;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload.exp) return false;
+    return Date.now() >= payload.exp * 1000;
+  } catch (e) {
+    return false;
+  }
+};
+
+export const getTokenRemainingMs = (token) => {
+  if (!token) return 0;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return 0;
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload.exp) return 0;
+    return Math.max(0, payload.exp * 1000 - Date.now());
+  } catch (e) {
+    return 0;
+  }
+};
+
+const redirectToLoginExpired = () => {
+  if (
+    typeof window !== 'undefined' &&
+    !window.location.pathname.startsWith('/login') &&
+    !window.location.pathname.startsWith('/register')
+  ) {
+    const currentPath = window.location.pathname + window.location.search;
+    const redirectParam = currentPath && currentPath !== '/' ? `redirect=${encodeURIComponent(currentPath)}` : '';
+    const queryStr = ['expired=true', redirectParam].filter(Boolean).join('&');
+    window.location.href = `/login?${queryStr}`;
+  }
+};
+
+// Attach JWT token to requests if available & valid
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
+      if (isTokenExpired(token)) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+        redirectToLoginExpired();
+        return Promise.reject(new Error('Session expired'));
+      }
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -21,7 +67,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
+// Response interceptor for 401 Unauthorized handling
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
@@ -32,16 +78,7 @@ api.interceptors.response.use(
       const isLoginRequest = error.config?.url?.includes('/auth/login');
       if (!isLoginRequest) {
         window.dispatchEvent(new CustomEvent('auth:unauthorized'));
-        if (
-          typeof window !== 'undefined' &&
-          !window.location.pathname.startsWith('/login') &&
-          !window.location.pathname.startsWith('/register')
-        ) {
-          const currentPath = window.location.pathname + window.location.search;
-          const redirectParam = currentPath && currentPath !== '/' ? `redirect=${encodeURIComponent(currentPath)}` : '';
-          const queryStr = ['expired=true', redirectParam].filter(Boolean).join('&');
-          window.location.href = `/login?${queryStr}`;
-        }
+        redirectToLoginExpired();
       }
     }
     return Promise.reject(error.response?.data?.message || error.message || 'An error occurred');

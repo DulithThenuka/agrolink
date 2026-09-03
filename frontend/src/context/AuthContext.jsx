@@ -1,38 +1,85 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { authAPI, isTokenExpired, getTokenRemainingMs } from '../services/api';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(() => {
+    const savedToken = localStorage.getItem('token');
+    if (savedToken && isTokenExpired(savedToken)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return null;
+    }
+    return savedToken || null;
+  });
+
   const [user, setUser] = useState(() => {
+    const savedToken = localStorage.getItem('token');
+    if (!savedToken || isTokenExpired(savedToken)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      return null;
+    }
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('token') || null);
+
   const [loading, setLoading] = useState(false);
+
+  const handleSessionExpired = useCallback(() => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+
+    if (
+      typeof window !== 'undefined' &&
+      !window.location.pathname.startsWith('/login') &&
+      !window.location.pathname.startsWith('/register')
+    ) {
+      const currentPath = window.location.pathname + window.location.search;
+      const redirectParam = currentPath && currentPath !== '/' ? `redirect=${encodeURIComponent(currentPath)}` : '';
+      const queryStr = ['expired=true', redirectParam].filter(Boolean).join('&');
+      window.location.href = `/login?${queryStr}`;
+    }
+  }, []);
 
   useEffect(() => {
     const handleUnauthorized = () => {
-      setToken(null);
-      setUser(null);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      handleSessionExpired();
     };
 
     const handleStorageChange = (e) => {
-      if (e.key === 'token' && !e.newValue) {
-        setToken(null);
-        setUser(null);
+      if (e.key === 'token' && (!e.newValue || isTokenExpired(e.newValue))) {
+        handleSessionExpired();
       }
     };
 
     window.addEventListener('auth:unauthorized', handleUnauthorized);
     window.addEventListener('storage', handleStorageChange);
+
+    // Active JWT expiration timer
+    let expiryTimer = null;
+    if (token) {
+      if (isTokenExpired(token)) {
+        handleSessionExpired();
+      } else {
+        const remainingMs = getTokenRemainingMs(token);
+        if (remainingMs > 0) {
+          expiryTimer = setTimeout(() => {
+            handleSessionExpired();
+          }, remainingMs);
+        }
+      }
+    }
+
     return () => {
       window.removeEventListener('auth:unauthorized', handleUnauthorized);
       window.removeEventListener('storage', handleStorageChange);
+      if (expiryTimer) clearTimeout(expiryTimer);
     };
-  }, []);
+  }, [token, handleSessionExpired]);
 
   const login = async (email, password) => {
     setLoading(true);
