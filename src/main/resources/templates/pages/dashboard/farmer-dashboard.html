@@ -132,6 +132,11 @@
             </div>
 
             <div class="space-y-3">
+                <th:block th:if="${#lists.isEmpty(farmerDashboard.lowStockAlerts)}">
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center text-xs text-slate-500 font-semibold">
+                        🌱 All listed crop stocks are healthy. No replenishment needed.
+                    </div>
+                </th:block>
                 <th:block th:each="alert : ${farmerDashboard.lowStockAlerts}">
                     <div class="p-3.5 bg-amber-50/80 rounded-2xl border border-amber-200/80 flex items-center justify-between">
                         <div>
@@ -156,6 +161,11 @@
             </div>
 
             <div class="space-y-3">
+                <th:block th:if="${#lists.isEmpty(farmerDashboard.cropBenchmarks)}">
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center text-xs text-slate-500 font-semibold">
+                        📊 Publish your first harvest batch to unlock real-time agronomy price suggestions.
+                    </div>
+                </th:block>
                 <th:block th:each="bench : ${farmerDashboard.cropBenchmarks}">
                     <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200/70 flex items-center justify-between text-xs">
                         <div>

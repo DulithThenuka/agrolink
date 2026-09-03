@@ -97,6 +97,7 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
 
                         .requestMatchers(
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/v1/farmer/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/farmer/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/farmer/**")
                         ).hasRole("FARMER")

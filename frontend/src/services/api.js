@@ -87,6 +87,7 @@ export const adminAPI = {
 
 export const farmersAPI = {
   getProfile: (id) => api.get(`/farmers/${id}/profile`),
+  getDashboard: () => api.get('/farmer/dashboard'),
 };
 
 export const buyersAPI = {
