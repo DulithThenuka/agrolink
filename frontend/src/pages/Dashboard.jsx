@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminAPI, cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Users, Sprout, ShoppingBag, PlusCircle, ArrowRight, Loader2, TrendingUp, Sparkles, LogOut, AlertCircle } from 'lucide-react';
+import { Users, Sprout, ShoppingBag, ArrowRight, Loader2, TrendingUp, Sparkles, LogOut, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { FarmerDashboard } from './FarmerDashboard';
 import { Logistics } from './Logistics';
@@ -134,7 +134,7 @@ export const Dashboard = () => {
                 Live Feed
               </span>
             </div>
-            <h2 className="text-3xl font-extrabold font-display text-slate-900">{stats.totalCrops || 'Live'}</h2>
+            <h2 className="text-3xl font-extrabold font-display text-slate-900">{stats.totalCrops ?? 0}</h2>
           </div>
           <div className="w-14 h-14 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition duration-300">
             <Sprout className="w-7 h-7" />
@@ -153,15 +153,6 @@ export const Dashboard = () => {
           >
             <span className="text-base">🏛️</span> Sri Lanka Agricultural Overview 🇱🇰
           </Link>
-
-          {isFarmer && (
-            <Link
-              to="/crops/add"
-              className="px-5 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-2"
-            >
-              <PlusCircle className="w-4 h-4" /> Publish Crop Listing
-            </Link>
-          )}
 
           {isBuyer && (
             <Link
