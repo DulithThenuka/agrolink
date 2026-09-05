@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { notificationsAPI } from '../services/api';
 import {
   Sprout, LogOut, User as UserIcon, LayoutDashboard,
-  Menu, X, ChevronDown, Bell,
+  Menu, X, ChevronDown, Bell, CheckCheck,
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -13,12 +14,28 @@ export const Navbar = () => {
     isLogistics, isExpert, isSupplier, isAdmin,
   } = useAuth();
 
-  const [userMenuOpen, setUserMenuOpen]     = useState(false);
+  const [userMenuOpen, setUserMenuOpen]       = useState(false);
   const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled]         = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen]   = useState(false);
+  const [isScrolled, setIsScrolled]           = useState(false);
+  const [notifications, setNotifications]     = useState([]);
   const location  = useLocation();
   const navigate  = useNavigate();
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      const res = await notificationsAPI.getAll();
+      if (res?.data) {
+        const list = Array.isArray(res.data) ? res.data : (res.data.data ?? []);
+        setNotifications(list);
+      }
+    } catch {
+      // silently fail — notifications are non-critical
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 20);
@@ -26,13 +43,59 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Fetch notifications on mount and whenever auth state changes
+  useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
+
   // Close mobile menu on route change
   useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
     setUserMenuOpen(false);
+    setNotifications([]);
     navigate('/login');
+  };
+
+  const handleMarkRead = async (id) => {
+    try {
+      await notificationsAPI.markRead(id);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+    } catch {
+      // optimistic update still applied
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    const unread = notifications.filter((n) => !n.read);
+    await Promise.allSettled(unread.map((n) => notificationsAPI.markRead(n.id)));
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  // Map notification type → display emoji
+  const notifIcon = (type) => {
+    switch (type) {
+      case 'ORDER_UPDATE':       return '🛍️';
+      case 'LOGISTICS_DISPATCH': return '🚚';
+      case 'ESCROW_RELEASE':     return '🔒';
+      case 'WASTE_ALERT':        return '♻️';
+      default:                   return '🔔';
+    }
+  };
+
+  // Map notification type → colour classes for the card
+  const notifColors = (type) => {
+    switch (type) {
+      case 'ORDER_UPDATE':       return 'bg-emerald-50/70 border-emerald-100 text-emerald-800';
+      case 'LOGISTICS_DISPATCH': return 'bg-emerald-50/70 border-emerald-100 text-emerald-800';
+      case 'ESCROW_RELEASE':     return 'bg-sky-50/70 border-sky-100 text-sky-800';
+      case 'WASTE_ALERT':        return 'bg-amber-50/70 border-amber-100 text-amber-800';
+      default:                   return 'bg-slate-50/70 border-slate-100 text-slate-800';
+    }
   };
 
   const isActive = (path) => location.pathname === path;
@@ -249,49 +312,55 @@ export const Navbar = () => {
                   title="System Notifications"
                 >
                   <Bell className="w-4 h-4 text-slate-700" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
-                    2
-                  </span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </button>
 
                 {notifDrawerOpen && (
                   <div className="absolute right-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-4 z-50 space-y-3 animate-fade-in">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                       <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 font-display">
-                        Notifications (2 Unread)
+                        Notifications {unreadCount > 0 && `(${unreadCount} Unread)`}
                       </h4>
-                      <button onClick={() => setNotifDrawerOpen(false)} className="text-[10px] text-emerald-600 font-bold hover:underline">
-                        Close
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {unreadCount > 0 && (
+                          <button
+                            onClick={handleMarkAllRead}
+                            title="Mark all as read"
+                            className="text-[10px] text-emerald-600 font-bold hover:underline flex items-center gap-0.5"
+                          >
+                            <CheckCheck className="w-3 h-3" /> All read
+                          </button>
+                        )}
+                        <button onClick={() => setNotifDrawerOpen(false)} className="text-[10px] text-slate-400 font-bold hover:underline">
+                          Close
+                        </button>
+                      </div>
                     </div>
+
                     <div className="space-y-2 max-h-64 overflow-y-auto text-xs">
-                      <div className="p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 space-y-1">
-                        <div className="flex items-center justify-between text-[10px] font-bold text-emerald-800">
-                          <span>🚚 Order Dispatched!</span>
-                          <span className="text-slate-400">Just now</span>
-                        </div>
-                        <p className="text-slate-600 text-[11px] leading-tight">
-                          Vehicle WP LK-4892 picked up 150kg Samba Rice from Nuwara Eliya.
-                        </p>
-                      </div>
-                      <div className="p-2.5 bg-sky-50/70 rounded-xl border border-sky-100 space-y-1">
-                        <div className="flex items-center justify-between text-[10px] font-bold text-sky-800">
-                          <span>🔒 Escrow Secured</span>
-                          <span className="text-slate-400">12m ago</span>
-                        </div>
-                        <p className="text-slate-600 text-[11px] leading-tight">
-                          Payment of Rs 34,500.00 is safely locked in Escrow vault.
-                        </p>
-                      </div>
-                      <div className="p-2.5 bg-amber-50/70 rounded-xl border border-amber-100 space-y-1">
-                        <div className="flex items-center justify-between text-[10px] font-bold text-amber-800">
-                          <span>♻️ Waste Risk Flagged</span>
-                          <span className="text-slate-400">2h ago</span>
-                        </div>
-                        <p className="text-slate-600 text-[11px] leading-tight">
-                          500kg Tomatoes near 2-day expiry. 15% discount recommended.
-                        </p>
-                      </div>
+                      {notifications.length === 0 ? (
+                        <p className="text-center text-slate-400 text-[11px] font-semibold py-6">No notifications yet.</p>
+                      ) : (
+                        notifications.map((n) => (
+                          <button
+                            key={n.id}
+                            onClick={() => handleMarkRead(n.id)}
+                            className={`w-full text-left p-2.5 rounded-xl border space-y-1 transition ${
+                              notifColors(n.type)
+                            } ${n.read ? 'opacity-60' : 'opacity-100'}`}
+                          >
+                            <div className="flex items-center justify-between text-[10px] font-bold">
+                              <span>{notifIcon(n.type)} {n.title}</span>
+                              <span className="text-slate-400 font-medium shrink-0 ml-2">{n.timestamp}</span>
+                            </div>
+                            <p className="text-[11px] leading-tight text-slate-600">{n.message}</p>
+                          </button>
+                        ))
+                      )}
                     </div>
                   </div>
                 )}
