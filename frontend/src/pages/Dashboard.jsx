@@ -10,13 +10,14 @@ import {
   Loader2,
   Sparkles,
   LogOut,
-  ShieldCheck,
   UserCheck,
   CheckCircle2,
   Clock,
   Truck,
   AlertTriangle,
   Package,
+  BarChart3,
+  TrendingUp,
 } from 'lucide-react';
 import { FarmerDashboard } from './FarmerDashboard';
 import { Logistics } from './Logistics';
@@ -279,7 +280,9 @@ export const Dashboard = () => {
 
       {/* QUICK ACTIONS */}
       <div className="premium-card p-6 bg-white border border-slate-100/90 shadow-md">
-        <h2 className="text-base font-bold text-slate-800 font-display mb-4">Quick Management Actions</h2>
+        <h2 className="text-base font-bold text-slate-800 font-display mb-4">
+          {isAdmin ? 'Admin Quick Controls' : 'Quick Management Actions'}
+        </h2>
         
         <div className="flex flex-wrap gap-3">
           <Link
@@ -289,6 +292,24 @@ export const Dashboard = () => {
             <span className="text-base">🏛️</span> Sri Lanka Agricultural Overview 🇱🇰
           </Link>
 
+          {isAdmin && (
+            <>
+              <Link
+                to="/analytics"
+                className="px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-500/20 transition flex items-center gap-2"
+              >
+                <BarChart3 className="w-4 h-4" /> Platform Analytics
+              </Link>
+
+              <Link
+                to="/price-prediction"
+                className="px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center gap-2"
+              >
+                <TrendingUp className="w-4 h-4" /> AI Price Intelligence
+              </Link>
+            </>
+          )}
+
           {isBuyer && (
             <Link
               to="/orders"
@@ -297,6 +318,13 @@ export const Dashboard = () => {
               <ShoppingBag className="w-4 h-4" /> Manage My Orders
             </Link>
           )}
+
+          <Link
+            to="/community"
+            className="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition flex items-center gap-2"
+          >
+            <Users className="w-4 h-4 text-emerald-600" /> Community Platform
+          </Link>
 
           <Link
             to="/crops"
