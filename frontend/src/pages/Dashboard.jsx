@@ -220,10 +220,10 @@ export const Dashboard = () => {
                     <td className="p-4 text-slate-500 text-xs">
                       <button
                         type="button"
-                        onClick={() => setSelectedBuyer({ id: order.buyerId, name: order.buyerName, email: order.buyerEmail || user?.email })}
+                        onClick={() => setSelectedBuyer({ id: order.buyerId, name: order.buyerName, email: order.buyerEmail })}
                         className="text-emerald-700 font-bold hover:underline"
                       >
-                        {order.buyerEmail || user?.email || 'Buyer'} ⭐
+                        {order.buyerEmail || 'Unknown Buyer'} ⭐
                       </button>
                     </td>
                     <td className="p-4 font-bold">{order.quantity} Kg</td>
