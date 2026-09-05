@@ -251,6 +251,7 @@ export const Orders = () => {
             const isExpanded = expandedOrderId === order.id;
             const currentStageIndex = getStageIndex(order.status);
             const isCancelled = currentStageIndex === -1;
+            const isDisputed = order.escrowStatus === 'DISPUTED';
 
             return (
               <div key={order.id} className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden transition">
@@ -309,11 +310,17 @@ export const Orders = () => {
                         <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 font-display">
                           Smart Logistics Lifecycle Flow
                         </h4>
-                        <span className="text-xs font-extrabold text-emerald-700">
+                        <span className="text-xs font-extrabold">
                           {isCancelled ? (
                             <span className="text-rose-600 font-bold">Order Cancelled</span>
+                          ) : isDisputed ? (
+                            <span className="text-amber-700 font-bold bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                              ⚠️ Step {currentStageIndex + 1} of 9 (Dispute Investigation)
+                            </span>
                           ) : (
-                            `Step ${currentStageIndex + 1} of 9`
+                            <span className="text-emerald-700 font-bold">
+                              Step {currentStageIndex + 1} of 9
+                            </span>
                           )}
                         </span>
                       </div>
@@ -326,21 +333,24 @@ export const Orders = () => {
                       ) : (
                         <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2">
                           {LOGISTICS_STAGES.map((stage, idx) => {
-                            const isDone = idx <= currentStageIndex;
-                            const isCurrent = idx === currentStageIndex;
+                            const isDone = idx < currentStageIndex || (idx === currentStageIndex && currentStageIndex === 8);
+                            const isCurrent = idx === currentStageIndex && currentStageIndex !== 8;
+
+                            let stepClass = 'bg-white text-slate-400 border-slate-200';
+                            if (isCurrent) {
+                              stepClass = isDisputed
+                                ? 'bg-amber-500 text-white border-amber-500 shadow-md ring-2 ring-amber-500/20'
+                                : 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/20';
+                            } else if (isDone) {
+                              stepClass = 'bg-emerald-100/70 text-emerald-800 border-emerald-200';
+                            }
 
                             return (
                               <div
                                 key={stage.key}
-                                className={`p-2.5 rounded-xl border text-center text-[10px] font-extrabold transition flex flex-col items-center justify-center space-y-1 ${
-                                  isCurrent
-                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/20'
-                                    : isDone
-                                    ? 'bg-emerald-100/70 text-emerald-800 border-emerald-200'
-                                    : 'bg-white text-slate-400 border-slate-200'
-                                }`}
+                                className={`p-2.5 rounded-xl border text-center text-[10px] font-extrabold transition flex flex-col items-center justify-center space-y-1 ${stepClass}`}
                               >
-                                <span>{isDone ? '✓' : idx + 1}</span>
+                                <span>{isDone ? '✓' : isCurrent && isDisputed ? '⚠️' : idx + 1}</span>
                                 <span className="leading-tight">{stage.label}</span>
                               </div>
                             );
