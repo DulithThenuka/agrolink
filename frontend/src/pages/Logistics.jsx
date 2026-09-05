@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 import { logisticsAPI } from '../services/api';
 import {
   Truck,
@@ -28,6 +29,9 @@ import {
 import { BuyerProfileModal } from '../components/BuyerProfileModal';
 
 export const Logistics = () => {
+  const { user } = useAuth();
+  const driverName = user?.name || (user?.email ? user.email.split('@')[0] : 'Logistics Partner');
+
   const [availableJobs, setAvailableJobs] = useState([]);
   const [myJobs, setMyJobs] = useState([]);
   const [activeTab, setActiveTab] = useState('available'); // 'available' | 'active' | 'map'
@@ -213,7 +217,7 @@ export const Logistics = () => {
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
-            Driver Logistics &amp; GPS Transit Hub 🚚
+            Logistics Hub: <span className="capitalize">{driverName}</span> 🚚
           </h1>
           <p className="text-slate-300 text-sm leading-relaxed font-medium">
             Connect growers with supermarket cold-chain logistics. Real-time GPS transit checkpoints, refrigerated cargo telemetry (8–12°C), and instant QR pickup validation.
