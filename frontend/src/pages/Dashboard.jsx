@@ -2,7 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAPI, cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Users, Sprout, ShoppingBag, ArrowRight, Loader2, Sparkles, LogOut, ShieldCheck, UserCheck } from 'lucide-react';
+import {
+  Users,
+  Sprout,
+  ShoppingBag,
+  ArrowRight,
+  Loader2,
+  Sparkles,
+  LogOut,
+  ShieldCheck,
+  UserCheck,
+  CheckCircle2,
+  Clock,
+  Truck,
+  AlertTriangle,
+  Package,
+} from 'lucide-react';
 import { FarmerDashboard } from './FarmerDashboard';
 import { Logistics } from './Logistics';
 import { ExpertDashboard } from './ExpertDashboard';
@@ -90,38 +105,67 @@ export const Dashboard = () => {
   if (isBusinessBuyer) return <BusinessBuyerDashboard />;
 
   const renderStatusBadge = (status) => {
-    const s = (status || 'DELIVERED').toUpperCase();
-    if (s === 'DELIVERED' || s === 'COMPLETED') {
+    const s = (status || 'PENDING').toUpperCase();
+
+    // Completed / Delivered / Paid / Confirmed
+    if (['DELIVERED', 'COMPLETED', 'CONFIRMED', 'PAID'].includes(s)) {
+      const label = s === 'PAID' ? 'Paid & Completed' : s === 'CONFIRMED' ? 'Confirmed' : 'Delivered';
       return (
-        <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">
-          DELIVERED
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <span>{label}</span>
         </span>
       );
     }
-    if (s === 'PENDING' || s === 'PLACED') {
+
+    // Active Logistics / In Transit / Dispatched
+    if (['IN_TRANSIT', 'DISPATCHED', 'SHIPPED', 'COLLECTED', 'DRIVER_ASSIGNED', 'TRANSPORT_REQUESTED'].includes(s)) {
+      const label =
+        s === 'IN_TRANSIT' || s === 'DISPATCHED' || s === 'SHIPPED'
+          ? 'In Transit'
+          : s === 'COLLECTED'
+          ? 'Crop Collected'
+          : s === 'DRIVER_ASSIGNED'
+          ? 'Driver Assigned'
+          : 'Transport Requested';
+
       return (
-        <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">
-          {status || 'PENDING'}
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+          <Truck className="w-3.5 h-3.5 text-sky-600" />
+          <span>{label}</span>
         </span>
       );
     }
-    if (s === 'DISPATCHED' || s === 'IN_TRANSIT' || s === 'SHIPPED') {
+
+    // Pending / Placed / Farmer Accepted / Processing
+    if (['PENDING', 'PLACED', 'FARMER_ACCEPTED', 'PROCESSING'].includes(s)) {
+      const label = s === 'FARMER_ACCEPTED' ? 'Farmer Accepted' : 'Pending Order';
       return (
-        <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200">
-          {status || 'IN_TRANSIT'}
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          <Clock className="w-3.5 h-3.5 text-amber-600" />
+          <span>{label}</span>
         </span>
       );
     }
-    if (s === 'CANCELLED' || s === 'DISPUTED') {
+
+    // Disputed / Escrow Locked / Cancelled
+    if (['DISPUTED', 'CANCELLED', 'ESCROW_LOCKED', 'REJECTED'].includes(s)) {
+      const isDispute = s === 'DISPUTED' || s === 'ESCROW_LOCKED';
       return (
-        <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-red-100 text-red-800 border border-red-200">
-          {status || 'DISPUTED'}
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shadow-sm">
+          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+          <span>{isDispute ? 'Dispute Under Review' : 'Cancelled'}</span>
         </span>
       );
     }
+
     return (
-      <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-800 border border-slate-200">
-        {status}
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shadow-sm">
+        <Package className="w-3.5 h-3.5 text-slate-500" />
+        <span>{status}</span>
       </span>
     );
   };
