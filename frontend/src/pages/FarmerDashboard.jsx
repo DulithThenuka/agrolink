@@ -14,7 +14,11 @@ import {
   Sparkles,
   TrendingUp,
   AlertCircle,
-  PackageCheck
+  PackageCheck,
+  Truck,
+  Clock,
+  AlertTriangle,
+  Package,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ordersAPI, cropsAPI, suppliersAPI, rentalsAPI, farmersAPI } from '../services/api';
@@ -241,10 +245,72 @@ export const FarmerDashboard = () => {
         loadAllFarmerData();
       }
     } catch (err) {
-      setMsg(`❌ Acceptance failed: ${err}`);
+      setMsg(`❌ Acceptance failed: ${err?.response?.data?.message || err?.message || 'Failed to accept order.'}`);
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const renderStatusBadge = (status) => {
+    const s = (status || 'PENDING').toUpperCase();
+
+    if (['DELIVERED', 'COMPLETED', 'CONFIRMED', 'PAID'].includes(s)) {
+      const label = s === 'PAID' ? 'Paid & Completed' : s === 'CONFIRMED' ? 'Confirmed' : 'Delivered';
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <span>{label}</span>
+        </span>
+      );
+    }
+
+    if (['IN_TRANSIT', 'DISPATCHED', 'SHIPPED', 'COLLECTED', 'DRIVER_ASSIGNED', 'TRANSPORT_REQUESTED'].includes(s)) {
+      const label =
+        s === 'IN_TRANSIT' || s === 'DISPATCHED' || s === 'SHIPPED'
+          ? 'In Transit'
+          : s === 'COLLECTED'
+          ? 'Crop Collected'
+          : s === 'DRIVER_ASSIGNED'
+          ? 'Driver Assigned'
+          : 'Transport Requested';
+
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+          <Truck className="w-3.5 h-3.5 text-sky-600" />
+          <span>{label}</span>
+        </span>
+      );
+    }
+
+    if (['PENDING', 'PLACED', 'FARMER_ACCEPTED', 'PROCESSING'].includes(s)) {
+      const label = s === 'FARMER_ACCEPTED' ? 'Farmer Accepted' : 'Pending Acceptance';
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          <Clock className="w-3.5 h-3.5 text-amber-600" />
+          <span>{label}</span>
+        </span>
+      );
+    }
+
+    if (['DISPUTED', 'CANCELLED', 'ESCROW_LOCKED', 'REJECTED'].includes(s)) {
+      const isDispute = s === 'DISPUTED' || s === 'ESCROW_LOCKED';
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shadow-sm">
+          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+          <span>{isDispute ? 'Dispute Under Review' : 'Cancelled'}</span>
+        </span>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shadow-sm">
+        <Package className="w-3.5 h-3.5 text-slate-500" />
+        <span>{status}</span>
+      </span>
+    );
   };
 
   const farmHealthScore = dashboardData?.farmHealthPercentage || (myCrops.length > 0 ? 92 : 85);
@@ -322,7 +388,7 @@ export const FarmerDashboard = () => {
           </div>
         </motion.div>
 
-        <Link to="/crop-disease" className="block">
+        <Link to="/disease-detection" className="block">
           <motion.div whileHover={{ y: -3 }} className="premium-card p-6 bg-white border border-slate-100/90 shadow-md flex items-center justify-between cursor-pointer group">
             <div className="space-y-1">
               <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">AI Disease Scanner</p>
@@ -561,9 +627,7 @@ export const FarmerDashboard = () => {
                     </td>
                     <td className="p-4 font-extrabold text-slate-800">{order.quantity} Kg</td>
                     <td className="p-4">
-                      <span className="badge-premium badge-pending uppercase text-[10px]">
-                        {order.statusLabel || order.status}
-                      </span>
+                      {renderStatusBadge(order.status)}
                     </td>
                     <td className="p-4">
                       {order.status === 'PENDING' ? (
