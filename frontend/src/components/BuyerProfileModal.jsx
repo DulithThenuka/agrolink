@@ -2,6 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { buyersAPI } from '../services/api';
 import { X, CheckCircle2, MapPin, Calendar, ShieldCheck, Star, CreditCard, ThumbsUp, Loader2, Ban } from 'lucide-react';
 
+const DEFAULT_BUYER_PROFILE = {
+  isVerifiedBuyer: true,
+  location: 'Colombo',
+  memberSinceYear: 2026,
+  completedOrdersCount: 342,
+  orderCancellationRate: 1.2,
+  onTimePaymentRate: 99.1,
+  buyerTrustScore: 4.9,
+  farmerSatisfactionRate: 98.0,
+};
+
 export const BuyerProfileModal = ({ buyerId, buyerName, buyerEmail, onClose }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,18 +22,7 @@ export const BuyerProfileModal = ({ buyerId, buyerName, buyerEmail, onClose }) =
   useEffect(() => {
     const fetchProfile = async () => {
       if (!buyerId) {
-        setProfile({
-          name: displayName,
-          email: buyerEmail || 'buyer@agrolink.com',
-          isVerifiedBuyer: true,
-          location: 'Colombo',
-          memberSinceYear: 2026,
-          completedOrdersCount: 342,
-          orderCancellationRate: 1.2,
-          onTimePaymentRate: 99.1,
-          buyerTrustScore: 4.9,
-          farmerSatisfactionRate: 98.0,
-        });
+        setProfile({ ...DEFAULT_BUYER_PROFILE, name: displayName, email: buyerEmail || 'buyer@agrolink.com' });
         setLoading(false);
         return;
       }
@@ -33,33 +33,11 @@ export const BuyerProfileModal = ({ buyerId, buyerName, buyerEmail, onClose }) =
         if (res && res.data) {
           setProfile(res.data);
         } else {
-          setProfile({
-            name: displayName,
-            email: buyerEmail || 'buyer@agrolink.com',
-            isVerifiedBuyer: true,
-            location: 'Colombo',
-            memberSinceYear: 2026,
-            completedOrdersCount: 342,
-            orderCancellationRate: 1.2,
-            onTimePaymentRate: 99.1,
-            buyerTrustScore: 4.9,
-            farmerSatisfactionRate: 98.0,
-          });
+          setProfile({ ...DEFAULT_BUYER_PROFILE, name: displayName, email: buyerEmail || 'buyer@agrolink.com' });
         }
       } catch (err) {
         console.error('Failed to load buyer profile:', err);
-        setProfile({
-          name: displayName,
-          email: buyerEmail || 'buyer@agrolink.com',
-          isVerifiedBuyer: true,
-          location: 'Colombo',
-          memberSinceYear: 2026,
-          completedOrdersCount: 342,
-          orderCancellationRate: 1.2,
-          onTimePaymentRate: 99.1,
-          buyerTrustScore: 4.9,
-          farmerSatisfactionRate: 98.0,
-        });
+        setProfile({ ...DEFAULT_BUYER_PROFILE, name: displayName, email: buyerEmail || 'buyer@agrolink.com' });
       } finally {
         setLoading(false);
       }

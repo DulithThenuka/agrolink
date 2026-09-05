@@ -3,6 +3,18 @@ import { farmersAPI } from '../services/api';
 import { X, CheckCircle2, MapPin, Calendar, Award, Star, Truck, ShieldCheck, ThumbsUp, Sprout, Loader2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+const DEFAULT_FARMER_PROFILE = {
+  isVerified: true,
+  district: 'Kandy',
+  memberSinceYear: 2026,
+  completedOrdersCount: 482,
+  overallRating: 4.8,
+  onTimeDeliveryRate: 96.0,
+  productQualityRating: 4.9,
+  buyerSatisfactionRate: 97.0,
+  crops: [],
+};
+
 export const FarmerProfileModal = ({ farmerId, farmerName, onClose }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,18 +23,7 @@ export const FarmerProfileModal = ({ farmerId, farmerName, onClose }) => {
     const fetchProfile = async () => {
       if (!farmerId) {
         // Fallback default structure if farmerId is not passed
-        setProfile({
-          name: farmerName || 'Nimal Perera',
-          isVerified: true,
-          district: 'Kandy',
-          memberSinceYear: 2026,
-          completedOrdersCount: 482,
-          overallRating: 4.8,
-          onTimeDeliveryRate: 96.0,
-          productQualityRating: 4.9,
-          buyerSatisfactionRate: 97.0,
-          crops: [],
-        });
+        setProfile({ ...DEFAULT_FARMER_PROFILE, name: farmerName || 'Nimal Perera' });
         setLoading(false);
         return;
       }
@@ -33,33 +34,11 @@ export const FarmerProfileModal = ({ farmerId, farmerName, onClose }) => {
         if (res && res.data) {
           setProfile(res.data);
         } else {
-          setProfile({
-            name: farmerName || 'Nimal Perera',
-            isVerified: true,
-            district: 'Kandy',
-            memberSinceYear: 2026,
-            completedOrdersCount: 482,
-            overallRating: 4.8,
-            onTimeDeliveryRate: 96.0,
-            productQualityRating: 4.9,
-            buyerSatisfactionRate: 97.0,
-            crops: [],
-          });
+          setProfile({ ...DEFAULT_FARMER_PROFILE, name: farmerName || 'Nimal Perera' });
         }
       } catch (err) {
         console.error('Failed to load farmer profile:', err);
-        setProfile({
-          name: farmerName || 'Nimal Perera',
-          isVerified: true,
-          district: 'Kandy',
-          memberSinceYear: 2026,
-          completedOrdersCount: 482,
-          overallRating: 4.8,
-          onTimeDeliveryRate: 96.0,
-          productQualityRating: 4.9,
-          buyerSatisfactionRate: 97.0,
-          crops: [],
-        });
+        setProfile({ ...DEFAULT_FARMER_PROFILE, name: farmerName || 'Nimal Perera' });
       } finally {
         setLoading(false);
       }
