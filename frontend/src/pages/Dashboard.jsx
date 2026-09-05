@@ -81,7 +81,7 @@ export const Dashboard = () => {
         <div className="flex items-center gap-3 self-start sm:self-auto">
           <div className="px-4 py-2 bg-emerald-50 text-emerald-800 font-bold rounded-2xl text-xs flex items-center gap-2 border border-emerald-200/70 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="capitalize">Welcome back, {user?.name || (user?.email ? user.email.split('@')[0] : 'User')}</span>
+            <span>Welcome back, {user?.name || 'User'}</span>
           </div>
 
           <button

@@ -43,7 +43,7 @@ const DISTRICT_BENCHMARK_MAP = {
 
 export const FarmerDashboard = () => {
   const { user } = useAuth();
-  const farmerName = user?.name || (user?.email ? user.email.split('@')[0] : 'Farmer');
+  const farmerName = user?.name || 'Farmer';
 
   const [dashboardData, setDashboardData] = useState(null);
   const [farmerOrders, setFarmerOrders] = useState([]);

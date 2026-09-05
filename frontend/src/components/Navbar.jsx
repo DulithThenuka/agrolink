@@ -301,33 +301,58 @@ export const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifDrawerOpen(false); }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100/80 hover:bg-emerald-50 text-slate-800 font-semibold transition"
+                  className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-100/90 hover:bg-emerald-50 text-slate-800 font-semibold transition border border-slate-200/60 shadow-sm group"
                 >
-                  <span className="max-w-[150px] truncate capitalize">{user?.name || (user?.email ? user.email.split('@')[0] : 'Account')}</span>
-                  <ChevronDown className="w-4 h-4 text-slate-500" />
+                  <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center shadow-xs">
+                    {(user?.name ? user.name.charAt(0) : (user?.email ? user.email.charAt(0) : 'U')).toUpperCase()}
+                  </div>
+                  <span className="max-w-[140px] truncate text-xs font-bold text-slate-800 group-hover:text-emerald-700">
+                    {user?.name || 'User'}
+                  </span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition" />
                 </button>
                 {userMenuOpen && (
                   <div
                     onMouseLeave={() => setUserMenuOpen(false)}
-                    className="absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 p-2 z-50 space-y-1 animate-fade-in"
+                    className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-3 z-50 space-y-2 animate-fade-in"
                   >
-                    <div className="px-3 py-2 border-b border-slate-100/80 mb-1">
-                      <p className="text-xs font-bold text-slate-900 truncate">{user?.name || 'User'}</p>
-                      <p className="text-[11px] text-slate-400 font-medium truncate">{user?.email}</p>
+                    {/* User Mini-Card */}
+                    <div className="p-3 bg-slate-50/90 rounded-xl border border-slate-100 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-black text-sm shadow-sm shrink-0">
+                        {(user?.name ? user.name.charAt(0) : (user?.email ? user.email.charAt(0) : 'U')).toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <p className="text-xs font-black text-slate-900 truncate">{user?.name || 'User'}</p>
+                        <p className="text-[11px] text-slate-500 font-medium truncate">{user?.email}</p>
+                        <span className="inline-block px-2 py-0.5 rounded-md bg-emerald-100/80 text-emerald-800 text-[9px] font-black uppercase tracking-wider">
+                          {user?.role?.replace('ROLE_', '') || 'BUYER'}
+                        </span>
+                      </div>
                     </div>
+
                     <Link
                       to="/profile"
                       onClick={() => setUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl font-medium transition"
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl font-bold transition"
                     >
                       <UserIcon className="w-4 h-4 text-emerald-600" /> Profile Settings
                     </Link>
+
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-xl font-bold transition"
+                    >
+                      <LayoutDashboard className="w-4 h-4 text-emerald-600" /> Dashboard Overview
+                    </Link>
+
                     <div className="h-px bg-slate-100 my-1" />
+
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-xl font-medium transition"
+                      className="w-full flex items-center gap-2.5 text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 rounded-xl font-bold transition cursor-pointer"
                     >
-                      <LogOut className="w-4 h-4" /> Logout
+                      <LogOut className="w-4 h-4" /> Logout Account
                     </button>
                   </div>
                 )}
