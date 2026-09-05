@@ -353,6 +353,7 @@ export const SupplierDashboard = () => {
                   <th className="p-4">Farmer Account</th>
                   <th className="p-4">Quantity</th>
                   <th className="p-4">Total Amount</th>
+                  <th className="p-4">Date</th>
                   <th className="p-4">Fulfillment Status</th>
                 </tr>
               </thead>
@@ -367,6 +368,7 @@ export const SupplierDashboard = () => {
                     <td className="p-4 text-xs font-bold text-emerald-700">{o.buyerEmail}</td>
                     <td className="p-4">{o.quantity} units</td>
                     <td className="p-4 font-bold text-slate-900">Rs {Number(o.totalPrice).toLocaleString()}</td>
+                    <td className="p-4 text-xs text-slate-500 font-medium whitespace-nowrap">{o.date || '—'}</td>
                     <td className="p-4">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
                         o.status === 'DELIVERED'
