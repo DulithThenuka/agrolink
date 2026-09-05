@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ordersAPI } from '../services/api';
-import { ShoppingBag, Loader2, CheckCircle2, Clock, Truck, MapPin, ChevronDown, ChevronUp, Navigation, AlertCircle, QrCode } from 'lucide-react';
+import {
+  ShoppingBag,
+  Loader2,
+  CheckCircle2,
+  Clock,
+  Truck,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  Navigation,
+  AlertCircle,
+  AlertTriangle,
+  QrCode,
+  Package,
+  XCircle,
+} from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
+import { DisputeModal } from '../components/DisputeModal';
 
 const LOGISTICS_STAGES = [
   { key: 'PENDING', label: 'Buyer Orders' },
@@ -18,17 +34,33 @@ const LOGISTICS_STAGES = [
 ];
 
 const getStageIndex = (status) => {
-  switch (status) {
-    case 'PENDING': return 0;
-    case 'FARMER_ACCEPTED': return 1;
-    case 'TRANSPORT_REQUESTED': return 2;
-    case 'DRIVER_ASSIGNED': return 3;
-    case 'COLLECTED': return 4;
-    case 'IN_TRANSIT': return 5;
-    case 'DELIVERED': return 6;
-    case 'CONFIRMED': return 7;
-    case 'PAID': return 8;
-    default: return 0;
+  const s = (status || 'PENDING').toUpperCase();
+  if (s === 'CANCELLED') return -1;
+  switch (s) {
+    case 'PENDING':
+    case 'PLACED':
+      return 0;
+    case 'FARMER_ACCEPTED':
+      return 1;
+    case 'TRANSPORT_REQUESTED':
+      return 2;
+    case 'DRIVER_ASSIGNED':
+      return 3;
+    case 'COLLECTED':
+      return 4;
+    case 'IN_TRANSIT':
+    case 'DISPATCHED':
+    case 'SHIPPED':
+      return 5;
+    case 'DELIVERED':
+      return 6;
+    case 'CONFIRMED':
+      return 7;
+    case 'PAID':
+    case 'COMPLETED':
+      return 8;
+    default:
+      return 0;
   }
 };
 
@@ -40,16 +72,20 @@ export const Orders = () => {
   const [msg, setMsg] = useState('');
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [selectedTraceOrder, setSelectedTraceOrder] = useState(null);
+  const [disputeOrder, setDisputeOrder] = useState(null);
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
       const res = await ordersAPI.getMyOrders({ page: 0, size: 50 });
       if (res && res.data) {
-        setOrders(res.data.content || []);
+        setOrders(res.data.content || (Array.isArray(res.data) ? res.data : []));
+      } else if (Array.isArray(res)) {
+        setOrders(res);
       }
     } catch (err) {
       console.error('Failed to load orders:', err);
+      setMsg(`Failed to load orders: ${err?.response?.data?.message || err?.message || 'Network error'}`);
     } finally {
       setLoading(false);
     }
@@ -69,29 +105,81 @@ export const Orders = () => {
         fetchOrders();
       }
     } catch (err) {
-      setMsg(`❌ Confirmation error: ${err}`);
+      setMsg(`❌ Confirmation error: ${err?.response?.data?.message || err?.message || 'Failed to confirm delivery'}`);
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleRaiseDispute = async (orderId) => {
-    const reason = prompt('Please enter your dispute reason (e.g. damaged crops, wrong weight, delayed delivery):');
-    if (!reason || !reason.trim()) return;
-
-    setActionLoading(orderId);
-    setMsg('');
-    try {
-      const res = await ordersAPI.raiseDispute(orderId, { reason: reason.trim() });
-      if (res && (res.success || res.data)) {
-        setMsg('⚠️ Escrow dispute filed successfully! Locked under Admin Investigation.');
-        fetchOrders();
-      }
-    } catch (err) {
-      setMsg(`❌ Dispute filing error: ${err}`);
-    } finally {
-      setActionLoading(null);
+  const handleRaiseDisputeSubmit = async (orderId, reason) => {
+    const res = await ordersAPI.raiseDispute(orderId, { reason });
+    if (res && (res.success || res.data)) {
+      setMsg('⚠️ Escrow dispute filed successfully! Funds locked under Admin Investigation.');
+      setDisputeOrder(null);
+      fetchOrders();
     }
+  };
+
+  const renderStatusBadge = (status) => {
+    const s = (status || 'PENDING').toUpperCase();
+
+    if (['DELIVERED', 'COMPLETED', 'CONFIRMED', 'PAID'].includes(s)) {
+      const label = s === 'PAID' ? 'Paid & Completed' : s === 'CONFIRMED' ? 'Confirmed' : 'Delivered';
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <span>{label}</span>
+        </span>
+      );
+    }
+
+    if (['IN_TRANSIT', 'DISPATCHED', 'SHIPPED', 'COLLECTED', 'DRIVER_ASSIGNED', 'TRANSPORT_REQUESTED'].includes(s)) {
+      const label =
+        s === 'IN_TRANSIT' || s === 'DISPATCHED' || s === 'SHIPPED'
+          ? 'In Transit'
+          : s === 'COLLECTED'
+          ? 'Crop Collected'
+          : s === 'DRIVER_ASSIGNED'
+          ? 'Driver Assigned'
+          : 'Transport Requested';
+
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+          <Truck className="w-3.5 h-3.5 text-sky-600" />
+          <span>{label}</span>
+        </span>
+      );
+    }
+
+    if (['PENDING', 'PLACED', 'FARMER_ACCEPTED', 'PROCESSING'].includes(s)) {
+      const label = s === 'FARMER_ACCEPTED' ? 'Farmer Accepted' : 'Pending Order';
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/80 shadow-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          <Clock className="w-3.5 h-3.5 text-amber-600" />
+          <span>{label}</span>
+        </span>
+      );
+    }
+
+    if (['DISPUTED', 'CANCELLED', 'ESCROW_LOCKED', 'REJECTED'].includes(s)) {
+      const isDispute = s === 'DISPUTED' || s === 'ESCROW_LOCKED';
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shadow-sm">
+          {isDispute ? <AlertTriangle className="w-3.5 h-3.5 text-rose-600" /> : <XCircle className="w-3.5 h-3.5 text-rose-600" />}
+          <span>{isDispute ? 'Dispute Under Review' : 'Cancelled'}</span>
+        </span>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 shadow-sm">
+        <Package className="w-3.5 h-3.5 text-slate-500" />
+        <span>{status}</span>
+      </span>
+    );
   };
 
   const renderEscrowBadge = (escrowStatus) => {
@@ -138,7 +226,7 @@ export const Orders = () => {
       </div>
 
       {msg && (
-        <div className={`p-4 rounded-2xl border font-bold text-xs ${msg.startsWith('🎉') ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+        <div className={`p-4 rounded-2xl border font-bold text-xs ${msg.startsWith('🎉') ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
           {msg}
         </div>
       )}
@@ -162,6 +250,7 @@ export const Orders = () => {
           {orders.map((order) => {
             const isExpanded = expandedOrderId === order.id;
             const currentStageIndex = getStageIndex(order.status);
+            const isCancelled = currentStageIndex === -1;
 
             return (
               <div key={order.id} className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden transition">
@@ -188,10 +277,8 @@ export const Orders = () => {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className="text-right flex flex-col items-end gap-1">
-                      <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 block">
-                        {order.statusLabel || order.status}
-                      </span>
+                    <div className="text-right flex flex-col items-end gap-1.5">
+                      {renderStatusBadge(order.status)}
                       <div className="flex items-center gap-2">
                         {renderEscrowBadge(order.escrowStatus)}
                         <button
@@ -200,7 +287,7 @@ export const Orders = () => {
                             e.stopPropagation();
                             setSelectedTraceOrder(order);
                           }}
-                          className="px-2.5 py-1 bg-emerald-950 hover:bg-slate-900 text-emerald-300 text-[10px] font-extrabold rounded-lg flex items-center gap-1 transition shadow-sm border border-emerald-800"
+                          className="px-2.5 py-1 bg-emerald-950 hover:bg-slate-900 text-emerald-300 text-[10px] font-extrabold rounded-lg flex items-center gap-1 transition shadow-sm border border-emerald-800 cursor-pointer"
                         >
                           <QrCode className="w-3 h-3 text-emerald-400" /> QR Trace 🔎
                         </button>
@@ -216,39 +303,50 @@ export const Orders = () => {
                 {/* Expanded Logistics Pipeline View */}
                 {isExpanded && (
                   <div className="p-6 bg-slate-50/70 border-t border-slate-100 space-y-6">
-                    {/* Stage Timeline */}
+                    {/* Stage Timeline or Cancelled State */}
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
                         <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 font-display">
                           Smart Logistics Lifecycle Flow
                         </h4>
                         <span className="text-xs font-extrabold text-emerald-700">
-                          Step {currentStageIndex + 1} of 9
+                          {isCancelled ? (
+                            <span className="text-rose-600 font-bold">Order Cancelled</span>
+                          ) : (
+                            `Step ${currentStageIndex + 1} of 9`
+                          )}
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2">
-                        {LOGISTICS_STAGES.map((stage, idx) => {
-                          const isDone = idx <= currentStageIndex;
-                          const isCurrent = idx === currentStageIndex;
+                      {isCancelled ? (
+                        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 text-rose-800 text-xs font-bold">
+                          <XCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                          <span>This trade order has been cancelled and will not progress through logistics delivery.</span>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2">
+                          {LOGISTICS_STAGES.map((stage, idx) => {
+                            const isDone = idx <= currentStageIndex;
+                            const isCurrent = idx === currentStageIndex;
 
-                          return (
-                            <div
-                              key={stage.key}
-                              className={`p-2.5 rounded-xl border text-center text-[10px] font-extrabold transition flex flex-col items-center justify-center space-y-1 ${
-                                isCurrent
-                                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/20'
-                                  : isDone
-                                  ? 'bg-emerald-100/70 text-emerald-800 border-emerald-200'
-                                  : 'bg-white text-slate-400 border-slate-200'
-                              }`}
-                            >
-                              <span>{isDone ? '✓' : idx + 1}</span>
-                              <span className="leading-tight">{stage.label}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            return (
+                              <div
+                                key={stage.key}
+                                className={`p-2.5 rounded-xl border text-center text-[10px] font-extrabold transition flex flex-col items-center justify-center space-y-1 ${
+                                  isCurrent
+                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/20'
+                                    : isDone
+                                    ? 'bg-emerald-100/70 text-emerald-800 border-emerald-200'
+                                    : 'bg-white text-slate-400 border-slate-200'
+                                }`}
+                              >
+                                <span>{isDone ? '✓' : idx + 1}</span>
+                                <span className="leading-tight">{stage.label}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
 
                     {/* Logistics Card Details */}
@@ -257,18 +355,18 @@ export const Orders = () => {
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
                           <MapPin className="w-3.5 h-3.5 text-emerald-600" /> Pickup (Farmer)
                         </span>
-                        <p className="font-extrabold text-slate-800 text-sm">{order.pickupLocation || 'Homagama'}</p>
+                        <p className="font-extrabold text-slate-800 text-sm">{order.pickupLocation || 'Local Farm Hub'}</p>
                         <p className="text-[11px] text-slate-500">
                           Producer:{' '}
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedFarmer({ id: order.farmerId, name: order.farmerName });
+                              setSelectedFarmer({ id: order.farmerId, name: order.farmerName || 'Local Farmer' });
                             }}
-                            className="text-emerald-700 font-bold hover:underline"
+                            className="text-emerald-700 font-bold hover:underline cursor-pointer"
                           >
-                            {order.farmerName || 'Nimal Perera'} ⭐
+                            {order.farmerName || 'Local Farmer'} 🌾
                           </button>
                         </p>
                       </div>
@@ -277,8 +375,8 @@ export const Orders = () => {
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
                           <Navigation className="w-3.5 h-3.5 text-emerald-600" /> Delivery (Buyer)
                         </span>
-                        <p className="font-extrabold text-slate-800 text-sm">{order.deliveryLocation || 'Colombo'}</p>
-                        <p className="text-[11px] text-slate-500">Distance: {order.distanceKm || 31} km</p>
+                        <p className="font-extrabold text-slate-800 text-sm">{order.deliveryLocation || 'Colombo Wholesale Hub'}</p>
+                        <p className="text-[11px] text-slate-500">Distance: {order.distanceKm || 32} km</p>
                       </div>
 
                       <div className="space-y-1">
@@ -298,7 +396,7 @@ export const Orders = () => {
                         <Clock className="w-4 h-4 text-emerald-600" /> Live Dispatch Update:
                       </span>
                       <p className="text-emerald-800 font-medium italic">
-                        "{order.trackingNotes || 'Waiting for farmer acceptance.'}"
+                        "{order.trackingNotes || 'Waiting for farmer acceptance and transport dispatch.'}"
                       </p>
                     </div>
 
@@ -323,7 +421,7 @@ export const Orders = () => {
                     <div className="pt-2 flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200">
                       <div>
                         <p className="font-extrabold text-slate-900 text-xs">AgroLink Escrow Protection 🛡️</p>
-                        <p className="text-[11px] text-slate-500 font-medium">Funds are safely held until you confirm crop delivery or raise a dispute.</p>
+                        <p className="text-[11px] text-slate-500 font-medium">Funds are safely held in vault until you confirm delivery or raise a dispute.</p>
                       </div>
 
                       <div className="flex items-center gap-3">
@@ -331,19 +429,19 @@ export const Orders = () => {
                           <button
                             onClick={() => handleBuyerConfirm(order.id)}
                             disabled={actionLoading === order.id}
-                            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2 disabled:opacity-50"
+                            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
                           >
                             {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Delivery (Release Escrow)'}
                           </button>
                         )}
 
-                        {order.escrowStatus !== 'RELEASED_TO_FARMER' && order.escrowStatus !== 'REFUNDED_TO_BUYER' && order.escrowStatus !== 'DISPUTED' && (
+                        {order.status !== 'CANCELLED' && order.escrowStatus !== 'RELEASED_TO_FARMER' && order.escrowStatus !== 'REFUNDED_TO_BUYER' && order.escrowStatus !== 'DISPUTED' && (
                           <button
-                            onClick={() => handleRaiseDispute(order.id)}
+                            onClick={() => setDisputeOrder(order)}
                             disabled={actionLoading === order.id}
-                            className="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 disabled:opacity-50"
+                            className="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
                           >
-                            <AlertCircle className="w-4 h-4 text-amber-600" />
+                            <AlertTriangle className="w-4 h-4 text-amber-600" />
                             <span>Raise Dispute ⚠️</span>
                           </button>
                         )}
@@ -357,6 +455,7 @@ export const Orders = () => {
         </div>
       )}
 
+      {/* Modals */}
       {selectedFarmer && (
         <FarmerProfileModal
           farmerId={selectedFarmer.id}
@@ -370,6 +469,14 @@ export const Orders = () => {
           cropId={selectedTraceOrder.cropId || selectedTraceOrder.crop?.id}
           batchCode={selectedTraceOrder.batchCode || 'BATCH-2026-NWR-0941'}
           onClose={() => setSelectedTraceOrder(null)}
+        />
+      )}
+
+      {disputeOrder && (
+        <DisputeModal
+          order={disputeOrder}
+          onClose={() => setDisputeOrder(null)}
+          onSubmitDispute={handleRaiseDisputeSubmit}
         />
       )}
     </div>
