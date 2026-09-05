@@ -16,6 +16,7 @@ import {
   QrCode,
   Package,
   XCircle,
+  X,
 } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
@@ -69,7 +70,7 @@ export const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
-  const [msg, setMsg] = useState('');
+  const [notification, setNotification] = useState(null); // { type: 'success' | 'error' | 'warning', text: string }
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [selectedTraceOrder, setSelectedTraceOrder] = useState(null);
   const [disputeOrder, setDisputeOrder] = useState(null);
@@ -85,7 +86,10 @@ export const Orders = () => {
       }
     } catch (err) {
       console.error('Failed to load orders:', err);
-      setMsg(`Failed to load orders: ${err?.response?.data?.message || err?.message || 'Network error'}`);
+      setNotification({
+        type: 'error',
+        text: `Failed to load orders: ${err?.response?.data?.message || err?.message || 'Network connection issue.'}`,
+      });
     } finally {
       setLoading(false);
     }
@@ -97,26 +101,42 @@ export const Orders = () => {
 
   const handleBuyerConfirm = async (orderId) => {
     setActionLoading(orderId);
-    setMsg('');
+    setNotification(null);
     try {
       const res = await ordersAPI.buyerConfirm(orderId);
       if (res && (res.success || res.data)) {
-        setMsg('🎉 Delivery confirmed! AgroLink Escrow released funds to farmer.');
+        setNotification({
+          type: 'success',
+          text: '🎉 Delivery confirmed! AgroLink Escrow has released payment to the farmer.',
+        });
         fetchOrders();
       }
     } catch (err) {
-      setMsg(`❌ Confirmation error: ${err?.response?.data?.message || err?.message || 'Failed to confirm delivery'}`);
+      setNotification({
+        type: 'error',
+        text: `❌ Confirmation failed: ${err?.response?.data?.message || err?.message || 'Unable to confirm delivery at this time.'}`,
+      });
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleRaiseDisputeSubmit = async (orderId, reason) => {
-    const res = await ordersAPI.raiseDispute(orderId, { reason });
-    if (res && (res.success || res.data)) {
-      setMsg('⚠️ Escrow dispute filed successfully! Funds locked under Admin Investigation.');
-      setDisputeOrder(null);
-      fetchOrders();
+    try {
+      const res = await ordersAPI.raiseDispute(orderId, { reason });
+      if (res && (res.success || res.data)) {
+        setNotification({
+          type: 'warning',
+          text: '⚠️ Escrow dispute filed successfully! Funds are frozen in vault under Admin Investigation.',
+        });
+        setDisputeOrder(null);
+        fetchOrders();
+      }
+    } catch (err) {
+      setNotification({
+        type: 'error',
+        text: `❌ Dispute submission error: ${err?.response?.data?.message || err?.message || 'Failed to file dispute.'}`,
+      });
     }
   };
 
@@ -225,9 +245,29 @@ export const Orders = () => {
         </Link>
       </div>
 
-      {msg && (
-        <div className={`p-4 rounded-2xl border font-bold text-xs ${msg.startsWith('🎉') ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
-          {msg}
+      {notification && (
+        <div
+          className={`p-4 rounded-2xl border font-bold text-xs flex items-center justify-between gap-3 shadow-sm transition animate-fade-in ${
+            notification.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : notification.type === 'error'
+              ? 'bg-rose-50 border-rose-200 text-rose-800'
+              : 'bg-amber-50 border-amber-200 text-amber-800'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {notification.type === 'success' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
+            {notification.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
+            {notification.type === 'warning' && <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />}
+            <span>{notification.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setNotification(null)}
+            className="p-1 rounded-lg hover:bg-black/5 text-current transition cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 
