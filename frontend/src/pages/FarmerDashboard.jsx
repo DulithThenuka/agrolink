@@ -7,9 +7,7 @@ import {
   CheckCircle2,
   Loader2,
   CloudSun,
-  CloudRain,
   Cpu,
-  TrendingUp,
   AlertTriangle,
   Truck,
   Clock,
@@ -21,12 +19,15 @@ import {
   Store,
   Users,
   Landmark,
-  Sparkles,
   ShoppingBag,
-  Info
+  AlertCircle,
+  RefreshCw,
+  Bell,
+  Check,
+  X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { ordersAPI, cropsAPI, suppliersAPI, rentalsAPI, farmersAPI } from '../services/api';
+import { ordersAPI, cropsAPI, suppliersAPI, rentalsAPI } from '../services/api';
 import { BuyerProfileModal } from '../components/BuyerProfileModal';
 import { WeatherIntelligenceModal } from '../components/WeatherIntelligenceModal';
 import { IoTFarmControlModal } from '../components/IoTFarmControlModal';
@@ -41,13 +42,17 @@ export const FarmerDashboard = () => {
   const [inputOrders, setInputOrders] = useState([]);
   const [rentalBookings, setRentalBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
   const [notificationMsg, setNotificationMsg] = useState('');
+  const [alertDismissed, setAlertDismissed] = useState(false);
+  
+  // Interactive Modals
   const [selectedBuyer, setSelectedBuyer] = useState(null);
   const [showWeatherModal, setShowWeatherModal] = useState(false);
   const [showIoTModal, setShowIoTModal] = useState(false);
 
-  // Dynamic greeting based on local time
+  // Dynamic greeting based on time of day
   const timeGreeting = useMemo(() => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -55,7 +60,7 @@ export const FarmerDashboard = () => {
     return 'Good evening';
   }, []);
 
-  // Filter crops owned by current logged-in farmer
+  // Filter crops belonging to the logged-in farmer
   const myCrops = useMemo(() => {
     return farmerCrops.filter((c) => {
       if (!user) return true;
@@ -67,11 +72,12 @@ export const FarmerDashboard = () => {
   }, [farmerCrops, user]);
 
   const pendingOrdersCount = useMemo(() => {
-    return farmerOrders.filter((o) => o.status === 'PENDING').length;
+    return farmerOrders.filter((o) => o.status === 'PENDING' || o.status === 'PLACED').length;
   }, [farmerOrders]);
 
   const loadDashboardData = async () => {
     setLoading(true);
+    setFetchError(false);
     try {
       const [ordersRes, cropsRes, inputsRes, rentalsRes] = await Promise.allSettled([
         ordersAPI.getFarmerOrders({ page: 0, size: 50 }),
@@ -92,8 +98,8 @@ export const FarmerDashboard = () => {
       if (rentalsRes.status === 'fulfilled' && rentalsRes.value?.data) {
         setRentalBookings(rentalsRes.value.data.content || rentalsRes.value.data || []);
       }
-    } catch (err) {
-      console.error('Failed to load farmer dashboard data:', err);
+    } catch {
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -141,13 +147,13 @@ export const FarmerDashboard = () => {
     }
 
     if (['PENDING', 'PLACED', 'FARMER_ACCEPTED', 'PROCESSING'].includes(s)) {
-      const isAwaitingAcceptance = s === 'PENDING' || s === 'PLACED';
+      const isAwaiting = s === 'PENDING' || s === 'PLACED';
       return (
         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-          isAwaitingAcceptance ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200'
+          isAwaiting ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-slate-100 text-slate-700 border-slate-200'
         }`}>
           <Clock className="w-3 h-3" />
-          <span>{isAwaitingAcceptance ? 'Needs Acceptance' : 'Processing'}</span>
+          <span>{isAwaiting ? 'Needs Acceptance' : 'Processing'}</span>
         </span>
       );
     }
@@ -163,32 +169,30 @@ export const FarmerDashboard = () => {
   return (
     <div className="bg-[#FBFBFA] min-h-screen text-slate-900 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
       
-      {/* ── 1. TOP BAR & WELCOME SECTION ── */}
+      {/* ── TOP BAR & WELCOME SECTION ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
         <div className="space-y-1 text-left">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-              {timeGreeting}, <span className="capitalize">{farmerName}</span>
-            </h1>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+            {timeGreeting}, <span className="capitalize">{farmerName}</span>
+          </h1>
           <p className="text-xs sm:text-sm text-slate-600">
-            Here's what is happening with your farm today.
+            Here's what is happening on your farm today.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5 self-start sm:self-auto">
-          {/* Location Badge */}
-          <div className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-2xs">
-            <MapPin className="w-3.5 h-3.5 text-emerald-700" />
-            <span>{farmerLocation}</span>
-          </div>
+          {farmerLocation && (
+            <div className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-1.5 shadow-2xs">
+              <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+              <span>{farmerLocation}</span>
+            </div>
+          )}
 
-          {/* IoT Controller Shortcut */}
           <button
             onClick={() => setShowIoTModal(true)}
             className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/80 rounded-xl text-xs font-bold text-emerald-800 flex items-center gap-1.5 transition cursor-pointer"
           >
-            <Cpu className="w-3.5 h-3.5 text-emerald-700" />
+            <Cpu className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
             <span className="hidden sm:inline">IoT Controller</span>
             <span className="sm:hidden">IoT</span>
           </button>
@@ -203,58 +207,109 @@ export const FarmerDashboard = () => {
             : 'bg-red-50 border-red-200 text-red-900'
         }`}>
           <span>{notificationMsg}</span>
-          <button onClick={() => setNotificationMsg('')} className="text-xs underline text-slate-500">
+          <button
+            onClick={() => setNotificationMsg('')}
+            className="text-xs underline text-slate-500 hover:text-slate-700 cursor-pointer"
+          >
             Dismiss
           </button>
         </div>
       )}
 
-      {/* ── 2. CRITICAL ALERT SECTION (ATTENTION NEEDED) ── */}
-      <div className="bg-amber-50/90 border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs text-left">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
-              <AlertTriangle className="w-5 h-5 text-amber-700" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-200/70 px-2 py-0.5 rounded">
-                  ATTENTION NEEDED
-                </span>
-                <span className="text-xs font-bold text-slate-900">
-                  Heavy rainfall expected in your area.
-                </span>
+      {/* Error State Banner */}
+      {fetchError && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-left flex items-center justify-between">
+          <div className="flex items-center gap-2.5 text-xs text-red-800 font-semibold">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>Unable to load latest farm data. Please check your connection.</span>
+          </div>
+          <button
+            onClick={loadDashboardData}
+            className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-900 text-xs font-bold rounded-lg transition cursor-pointer flex items-center gap-1"
+          >
+            <RefreshCw className="w-3 h-3" />
+            <span>Try again</span>
+          </button>
+        </div>
+      )}
+
+      {/* ── CRITICAL ALERT SECTION ── */}
+      {!alertDismissed ? (
+        <div className="bg-amber-50/90 border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="w-5 h-5 text-amber-700" />
               </div>
-              <p className="text-xs text-slate-700 leading-relaxed">
-                Possible impact: <strong className="text-slate-900">Tomato crops</strong> &bull; Risk: <span className="font-bold text-amber-900">Moderate</span>
-              </p>
-              <p className="text-xs text-slate-600">
-                Recommended action: Check drainage channels and avoid unnecessary evening irrigation.
-              </p>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-200/70 px-2 py-0.5 rounded">
+                    ATTENTION NEEDED
+                  </span>
+                  <span className="text-xs font-bold text-slate-900">
+                    Heavy rainfall expected in your area.
+                  </span>
+                </div>
+                <p className="text-xs text-slate-700 leading-relaxed">
+                  Possible impact: <strong className="text-slate-900">Tomato crops</strong> &bull; Risk Level: <span className="font-bold text-amber-900">Medium Risk</span>
+                </p>
+                <p className="text-xs text-slate-600">
+                  Recommended action: Check field drainage channels and avoid unnecessary evening irrigation.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+              <Link
+                to="/disease-detection"
+                className="px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shadow-2xs"
+              >
+                <span>View AI Insight</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <button
+                onClick={() => setAlertDismissed(true)}
+                className="p-2 text-slate-400 hover:text-slate-600 transition"
+                title="Dismiss alert"
+                aria-label="Dismiss alert"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
-
-          <Link
-            to="/disease-detection"
-            className="px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shrink-0 self-start sm:self-auto shadow-2xs"
-          >
-            <span>View AI Insight</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
-      </div>
+      ) : (
+        <div className="p-3 bg-emerald-50/70 border border-emerald-100 rounded-xl text-xs text-emerald-800 font-semibold flex items-center justify-between text-left">
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-emerald-700 shrink-0" />
+            <span>You're all caught up. No active urgent alerts right now.</span>
+          </div>
+          <button
+            onClick={() => setAlertDismissed(false)}
+            className="text-[11px] underline text-emerald-800 font-bold hover:text-emerald-950 cursor-pointer"
+          >
+            Show previous advisory
+          </button>
+        </div>
+      )}
 
-      {/* ── 3. FARM STATUS SUMMARY ROW ── */}
+      {/* ── FARM STATUS SUMMARY ROW ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* Metric 1: Active Crops */}
+        {/* Metric 1: My Crops */}
         <div className="agri-card p-4 sm:p-5 flex items-center justify-between text-left">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               My Crops
             </span>
             <div className="text-2xl sm:text-3xl font-bold text-slate-900">
-              {loading ? '—' : myCrops.length > 0 ? myCrops.length : 3}
+              {loading ? (
+                <span className="inline-block w-8 h-7 bg-slate-200 rounded animate-pulse" />
+              ) : myCrops.length > 0 ? (
+                myCrops.length
+              ) : (
+                0
+              )}
             </div>
             <p className="text-[11px] text-emerald-800 font-medium">Monitored fields</p>
           </div>
@@ -270,26 +325,36 @@ export const FarmerDashboard = () => {
               Active Risks
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-2xl sm:text-3xl font-bold text-amber-700">1</span>
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span className="text-2xl sm:text-3xl font-bold text-amber-700">
+                {alertDismissed ? '0' : '1'}
+              </span>
+              <span className={`w-2 h-2 rounded-full ${alertDismissed ? 'bg-emerald-500' : 'bg-amber-500'}`}></span>
             </div>
-            <p className="text-[11px] text-slate-500 font-medium">Moderate rainfall alert</p>
+            <p className="text-[11px] text-slate-500 font-medium">
+              {alertDismissed ? 'All clear' : 'Rainfall advisory'}
+            </p>
           </div>
           <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-800 flex items-center justify-center">
             <AlertTriangle className="w-5 h-5" />
           </div>
         </div>
 
-        {/* Metric 3: Equipment Bookings */}
+        {/* Metric 3: Machinery Rentals */}
         <div className="agri-card p-4 sm:p-5 flex items-center justify-between text-left">
           <div className="space-y-1">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Machinery
             </span>
             <div className="text-2xl sm:text-3xl font-bold text-slate-900">
-              {loading ? '—' : rentalBookings.length > 0 ? rentalBookings.length : 2}
+              {loading ? (
+                <span className="inline-block w-8 h-7 bg-slate-200 rounded animate-pulse" />
+              ) : rentalBookings.length > 0 ? (
+                rentalBookings.length
+              ) : (
+                2
+              )}
             </div>
-            <p className="text-[11px] text-slate-500 font-medium">Active fleet rentals</p>
+            <p className="text-[11px] text-slate-500 font-medium">Active equipment</p>
           </div>
           <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
             <Tractor className="w-5 h-5" />
@@ -304,7 +369,11 @@ export const FarmerDashboard = () => {
             </span>
             <div className="flex items-center gap-2">
               <span className="text-2xl sm:text-3xl font-bold text-slate-900">
-                {loading ? '—' : pendingOrdersCount}
+                {loading ? (
+                  <span className="inline-block w-8 h-7 bg-slate-200 rounded animate-pulse" />
+                ) : (
+                  pendingOrdersCount
+                )}
               </span>
               {pendingOrdersCount > 0 && (
                 <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -325,7 +394,7 @@ export const FarmerDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* ════════════════════════════════════════════════════════════
-            LEFT COLUMN: CROPS, AI INSIGHTS, ORDERS (7 COLS)
+            LEFT COLUMN: MY CROPS, AI INSIGHTS, ORDERS (7 COLS)
            ════════════════════════════════════════════════════════════ */}
         <div className="lg:col-span-7 space-y-6">
           
@@ -338,13 +407,13 @@ export const FarmerDashboard = () => {
                   <span>My Crops</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Overview of crops currently planted and listed for wholesale.
+                  Overview of crops currently planted and listed for wholesale trade.
                 </p>
               </div>
 
               <Link
                 to="/crops/add"
-                className="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-lg transition flex items-center gap-1"
+                className="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-2xs"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 <span>Add Crop</span>
@@ -354,13 +423,13 @@ export const FarmerDashboard = () => {
             {loading ? (
               <div className="py-8 text-center text-slate-400">
                 <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-700" />
-                <span className="text-xs">Loading crop status...</span>
+                <span className="text-xs">Loading crop health status...</span>
               </div>
             ) : myCrops.length === 0 ? (
               <div className="text-center py-8 bg-slate-50 rounded-xl border border-slate-200/80 space-y-3 p-4">
-                <p className="text-sm font-bold text-slate-700">No crops listed yet.</p>
+                <p className="text-sm font-bold text-slate-700">No crops added yet.</p>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Add your first crop to start receiving personalized AI risk insights and buyer orders.
+                  Add your first crop to start receiving personalized AI insights and direct buyer orders.
                 </p>
                 <Link
                   to="/crops/add"
@@ -389,14 +458,14 @@ export const FarmerDashboard = () => {
                         )}
                       </div>
                       <p className="text-xs text-slate-500">
-                        Listed: {crop.quantity || 500} kg &bull; Rs. {Number(crop.price || 0).toFixed(2)}/kg
+                        Listed Yield: {crop.quantity || 500} kg &bull; Rate: Rs. {Number(crop.price || 0).toFixed(2)}/kg
                       </p>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                        Healthy
+                        Healthy &bull; Low Risk
                       </span>
                     </div>
                   </div>
@@ -404,9 +473,12 @@ export const FarmerDashboard = () => {
               </div>
             )}
 
-            <div className="pt-2 text-right">
+            <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+              <span className="text-xs text-slate-500">
+                {myCrops.length} active plot{myCrops.length === 1 ? '' : 's'} registered
+              </span>
               <Link to="/crops" className="text-xs font-bold text-emerald-800 hover:underline inline-flex items-center gap-1">
-                <span>View All Produce Marketplace</span>
+                <span>View All Produce Listings</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -421,7 +493,7 @@ export const FarmerDashboard = () => {
                   <span>AI Crop Insights</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Actionable risk diagnostics based on localized weather and telemetry.
+                  Actionable risk diagnostics based on localized weather and leaf telemetry.
                 </p>
               </div>
 
@@ -438,7 +510,7 @@ export const FarmerDashboard = () => {
                 </div>
                 <div className="text-right space-y-0.5">
                   <span className="text-[10px] font-bold uppercase text-slate-400">Overall Risk</span>
-                  <p className="text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
+                  <p className="text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-md inline-block">
                     Moderate Risk
                   </p>
                 </div>
@@ -447,20 +519,20 @@ export const FarmerDashboard = () => {
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div className="p-2.5 bg-white rounded-lg border border-slate-200/80">
                   <span className="text-slate-400 text-[10px] uppercase font-bold block">Disease Risk</span>
-                  <span className="font-semibold text-slate-800">Low &bull; Blight 14%</span>
+                  <span className="font-semibold text-slate-800">Low &bull; Early Blight 14%</span>
                 </div>
                 <div className="p-2.5 bg-white rounded-lg border border-slate-200/80">
                   <span className="text-slate-400 text-[10px] uppercase font-bold block">Weather Risk</span>
-                  <span className="font-semibold text-slate-800">Medium &bull; 68% Rain</span>
+                  <span className="font-semibold text-slate-800">Medium &bull; 68% Rain Expected</span>
                 </div>
               </div>
 
               <div className="p-3 bg-emerald-50/90 rounded-lg border border-emerald-200 text-xs text-emerald-900 font-medium">
-                <strong className="font-bold">Recommended action:</strong> Inspect leaves within 24 hours for moisture spot buildup. Apply organic copper spray if rain exceeds 20mm.
+                <strong className="font-bold">Recommended action:</strong> Inspect tomato foliage within 24 hours for water-spot buildup. Ensure soil drainage channels are free from debris before evening rainfall.
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-1">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
               <Link
                 to="/disease-detection"
                 className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-lg transition inline-flex items-center gap-1.5 shadow-2xs"
@@ -469,7 +541,7 @@ export const FarmerDashboard = () => {
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link to="/advisor" className="text-xs font-bold text-emerald-800 hover:underline">
-                Ask AI Agronomist &rarr;
+                Consult AI Agronomist &rarr;
               </Link>
             </div>
           </div>
@@ -501,9 +573,9 @@ export const FarmerDashboard = () => {
               </div>
             ) : farmerOrders.length === 0 ? (
               <div className="text-center py-8 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1 p-4">
-                <p className="text-sm font-bold text-slate-700">No incoming orders right now.</p>
+                <p className="text-sm font-bold text-slate-700">No incoming buyer orders right now.</p>
                 <p className="text-xs text-slate-500">
-                  Orders placed by commercial buyers on your produce will appear here.
+                  Orders placed by verified commercial buyers will appear here for acceptance.
                 </p>
               </div>
             ) : (
@@ -536,7 +608,7 @@ export const FarmerDashboard = () => {
                         <td className="p-3 font-semibold">{order.quantity} Kg</td>
                         <td className="p-3">{renderStatusBadge(order.status)}</td>
                         <td className="p-3">
-                          {order.status === 'PENDING' ? (
+                          {order.status === 'PENDING' || order.status === 'PLACED' ? (
                             <button
                               onClick={() => handleAcceptOrder(order.id)}
                               disabled={actionLoading === order.id}
@@ -550,7 +622,7 @@ export const FarmerDashboard = () => {
                             </button>
                           ) : (
                             <span className="text-[11px] font-bold text-emerald-800">
-                              Accepted
+                              Accepted &bull; Locked
                             </span>
                           )}
                         </td>
@@ -624,7 +696,7 @@ export const FarmerDashboard = () => {
                   <Leaf className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold text-slate-900 block">Check Crop Risk</span>
-                <span className="text-[10px] text-slate-500 block leading-tight">AI leaf scan</span>
+                <span className="text-[10px] text-slate-500 block leading-tight">AI leaf diagnostics</span>
               </Link>
 
               <Link
@@ -635,7 +707,7 @@ export const FarmerDashboard = () => {
                   <Tractor className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold text-slate-900 block">Find Equipment</span>
-                <span className="text-[10px] text-slate-500 block leading-tight">Tractors &amp; machinery</span>
+                <span className="text-[10px] text-slate-500 block leading-tight">Machinery rentals</span>
               </Link>
 
               <Link
@@ -646,7 +718,7 @@ export const FarmerDashboard = () => {
                   <Store className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold text-slate-900 block">Shop Supplies</span>
-                <span className="text-[10px] text-slate-500 block leading-tight">Seeds &amp; fertilizer</span>
+                <span className="text-[10px] text-slate-500 block leading-tight">Seeds &amp; inputs</span>
               </Link>
 
               <Link
@@ -657,7 +729,7 @@ export const FarmerDashboard = () => {
                   <Users className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-bold text-slate-900 block">Ask an Expert</span>
-                <span className="text-[10px] text-slate-500 block leading-tight">Soil &amp; agronomist</span>
+                <span className="text-[10px] text-slate-500 block leading-tight">Agronomy advisors</span>
               </Link>
             </div>
           </div>
@@ -732,7 +804,7 @@ export const FarmerDashboard = () => {
 
       </div>
 
-      {/* ── MODALS PRESERVED ── */}
+      {/* ── INTERACTIVE MODALS PRESERVED ── */}
       {selectedBuyer && (
         <BuyerProfileModal
           buyerId={selectedBuyer.id}
