@@ -172,9 +172,31 @@ export const SupplierDashboard = () => {
     }
   };
 
-  const totalCatalogStock = items.reduce((acc, curr) => acc + (Number(curr.quantity) || 0), 0);
-  const totalRevenue = orders.reduce((acc, curr) => acc + (Number(curr.totalPrice) || 0), 0);
-  const pendingDispatches = orders.filter((o) => o.status === 'PENDING_DISPATCH' || o.status === 'CONFIRMED').length;
+  const renderFulfillmentBadge = (status) => {
+    const s = (status || 'PENDING_DISPATCH').toUpperCase();
+    if (s === 'DELIVERED' || s === 'COMPLETED') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+          <span>DELIVERED</span>
+        </span>
+      );
+    }
+    if (s === 'CONFIRMED' || s === 'PROCESSING') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-sky-50 text-sky-700 border border-sky-200">
+          <Truck className="w-3 h-3 text-sky-600" />
+          <span>CONFIRMED</span>
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200">
+        <Clock className="w-3 h-3 text-amber-600" />
+        <span>PENDING DISPATCH</span>
+      </span>
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
@@ -370,15 +392,7 @@ export const SupplierDashboard = () => {
                     <td className="p-4 font-bold text-slate-900">Rs {Number(o.totalPrice).toLocaleString()}</td>
                     <td className="p-4 text-xs text-slate-500 font-medium whitespace-nowrap">{o.date || '—'}</td>
                     <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                        o.status === 'DELIVERED'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : o.status === 'CONFIRMED'
-                          ? 'bg-sky-100 text-sky-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}>
-                        {o.status}
-                      </span>
+                      {renderFulfillmentBadge(o.status)}
                     </td>
                   </tr>
                 ))}
@@ -400,7 +414,17 @@ export const SupplierDashboard = () => {
                   <p className="text-emerald-700 font-extrabold text-sm mt-1">Rs {Number(item.price).toLocaleString()}</p>
                 </div>
                 <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100 text-slate-500">
-                  <span>Stock: <strong>{item.quantity}</strong></span>
+                  <span className="flex items-center gap-1.5">
+                    <span>Stock:</span>
+                    <strong className={Number(item.quantity) <= 25 ? 'text-amber-600 font-extrabold' : 'text-slate-900 font-bold'}>
+                      {item.quantity}
+                    </strong>
+                    {Number(item.quantity) <= 25 && (
+                      <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                        Low Stock
+                      </span>
+                    )}
+                  </span>
                   <span className="text-[10px] font-bold text-slate-400">{item.badge}</span>
                 </div>
               </div>

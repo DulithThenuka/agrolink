@@ -1,755 +1,349 @@
-import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Float } from '@react-three/drei';
-import * as THREE from 'three';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
-  Layers,
-  Activity,
-  Radio,
-  RefreshCw,
-  Truck,
-  Zap,
-  Globe,
-  CheckCircle2,
   ShieldCheck,
-  Cpu,
+  CheckCircle2,
+  TrendingUp,
+  Truck,
+  Lock,
+  QrCode,
   MapPin,
-  TrendingUp
+  Clock,
+  ArrowUpRight,
+  Sprout,
+  Activity,
+  Award,
+  Zap,
+  DollarSign
 } from 'lucide-react';
 
-// Procedural High-Definition Photorealistic Earth & Topography Texture
-const createRealisticEarthTextures = () => {
-  const width = 2048;
-  const height = 1024;
-
-  // 1. Daytime Earth Map (Oceans, Continents, Terrain Gradients, Grid)
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-
-  // Deep Space Ocean Gradient
-  const oceanGrad = ctx.createLinearGradient(0, 0, 0, height);
-  oceanGrad.addColorStop(0, '#021024');
-  oceanGrad.addColorStop(0.5, '#051937');
-  oceanGrad.addColorStop(1, '#021024');
-  ctx.fillStyle = oceanGrad;
-  ctx.fillRect(0, 0, width, height);
-
-  // Ocean Bathymetry & Currents (Subtle glowing grid and depth lines)
-  ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)';
-  ctx.lineWidth = 1;
-  for (let lat = 0; lat < height; lat += 32) {
-    ctx.beginPath();
-    ctx.moveTo(0, lat);
-    ctx.lineTo(width, lat);
-    ctx.stroke();
-  }
-  for (let lon = 0; lon < width; lon += 64) {
-    ctx.beginPath();
-    ctx.moveTo(lon, 0);
-    ctx.lineTo(lon, height);
-    ctx.stroke();
-  }
-
-  // Draw Realistic Major Continents & Landmasses with Topographic Shading
-  const drawLand = (coords, color = '#0f3a2c', strokeColor = '#10b981') => {
-    ctx.fillStyle = color;
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    coords.forEach(([xPct, yPct], i) => {
-      const x = xPct * width;
-      const y = yPct * height;
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-  };
-
-  // Indian Subcontinent & South Asia
-  drawLand([
-    [0.64, 0.35], [0.69, 0.38], [0.72, 0.45], [0.70, 0.58], 
-    [0.68, 0.62], [0.65, 0.54], [0.62, 0.44], [0.63, 0.36]
-  ], '#134e3a', '#34d399');
-
-  // Sri Lanka Island (Enlarged & Detailed for Agro Hub Prominence)
-  drawLand([
-    [0.695, 0.625], [0.708, 0.630], [0.712, 0.655], [0.705, 0.680],
-    [0.690, 0.675], [0.685, 0.645]
-  ], '#15803d', '#6ee7b7');
-
-  // Southeast Asia & Australia
-  drawLand([
-    [0.73, 0.48], [0.78, 0.52], [0.82, 0.58], [0.79, 0.65],
-    [0.75, 0.56], [0.73, 0.50]
-  ], '#0f3a2c', '#10b981');
-  drawLand([
-    [0.78, 0.72], [0.88, 0.70], [0.90, 0.84], [0.82, 0.88], [0.76, 0.78]
-  ], '#114232', '#059669');
-
-  // Africa & Middle East
-  drawLand([
-    [0.48, 0.38], [0.58, 0.36], [0.62, 0.46], [0.59, 0.58],
-    [0.54, 0.78], [0.48, 0.65], [0.44, 0.48], [0.46, 0.40]
-  ], '#1e3a2b', '#10b981');
-
-  // Europe & Northern Eurasia
-  drawLand([
-    [0.46, 0.22], [0.60, 0.20], [0.80, 0.18], [0.88, 0.26],
-    [0.75, 0.34], [0.55, 0.32], [0.45, 0.28]
-  ], '#14532d', '#34d399');
-
-  // Americas (North & South)
-  drawLand([
-    [0.15, 0.18], [0.28, 0.20], [0.30, 0.38], [0.22, 0.44], [0.12, 0.32]
-  ], '#134e3a', '#10b981');
-  drawLand([
-    [0.22, 0.52], [0.32, 0.56], [0.35, 0.74], [0.28, 0.88], [0.20, 0.68]
-  ], '#15803d', '#34d399');
-
-  // Add Night City Lights / Bio-luminescence Nodes
-  ctx.fillStyle = '#fef08a';
-  for (let i = 0; i < 240; i++) {
-    const lx = Math.random() * width;
-    const ly = Math.random() * height;
-    ctx.beginPath();
-    ctx.arc(lx, ly, Math.random() * 1.8, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  const earthTex = new THREE.CanvasTexture(canvas);
-  earthTex.wrapS = THREE.RepeatWrapping;
-  earthTex.wrapT = THREE.ClampToEdgeWrapping;
-
-  // 2. Cloud Atmosphere Texture
-  const cloudCanvas = document.createElement('canvas');
-  cloudCanvas.width = 1024;
-  cloudCanvas.height = 512;
-  const cctx = cloudCanvas.getContext('2d');
-  cctx.clearRect(0, 0, 1024, 512);
-
-  // Soft organic cloud bands
-  cctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-  for (let i = 0; i < 65; i++) {
-    const cx = Math.random() * 1024;
-    const cy = Math.random() * 512;
-    const cr = 35 + Math.random() * 75;
-    cctx.beginPath();
-    cctx.arc(cx, cy, cr, 0, Math.PI * 2);
-    cctx.fill();
-  }
-
-  const cloudTex = new THREE.CanvasTexture(cloudCanvas);
-  cloudTex.wrapS = THREE.RepeatWrapping;
-  cloudTex.wrapT = THREE.ClampToEdgeWrapping;
-
-  return { earthTex, cloudTex };
-};
-
-// Node coordinate conversion helper for spherical Earth
-const latLonToVector3 = (lat, lon, radius = 1.52) => {
-  const phi = (90 - lat) * (Math.PI / 180);
-  const theta = (lon + 180) * (Math.PI / 180);
-  const x = -(radius * Math.sin(phi) * Math.cos(theta));
-  const z = radius * Math.sin(phi) * Math.sin(theta);
-  const y = radius * Math.cos(phi);
-  return new THREE.Vector3(x, y, z);
-};
-
-// High-Precision Agricultural Hubs mapped to realistic geographic coordinates
-export const REAL_FARM_HUBS = [
-  { id: 'badulla', name: 'Welimada Organic Hub', crop: 'Grade A Tomatoes', lat: 6.9, lon: 80.9, color: '#10b981', code: 'HUB-BDL', price: 'Rs. 185/kg', health: '98%', doa: 'DOA Grade A Certified' },
-  { id: 'polonnaruwa', name: 'Polonnaruwa Belt', crop: 'Samba Paddy Grain', lat: 7.9, lon: 81.0, color: '#34d399', code: 'HUB-PLN', price: 'Rs. 220/kg', health: '99%', doa: 'DOA Seed Certified' },
-  { id: 'jaffna', name: 'Jaffna Agro Hub', crop: 'Pungent Green Chillies', lat: 9.6, lon: 80.0, color: '#f59e0b', code: 'HUB-JAF', price: 'Rs. 520/kg', health: '95%', doa: 'DOA Commercial Pass' },
-  { id: 'nuwaraeliya', name: 'Nuwara Eliya Cold Zone', crop: 'Export Potatoes', lat: 6.97, lon: 80.78, color: '#06b6d4', code: 'HUB-NWE', price: 'Rs. 280/kg', health: '97%', doa: 'Export Grade Pass' },
-  { id: 'kandy', name: 'Central Spices Cluster', crop: 'Organic Pepper & Cloves', lat: 7.29, lon: 80.63, color: '#10b981', code: 'HUB-KDY', price: 'Rs. 650/kg', health: '96%', doa: 'Organic Cert. Sri Lanka' },
-  { id: 'colombo', name: 'Colombo Export Terminal', crop: 'Escrow Trade Gateway', lat: 6.92, lon: 79.86, color: '#38bdf8', code: 'GATE-CMB', price: 'Settled Daily', health: '100%', doa: 'National Escrow Verified' }
-];
-
-// Photorealistic 3D Earth Globe with Atmosphere and Cloud Shell
-const RealEarthGlobe = ({ mode = 'ecosystem' }) => {
-  const globeRef = useRef();
-  const cloudRef = useRef();
-  const atmosphereRef = useRef();
-
-  const { earthTex, cloudTex } = useMemo(() => createRealisticEarthTextures(), []);
-
-  useFrame((state, delta) => {
-    if (globeRef.current) {
-      globeRef.current.rotation.y += delta * 0.12;
-    }
-    if (cloudRef.current) {
-      cloudRef.current.rotation.y += delta * 0.16;
-    }
-    if (atmosphereRef.current) {
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.5) * 0.015;
-      atmosphereRef.current.scale.set(pulse, pulse, pulse);
-    }
-  });
-
-  const glowColor = mode === 'heatmap' ? '#f59e0b' : mode === 'sensors' ? '#06b6d4' : '#10b981';
-
-  return (
-    <group>
-      {/* 1. Photorealistic Solid Earth Sphere */}
-      <mesh ref={globeRef}>
-        <sphereGeometry args={[1.5, 64, 64]} />
-        <meshStandardMaterial
-          map={earthTex}
-          roughness={0.45}
-          metalness={0.15}
-          emissive="#06281e"
-          emissiveIntensity={0.35}
-        />
-      </mesh>
-
-      {/* 2. Floating Atmospheric Cloud Layer */}
-      <mesh ref={cloudRef}>
-        <sphereGeometry args={[1.52, 48, 48]} />
-        <meshStandardMaterial
-          map={cloudTex}
-          transparent
-          opacity={0.35}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
-        />
-      </mesh>
-
-      {/* 3. Outer Fresnel Atmospheric Glow Halo */}
-      <mesh ref={atmosphereRef}>
-        <sphereGeometry args={[1.56, 48, 48]} />
-        <meshBasicMaterial
-          color={glowColor}
-          transparent
-          opacity={0.2}
-          side={THREE.BackSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-    </group>
-  );
-};
-
-// 3D Active Hub Halos & Pulsing Concentric Radar Beacons
-const ActiveHubHalos = ({ onSelectNode, selectedNodeId, hoveredNodeId, setHoveredNodeId }) => {
-  const groupRef = useRef();
-  const shockwavesRef = useRef([]);
-
-  useFrame((state, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.12;
-    }
-
-    // Radiate shockwave rings outward
-    const t = state.clock.elapsedTime;
-    shockwavesRef.current.forEach((ring, i) => {
-      if (ring) {
-        const progress = (t * 1.5 + i * 0.4) % 1;
-        const scale = 1 + progress * 2.2;
-        ring.scale.set(scale, scale, scale);
-        if (ring.material) {
-          ring.material.opacity = Math.max(0, (1 - progress) * 0.85);
-        }
-      }
-    });
-  });
-
-  return (
-    <group ref={groupRef}>
-      {REAL_FARM_HUBS.map((hub, idx) => {
-        const isSelected = selectedNodeId === hub.id;
-        const isHovered = hoveredNodeId === hub.id;
-        const pos = latLonToVector3(hub.lat, hub.lon, 1.52);
-        const normal = pos.clone().normalize();
-
-        // Calculate rotation quaternion to lay halos flush on Earth's curved surface
-        const up = new THREE.Vector3(0, 0, 1);
-        const quaternion = new THREE.Quaternion().setFromUnitVectors(up, normal);
-
-        return (
-          <group key={hub.id} position={[pos.x, pos.y, pos.z]} quaternion={quaternion}>
-            {/* 1. Core 3D Interactive Hub Beacon Pin */}
-            <mesh
-              onPointerOver={(e) => {
-                e.stopPropagation();
-                document.body.style.cursor = 'pointer';
-                if (setHoveredNodeId) setHoveredNodeId(hub.id);
-              }}
-              onPointerOut={() => {
-                document.body.style.cursor = 'auto';
-                if (setHoveredNodeId) setHoveredNodeId(null);
-              }}
-              onClick={() => onSelectNode(hub)}
-              scale={isSelected || isHovered ? 1.7 : 1.1}
-            >
-              <sphereGeometry args={[0.045, 16, 16]} />
-              <meshStandardMaterial
-                color={hub.color}
-                emissive={hub.color}
-                emissiveIntensity={isSelected || isHovered ? 2.2 : 1.2}
-                roughness={0.1}
-              />
-            </mesh>
-
-            {/* 2. Vertical Holographic Light Pillar */}
-            <mesh position={[0, 0, 0.08]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.006, 0.016, 0.16, 12]} />
-              <meshBasicMaterial
-                color={hub.color}
-                transparent
-                opacity={isSelected || isHovered ? 0.95 : 0.6}
-                blending={THREE.AdditiveBlending}
-              />
-            </mesh>
-
-            {/* 3. Surface Concentric Active Halo Rings */}
-            <mesh>
-              <ringGeometry args={[0.07, 0.095, 24]} />
-              <meshBasicMaterial
-                color={hub.color}
-                transparent
-                opacity={isSelected || isHovered ? 0.95 : 0.65}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-
-            {/* 4. Radiating Radar Shockwave Ring */}
-            <mesh ref={(el) => (shockwavesRef.current[idx] = el)}>
-              <ringGeometry args={[0.09, 0.11, 24]} />
-              <meshBasicMaterial
-                color={isSelected || isHovered ? '#ffffff' : hub.color}
-                transparent
-                opacity={0.8}
-                side={THREE.DoubleSide}
-                blending={THREE.AdditiveBlending}
-              />
-            </mesh>
-          </group>
-        );
-      })}
-    </group>
-  );
-};
-
-// 3D Animated Trade Arcs between Real Earth Coordinates
-const RealEarthTradeArcs = ({ mode = 'ecosystem' }) => {
-  const routes = useMemo(() => {
-    const pairs = [
-      ['badulla', 'colombo'],
-      ['nuwaraeliya', 'badulla'],
-      ['jaffna', 'colombo'],
-      ['polonnaruwa', 'colombo'],
-      ['kandy', 'colombo'],
-      ['kandy', 'jaffna']
-    ];
-
-    return pairs.map(([fromId, toId], idx) => {
-      const fromHub = REAL_FARM_HUBS.find((h) => h.id === fromId);
-      const toHub = REAL_FARM_HUBS.find((h) => h.id === toId);
-
-      const p1 = latLonToVector3(fromHub.lat, fromHub.lon, 1.52);
-      const p2 = latLonToVector3(toHub.lat, toHub.lon, 1.52);
-
-      // Elevated Great-Circle Midpoint for smooth 3D arc over the Earth
-      const mid = p1.clone().add(p2).multiplyScalar(0.5);
-      const distance = p1.distanceTo(p2);
-      mid.normalize().multiplyScalar(1.52 + Math.min(distance * 0.65, 0.55));
-
-      const curve = new THREE.QuadraticBezierCurve3(p1, mid, p2);
-      const points = curve.getPoints(36);
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-      return {
-        id: `${fromId}-${toId}`,
-        curve,
-        geometry,
-        speed: 0.4 + (idx % 3) * 0.12,
-        offset: idx * 0.18,
-        color: mode === 'heatmap' ? '#f59e0b' : mode === 'sensors' ? '#06b6d4' : '#34d399'
-      };
-    });
-  }, [mode]);
-
-  const pulsesRef = useRef([]);
-  const groupRef = useRef();
-
-  useFrame((state, delta) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.12;
-    }
-
-    const t = state.clock.elapsedTime;
-    routes.forEach((route, idx) => {
-      const pulseMesh = pulsesRef.current[idx];
-      if (pulseMesh && route.curve) {
-        const progress = ((t * route.speed + route.offset) % 1);
-        const point = route.curve.getPointAt(progress);
-        pulseMesh.position.copy(point);
-      }
-    });
-  });
-
-  return (
-    <group ref={groupRef}>
-      {routes.map((route, idx) => (
-        <group key={route.id}>
-          {/* Luminous Translucent Trade Line */}
-          <line geometry={route.geometry}>
-            <lineBasicMaterial
-              color={route.color}
-              transparent
-              opacity={0.65}
-              blending={THREE.AdditiveBlending}
-              linewidth={1}
-            />
-          </line>
-
-          {/* Traveling Harvest Pulse Packet */}
-          <mesh ref={(el) => (pulsesRef.current[idx] = el)}>
-            <sphereGeometry args={[0.038, 16, 16]} />
-            <meshBasicMaterial
-              color="#ffffff"
-              transparent
-              opacity={0.95}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
-};
-
-// 3D Bioluminescent Spores Cloud
-const BioluminescentSpores = ({ count = 650, mode = 'ecosystem' }) => {
-  const pointsRef = useRef();
-
-  const [positions, colors] = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    const col = new Float32Array(count * 3);
-
-    const c1 = mode === 'heatmap' 
-      ? new THREE.Color('#f59e0b') 
-      : mode === 'sensors' 
-      ? new THREE.Color('#06b6d4') 
-      : new THREE.Color('#10b981');
-      
-    const c2 = new THREE.Color('#34d399');
-
-    for (let i = 0; i < count; i++) {
-      const radius = 2.0 + Math.random() * 2.5;
-      const theta = Math.acos(2 * Math.random() - 1);
-      const phi = 2 * Math.PI * Math.random();
-
-      pos[i * 3] = radius * Math.sin(theta) * Math.cos(phi);
-      pos[i * 3 + 1] = radius * Math.sin(theta) * Math.sin(phi);
-      pos[i * 3 + 2] = radius * Math.cos(theta);
-
-      const mixed = c1.clone().lerp(c2, Math.random());
-      col[i * 3] = mixed.r;
-      col[i * 3 + 1] = mixed.g;
-      col[i * 3 + 2] = mixed.b;
-    }
-    return [pos, col];
-  }, [count, mode]);
-
-  useFrame((state, delta) => {
-    if (pointsRef.current) {
-      pointsRef.current.rotation.y += delta * 0.06;
-    }
-  });
-
-  return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          count={colors.length / 3}
-          array={colors}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.032}
-        vertexColors
-        transparent
-        opacity={0.75}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </points>
-  );
-};
-
-// 3D Orbiting Autonomous Agri-Drone with Downward Holographic Scanner
-const OrbitingDroneScanner = ({ mode = 'ecosystem' }) => {
-  const droneRef = useRef();
-  const scanConeRef = useRef();
-  const groundRingRef = useRef();
-
-  useFrame((state, delta) => {
-    const t = state.clock.elapsedTime * 0.55;
-    if (droneRef.current) {
-      const radius = 2.25;
-      const x = Math.sin(t) * radius;
-      const z = Math.cos(t) * radius;
-      const y = Math.sin(t * 2) * 0.35 + 0.35;
-
-      droneRef.current.position.set(x, y, z);
-      droneRef.current.rotation.y = -t + Math.PI / 2;
-
-      if (scanConeRef.current) {
-        scanConeRef.current.rotation.y += delta * 2;
-        const pulse = 0.25 + Math.sin(state.clock.elapsedTime * 4) * 0.12;
-        scanConeRef.current.material.opacity = pulse;
-      }
-
-      if (groundRingRef.current) {
-        const groundPos = new THREE.Vector3(x, y, z).normalize().multiplyScalar(1.53);
-        groundRingRef.current.position.copy(groundPos);
-        groundRingRef.current.lookAt(0, 0, 0);
-      }
-    }
-  });
-
-  const beamColor = mode === 'heatmap' ? '#f59e0b' : mode === 'sensors' ? '#06b6d4' : '#10b981';
-
-  return (
-    <group>
-      <group ref={droneRef}>
-        {/* Chassis */}
-        <mesh>
-          <boxGeometry args={[0.18, 0.045, 0.18]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.85} />
-        </mesh>
-        
-        {/* Flashing Green Sensor Beacon */}
-        <mesh position={[0, 0.04, 0]}>
-          <sphereGeometry args={[0.035, 16, 16]} />
-          <meshBasicMaterial color="#34d399" />
-        </mesh>
-
-        {/* 4 Rotors */}
-        {[[0.11, 0.02, 0.11], [-0.11, 0.02, -0.11], [0.11, 0.02, -0.11], [-0.11, 0.02, 0.11]].map((p, i) => (
-          <mesh key={i} position={p}>
-            <cylinderGeometry args={[0.045, 0.045, 0.004, 16]} />
-            <meshBasicMaterial color="#38bdf8" transparent opacity={0.7} />
-          </mesh>
-        ))}
-
-        {/* Holographic Downward Scanning Laser Beam */}
-        <mesh
-          ref={scanConeRef}
-          position={[0, -0.42, 0]}
-          rotation={[Math.PI, 0, 0]}
-        >
-          <coneGeometry args={[0.35, 0.85, 24, 1, true]} />
-          <meshBasicMaterial
-            color={beamColor}
-            transparent
-            opacity={0.3}
-            side={THREE.DoubleSide}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-          />
-        </mesh>
-      </group>
-
-      {/* Surface Ground Target Radar Ring */}
-      <mesh ref={groundRingRef}>
-        <ringGeometry args={[0.12, 0.18, 24]} />
-        <meshBasicMaterial
-          color={beamColor}
-          transparent
-          opacity={0.75}
-          side={THREE.DoubleSide}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-    </group>
-  );
-};
-
-// Subtle cursor parallax container
-const InteractiveSceneContainer = ({ mode, selectedNode, onSelectNode, hoveredNodeId, setHoveredNodeId }) => {
-  const sceneGroup = useRef();
-
-  useFrame(({ pointer }) => {
-    if (sceneGroup.current) {
-      sceneGroup.current.rotation.x = THREE.MathUtils.lerp(
-        sceneGroup.current.rotation.x,
-        -pointer.y * 0.18,
-        0.05
-      );
-      sceneGroup.current.rotation.y = THREE.MathUtils.lerp(
-        sceneGroup.current.rotation.y,
-        pointer.x * 0.22,
-        0.05
-      );
-    }
-  });
-
-  return (
-    <group ref={sceneGroup}>
-      <RealEarthGlobe mode={mode} />
-      <ActiveHubHalos
-        onSelectNode={onSelectNode}
-        selectedNodeId={selectedNode?.id}
-        hoveredNodeId={hoveredNodeId}
-        setHoveredNodeId={setHoveredNodeId}
-      />
-      <RealEarthTradeArcs mode={mode} />
-      <BioluminescentSpores count={500} mode={mode} />
-      <OrbitingDroneScanner mode={mode} />
-    </group>
-  );
-};
-
 export const AgriHero3DCanvas = () => {
-  const [activeMode, setActiveMode] = useState('ecosystem');
-  const [selectedNode, setSelectedNode] = useState(REAL_FARM_HUBS[0]);
-  const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  const controlsRef = useRef();
+  const [activeTab, setActiveTab] = useState('passport'); // 'passport', 'price', 'escrow', 'logistics'
 
-  const handleResetCamera = () => {
-    if (controlsRef.current) {
-      controlsRef.current.reset();
-    }
-  };
+  // Auto-cycle through tabs every 6 seconds for dynamic life, pausing on user interaction
+  const [autoRotate, setAutoRotate] = useState(true);
 
-  const activeDisplayNode = useMemo(() => {
-    if (hoveredNodeId) {
-      return REAL_FARM_HUBS.find((h) => h.id === hoveredNodeId) || selectedNode;
-    }
-    return selectedNode;
-  }, [hoveredNodeId, selectedNode]);
+  useEffect(() => {
+    if (!autoRotate) return;
+    const tabs = ['passport', 'price', 'escrow', 'logistics'];
+    const interval = setInterval(() => {
+      setActiveTab((curr) => {
+        const nextIdx = (tabs.indexOf(curr) + 1) % tabs.length;
+        return tabs[nextIdx];
+      });
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [autoRotate]);
 
   return (
-    <div className="relative w-full h-[520px] rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 overflow-hidden shadow-2xl border border-white/10 select-none group">
-      {/* Top Glassmorphic Mode HUD */}
-      <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-auto">
-        <div className="flex items-center gap-1.5 p-1 bg-black/60 backdrop-blur-md rounded-2xl border border-white/10 shadow-lg">
-          <button
-            onClick={() => setActiveMode('ecosystem')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              activeMode === 'ecosystem'
-                ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>3D Earth</span>
-          </button>
-          <button
-            onClick={() => setActiveMode('sensors')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              activeMode === 'sensors'
-                ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/30'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Cpu className="w-3.5 h-3.5" />
-            <span>IoT Sensors</span>
-          </button>
-          <button
-            onClick={() => setActiveMode('heatmap')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              activeMode === 'heatmap'
-                ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
-                : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Activity className="w-3.5 h-3.5" />
-            <span>Supply Heatmap</span>
-          </button>
-        </div>
+    <div 
+      className="relative w-full select-none"
+      onMouseEnter={() => setAutoRotate(false)}
+      onMouseLeave={() => setAutoRotate(true)}
+    >
+      {/* GLOW BACKDROPS */}
+      <div className="absolute -top-6 -right-6 w-72 h-72 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-8 -left-8 w-72 h-72 bg-teal-400/20 rounded-full blur-3xl pointer-events-none" />
 
-        <button
-          onClick={handleResetCamera}
-          title="Reset Camera Angle"
-          className="p-2 bg-black/60 hover:bg-black/80 backdrop-blur-md text-slate-300 hover:text-white rounded-xl border border-white/10 shadow transition"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-        </button>
-      </div>
-
-      {/* Floating 3D Telemetry Overlay Card */}
-      {activeDisplayNode && (
-        <div className="absolute bottom-4 left-4 z-20 max-w-[290px] bg-slate-950/85 backdrop-blur-xl border border-emerald-500/30 p-3.5 rounded-2xl shadow-2xl space-y-2 pointer-events-auto animate-fade-in text-white">
-          <div className="flex items-center justify-between">
-            <span className="inline-flex items-center gap-1 text-[10px] font-black tracking-wider uppercase text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-800/60">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-              {activeDisplayNode.code}
-            </span>
-            <span className="text-[10px] font-bold text-slate-400">Yield Health: {activeDisplayNode.health}</span>
+      {/* MAIN GLASSMORPHIC CARD */}
+      <div className="glass-card bg-white/95 border border-slate-200/90 rounded-3xl p-5 sm:p-7 shadow-2xl shadow-emerald-500/10 space-y-5 relative overflow-hidden backdrop-blur-xl">
+        
+        {/* CARD HEADER & INTERACTIVE PILL SWITCHER */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-black text-base shadow-xs">
+              🌱
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-slate-900 font-display">AgroLink Live Hub</span>
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium">Verified Smart Agri-Trade Ledger</p>
+            </div>
           </div>
 
-          <div>
-            <h4 className="font-extrabold text-sm text-white flex items-center gap-1 font-display">
-              <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              {activeDisplayNode.name}
-            </h4>
-            <p className="text-xs text-slate-300 font-medium">{activeDisplayNode.crop}</p>
-            {activeDisplayNode.doa && (
-              <p className="text-[10px] text-emerald-400/90 font-semibold pt-0.5 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" /> {activeDisplayNode.doa}
-              </p>
-            )}
-          </div>
-
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-[11px] text-slate-400">Escrow Index</span>
-            <span className="font-bold text-emerald-400 font-display">{activeDisplayNode.price}</span>
+          {/* TAB BUTTONS */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 rounded-2xl border border-slate-200/80 overflow-x-auto">
+            {[
+              { id: 'passport', label: 'Produce', icon: '🌾' },
+              { id: 'price', label: 'AI Price', icon: '📈' },
+              { id: 'escrow', label: 'Escrow', icon: '🔒' },
+              { id: 'logistics', label: 'Cold Fleet', icon: '🚚' }
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    setAutoRotate(false);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-[11px] font-extrabold transition-all flex items-center gap-1 cursor-pointer shrink-0 ${
+                    isActive
+                      ? 'bg-white text-emerald-800 shadow-sm border border-slate-200/80 ring-1 ring-emerald-500/20'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                  }`}
+                >
+                  <span>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
-      )}
 
-      {/* Interactive Hint Indicator */}
-      <div className="absolute bottom-4 right-4 z-20 hidden sm:flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md rounded-xl text-[10px] font-bold text-slate-400 border border-white/10 pointer-events-none">
-        <Sparkles className="w-3 h-3 text-emerald-400" />
-        <span>Drag to orbit • Hover hubs to inspect</span>
+        {/* TAB 1: HARVEST ORIGIN PASSPORT */}
+        <AnimatePresence mode="wait">
+          {activeTab === 'passport' && (
+            <motion.div
+              key="passport"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-4"
+            >
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-50 group">
+                <img
+                  src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80"
+                  alt="Welimada Grade A Organic Tomatoes"
+                  className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30" />
+                
+                {/* TOP CHIPS */}
+                <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-900 text-[10px] font-black uppercase tracking-wider border border-white shadow-xs">
+                    DOA Certified
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider shadow">
+                    Grade A Export
+                  </span>
+                </div>
+
+                <div className="absolute top-3 right-3">
+                  <span className="px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-emerald-300 text-[10px] font-black uppercase flex items-center gap-1 border border-white/20">
+                    <QrCode className="w-3 h-3 text-emerald-400" /> BATCH #WLM-882
+                  </span>
+                </div>
+
+                {/* BOTTOM OVERLAY INFO */}
+                <div className="absolute bottom-3 left-3 right-3 text-white">
+                  <h4 className="text-base font-extrabold font-display leading-snug drop-shadow-sm">
+                    Welimada Red Tomatoes (Grade A)
+                  </h4>
+                  <div className="flex items-center justify-between text-xs text-slate-200 font-medium pt-0.5">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-400" /> Welimada Organic Cooperative
+                    </span>
+                    <span className="font-bold text-emerald-300 font-display">Rs. 185.00/kg</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* TELEMETRY METRIC GRID */}
+              <div className="grid grid-cols-3 gap-2.5 text-xs">
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase text-slate-400 block">Freshness Index</span>
+                  <strong className="text-emerald-700 font-black text-sm">98.4% Peak</strong>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase text-slate-400 block">Harvest Lot</span>
+                  <strong className="text-slate-800 font-black text-sm">2,500 Kg</strong>
+                </div>
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase text-slate-400 block">Middleman Markup</span>
+                  <strong className="text-emerald-700 font-black text-sm">0.00% Zero</strong>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 2: AI PRICE PREDICTION & FORECAST */}
+          {activeTab === 'price' && (
+            <motion.div
+              key="price"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-3.5"
+            >
+              <div className="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200 flex items-center justify-between">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> AI 7-DAY PRICE FORECAST
+                  </span>
+                  <h4 className="text-sm font-extrabold text-slate-900 font-display">
+                    Tomato Wholesale Market Surge
+                  </h4>
+                </div>
+                <span className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-black text-xs shadow-sm flex items-center gap-1">
+                  +19.4% Surge Expected
+                </span>
+              </div>
+
+              <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2.5 text-xs shadow-xs">
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>Current Dambulla Wholesale:</span>
+                  <span className="font-bold text-slate-800">Rs. 180.00 / kg</span>
+                </div>
+                <div className="flex justify-between items-center text-emerald-800 font-bold">
+                  <span>AI Target Fair Value (in 3 Days):</span>
+                  <span className="text-base font-black font-display text-emerald-700">Rs. 215.00 / kg</span>
+                </div>
+                <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-slate-500">
+                  <span>Pettah Market Arrivals:</span>
+                  <span className="font-bold text-amber-700">Tight Supply (Deficit -15%)</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 font-medium flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>AI Recommendation: Hold harvest for 3 days to maximize wholesale revenue.</span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 3: 100% SMART ESCROW VAULT */}
+          {activeTab === 'escrow' && (
+            <motion.div
+              key="escrow"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-3.5"
+            >
+              <div className="p-4 bg-teal-50/70 rounded-2xl border border-teal-200 flex items-center justify-between">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase text-teal-800 tracking-wider flex items-center gap-1">
+                    <Lock className="w-3.5 h-3.5 text-teal-600" /> SMART CONTRACT ESCROW
+                  </span>
+                  <h4 className="text-sm font-extrabold text-slate-900 font-display">
+                    Keells Supermarket Forward Vault
+                  </h4>
+                </div>
+                <span className="px-3 py-1.5 rounded-xl bg-teal-600 text-white font-black text-xs shadow-sm">
+                  100% Funds Locked
+                </span>
+              </div>
+
+              <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2.5 text-xs shadow-xs">
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>Locked Escrow Capital:</span>
+                  <span className="text-base font-black text-emerald-700 font-display">Rs. 462,500.00</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>Agreed Batch Volume:</span>
+                  <span className="font-bold text-slate-800">2,500 kg Organic Tomatoes</span>
+                </div>
+                <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-slate-700 font-bold">
+                  <span>Farmer Payout Release:</span>
+                  <span className="text-teal-700 font-extrabold">Instant upon Destination Scan</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900 font-medium flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Farmers are 100% protected against delayed payments and unfair deductions.</span>
+              </div>
+            </motion.div>
+          )}
+
+          {/* TAB 4: COLD-CHAIN FLEET LOGISTICS */}
+          {activeTab === 'logistics' && (
+            <motion.div
+              key="logistics"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-3.5"
+            >
+              <div className="p-4 bg-sky-50/70 rounded-2xl border border-sky-200 flex items-center justify-between">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black uppercase text-sky-800 tracking-wider flex items-center gap-1">
+                    <Truck className="w-3.5 h-3.5 text-sky-600" /> REAL-TIME COLD-CHAIN FLEET
+                  </span>
+                  <h4 className="text-sm font-extrabold text-slate-900 font-display">
+                    Refrigerated Transit #AG-8842
+                  </h4>
+                </div>
+                <span className="px-3 py-1.5 rounded-xl bg-sky-600 text-white font-black text-xs shadow-sm flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span> In Transit
+                </span>
+              </div>
+
+              <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2.5 text-xs shadow-xs">
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>Cold Storage Core Temp:</span>
+                  <span className="font-extrabold text-emerald-700 font-mono">4.2°C (Optimal)</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-500">
+                  <span>Transit Route:</span>
+                  <span className="font-bold text-slate-800">Welimada ➔ Dambulla Central</span>
+                </div>
+                <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-slate-700">
+                  <span>Estimated Delivery Window:</span>
+                  <span className="font-black text-sky-700">1 Hour 35 Mins (On-Time)</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600 font-medium flex items-center gap-2">
+                <Clock className="w-4 h-4 text-sky-600 shrink-0" />
+                <span>9-Stage verified logistics tracking with digital origin &amp; destination scans.</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* CARD FOOTER CALLOUT */}
+        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-slate-500 font-semibold text-[11px]">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Sri Lanka DOA Verified Ecosystem</span>
+          </div>
+
+          <Link
+            to="/crops"
+            className="text-emerald-700 hover:text-emerald-800 font-extrabold text-xs inline-flex items-center gap-1 transition group"
+          >
+            <span>Explore Live Batches</span>
+            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </Link>
+        </div>
+
       </div>
 
-      {/* Three.js WebGL Canvas */}
-      <Canvas
-        camera={{ position: [0, 0, 4.2], fov: 45 }}
-        dpr={[1, Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 2)]}
-        className="w-full h-full cursor-grab active:cursor-grabbing"
+      {/* FLOATING GLASS CHIPS SURROUNDING HERO CARD */}
+      <motion.div
+        animate={{ y: [0, -6, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute -bottom-5 -left-4 sm:-left-6 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-slate-200/90 shadow-xl flex items-center gap-2 text-xs font-black text-slate-800"
       >
-        <ambientLight intensity={0.9} />
-        <pointLight position={[10, 10, 10]} intensity={1.5} color="#ffffff" />
-        <pointLight position={[-10, -10, -5]} intensity={0.6} color="#10b981" />
-        <directionalLight position={[5, 3, 5]} intensity={1.0} color="#e0f2fe" />
+        <div className="w-6 h-6 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">
+          🛡️
+        </div>
+        <span>100% Escrow Secured</span>
+      </motion.div>
 
-        <Suspense fallback={null}>
-          <InteractiveSceneContainer
-            mode={activeMode}
-            selectedNode={selectedNode}
-            onSelectNode={setSelectedNode}
-            hoveredNodeId={hoveredNodeId}
-            setHoveredNodeId={setHoveredNodeId}
-          />
-        </Suspense>
-
-        <OrbitControls
-          ref={controlsRef}
-          enableZoom={false}
-          enablePan={false}
-          autoRotate={false}
-          maxPolarAngle={Math.PI / 1.5}
-          minPolarAngle={Math.PI / 3}
-        />
-      </Canvas>
+      <motion.div
+        animate={{ y: [0, 6, 0] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        className="absolute -top-4 -right-2 sm:-right-4 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-slate-200/90 shadow-xl flex items-center gap-2 text-xs font-black text-slate-800"
+      >
+        <div className="w-6 h-6 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xs">
+          🌿
+        </div>
+        <span>DOA Certified Quality</span>
+      </motion.div>
     </div>
   );
 };

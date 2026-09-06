@@ -258,19 +258,23 @@ export const CropDetails = () => {
               </div>
             </div>
 
-            {/* PRICE CARD */}
-            <div className="p-5 bg-gradient-to-r from-emerald-950 to-slate-900 text-white rounded-2xl shadow-lg space-y-2">
-              <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-widest text-emerald-300">
+            {/* PRICE CARD (CLEAN WHITE & GLASSMORPHIC) */}
+            <div className="p-5 bg-gradient-to-br from-emerald-50 via-teal-50/40 to-white rounded-2xl border border-emerald-200 shadow-sm space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-emerald-800">
                 <span>Direct Farmer Harvest Price</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Direct Farm Savings: 6.7%</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold border border-emerald-200">
+                  Direct Farm Savings: 6.7%
+                </span>
               </div>
 
               <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-black text-emerald-400 font-display">
+                <span className="text-4xl font-black text-emerald-700 font-display">
                   Rs. {Number(crop.price || 210).toLocaleString()}
                 </span>
-                <span className="text-sm font-bold text-slate-300">/ Kg</span>
-                <span className="text-xs text-slate-400 line-through ml-2 font-semibold">Market: Rs. {(Number(crop.price || 210) * 1.07).toFixed(0)}/kg</span>
+                <span className="text-sm font-bold text-slate-600">/ Kg</span>
+                <span className="text-xs text-slate-400 line-through ml-2 font-semibold">
+                  Market: Rs. {(Number(crop.price || 210) * 1.07).toFixed(0)}/kg
+                </span>
               </div>
             </div>
 

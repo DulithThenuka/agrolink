@@ -313,33 +313,33 @@ export const CropsList = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-fade-in">
       {/* 1. HERO MARKETPLACE HEADER */}
-      <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="glass-card p-6 sm:p-8 bg-white border border-slate-200/90 shadow-xl shadow-slate-200/50 rounded-3xl relative overflow-hidden text-slate-800 space-y-4">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black uppercase tracking-wider border border-emerald-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> Verified Producer Marketplace
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-black uppercase tracking-wider border border-emerald-200 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Verified Producer Marketplace
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-white">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-slate-900">
               Available Farm Harvests 🌾
             </h1>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-xl font-medium leading-relaxed">
+            <p className="text-slate-500 text-xs sm:text-sm max-w-xl font-medium leading-relaxed">
               Direct-from-farm wholesale produce with 100% Escrow security, origin traceability passports, and zero intermediary markup.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             <button
               onClick={() => setShowPostModal(true)}
-              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition"
+              className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" />
               <span>+ Post Harvest Listing</span>
             </button>
             <Link
               to="/contracts"
-              className="px-5 py-3 bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-200 font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center gap-1.5"
+              className="px-5 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center gap-1.5"
             >
               <span>Forward Contracts</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -348,22 +348,22 @@ export const CropsList = () => {
         </div>
 
         {/* LIVE MICRO-STATS STRIP */}
-        <div className="mt-6 pt-5 border-t border-slate-800/80 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold relative z-10">
-          <div className="flex items-center gap-2 text-slate-300">
-            <Package className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span><strong className="text-white font-bold">12.4 MT</strong> Active Harvest</span>
+        <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold relative z-10 text-slate-600">
+          <div className="flex items-center gap-2">
+            <Package className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span><strong className="text-slate-900 font-bold">12.4 MT</strong> Active Harvest</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
-            <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span><strong className="text-white font-bold">25 Districts</strong> Covered</span>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span><strong className="text-slate-900 font-bold">25 Districts</strong> Covered</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span><strong className="text-white font-bold">100% Escrow</strong> Protected</span>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span><strong className="text-slate-900 font-bold">100% Escrow</strong> Protected</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
-            <Truck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span><strong className="text-white font-bold">Cold-Chain Fleet</strong> Ready</span>
+          <div className="flex items-center gap-2">
+            <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span><strong className="text-slate-900 font-bold">Cold-Chain Fleet</strong> Ready</span>
           </div>
         </div>
       </div>
@@ -737,7 +737,7 @@ export const CropsList = () => {
                     />
 
                     {/* TOP-LEFT CATEGORY BADGE */}
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-slate-950/80 backdrop-blur-md text-emerald-300 text-[10px] font-black uppercase tracking-wider rounded-full border border-white/20 shadow-sm">
+                    <div className="absolute top-3 left-3 px-3 py-1 bg-white/95 backdrop-blur-md text-slate-800 text-[10px] font-black uppercase tracking-wider rounded-full border border-slate-200/90 shadow-sm">
                       {crop.category || 'Produce'}
                     </div>
 
@@ -853,29 +853,31 @@ export const CropsList = () => {
       )}
 
       {/* 4. B2B BULK TENDER & FORWARD CONTRACT CALLOUT BANNER */}
-      <div className="p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-slate-950 to-emerald-950 text-white rounded-3xl border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-1.5 text-center md:text-left">
-          <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-wider border border-emerald-500/30">
+      <div className="p-6 sm:p-8 bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-800 text-white rounded-3xl border border-emerald-400/30 shadow-xl shadow-emerald-900/10 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="space-y-1.5 text-center md:text-left relative z-10">
+          <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider border border-white/30">
             Institutional Procurement
           </span>
           <h3 className="text-xl sm:text-2xl font-extrabold font-display text-white">
             Need Bulk Commercial Volumes (5,000+ kg)? 🏬
           </h3>
-          <p className="text-slate-300 text-xs sm:text-sm max-w-xl font-medium">
+          <p className="text-emerald-50 text-xs sm:text-sm max-w-xl font-medium">
             Post an official B2B tender request or lock in guaranteed forward price agreements directly with regional grower cooperatives.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3 shrink-0">
+        <div className="flex flex-wrap gap-3 shrink-0 relative z-10">
           <Link
             to="/contracts"
-            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow transition"
+            className="px-5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-extrabold text-xs rounded-xl shadow-md transition"
           >
             Contract Farming →
           </Link>
           <Link
             to="/negotiation"
-            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-extrabold text-xs rounded-xl transition"
+            className="px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-md font-extrabold text-xs rounded-xl transition"
           >
             Trade Negotiation
           </Link>

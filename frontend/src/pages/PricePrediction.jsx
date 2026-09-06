@@ -219,21 +219,21 @@ export const PricePrediction = () => {
         </motion.div>
       </div>
 
-      {/* WHAT-IF HARVEST PROFIT CALCULATOR */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-700/80 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-700/60 pb-4">
+      {/* WHAT-IF HARVEST PROFIT CALCULATOR (CLEAN WHITE & GLASSMORPHIC) */}
+      <div className="glass-card bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div className="flex items-center gap-3">
-            <span className="p-3 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="p-3 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200">
               <Calculator className="w-6 h-6" />
             </span>
             <div>
-              <h3 className="text-xl font-bold font-display text-white">Harvest Revenue & Profit Calculator 💡</h3>
-              <p className="text-xs text-slate-300">
-                Simulate earnings for <span className="font-extrabold text-emerald-400">{selectedGrade}</span> at <span className="font-extrabold text-emerald-400">{selectedLocation}</span>
+              <h3 className="text-xl font-extrabold font-display text-slate-900">Harvest Revenue &amp; Profit Calculator 💡</h3>
+              <p className="text-xs text-slate-500 font-medium">
+                Simulate earnings for <strong className="text-emerald-700">{selectedGrade}</strong> at <strong className="text-slate-800">{selectedLocation}</strong>
               </p>
             </div>
           </div>
-          <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-extrabold border border-emerald-500/30 self-start sm:self-auto">
+          <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-black uppercase border border-emerald-200 self-start sm:self-auto">
             Interactive Scenario Tool
           </span>
         </div>
@@ -241,12 +241,12 @@ export const PricePrediction = () => {
         <div className="grid lg:grid-cols-12 gap-8 items-center">
           {/* SLIDER CONTROLS */}
           <div className="lg:col-span-6 space-y-5">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-black uppercase tracking-wider text-slate-500">
                   Harvest Batch Quantity (kg):
                 </label>
-                <span className="text-lg font-extrabold text-emerald-400 font-display">
+                <span className="text-xl font-black text-emerald-700 font-display">
                   {harvestQty.toLocaleString()} kg
                 </span>
               </div>
@@ -257,9 +257,9 @@ export const PricePrediction = () => {
                 step="50"
                 value={harvestQty}
                 onChange={(e) => setHarvestQty(Number(e.target.value))}
-                className="w-full h-2.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
               />
-              <div className="flex justify-between text-[11px] text-slate-400 mt-1 font-medium">
+              <div className="flex justify-between text-[11px] text-slate-400 font-bold">
                 <span>50 kg</span>
                 <span>1,000 kg</span>
                 <span>2,500 kg</span>
@@ -267,16 +267,16 @@ export const PricePrediction = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setHarvestQty(250)}
-                className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 transition"
+                className="py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:text-emerald-800 text-xs font-extrabold text-slate-700 border border-slate-200 transition cursor-pointer"
               >
                 Smallholder (250 kg)
               </button>
               <button
                 onClick={() => setHarvestQty(1000)}
-                className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 transition"
+                className="py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:text-emerald-800 text-xs font-extrabold text-slate-700 border border-slate-200 transition cursor-pointer"
               >
                 Commercial (1,000 kg)
               </button>
@@ -284,31 +284,31 @@ export const PricePrediction = () => {
           </div>
 
           {/* CALCULATED REVENUE GAIN DISPLAY */}
-          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-800/80 rounded-xl p-5 border border-slate-700">
+          <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 rounded-2xl p-5 border border-slate-200/90">
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Selling Today ({selectedLocation}):</span>
-              <p className="text-2xl font-extrabold text-slate-200 font-display">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Selling Today ({selectedLocation}):</span>
+              <p className="text-2xl font-black text-slate-900 font-display">
                 Rs. {todayRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
-              <span className="text-[11px] text-slate-400">@ Rs. {prediction.todaysMarketPriceLkr.toFixed(2)}/kg</span>
+              <span className="text-[11px] text-slate-500 font-semibold">@ Rs. {prediction.todaysMarketPriceLkr.toFixed(2)}/kg</span>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Selling at AI Target Window:</span>
-              <p className="text-2xl font-extrabold text-emerald-400 font-display">
+              <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">Selling at AI Target Window:</span>
+              <p className="text-2xl font-black text-emerald-700 font-display">
                 Rs. {targetRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
-              <span className="text-[11px] text-emerald-300">@ Rs. {prediction.predictedFairPriceLkr.toFixed(2)}/kg</span>
+              <span className="text-[11px] text-emerald-700 font-semibold">@ Rs. {prediction.predictedFairPriceLkr.toFixed(2)}/kg</span>
             </div>
 
-            <div className="sm:col-span-2 pt-3 border-t border-slate-700 flex items-center justify-between">
+            <div className="sm:col-span-2 pt-3 border-t border-slate-200 flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-300">Net Additional Revenue:</span>
-                <p className={`text-xl font-extrabold font-display ${netGain >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <span className="text-xs font-bold text-slate-600">Net Additional Revenue:</span>
+                <p className={`text-xl font-black font-display ${netGain >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
                   {netGain >= 0 ? `+ Rs. ${netGain.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : `- Rs. ${Math.abs(netGain).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </p>
               </div>
-              <span className={`px-3 py-1.5 rounded-xl text-xs font-extrabold ${netGain >= 0 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}`}>
+              <span className={`px-3 py-1.5 rounded-xl text-xs font-black ${netGain >= 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'}`}>
                 {netGain >= 0 ? `+${percentageGain.toFixed(1)}% Extra Gain` : `${percentageGain.toFixed(1)}% Loss`}
               </span>
             </div>
