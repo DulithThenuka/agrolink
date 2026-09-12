@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cropsAPI, ordersAPI } from '../services/api';
+import { cropsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   Search,
@@ -18,15 +18,18 @@ import {
   Sparkles,
   ShieldCheck,
   Truck,
-  TrendingDown,
   ArrowRight,
   X,
   SlidersHorizontal,
-  FileCheck2,
   Package,
   BadgeCheck,
   CheckCircle2,
-  Star
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Clock,
+  ExternalLink,
+  Eye
 } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
@@ -48,7 +51,8 @@ const MOCK_CROPS = [
     isOrganic: true,
     imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
     description: 'Fresh grade-A vine-ripened organic tomatoes grown in high-altitude soil. Zero chemical pesticides.',
-    batchCode: 'BATCH-2026-NWR-0941'
+    batchCode: 'BATCH-2026-NWR-0941',
+    harvestDateText: 'Available Now'
   },
   {
     id: 2,
@@ -64,7 +68,8 @@ const MOCK_CROPS = [
     isOrganic: true,
     imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=800&auto=format&fit=crop&q=80',
     description: 'Pungent, sun-cured Jaffna shallots with high oil content. Ideal for long-term commercial storage.',
-    batchCode: 'BATCH-2026-JAF-0822'
+    batchCode: 'BATCH-2026-JAF-0822',
+    harvestDateText: 'Available Now'
   },
   {
     id: 3,
@@ -80,7 +85,8 @@ const MOCK_CROPS = [
     isOrganic: true,
     imageUrl: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&auto=format&fit=crop&q=80',
     description: 'Authentic Alba-grade Ceylon quills. Hand-peeled in Southern Sri Lanka with certified low coumarin.',
-    batchCode: 'BATCH-2026-GAL-0519'
+    batchCode: 'BATCH-2026-GAL-0519',
+    harvestDateText: 'Available Now'
   },
   {
     id: 4,
@@ -96,7 +102,8 @@ const MOCK_CROPS = [
     isOrganic: false,
     imageUrl: 'https://images.unsplash.com/photo-1589984662646-e7b2e4962f18?w=800&auto=format&fit=crop&q=80',
     description: 'Juicy, high-brix sugar-baby watermelons harvested fresh from dry zone farms. Direct dispatch.',
-    batchCode: 'BATCH-2026-HMB-0312'
+    batchCode: 'BATCH-2026-HMB-0312',
+    harvestDateText: 'Available Now'
   },
   {
     id: 5,
@@ -112,7 +119,8 @@ const MOCK_CROPS = [
     isOrganic: true,
     imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop&q=80',
     description: 'Aromatic long-grain paddy harvested from Ancient Tank Irrigation zones. Aged 6 months for premium texture.',
-    batchCode: 'BATCH-2026-ANU-1104'
+    batchCode: 'BATCH-2026-ANU-1104',
+    harvestDateText: 'Available Now'
   },
   {
     id: 6,
@@ -128,7 +136,8 @@ const MOCK_CROPS = [
     isOrganic: true,
     imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=800&auto=format&fit=crop&q=80',
     description: 'Hand-picked two-leaves-and-a-bud fresh tea flush from central hill slopes. Rich in natural antioxidants.',
-    batchCode: 'BATCH-2026-KDY-0731'
+    batchCode: 'BATCH-2026-KDY-0731',
+    harvestDateText: 'Available Now'
   }
 ];
 
@@ -160,10 +169,11 @@ const SRI_LANKA_DISTRICTS = [
 ];
 
 export const CropsList = () => {
-  const { user, isFarmer, isAuthenticated } = useAuth();
+  const { user, isFarmer, isAdmin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialKeyword = searchParams.get('search') || '';
+  const searchInputRef = useRef(null);
 
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -172,6 +182,19 @@ export const CropsList = () => {
   const [selectedBuyCrop, setSelectedBuyCrop] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
   const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
+
+  // Filters State
+  const [keyword, setKeyword] = useState(initialKeyword);
+  const [category, setCategory] = useState('');
+  const [location, setLocation] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [organicOnly, setOrganicOnly] = useState(false);
+  const [gradeAOnly, setGradeAOnly] = useState(false);
+  const [sortBy, setSortBy] = useState('DEFAULT');
+  const [viewMode, setViewMode] = useState('grid');
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Checks if the logged-in farmer owns this listing
   const isCropOwner = (c) => Boolean(
@@ -191,23 +214,22 @@ export const CropsList = () => {
     setSelectedBuyCrop(c);
   };
 
-  // Filters State
-  const [keyword, setKeyword] = useState(initialKeyword);
-  const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [organicOnly, setOrganicOnly] = useState(false);
-  const [gradeAOnly, setGradeAOnly] = useState(false);
-  const [sortBy, setSortBy] = useState('DEFAULT');
-  const [viewMode, setViewMode] = useState('grid');
-  const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  // Keyboard shortcut '/' to focus search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === '/' && document.activeElement !== searchInputRef.current && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const filterMockData = useCallback((kw, cat, loc, minP, maxP, orgOnly, grAOnly, sort) => {
     let result = [...MOCK_CROPS];
     if (kw) {
-      result = result.filter(c => c.name.toLowerCase().includes(kw.toLowerCase()) || c.description.toLowerCase().includes(kw.toLowerCase()));
+      result = result.filter(c => c.name.toLowerCase().includes(kw.toLowerCase()) || (c.description && c.description.toLowerCase().includes(kw.toLowerCase())));
     }
     if (cat) {
       result = result.filter(c => c.category.toLowerCase() === cat.toLowerCase());
@@ -267,7 +289,7 @@ export const CropsList = () => {
         setTotalPages(1);
       }
     } catch (err) {
-      console.warn('Backend API offline. Loading featured crops catalog:', err);
+      console.warn('Backend API offline. Loading verified crop catalog:', err);
       const filtered = filterMockData(keyword, category, location, minPrice, maxPrice, organicOnly, gradeAOnly, sortBy);
       setCrops(filtered);
       setTotalPages(1);
@@ -306,608 +328,762 @@ export const CropsList = () => {
       await cropsAPI.delete(cropId);
       fetchCrops();
     } catch (err) {
-      alert('Failed to delete crop');
+      alert('Failed to delete crop listing.');
     }
   };
 
+  // Helper to format quantity cleanly
+  const formatQuantity = (qty) => {
+    const num = Number(qty) || 0;
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)} MT (${num.toLocaleString()} kg)`;
+    }
+    return `${num.toLocaleString()} kg`;
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 animate-fade-in">
-      {/* 1. HERO MARKETPLACE HEADER */}
-      <div className="glass-card p-6 sm:p-8 bg-white border border-slate-200/90 shadow-xl shadow-slate-200/50 rounded-3xl relative overflow-hidden text-slate-800 space-y-4">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-black uppercase tracking-wider border border-emerald-200 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Verified Producer Marketplace
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-display text-slate-900">
-              Available Farm Harvests 🌾
-            </h1>
-            <p className="text-slate-500 text-xs sm:text-sm max-w-xl font-medium leading-relaxed">
-              Direct-from-farm wholesale produce with 100% Escrow security, origin traceability passports, and zero intermediary markup.
-            </p>
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-16 font-sans">
+      
+      {/* 1. TOP ANNOUNCEMENT & TRUST STRIP */}
+      <div className="bg-emerald-800 text-emerald-50 px-4 py-2.5 text-xs font-medium border-b border-emerald-900/30">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 font-semibold text-emerald-200">
+              <ShieldCheck className="w-4 h-4 text-emerald-300" aria-hidden="true" />
+              Verified Agricultural Produce Exchange
+            </span>
+            <span className="hidden sm:inline text-emerald-300/60">•</span>
+            <span className="hidden sm:inline text-emerald-100">
+              Direct Farmer-to-Buyer Wholesale Trading with 100% Escrow Protection
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
-            <button
-              onClick={() => setShowPostModal(true)}
-              className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-500/20 flex items-center gap-2 transition cursor-pointer"
-            >
-              <PlusCircle className="w-4 h-4" />
-              <span>+ Post Harvest Listing</span>
-            </button>
-            <Link
-              to="/contracts"
-              className="px-5 py-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-extrabold text-xs sm:text-sm rounded-xl shadow-xs transition flex items-center gap-1.5"
-            >
-              <span>Forward Contracts</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
-
-        {/* LIVE MICRO-STATS STRIP */}
-        <div className="mt-4 pt-4 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold relative z-10 text-slate-600">
-          <div className="flex items-center gap-2">
-            <Package className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span><strong className="text-slate-900 font-bold">12.4 MT</strong> Active Harvest</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span><strong className="text-slate-900 font-bold">25 Districts</strong> Covered</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span><strong className="text-slate-900 font-bold">100% Escrow</strong> Protected</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span><strong className="text-slate-900 font-bold">Cold-Chain Fleet</strong> Ready</span>
+          <div className="flex items-center gap-4 text-emerald-200 text-xs">
+            <span className="inline-flex items-center gap-1">
+              <Truck className="w-3.5 h-3.5" aria-hidden="true" /> Farmgate &amp; Hub Dispatch
+            </span>
+            <span className="hidden md:inline-flex items-center gap-1">
+              <BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" /> Origin Passport Traceability
+            </span>
           </div>
         </div>
       </div>
 
-      {/* 2. UNIFIED SEARCH, DISTRICT & VIEW CONTROL BAR */}
-      <div className="glass rounded-2xl p-4 border border-white/80 shadow-lg space-y-4">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-          {/* SEARCH INPUT */}
-          <form onSubmit={handleSearchSubmit} className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Search produce by name, crop type, or farm cooperative..."
-              className="w-full pl-10 pr-20 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 bg-white transition"
-            />
-            {keyword && (
-              <button
-                type="button"
-                onClick={() => { setKeyword(''); setPage(0); }}
-                className="absolute right-12 top-3 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-            <button
-              type="submit"
-              className="absolute right-1.5 top-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition"
-            >
-              Search
-            </button>
-          </form>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-          {/* DISTRICT SELECTOR */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="relative min-w-[170px]">
-              <select
-                value={location}
-                onChange={(e) => { setLocation(e.target.value); setPage(0); }}
-                className="w-full pl-3 pr-8 py-2.5 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer"
-              >
-                <option value="">All Sri Lanka Districts 📍</option>
-                {SRI_LANKA_DISTRICTS.map((dist) => (
-                  <option key={dist} value={dist}>📍 {dist}</option>
-                ))}
-              </select>
+        {/* 2. HEADER BANNER */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2 max-w-3xl">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold tracking-wide uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />
+                Produce Marketplace
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Fresh Crops. Direct From Farmers.
+              </h1>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                Connect farmers with buyers and find crops available in your area. Guaranteed origin traceability, transparent farmgate prices, and secure escrow settlement.
+              </p>
             </div>
 
-            {/* SORT SELECTOR */}
-            <div className="relative min-w-[150px]">
-              <select
-                value={sortBy}
-                onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
-                className="w-full pl-3 pr-8 py-2.5 rounded-xl border border-slate-200 text-xs font-bold bg-white text-slate-800 focus:outline-none focus:border-emerald-500 shadow-sm cursor-pointer"
-              >
-                <option value="DEFAULT">⭐ Sort: Featured</option>
-                <option value="PRICE_LOW">💲 Price: Low to High</option>
-                <option value="PRICE_HIGH">💲 Price: High to Low</option>
-                <option value="QTY_HIGH">🌾 Stock: High to Low</option>
-                <option value="NEWEST">🕒 Newest First</option>
-              </select>
-            </div>
-
-            {/* ADVANCED PRICE FILTER TOGGLE */}
-            <button
-              type="button"
-              onClick={() => setShowFiltersDrawer(!showFiltersDrawer)}
-              className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 ${
-                showFiltersDrawer || minPrice || maxPrice
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Price Filters</span>
-            </button>
-
-            {/* VIEW MODE TOGGLE */}
-            <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg text-xs font-bold transition ${
-                  viewMode === 'grid' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-                title="Grid View"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`p-1.5 rounded-lg text-xs font-bold transition ${
-                  viewMode === 'table' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-                title="Table View"
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* EXPANDABLE ADVANCED PRICE FILTER DRAWER */}
-        <AnimatePresence>
-          {showFiltersDrawer && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="pt-3 border-t border-slate-200/80 overflow-hidden"
-            >
-              <div className="flex flex-wrap items-center gap-4 bg-slate-50/80 p-4 rounded-xl border border-slate-200/60 text-xs">
-                <span className="font-extrabold text-slate-600">Price Range (Rs./kg):</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                    placeholder="Min (Rs. 0)"
-                    className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-semibold text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                  <span className="text-slate-400 font-bold">to</span>
-                  <input
-                    type="number"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
-                    placeholder="Max (Rs. 2000)"
-                    className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-semibold text-xs focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
+            {/* Actions: Sell Your Crop (Only for farmers/admins) & Forward Contracts */}
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              {(isFarmer || isAdmin) && (
                 <button
                   type="button"
-                  onClick={() => { setPage(0); fetchCrops(); }}
-                  className="px-4 py-1.5 bg-slate-900 text-white font-bold rounded-lg text-xs hover:bg-slate-800 transition"
+                  onClick={() => setShowPostModal(true)}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
                 >
-                  Apply Price
+                  <PlusCircle className="w-4 h-4" aria-hidden="true" />
+                  <span>Sell Your Crop</span>
                 </button>
-                {(minPrice || maxPrice) && (
-                  <button
-                    type="button"
-                    onClick={() => { setMinPrice(''); setMaxPrice(''); setPage(0); }}
-                    className="text-xs font-bold text-rose-600 hover:underline"
-                  >
-                    Clear Price
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              )}
 
-        {/* CATEGORY PILLS & QUALITY QUICK TOGGLE BADGES */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <div className="flex flex-wrap items-center gap-2">
-            {[
-              { label: 'All Produce 🌾', value: '' },
-              { label: '🥬 Vegetables', value: 'Vegetables' },
-              { label: '🌾 Grains', value: 'Grains' },
-              { label: '🍎 Fruits', value: 'Fruits' },
-              { label: '🌶️ Spices', value: 'Spices' }
-            ].map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => { setCategory(tab.value); setPage(0); }}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition border ${
-                  category === tab.value
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'
-                }`}
+              <Link
+                to="/contracts"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold shadow-2xs transition"
               >
-                {tab.label}
-              </button>
-            ))}
+                <span>Forward Contracts</span>
+                <ArrowRight className="w-4 h-4 text-slate-400" />
+              </Link>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => { setOrganicOnly(!organicOnly); setPage(0); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition border flex items-center gap-1.5 ${
-                organicOnly
-                  ? 'bg-emerald-800 text-emerald-100 border-emerald-700'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-emerald-50'
-              }`}
-            >
-              <span>🌱 Organic Certified</span>
-            </button>
+          {/* Micro-Stats Strip */}
+          <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 shrink-0">
+                <Package className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <div>
+                <span className="font-semibold text-slate-900 block">Active Harvests</span>
+                <span className="text-slate-500">Commercial &amp; smallholder volumes</span>
+              </div>
+            </div>
 
-            <button
-              onClick={() => { setGradeAOnly(!gradeAOnly); setPage(0); }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition border flex items-center gap-1.5 ${
-                gradeAOnly
-                  ? 'bg-amber-700 text-amber-100 border-amber-600'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-amber-50'
-              }`}
-            >
-              <span>⭐ Grade A Export</span>
-            </button>
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-teal-50 text-teal-700 border border-teal-100 shrink-0">
+                <MapPin className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <div>
+                <span className="font-semibold text-slate-900 block">25 Districts</span>
+                <span className="text-slate-500">Islandwide grower cooperatives</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 shrink-0">
+                <ShieldCheck className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <div>
+                <span className="font-semibold text-slate-900 block">100% Escrow Vault</span>
+                <span className="text-slate-500">Funds released on buyer delivery sign-off</span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 shrink-0">
+                <Truck className="w-4 h-4" aria-hidden="true" />
+              </div>
+              <div>
+                <span className="font-semibold text-slate-900 block">Fleet Logistics</span>
+                <span className="text-slate-500">Integrated cold-chain transport options</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* ACTIVE FILTER CHIPS (IF ANY ACTIVE) */}
-        {hasActiveFilters && (
-          <div className="pt-2 border-t border-slate-200/60 flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-extrabold text-slate-400">Active Filters:</span>
-            {keyword && (
-              <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-bold flex items-center gap-1">
-                "{keyword}" <button onClick={() => setKeyword('')}><X className="w-3 h-3 text-slate-400 hover:text-slate-600" /></button>
-              </span>
+        {/* 3. UNIFIED SEARCH & FILTER TOOLBAR */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+          
+          {/* Top Row: Search Input + District Selector + Sort Dropdown + View Switcher */}
+          <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
+            
+            {/* Search Field */}
+            <form onSubmit={handleSearchSubmit} className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Search crops by name, crop variety, or cooperative (e.g. Tomatoes, Samba, Cinnamon)..."
+                className="w-full pl-10 pr-24 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
+                aria-label="Search crops"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                {keyword && (
+                  <button
+                    type="button"
+                    onClick={() => { setKeyword(''); setPage(0); }}
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 transition"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  className="px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-lg transition shadow-2xs"
+                >
+                  Search
+                </button>
+              </div>
+            </form>
+
+            {/* Filter Dropdowns & Controls */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              
+              {/* District Selector */}
+              <div className="relative min-w-[170px] flex-1 sm:flex-initial">
+                <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                <select
+                  value={location}
+                  onChange={(e) => { setLocation(e.target.value); setPage(0); }}
+                  className="w-full pl-8 pr-8 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 appearance-none cursor-pointer hover:bg-slate-100 transition"
+                  aria-label="Filter by district"
+                >
+                  <option value="">All Sri Lanka Districts</option>
+                  {SRI_LANKA_DISTRICTS.map((dist) => (
+                    <option key={dist} value={dist}>{dist}</option>
+                  ))}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+
+              {/* Sort Selector */}
+              <div className="relative min-w-[150px] flex-1 sm:flex-initial">
+                <select
+                  value={sortBy}
+                  onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
+                  className="w-full pl-3 pr-8 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 appearance-none cursor-pointer hover:bg-slate-100 transition"
+                  aria-label="Sort crops"
+                >
+                  <option value="DEFAULT">Featured Produce</option>
+                  <option value="PRICE_LOW">Price: Low to High</option>
+                  <option value="PRICE_HIGH">Price: High to Low</option>
+                  <option value="QTY_HIGH">Stock: High to Low</option>
+                  <option value="NEWEST">Newest Harvest</option>
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+
+              {/* Advanced Price Filter Toggle */}
+              <button
+                type="button"
+                onClick={() => setShowFiltersDrawer(!showFiltersDrawer)}
+                className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition flex items-center gap-1.5 ${
+                  showFiltersDrawer || minPrice || maxPrice
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+                aria-expanded={showFiltersDrawer}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />
+                <span>Price</span>
+                {(minPrice || maxPrice) && (
+                  <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+                )}
+              </button>
+
+              {/* View Mode Switcher (Grid vs Table) */}
+              <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200" role="group" aria-label="View mode">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1.5 rounded-lg text-xs transition ${
+                    viewMode === 'grid' ? 'bg-white text-emerald-800 shadow-2xs font-semibold' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                  title="Grid View"
+                  aria-pressed={viewMode === 'grid'}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('table')}
+                  className={`p-1.5 rounded-lg text-xs transition ${
+                    viewMode === 'table' ? 'bg-white text-emerald-800 shadow-2xs font-semibold' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                  title="Commercial Table View"
+                  aria-pressed={viewMode === 'table'}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Expandable Price Range Drawer */}
+          <AnimatePresence>
+            {showFiltersDrawer && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="pt-3 border-t border-slate-100 overflow-hidden"
+              >
+                <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
+                  <span className="font-semibold text-slate-700">Price Range (Rs./kg):</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      placeholder="Min (Rs. 0)"
+                      className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    />
+                    <span className="text-slate-400 font-medium">to</span>
+                    <input
+                      type="number"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      placeholder="Max (Rs. 2000)"
+                      className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setPage(0); fetchCrops(); }}
+                    className="px-4 py-1.5 bg-slate-900 text-white font-semibold rounded-lg text-xs hover:bg-slate-800 transition"
+                  >
+                    Apply Price
+                  </button>
+                  {(minPrice || maxPrice) && (
+                    <button
+                      type="button"
+                      onClick={() => { setMinPrice(''); setMaxPrice(''); setPage(0); }}
+                      className="text-xs font-semibold text-rose-600 hover:underline"
+                    >
+                      Clear Price
+                    </button>
+                  )}
+                </div>
+              </motion.div>
             )}
-            {category && (
-              <span className="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 font-bold flex items-center gap-1">
-                Category: {category} <button onClick={() => setCategory('')}><X className="w-3 h-3 text-emerald-400 hover:text-emerald-700" /></button>
-              </span>
-            )}
-            {location && (
-              <span className="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-700 font-bold flex items-center gap-1">
-                District: {location} <button onClick={() => setLocation('')}><X className="w-3 h-3 text-teal-400 hover:text-teal-700" /></button>
-              </span>
-            )}
-            {organicOnly && (
-              <span className="px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 font-bold flex items-center gap-1">
-                Organic Only <button onClick={() => setOrganicOnly(false)}><X className="w-3 h-3 text-emerald-600" /></button>
-              </span>
-            )}
-            {gradeAOnly && (
-              <span className="px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-800 font-bold flex items-center gap-1">
-                Grade A Only <button onClick={() => setGradeAOnly(false)}><X className="w-3 h-3 text-amber-600" /></button>
-              </span>
-            )}
-            <button
-              onClick={handleResetFilters}
-              className="text-xs font-black text-rose-600 hover:underline ml-2"
+          </AnimatePresence>
+
+          {/* Category Pills & Quick Quality Toggles */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" role="tablist">
+              {[
+                { label: 'All Produce', value: '' },
+                { label: 'Vegetables', value: 'Vegetables' },
+                { label: 'Grains', value: 'Grains' },
+                { label: 'Fruits', value: 'Fruits' },
+                { label: 'Spices', value: 'Spices' }
+              ].map((tab) => {
+                const isActive = category === tab.value;
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    onClick={() => { setCategory(tab.value); setPage(0); }}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all ${
+                      isActive
+                        ? 'bg-emerald-700 text-white shadow-2xs'
+                        : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Quality & Organic Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => { setOrganicOnly(!organicOnly); setPage(0); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-1.5 ${
+                  organicOnly
+                    ? 'bg-emerald-800 text-white border-emerald-800'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <span>🌱 Organic Certified</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setGradeAOnly(!gradeAOnly); setPage(0); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-1.5 ${
+                  gradeAOnly
+                    ? 'bg-amber-800 text-white border-amber-800'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <span>⭐ Grade A Export</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Active Filter Chips */}
+          {hasActiveFilters && (
+            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-semibold text-slate-500">Active Filters:</span>
+              {keyword && (
+                <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium flex items-center gap-1">
+                  "{keyword}" <button onClick={() => setKeyword('')}><X className="w-3 h-3 text-slate-400 hover:text-slate-600" /></button>
+                </span>
+              )}
+              {category && (
+                <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-medium border border-emerald-200 flex items-center gap-1">
+                  Category: {category} <button onClick={() => setCategory('')}><X className="w-3 h-3 text-emerald-600 hover:text-emerald-800" /></button>
+                </span>
+              )}
+              {location && (
+                <span className="px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-800 font-medium border border-teal-200 flex items-center gap-1">
+                  District: {location} <button onClick={() => setLocation('')}><X className="w-3 h-3 text-teal-600 hover:text-teal-800" /></button>
+                </span>
+              )}
+              {organicOnly && (
+                <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-900 font-medium flex items-center gap-1">
+                  Organic Only <button onClick={() => setOrganicOnly(false)}><X className="w-3 h-3 text-emerald-700 hover:text-emerald-900" /></button>
+                </span>
+              )}
+              {gradeAOnly && (
+                <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900 font-medium flex items-center gap-1">
+                  Grade A Only <button onClick={() => setGradeAOnly(false)}><X className="w-3 h-3 text-amber-700 hover:text-amber-900" /></button>
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="text-xs font-semibold text-rose-600 hover:underline ml-2"
+              >
+                Clear All Filters ✕
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 4. CROP CATALOG DISPLAY (GRID vs TABLE VIEW) */}
+        {loading ? (
+          /* Loading Skeleton */
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((sk) => (
+              <div key={sk} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm animate-pulse">
+                <div className="h-44 bg-slate-200" />
+                <div className="p-5 space-y-3">
+                  <div className="h-3 bg-slate-200 rounded w-1/3" />
+                  <div className="h-5 bg-slate-200 rounded w-3/4" />
+                  <div className="h-3 bg-slate-200 rounded w-1/2" />
+                  <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
+                    <div className="h-6 bg-slate-200 rounded w-20" />
+                    <div className="h-8 bg-slate-200 rounded w-20" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : crops.length === 0 ? (
+          /* Empty State */
+          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm max-w-md mx-auto space-y-4">
+            <div className="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+              <Package className="w-7 h-7" aria-hidden="true" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-slate-900">
+                {hasActiveFilters ? 'No Matching Crops Found' : 'No Crops Available Right Now'}
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                {hasActiveFilters
+                  ? 'No harvest listings matched your filter criteria. Try clearing search keywords or district filters.'
+                  : 'No fresh crops have been listed in this category yet. Check back soon or list your own harvest.'}
+              </p>
+            </div>
+            <div className="pt-2 flex justify-center gap-3">
+              {hasActiveFilters ? (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> Clear All Filters
+                </button>
+              ) : (isFarmer || isAdmin) && (
+                <button
+                  type="button"
+                  onClick={() => setShowPostModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" /> Add Crop Listing
+                </button>
+              )}
+            </div>
+          </div>
+        ) : viewMode === 'table' ? (
+          /* TABLE VIEW (FOR COMMERCIAL B2B BUYERS) */
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-medium text-slate-700">
+                <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4">Produce Harvest</th>
+                    <th className="px-4 py-4">Category</th>
+                    <th className="px-4 py-4">Origin District</th>
+                    <th className="px-4 py-4">Verified Grower</th>
+                    <th className="px-4 py-4">Direct Price</th>
+                    <th className="px-4 py-4">Available Stock</th>
+                    <th className="px-4 py-4">Batch Passport</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {crops.map((crop) => (
+                    <tr key={crop.id} className="hover:bg-slate-50/80 transition">
+                      <td className="px-6 py-4 font-semibold text-slate-900 flex items-center gap-3">
+                        <img
+                          src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
+                          alt={crop.name}
+                          className="w-11 h-11 rounded-lg object-cover border border-slate-200 shrink-0"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80';
+                          }}
+                        />
+                        <div>
+                          <Link to={`/crops/${crop.id}`} className="hover:text-emerald-700 font-bold transition block text-sm">
+                            {crop.name}
+                          </Link>
+                          <span className="text-[10px] text-emerald-700 font-semibold">
+                            {crop.grade || 'Grade A'}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-slate-600">{crop.category || 'Produce'}</td>
+                      <td className="px-4 py-4 text-slate-600">📍 {crop.location || 'Sri Lanka'}</td>
+                      <td className="px-4 py-4">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
+                          className="text-emerald-700 font-semibold hover:underline flex items-center gap-1"
+                        >
+                          <span>{crop.farmerName || 'Registered Grower'}</span>
+                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        </button>
+                      </td>
+                      <td className="px-4 py-4 font-bold text-slate-900 text-sm">
+                        Rs. {Number(crop.price).toFixed(2)} / kg
+                      </td>
+                      <td className="px-4 py-4 font-semibold text-slate-700">
+                        {formatQuantity(crop.quantity)}
+                      </td>
+                      <td className="px-4 py-4">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTraceCrop(crop)}
+                          className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-md flex items-center gap-1 transition"
+                        >
+                          <QrCode className="w-3 h-3 text-emerald-600" /> Batch QR
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            to={`/crops/${crop.id}`}
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                          >
+                            View Crop
+                          </Link>
+                          {isCropOwner(crop) ? (
+                            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 font-semibold text-[11px] rounded-lg border border-emerald-200">
+                              Your Produce
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleBuyClick(crop)}
+                              disabled={crop.quantity <= 0}
+                              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+                                crop.quantity <= 0
+                                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                                  : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs'
+                              }`}
+                            >
+                              {crop.quantity <= 0 ? 'Out of Stock' : (!isAuthenticated ? 'Sign In' : 'Buy')}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          /* GRID VIEW WITH CLEAN CARDS */
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {crops.map((crop) => {
+              const isOutOfStock = (crop.quantity || 0) <= 0;
+              const isOwner = isCropOwner(crop);
+
+              return (
+                <div
+                  key={crop.id}
+                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+                >
+                  <div>
+                    {/* Media Container */}
+                    <div className="h-44 overflow-hidden bg-slate-100 relative group">
+                      <img
+                        src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
+                        alt={crop.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80';
+                        }}
+                      />
+
+                      {/* Top-Left Category Badge */}
+                      <div className="absolute top-3 left-3 px-2.5 py-0.5 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-semibold rounded-md">
+                        {crop.category || 'Produce'}
+                      </div>
+
+                      {/* Top-Right Grade Badge */}
+                      {crop.grade && (
+                        <div className="absolute top-3 right-3 px-2 py-0.5 bg-emerald-700/90 backdrop-blur-sm text-white text-[10px] font-semibold rounded-md flex items-center gap-1 shadow-2xs">
+                          <BadgeCheck className="w-3 h-3 text-emerald-200" aria-hidden="true" />
+                          <span>{crop.grade}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-4 sm:p-5 space-y-3">
+                      
+                      {/* Location & Harvest Indicator */}
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+                        <span className="flex items-center gap-1 truncate text-slate-700">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" aria-hidden="true" />
+                          <span>{crop.location || 'Sri Lanka'}</span>
+                        </span>
+                        <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                          {crop.harvestDateText || 'Available Now'}
+                        </span>
+                      </div>
+
+                      {/* Crop Title */}
+                      <h3 className="text-base font-bold text-slate-900 leading-snug line-clamp-1 hover:text-emerald-700 transition">
+                        <Link to={`/crops/${crop.id}`}>{crop.name}</Link>
+                      </h3>
+
+                      {/* Seller & Available Quantity */}
+                      <div className="flex items-center justify-between text-xs pt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
+                          className="text-slate-600 hover:text-emerald-800 font-semibold truncate max-w-[150px] flex items-center gap-1 text-left"
+                        >
+                          <span className="truncate">{crop.farmerName || 'Registered Grower'}</span>
+                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        </button>
+                        <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
+                          {formatQuantity(crop.quantity)}
+                        </span>
+                      </div>
+
+                      {/* Price Strip */}
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                        <div className="flex items-baseline justify-between">
+                          <span className="text-lg font-extrabold text-slate-900">
+                            Rs. {Number(crop.price).toFixed(2)}
+                            <span className="text-xs text-slate-500 font-normal"> / kg</span>
+                          </span>
+                          {crop.marketPrice && crop.marketPrice > crop.price && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                              -{Math.round(((crop.marketPrice - crop.price) / crop.marketPrice) * 100)}% vs Retail
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold uppercase">
+                          <span>Farmgate Rate</span>
+                          <span className="text-emerald-700 lowercase font-medium">100% Escrow</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Footer Actions */}
+                  <div className="p-4 sm:p-5 pt-0 space-y-2">
+                    {isOwner ? (
+                      <div className="w-full py-2 px-3 bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 text-center">
+                        Your Own Crop Listing
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleBuyClick(crop)}
+                        disabled={isOutOfStock}
+                        className={`w-full py-2 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+                          isOutOfStock
+                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                            : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs'
+                        }`}
+                      >
+                        <ShoppingBag className="w-3.5 h-3.5" aria-hidden="true" />
+                        <span>{isOutOfStock ? 'Sold Out' : (!isAuthenticated ? 'Sign In to Buy' : 'Buy with Escrow')}</span>
+                      </button>
+                    )}
+
+                    <div className="flex items-center justify-between pt-1 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTraceCrop(crop)}
+                        className="text-[11px] font-semibold text-slate-600 hover:text-emerald-800 flex items-center gap-1 transition"
+                      >
+                        <QrCode className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Batch QR</span>
+                      </button>
+
+                      <Link
+                        to={`/crops/${crop.id}`}
+                        className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1"
+                      >
+                        <span>View Crop</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+
+                      {isFarmer && isOwner && (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(crop.id)}
+                          className="p-1 text-slate-400 hover:text-rose-600 transition"
+                          title="Delete Listing"
+                          aria-label="Delete listing"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* 5. B2B COMMERCIAL CALLOUT */}
+        <div className="p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-1 max-w-2xl">
+            <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[11px] font-semibold border border-emerald-200">
+              Institutional &amp; Wholesale Procurement
+            </span>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900">
+              Need Bulk Commercial Harvests (5,000+ kg)?
+            </h2>
+            <p className="text-slate-600 text-xs sm:text-sm">
+              Lock in guaranteed pre-harvest supply agreements or negotiate forward purchase contracts directly with registered producer cooperatives across Sri Lanka.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3 shrink-0">
+            <Link
+              to="/contracts"
+              className="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-xl shadow-2xs transition flex items-center gap-1.5"
             >
-              Clear All Filters ✕
+              <span>Forward Contracts</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
+              to="/negotiation"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition"
+            >
+              Trade Negotiation
+            </Link>
+          </div>
+        </div>
+
+        {/* 6. PAGINATION */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl disabled:opacity-50 shadow-2xs hover:bg-slate-50 transition"
+            >
+              Previous
+            </button>
+            <span className="px-4 py-2 bg-emerald-50 text-emerald-800 font-semibold text-xs rounded-xl border border-emerald-200">
+              Page {page + 1} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl disabled:opacity-50 shadow-2xs hover:bg-slate-50 transition"
+            >
+              Next
             </button>
           </div>
         )}
       </div>
 
-      {/* 3. CROP CATALOG DISPLAY (GRID vs TABLE VIEW) */}
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-          <p className="text-sm font-semibold">Loading live agricultural harvest feed...</p>
-        </div>
-      ) : crops.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8 space-y-4 shadow-sm">
-          <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto">
-            🌾
-          </div>
-          <h3 className="text-lg font-bold text-slate-900 font-display">No Produce Listings Found</h3>
-          <p className="text-slate-500 text-xs sm:text-sm max-w-md mx-auto">
-            No crops matched your current filter criteria. Try clearing district filters or search keywords.
-          </p>
-          <button
-            onClick={handleResetFilters}
-            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow transition"
-          >
-            Reset All Filters
-          </button>
-        </div>
-      ) : viewMode === 'table' ? (
-        /* TABLE VIEW (FOR B2B COMMERCIAL TRADERS) */
-        <div className="premium-card overflow-hidden bg-white border border-slate-200/90 shadow-md">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-semibold text-slate-700">
-              <thead className="bg-slate-50 border-b border-slate-200 text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                <tr>
-                  <th className="px-6 py-4">Produce Harvest</th>
-                  <th className="px-4 py-4">Category</th>
-                  <th className="px-4 py-4">Origin District</th>
-                  <th className="px-4 py-4">Verified Grower</th>
-                  <th className="px-4 py-4">Direct Price</th>
-                  <th className="px-4 py-4">Available Stock</th>
-                  <th className="px-4 py-4">Batch Passport</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {crops.map((crop) => (
-                  <tr key={crop.id} className="hover:bg-emerald-50/40 transition">
-                    <td className="px-6 py-4 font-bold text-slate-900 flex items-center gap-3">
-                      <img
-                        src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea'}
-                        alt={crop.name}
-                        className="w-11 h-11 rounded-xl object-cover border border-slate-200 shrink-0"
-                      />
-                      <div>
-                        <Link to={`/crops/${crop.id}`} className="hover:text-emerald-600 font-bold transition block text-sm">
-                          {crop.name}
-                        </Link>
-                        <span className="text-[10px] text-emerald-600 font-bold">
-                          {crop.grade || 'Grade A Quality'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 font-medium text-slate-600">{crop.category || 'Produce'}</td>
-                    <td className="px-4 py-4 font-medium text-slate-600">📍 {crop.location || 'Sri Lanka'}</td>
-                    <td className="px-4 py-4">
-                      <button
-                        onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
-                        className="text-emerald-700 font-bold hover:underline flex items-center gap-1"
-                      >
-                        <span>🧑‍🌾 {crop.farmerName || 'Registered Grower'}</span>
-                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      </button>
-                    </td>
-                    <td className="px-4 py-4 font-black text-emerald-600 text-sm font-display">Rs. {Number(crop.price).toFixed(2)}/kg</td>
-                    <td className="px-4 py-4 font-bold text-slate-700">{crop.quantity} kg</td>
-                    <td className="px-4 py-4">
-                      <button
-                        onClick={() => setSelectedTraceCrop(crop)}
-                        className="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg flex items-center gap-1 transition"
-                      >
-                        <QrCode className="w-3 h-3 text-emerald-600" /> Batch QR
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {isCropOwner(crop) ? (
-                          <span className="px-3 py-1 bg-emerald-50 text-emerald-800 font-extrabold text-[11px] rounded-xl border border-emerald-200">
-                            Your Produce 🧑‍🌾
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => handleBuyClick(crop)}
-                            disabled={crop.quantity <= 0}
-                            className="px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition disabled:opacity-50"
-                          >
-                            {!isAuthenticated ? 'Sign In to Buy' : 'Buy 🛒'}
-                          </button>
-                        )}
-                        <Link
-                          to={`/crops/${crop.id}`}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition"
-                        >
-                          Details
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ) : (
-        /* REDESIGNED GRID VIEW WITH UNCLUTTERED CARD AESTHETICS */
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {crops.map((crop) => {
-            const savingsPct = crop.marketPrice
-              ? Math.round(((crop.marketPrice - crop.price) / crop.marketPrice) * 100)
-              : 8;
-
-            return (
-              <motion.div
-                key={crop.id}
-                whileHover={{ y: -5 }}
-                className="premium-card bg-white border border-slate-200/90 rounded-3xl overflow-hidden flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300 group"
-              >
-                {/* UNCLUTTERED CLEAN IMAGE WITH MAX 2 GLASS BADGES */}
-                <div>
-                  <div className="h-48 overflow-hidden bg-slate-100 relative">
-                    <img
-                      src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea'}
-                      alt={crop.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.src = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea';
-                      }}
-                    />
-
-                    {/* TOP-LEFT CATEGORY BADGE */}
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-white/95 backdrop-blur-md text-slate-800 text-[10px] font-black uppercase tracking-wider rounded-full border border-slate-200/90 shadow-sm">
-                      {crop.category || 'Produce'}
-                    </div>
-
-                    {/* TOP-RIGHT GRADE BADGE */}
-                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-emerald-600/95 backdrop-blur-md text-white text-[10px] font-extrabold rounded-full border border-emerald-400/40 shadow-sm">
-                      {crop.grade || 'Grade A'}
-                    </div>
-                  </div>
-
-                  {/* CARD BODY */}
-                  <div className="p-5 space-y-3">
-                    {/* ORIGIN LOCATION & BATCH CODE */}
-                    <div className="flex items-center justify-between text-[11px] font-extrabold text-emerald-700">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-emerald-600" /> {crop.location || 'Sri Lanka'}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">
-                        {crop.batchCode?.slice(0, 14) || 'Origin Pass'}
-                      </span>
-                    </div>
-
-                    {/* CROP TITLE */}
-                    <h3 className="text-base font-extrabold text-slate-900 font-display leading-snug hover:text-emerald-600 transition line-clamp-1">
-                      <Link to={`/crops/${crop.id}`}>{crop.name}</Link>
-                    </h3>
-
-                    {/* VERIFIED GROWER PROFILE LINK */}
-                    <div className="flex items-center justify-between text-xs pt-0.5">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
-                        className="text-slate-600 hover:text-emerald-700 font-bold truncate max-w-[170px] flex items-center gap-1"
-                      >
-                        <span>🧑‍🌾 {crop.farmerName || 'Verified Grower'}</span>
-                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                      </button>
-                      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
-                        📦 {crop.quantity || 350} kg
-                      </span>
-                    </div>
-
-                    {/* SLEEK 2-LINE FINANCIAL RATE CHIP */}
-                    <div className="p-3 bg-slate-50/90 rounded-2xl border border-slate-200/70 space-y-1">
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-xl font-black text-emerald-600 font-display">
-                          Rs. {Number(crop.price).toFixed(2)}
-                          <span className="text-xs text-slate-500 font-medium">/kg</span>
-                        </span>
-                        {savingsPct > 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black border border-emerald-200">
-                            -{savingsPct}% vs Retail
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase">
-                        <span>Direct Farm Gate</span>
-                        <span className="text-emerald-700 lowercase font-medium">100% Escrow</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* CARD FOOTER WITH PROMINENT ESCROW BUY BUTTON & MICRO ACTIONS */}
-                <div className="p-5 pt-0 space-y-2">
-                  {isCropOwner(crop) ? (
-                    <div className="w-full py-2.5 px-4 bg-slate-100 text-slate-700 text-xs font-extrabold rounded-xl border border-slate-200 text-center flex items-center justify-center gap-1.5">
-                      <span>🧑‍🌾 Your Own Produce Listing</span>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => handleBuyClick(crop)}
-                      disabled={crop.quantity <= 0}
-                      className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white text-xs font-extrabold rounded-xl shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-2"
-                    >
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>{!isAuthenticated ? 'Sign In to Buy 🛒' : 'Buy with Escrow 🛒'}</span>
-                    </button>
-                  )}
-
-                  <div className="flex items-center justify-between pt-1 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedTraceCrop(crop)}
-                      className="text-[11px] font-extrabold text-slate-600 hover:text-emerald-700 flex items-center gap-1 transition"
-                    >
-                      <QrCode className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Batch Passport</span>
-                    </button>
-
-                    <Link
-                      to={`/crops/${crop.id}`}
-                      className="text-[11px] font-extrabold text-emerald-700 hover:underline flex items-center gap-0.5"
-                    >
-                      <span>Full Details</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </Link>
-
-                    {isFarmer && (
-                      <button
-                        onClick={() => handleDelete(crop.id)}
-                        className="p-1 text-rose-500 hover:bg-rose-50 rounded-lg transition"
-                        title="Delete Listing"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* 4. B2B BULK TENDER & FORWARD CONTRACT CALLOUT BANNER */}
-      <div className="p-6 sm:p-8 bg-gradient-to-br from-emerald-600 via-teal-700 to-emerald-800 text-white rounded-3xl border border-emerald-400/30 shadow-xl shadow-emerald-900/10 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="space-y-1.5 text-center md:text-left relative z-10">
-          <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-wider border border-white/30">
-            Institutional Procurement
-          </span>
-          <h3 className="text-xl sm:text-2xl font-extrabold font-display text-white">
-            Need Bulk Commercial Volumes (5,000+ kg)? 🏬
-          </h3>
-          <p className="text-emerald-50 text-xs sm:text-sm max-w-xl font-medium">
-            Post an official B2B tender request or lock in guaranteed forward price agreements directly with regional grower cooperatives.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-3 shrink-0 relative z-10">
-          <Link
-            to="/contracts"
-            className="px-5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-extrabold text-xs rounded-xl shadow-md transition"
-          >
-            Contract Farming →
-          </Link>
-          <Link
-            to="/negotiation"
-            className="px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-md font-extrabold text-xs rounded-xl transition"
-          >
-            Trade Negotiation
-          </Link>
-        </div>
-      </div>
-
-      {/* 5. PAGINATION */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-3 pt-4">
-          <button
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
-            className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold text-xs rounded-xl disabled:opacity-50 shadow-sm hover:bg-slate-50 transition"
-          >
-            Previous
-          </button>
-          <span className="px-4 py-2 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-100">
-            Page {page + 1} of {totalPages}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-            disabled={page >= totalPages - 1}
-            className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-bold text-xs rounded-xl disabled:opacity-50 shadow-sm hover:bg-slate-50 transition"
-          >
-            Next
-          </button>
-        </div>
-      )}
-
-      {/* 6. MODALS */}
+      {/* 7. MODALS */}
       {selectedFarmer && (
         <FarmerProfileModal
           farmerId={selectedFarmer.id}
@@ -944,3 +1120,5 @@ export const CropsList = () => {
     </div>
   );
 };
+
+export default CropsList;
