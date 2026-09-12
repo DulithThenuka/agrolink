@@ -26,7 +26,9 @@ import {
   Check,
   SlidersHorizontal,
   ChevronRight,
-  AlertCircle
+  AlertCircle,
+  User,
+  Phone
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -37,24 +39,27 @@ export const EquipmentRental = () => {
   const [bookings, setBookings] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedLocation, setSelectedLocation] = useState('ALL');
+  const [selectedServiceType, setSelectedServiceType] = useState('ALL'); // 'ALL' | 'EQUIPMENT_ONLY' | 'EQUIPMENT_AND_DRIVER' | 'DRIVER_ONLY'
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Modals
+  // Modals & Booking Flow
   const [selectedDetailsItem, setSelectedDetailsItem] = useState(null);
   const [bookingEquipment, setBookingEquipment] = useState(null);
+  const [bookingStep, setBookingStep] = useState('CONFIGURE'); // 'CONFIGURE' | 'REVIEW' | 'CONFIRMED'
+  const [bookingConfirmationData, setBookingConfirmationData] = useState(null);
+
+  // Booking Parameters
+  const [serviceOption, setServiceOption] = useState('WITH_DRIVER'); // 'WITH_DRIVER' | 'WITHOUT_DRIVER' | 'DRIVER_ONLY'
   const [startDate, setStartDate] = useState('2026-08-25');
   const [endDate, setEndDate] = useState('2026-08-30');
   const [totalDays, setTotalDays] = useState(5);
-  const [processingBooking, setProcessingBooking] = useState(false);
-
-  // Add-On States
-  const [includeOperator, setIncludeOperator] = useState(true);
   const [deliveryDistanceKm, setDeliveryDistanceKm] = useState(15);
   const [includeDamageWaiver, setIncludeDamageWaiver] = useState(true);
+  const [processingBooking, setProcessingBooking] = useState(false);
 
   // List New Machinery Modal State
   const [showAddModal, setShowAddModal] = useState(false);
@@ -68,7 +73,8 @@ export const EquipmentRental = () => {
     description: '',
     imageUrl: '',
     rating: 4.9,
-    operatorAvailable: true
+    operatorAvailable: true,
+    serviceType: 'EQUIPMENT_AND_DRIVER'
   });
 
   const categories = ['ALL', 'Tractor', 'Harvester', 'Drone', 'Water Pump', 'Cultivator'];
@@ -83,81 +89,115 @@ export const EquipmentRental = () => {
       id: 1,
       name: 'Kubota L4508 45HP 4WD Tractor',
       category: 'Tractor',
+      serviceType: 'EQUIPMENT_AND_DRIVER',
       location: 'Kurunegala',
       dailyRateLkr: 8500,
+      driverDailyRateLkr: 2500,
       rating: 4.9,
       ownerName: 'Kurunegala Machinery Hub',
+      assignedDriver: 'Kamal Perera (Licensed Tractor Operator)',
       availableFrom: '25 Aug',
       availableTo: '15 Sep',
       operatorAvailable: true,
       distanceKm: 6.4,
       availabilityStatus: 'Available Now',
       imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80',
-      description: 'Heavy-duty 4WD tractor with rotary tiller and heavy plow attachments for wet and dry field cultivation.'
+      description: 'Heavy-duty 4WD tractor with rotary tiller and heavy plow attachments. Available as equipment-only or with certified driver.'
     },
     {
       id: 2,
       name: 'Yanmar AW70V Combined Paddy Harvester',
       category: 'Harvester',
+      serviceType: 'EQUIPMENT_AND_DRIVER',
       location: 'Anuradhapura',
       dailyRateLkr: 22000,
+      driverDailyRateLkr: 3500,
       rating: 5.0,
       ownerName: 'Rajarata Agro Machinery Services',
+      assignedDriver: 'Sunil Bandara (Master Harvester Driver)',
       availableFrom: '25 Aug',
       availableTo: '20 Sep',
       operatorAvailable: true,
       distanceKm: 12.8,
       availabilityStatus: 'Available Tomorrow',
       imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop&q=80',
-      description: 'High-speed combined grain harvester with 1,400L grain tank and rubber crawler tracks for muddy paddy fields.'
+      description: 'High-speed combined grain harvester with 1,400L grain tank. Includes trained paddy operator and farmgate flatbed delivery.'
     },
     {
       id: 3,
       name: 'DJI Agras T40 Agricultural Spraying Drone',
       category: 'Drone',
+      serviceType: 'EQUIPMENT_AND_DRIVER',
       location: 'Kandy',
       dailyRateLkr: 15000,
+      driverDailyRateLkr: 4000,
       rating: 4.8,
       ownerName: 'SmartAgri Tech Lanka Ltd',
+      assignedDriver: 'Dinesh Jayawardena (CAA Certified Drone Pilot)',
       availableFrom: '25 Aug',
       availableTo: '10 Sep',
       operatorAvailable: true,
       distanceKm: 4.2,
       availabilityStatus: 'Available Now',
       imageUrl: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&auto=format&fit=crop&q=80',
-      description: 'Precision spraying drone with 40kg liquid payload, centimeter-level RTK positioning, and automated flight paths.'
+      description: 'Precision spraying drone with 40kg payload. Operated exclusively by certified pilot for precise pesticide/fertilizer application.'
     },
     {
       id: 4,
       name: 'Honda GX160 High-Pressure 3-Inch Water Pump',
       category: 'Water Pump',
+      serviceType: 'EQUIPMENT_ONLY',
       location: 'Matale',
       dailyRateLkr: 3500,
+      driverDailyRateLkr: 0,
       rating: 4.7,
       ownerName: 'Central Irrigation Fleet',
+      assignedDriver: 'Self-Operated (No Driver Required)',
       availableFrom: '25 Aug',
       availableTo: '30 Sep',
       operatorAvailable: false,
       distanceKm: 18.5,
       availabilityStatus: 'Available Now',
       imageUrl: 'https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?w=800&auto=format&fit=crop&q=80',
-      description: 'High-output 1,000L/min 4-stroke petrol water pump with 30-meter suction and discharge hoses.'
+      description: 'High-output 1,000L/min 4-stroke petrol water pump with 30m hoses. Self-operated equipment only.'
     },
     {
       id: 5,
       name: 'Mahindra 15HP Rotary Cultivator / Power Tiller',
       category: 'Cultivator',
+      serviceType: 'EQUIPMENT_AND_DRIVER',
       location: 'Nuwara Eliya',
       dailyRateLkr: 5500,
+      driverDailyRateLkr: 2000,
       rating: 4.9,
       ownerName: 'Highland Agri Services',
+      assignedDriver: 'Nimal Rathnayake (Field Operator)',
       availableFrom: '25 Aug',
       availableTo: '12 Sep',
       operatorAvailable: true,
       distanceKm: 8.1,
       availabilityStatus: 'Available Now',
       imageUrl: 'https://images.unsplash.com/photo-1530267981608-bc70a2974b6f?w=800&auto=format&fit=crop&q=80',
-      description: 'Compact 15HP diesel rotary power tiller ideal for terraced vegetable plots and hilly upland beds.'
+      description: 'Compact 15HP diesel rotary power tiller ideal for terraced vegetable plots. Available with or without field operator.'
+    },
+    {
+      id: 6,
+      name: 'Certified Tractor Operator Service (Driver Only)',
+      category: 'Tractor',
+      serviceType: 'DRIVER_ONLY',
+      location: 'Kurunegala',
+      dailyRateLkr: 0,
+      driverDailyRateLkr: 3500,
+      rating: 4.9,
+      ownerName: 'Rajarata Operators Union',
+      assignedDriver: 'Bandara Wickramasinghe (12 Yrs Exp, 4WD Certified)',
+      availableFrom: '25 Aug',
+      availableTo: '25 Sep',
+      operatorAvailable: true,
+      distanceKm: 5.0,
+      availabilityStatus: 'Available Now',
+      imageUrl: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?w=800&auto=format&fit=crop&q=80',
+      description: 'Professional tractor driver for hire. Drives farmer-owned 35HP to 60HP tractors for ploughing, puddling, and rotavating.'
     }
   ];
 
@@ -205,11 +245,29 @@ export const EquipmentRental = () => {
     setEndDate(end.toISOString().split('T')[0]);
   };
 
+  const startBookingFlow = (item) => {
+    setBookingEquipment(item);
+    if (item.serviceType === 'DRIVER_ONLY') {
+      setServiceOption('DRIVER_ONLY');
+    } else if (item.operatorAvailable) {
+      setServiceOption('WITH_DRIVER');
+    } else {
+      setServiceOption('WITHOUT_DRIVER');
+    }
+    setBookingStep('CONFIGURE');
+  };
+
   // Cost Calculator Math
   const calculateTotalCost = (equipment) => {
-    if (!equipment) return { baseRental: 0, discountPct: 0, discountAmount: 0, operatorCost: 0, deliveryCost: 0, damageWaiverCost: 0, finalTotal: 0 };
+    if (!equipment) return { baseRental: 0, discountPct: 0, discountAmount: 0, netBase: 0, operatorCost: 0, deliveryCost: 0, damageWaiverCost: 0, finalTotal: 0 };
 
-    const baseRental = Number(equipment.dailyRateLkr || 0) * totalDays;
+    const isDriverOnly = serviceOption === 'DRIVER_ONLY' || equipment.serviceType === 'DRIVER_ONLY';
+    const isWithDriver = serviceOption === 'WITH_DRIVER';
+
+    const equipDailyRate = isDriverOnly ? 0 : Number(equipment.dailyRateLkr || 0);
+    const driverDailyRate = (isWithDriver || isDriverOnly) ? Number(equipment.driverDailyRateLkr || OPERATOR_DAILY_RATE) : 0;
+
+    const baseRental = equipDailyRate * totalDays;
     
     let discountPct = 0;
     if (totalDays >= 14) discountPct = 15;
@@ -218,9 +276,9 @@ export const EquipmentRental = () => {
 
     const discountAmount = baseRental * (discountPct / 100);
     const netBase = baseRental - discountAmount;
-    const operatorCost = includeOperator ? (OPERATOR_DAILY_RATE * totalDays) : 0;
-    const deliveryCost = deliveryDistanceKm > 0 ? Math.round(deliveryDistanceKm * TRANSPORT_RATE_PER_KM * 2) : 0;
-    const damageWaiverCost = includeDamageWaiver ? (DAMAGE_WAIVER_DAILY_RATE * totalDays) : 0;
+    const operatorCost = driverDailyRate * totalDays;
+    const deliveryCost = (!isDriverOnly && deliveryDistanceKm > 0) ? Math.round(deliveryDistanceKm * TRANSPORT_RATE_PER_KM * 2) : 0;
+    const damageWaiverCost = (!isDriverOnly && includeDamageWaiver) ? (DAMAGE_WAIVER_DAILY_RATE * totalDays) : 0;
 
     const finalTotal = netBase + operatorCost + deliveryCost + damageWaiverCost;
 
@@ -232,7 +290,9 @@ export const EquipmentRental = () => {
       operatorCost,
       deliveryCost,
       damageWaiverCost,
-      finalTotal
+      finalTotal,
+      isDriverOnly,
+      isWithDriver
     };
   };
 
@@ -244,45 +304,35 @@ export const EquipmentRental = () => {
     setErrorMsg('');
     const calc = calculateTotalCost(bookingEquipment);
 
+    const bookingRef = `#RENT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const serviceLabel = serviceOption === 'DRIVER_ONLY' 
+      ? 'Driver / Operator Only'
+      : serviceOption === 'WITH_DRIVER'
+      ? 'Equipment + Certified Driver'
+      : 'Equipment Only';
+
+    const newBookingRecord = {
+      id: Math.floor(1000 + Math.random() * 9000),
+      refId: bookingRef,
+      equipmentName: bookingEquipment.name,
+      serviceTypeLabel: serviceLabel,
+      driverName: (serviceOption !== 'WITHOUT_DRIVER' && bookingEquipment.assignedDriver) ? bookingEquipment.assignedDriver : 'No Driver Assigned',
+      location: bookingEquipment.location,
+      startDate,
+      endDate,
+      totalDays,
+      totalCost: calc.finalTotal,
+      status: 'CONFIRMED'
+    };
+
     try {
-      const res = await rentalsAPI.bookEquipment(bookingEquipment.id, startDate, endDate);
-      const bookingRef = `#RENT-${Math.floor(1000 + Math.random() * 9000)}`;
-      setMsg(`Booking confirmed for ${bookingEquipment.name}! Ref: ${bookingRef} (${totalDays} Days, Total: Rs. ${calc.finalTotal.toLocaleString()}).`);
-      
-      // Update local reservations
-      setBookings((prev) => [
-        {
-          id: Math.floor(1000 + Math.random() * 9000),
-          equipmentName: bookingEquipment.name,
-          location: bookingEquipment.location,
-          startDate,
-          endDate,
-          totalDays,
-          totalCost: calc.finalTotal,
-          status: 'CONFIRMED'
-        },
-        ...prev
-      ]);
-      setBookingEquipment(null);
+      await rentalsAPI.bookEquipment(bookingEquipment.id, startDate, endDate);
     } catch (err) {
-      console.warn('Backend booking note (applying confirmed reservation):', err);
-      const bookingRef = `#RENT-${Math.floor(1000 + Math.random() * 9000)}`;
-      setMsg(`Booking confirmed for ${bookingEquipment.name}! Ref: ${bookingRef} (${totalDays} Days, Total: Rs. ${calc.finalTotal.toLocaleString()}).`);
-      setBookings((prev) => [
-        {
-          id: Math.floor(1000 + Math.random() * 9000),
-          equipmentName: bookingEquipment.name,
-          location: bookingEquipment.location,
-          startDate,
-          endDate,
-          totalDays,
-          totalCost: calc.finalTotal,
-          status: 'CONFIRMED'
-        },
-        ...prev
-      ]);
-      setBookingEquipment(null);
+      console.warn('Backend booking note (recording confirmed reservation locally):', err);
     } finally {
+      setBookings((prev) => [newBookingRecord, ...prev]);
+      setBookingConfirmationData(newBookingRecord);
+      setBookingStep('CONFIRMED');
       setProcessingBooking(false);
     }
   };
@@ -293,7 +343,7 @@ export const EquipmentRental = () => {
 
     setProcessingBooking(true);
     try {
-      const res = await rentalsAPI.createListing({
+      await rentalsAPI.createListing({
         ...newMachinery,
         ownerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Fleet Owner'),
       });
@@ -310,7 +360,8 @@ export const EquipmentRental = () => {
         description: '',
         imageUrl: '',
         rating: 4.9,
-        operatorAvailable: true
+        operatorAvailable: true,
+        serviceType: 'EQUIPMENT_AND_DRIVER'
       });
       fetchData();
     } catch (err) {
@@ -325,15 +376,27 @@ export const EquipmentRental = () => {
     .filter((item) => {
       const matchesCategory = selectedCategory === 'ALL' || item.category.toLowerCase() === selectedCategory.toLowerCase();
       const matchesLocation = selectedLocation === 'ALL' || item.location.toLowerCase() === selectedLocation.toLowerCase();
+      
+      let matchesService = true;
+      if (selectedServiceType === 'EQUIPMENT_ONLY') {
+        matchesService = item.serviceType === 'EQUIPMENT_ONLY' || item.operatorAvailable === false;
+      } else if (selectedServiceType === 'EQUIPMENT_AND_DRIVER') {
+        matchesService = item.serviceType === 'EQUIPMENT_AND_DRIVER';
+      } else if (selectedServiceType === 'DRIVER_ONLY') {
+        matchesService = item.serviceType === 'DRIVER_ONLY';
+      }
+
       const matchesSearch = searchQuery === '' || 
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
         item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (item.ownerName && item.ownerName.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesCategory && matchesLocation && matchesSearch;
+        (item.ownerName && item.ownerName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (item.assignedDriver && item.assignedDriver.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      return matchesCategory && matchesLocation && matchesService && matchesSearch;
     })
     .sort((a, b) => {
-      if (sortBy === 'price-low') return Number(a.dailyRateLkr) - Number(b.dailyRateLkr);
-      if (sortBy === 'price-high') return Number(b.dailyRateLkr) - Number(a.dailyRateLkr);
+      if (sortBy === 'price-low') return Number(a.dailyRateLkr || a.driverDailyRateLkr) - Number(b.dailyRateLkr || b.driverDailyRateLkr);
+      if (sortBy === 'price-high') return Number(b.dailyRateLkr || b.driverDailyRateLkr) - Number(a.dailyRateLkr || a.driverDailyRateLkr);
       if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
       return 0; // recommended
     });
@@ -342,7 +405,7 @@ export const EquipmentRental = () => {
     <div className="min-h-screen bg-[#FBFBFA] py-8 px-4 sm:px-6 lg:px-8 text-slate-800 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
 
-        {/* ─── 1. BREADCRUMB & HEADER ─── */}
+        {/* ─── 1. BREADCRUMB & COMPACT HEADER ─── */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
             <Link to="/dashboard" className="hover:text-emerald-700 transition flex items-center gap-1">
@@ -362,12 +425,13 @@ export const EquipmentRental = () => {
                 Find Equipment &amp; Agricultural Services
               </h1>
               <p className="text-sm text-slate-600 leading-relaxed">
-                Find tractors, harvesters, spraying drones, and certified drivers near your plot with farmgate transport and guaranteed daily rates.
+                Book tractors, combined harvesters, and spraying drones — with equipment-only, equipment + certified driver, or driver-only options.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 shrink-0">
               <button
+                type="button"
                 onClick={() => setShowAddModal(!showAddModal)}
                 className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 shadow-xs transition flex items-center gap-2 cursor-pointer"
               >
@@ -391,7 +455,7 @@ export const EquipmentRental = () => {
           </div>
         )}
 
-        {/* ─── 2. SEARCH & FILTER PANEL ─── */}
+        {/* ─── 2. SEARCH & SERVICE TYPE FILTER PANEL ─── */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
           
           {/* Top Row: Search Input + Location Selector + Sort */}
@@ -402,7 +466,7 @@ export const EquipmentRental = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tractors, harvesters, or providers..."
+                placeholder="Search tractors, harvesters, drivers, or hubs..."
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:border-emerald-600"
               />
               {searchQuery && (
@@ -450,7 +514,31 @@ export const EquipmentRental = () => {
             </div>
           </div>
 
-          {/* Bottom Row: Quick Category Pills */}
+          {/* Service Inclusion Filter Bar (Equipment Only / Equipment + Driver / Driver Only) */}
+          <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
+            <span className="text-xs font-bold text-slate-400 shrink-0 mr-1">Service Mode:</span>
+            {[
+              { id: 'ALL', label: 'All Services' },
+              { id: 'EQUIPMENT_AND_DRIVER', label: 'Equipment + Driver' },
+              { id: 'EQUIPMENT_ONLY', label: 'Equipment Only' },
+              { id: 'DRIVER_ONLY', label: 'Driver / Operator Only' }
+            ].map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => setSelectedServiceType(mode.id)}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer border ${
+                  selectedServiceType === mode.id
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Quick Category Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 border-t border-slate-100 pt-3">
             <span className="text-xs font-bold text-slate-400 shrink-0 mr-1">Category:</span>
             {categories.map((cat) => (
@@ -489,7 +577,7 @@ export const EquipmentRental = () => {
 
             <form onSubmit={handleCreateMachinery} className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-semibold">
               <div>
-                <label className="block text-slate-600 font-bold mb-1">Equipment Name</label>
+                <label className="block text-slate-600 font-bold mb-1">Equipment / Service Name</label>
                 <input
                   type="text"
                   value={newMachinery.name}
@@ -574,21 +662,21 @@ export const EquipmentRental = () => {
           </div>
         )}
 
-        {/* ─── 4. RESULTS HEADER & MACHINERY CARDS GRID ─── */}
+        {/* ─── 4. RESULTS HEADER & MACHINERY / DRIVER CARDS ─── */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-bold text-slate-900">
-                Available Equipment ({filteredEquipment.length} units)
+                Available Equipment &amp; Services ({filteredEquipment.length} units)
               </h2>
               <p className="text-xs text-slate-500">
-                {selectedLocation === 'ALL' ? 'Across all districts' : `In ${selectedLocation} district`} • {selectedCategory === 'ALL' ? 'All machinery types' : selectedCategory}
+                {selectedLocation === 'ALL' ? 'Across all districts' : `In ${selectedLocation} district`} • {selectedCategory === 'ALL' ? 'All machinery' : selectedCategory} • {selectedServiceType === 'ALL' ? 'All Service Types' : selectedServiceType.replace(/_/g, ' ')}
               </p>
             </div>
 
             <div className="flex items-center gap-3 text-xs text-slate-500">
               <span className="flex items-center gap-1 font-semibold text-emerald-800">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Verified Fleet
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Verified Machinery
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-semibold text-slate-700">
@@ -608,7 +696,7 @@ export const EquipmentRental = () => {
                 <Truck className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-800">No equipment found nearby</h3>
+                <h3 className="text-sm font-bold text-slate-800">No equipment or driver services found</h3>
                 <p className="text-xs text-slate-500">Try choosing another district or clearing your search filters.</p>
               </div>
               <button
@@ -616,6 +704,7 @@ export const EquipmentRental = () => {
                 onClick={() => {
                   setSelectedCategory('ALL');
                   setSelectedLocation('ALL');
+                  setSelectedServiceType('ALL');
                   setSearchQuery('');
                 }}
                 className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition"
@@ -625,99 +714,138 @@ export const EquipmentRental = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEquipment.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Image Area */}
-                    <div className="relative h-48 bg-slate-100 overflow-hidden">
-                      <img
-                        src={item.imageUrl || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854'}
-                        alt={item.name}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          e.target.src = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854';
-                        }}
-                      />
-                      <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 backdrop-blur-sm text-slate-800 text-[10px] font-bold rounded-full border border-slate-200 shadow-xs">
-                        {item.category}
-                      </div>
-                      <div className="absolute top-3 right-3 px-2 py-0.5 bg-white/95 backdrop-blur-sm text-slate-900 text-xs font-bold rounded-full flex items-center gap-1 shadow-xs border border-slate-200">
-                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {item.rating || 4.9}
-                      </div>
-                    </div>
+              {filteredEquipment.map((item) => {
+                const isDriverOnly = item.serviceType === 'DRIVER_ONLY';
+                const hasDriver = item.operatorAvailable;
 
-                    {/* Card Content */}
-                    <div className="p-5 space-y-3">
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-emerald-800 flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5 text-emerald-600" /> {item.location}
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      {/* Image Area */}
+                      <div className="relative h-48 bg-slate-100 overflow-hidden">
+                        <img
+                          src={item.imageUrl || 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854'}
+                          alt={item.name}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854';
+                          }}
+                        />
+                        
+                        {/* Service Type Pill Badge */}
+                        <div className="absolute top-3 left-3 flex flex-col gap-1">
+                          <span className="px-2.5 py-1 bg-white/95 backdrop-blur-sm text-slate-800 text-[10px] font-bold rounded-full border border-slate-200 shadow-xs">
+                            {item.category}
                           </span>
-                          <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            {item.availabilityStatus || 'Available Now'}
+                          <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full border shadow-xs ${
+                            isDriverOnly
+                              ? 'bg-sky-50 text-sky-800 border-sky-200'
+                              : hasDriver
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : 'bg-slate-50 text-slate-700 border-slate-200'
+                          }`}>
+                            {isDriverOnly ? 'Driver Service Only' : hasDriver ? 'Driver Option Available' : 'Equipment Only (No Driver)'}
                           </span>
                         </div>
 
-                        <h3 className="font-bold text-slate-900 text-sm leading-snug">{item.name}</h3>
-                        <p className="text-xs text-slate-500 line-clamp-2">{item.description}</p>
+                        <div className="absolute top-3 right-3 px-2 py-0.5 bg-white/95 backdrop-blur-sm text-slate-900 text-xs font-bold rounded-full flex items-center gap-1 shadow-xs border border-slate-200">
+                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {item.rating || 4.9}
+                        </div>
                       </div>
 
-                      <div className="pt-1 flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-600">
-                        {item.operatorAvailable && (
-                          <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-200 flex items-center gap-1">
-                            <UserCheck className="w-3 h-3 text-emerald-600" /> Driver Included Option
+                      {/* Card Content */}
+                      <div className="p-5 space-y-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-emerald-800 flex items-center gap-1">
+                              <MapPin className="w-3.5 h-3.5 text-emerald-600" /> {item.location}
+                            </span>
+                            <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                              {item.availabilityStatus || 'Available'}
+                            </span>
+                          </div>
+
+                          <h3 className="font-bold text-slate-900 text-sm leading-snug">{item.name}</h3>
+                          <p className="text-xs text-slate-500 line-clamp-2">{item.description}</p>
+                        </div>
+
+                        {/* Provider / Driver Info Strip */}
+                        <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] space-y-1">
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-500">Fleet Hub:</span>
+                            <span className="font-semibold text-slate-800">{item.ownerName}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-500">Assigned Operator:</span>
+                            <span className="font-semibold text-emerald-800">{item.assignedDriver || 'Driver included on request'}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-1 flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-600">
+                          {hasDriver ? (
+                            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                              <UserCheck className="w-3 h-3 text-emerald-600" /> Certified Driver
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded bg-slate-50 text-slate-600 border border-slate-200 flex items-center gap-1">
+                              <User className="w-3 h-3 text-slate-400" /> Self-Operated
+                            </span>
+                          )}
+                          {!isDriverOnly && (
+                            <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-200 flex items-center gap-1">
+                              <Navigation className="w-3 h-3 text-slate-500" /> Flatbed Transport
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card Footer */}
+                    <div className="p-5 pt-0">
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <div>
+                          <span className="text-[10px] font-bold uppercase text-slate-400 block">
+                            {isDriverOnly ? 'Operator Daily Fee' : 'Daily Base Rate'}
                           </span>
-                        )}
-                        <span className="px-2 py-0.5 rounded bg-slate-50 border border-slate-200 flex items-center gap-1">
-                          <Navigation className="w-3 h-3 text-slate-500" /> Farm Delivery
-                        </span>
+                          <span className="text-lg font-bold text-slate-900">
+                            Rs. {Number(isDriverOnly ? item.driverDailyRateLkr : item.dailyRateLkr).toLocaleString()} <span className="text-xs text-slate-500 font-normal">/ day</span>
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedDetailsItem(item)}
+                            className="px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"
+                          >
+                            Details
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => startBookingFlow(item)}
+                            className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer"
+                          >
+                            Book Service
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Card Footer */}
-                  <div className="p-5 pt-0">
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                      <div>
-                        <span className="text-[10px] font-bold uppercase text-slate-400 block">Daily Rate</span>
-                        <span className="text-lg font-bold text-slate-900">
-                          Rs. {Number(item.dailyRateLkr).toLocaleString()} <span className="text-xs text-slate-500 font-normal">/ day</span>
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedDetailsItem(item)}
-                          className="px-3 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer"
-                        >
-                          Details
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setBookingEquipment(item)}
-                          className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition cursor-pointer"
-                        >
-                          Book Now
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* ─── 5. MY RENTAL RESERVATIONS TABLE ─── */}
+        {/* ─── 5. MY RENTAL & DRIVER RESERVATIONS TABLE ─── */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">My Machinery Reservations</h3>
-              <p className="text-xs text-slate-500">History of rented tractors, harvesters, and spraying drones</p>
+              <h3 className="text-sm font-bold text-slate-900">My Machinery &amp; Driver Bookings</h3>
+              <p className="text-xs text-slate-500">History of rented machinery, harvesters, and assigned drivers</p>
             </div>
             <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
               {bookings.length} Bookings
@@ -725,17 +853,18 @@ export const EquipmentRental = () => {
           </div>
 
           {bookings.length === 0 ? (
-            <p className="text-xs text-slate-400 py-4 text-center">No active machinery bookings recorded yet.</p>
+            <p className="text-xs text-slate-400 py-4 text-center">No active machinery or driver bookings recorded yet.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
                 <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px]">
                   <tr>
                     <th className="p-3">Booking ID</th>
-                    <th className="p-3">Machinery</th>
+                    <th className="p-3">Machinery / Service</th>
+                    <th className="p-3">Service Inclusions</th>
+                    <th className="p-3">Assigned Operator</th>
                     <th className="p-3">District</th>
                     <th className="p-3">Date Period</th>
-                    <th className="p-3">Total Days</th>
                     <th className="p-3">Total Cost</th>
                     <th className="p-3">Status</th>
                   </tr>
@@ -743,11 +872,16 @@ export const EquipmentRental = () => {
                 <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
                   {bookings.map((b) => (
                     <tr key={b.id} className="hover:bg-slate-50/70">
-                      <td className="p-3 font-mono font-bold text-slate-900">#RENT-{b.id}</td>
+                      <td className="p-3 font-mono font-bold text-slate-900">{b.refId || `#RENT-${b.id}`}</td>
                       <td className="p-3 font-bold text-slate-900">{b.equipmentName}</td>
-                      <td className="p-3 text-emerald-800 font-semibold">{b.location}</td>
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-semibold">
+                          {b.serviceTypeLabel || 'Equipment + Driver'}
+                        </span>
+                      </td>
+                      <td className="p-3 font-semibold text-emerald-800">{b.driverName || 'Operator Included'}</td>
+                      <td className="p-3 text-slate-600">{b.location}</td>
                       <td className="p-3">{b.startDate} → {b.endDate}</td>
-                      <td className="p-3 font-semibold">{b.totalDays} Days</td>
                       <td className="p-3 font-bold text-slate-900">Rs. {Number(b.totalCost).toLocaleString()}</td>
                       <td className="p-3">
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -764,7 +898,7 @@ export const EquipmentRental = () => {
 
       </div>
 
-      {/* ─── MODAL 1: EQUIPMENT DETAILS MODAL ─── */}
+      {/* ─── MODAL 1: EQUIPMENT & DRIVER DETAILS ─── */}
       <AnimatePresence>
         {selectedDetailsItem && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
@@ -776,7 +910,7 @@ export const EquipmentRental = () => {
             >
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h3 className="text-base font-bold text-slate-900">
-                  Equipment Details &amp; Specifications
+                  Service Details &amp; Specifications
                 </h3>
                 <button
                   type="button"
@@ -808,9 +942,20 @@ export const EquipmentRental = () => {
                 <p className="text-xs text-slate-600 leading-relaxed">{selectedDetailsItem.description}</p>
               </div>
 
-              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5">
+              {/* Service & Operator Inclusions */}
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Owner / Fleet Hub:</span>
+                  <span className="text-slate-500">Service Type:</span>
+                  <span className="font-bold text-slate-900">
+                    {selectedDetailsItem.serviceType === 'DRIVER_ONLY' ? 'Driver Service Only' : selectedDetailsItem.operatorAvailable ? 'Equipment + Driver Option' : 'Equipment Only'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Assigned Driver:</span>
+                  <span className="font-bold text-emerald-800">{selectedDetailsItem.assignedDriver || 'Driver optional'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Fleet Hub / Owner:</span>
                   <span className="font-bold text-slate-800">{selectedDetailsItem.ownerName}</span>
                 </div>
                 <div className="flex justify-between">
@@ -818,12 +963,10 @@ export const EquipmentRental = () => {
                   <span className="font-bold text-slate-800">{selectedDetailsItem.location}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Availability:</span>
-                  <span className="font-bold text-emerald-700">{selectedDetailsItem.availableFrom} – {selectedDetailsItem.availableTo}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-slate-500">Daily Base Rate:</span>
-                  <span className="font-bold text-slate-900">Rs. {Number(selectedDetailsItem.dailyRateLkr).toLocaleString()} / day</span>
+                  <span className="font-bold text-slate-900">
+                    Rs. {Number(selectedDetailsItem.serviceType === 'DRIVER_ONLY' ? selectedDetailsItem.driverDailyRateLkr : selectedDetailsItem.dailyRateLkr).toLocaleString()} / day
+                  </span>
                 </div>
               </div>
 
@@ -840,11 +983,11 @@ export const EquipmentRental = () => {
                   onClick={() => {
                     const item = selectedDetailsItem;
                     setSelectedDetailsItem(null);
-                    setBookingEquipment(item);
+                    startBookingFlow(item);
                   }}
                   className="w-1/2 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition"
                 >
-                  Book This Equipment
+                  Book Service
                 </button>
               </div>
             </motion.div>
@@ -852,7 +995,7 @@ export const EquipmentRental = () => {
         )}
       </AnimatePresence>
 
-      {/* ─── MODAL 2: BOOKING FLOW & COST CALCULATOR ─── */}
+      {/* ─── MODAL 2: 2-STEP BOOKING FLOW (CONFIGURE -> REVIEW -> CONFIRMED) ─── */}
       <AnimatePresence>
         {bookingEquipment && (() => {
           const costCalc = calculateTotalCost(bookingEquipment);
@@ -868,214 +1011,347 @@ export const EquipmentRental = () => {
                 
                 {/* Modal Header */}
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-emerald-600" /> Machinery Reservation &amp; Cost Calculator
-                  </h3>
+                  <div className="space-y-0.5">
+                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-emerald-600" />
+                      {bookingStep === 'CONFIGURE' && '1. Configure Service & Duration'}
+                      {bookingStep === 'REVIEW' && '2. Review & Confirm Booking'}
+                      {bookingStep === 'CONFIRMED' && 'Booking Confirmed!'}
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      {bookingEquipment.name} ({bookingEquipment.location})
+                    </p>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setBookingEquipment(null)}
+                    onClick={() => {
+                      setBookingEquipment(null);
+                      setBookingStep('CONFIGURE');
+                    }}
                     className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-                
-                {/* Equipment Summary */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-bold text-slate-900 text-sm">{bookingEquipment.name}</p>
-                      <p className="text-slate-500 font-medium">
-                        District: <strong>{bookingEquipment.location}</strong> • Type: <strong>{bookingEquipment.category}</strong>
+
+                {/* ── STEP 1: CONFIGURE SERVICE OPTIONS ── */}
+                {bookingStep === 'CONFIGURE' && (
+                  <div className="space-y-4">
+                    {/* Service Type Selection */}
+                    {bookingEquipment.serviceType !== 'DRIVER_ONLY' && bookingEquipment.operatorAvailable && (
+                      <div className="space-y-2">
+                        <label className="block text-xs font-bold text-slate-700">
+                          Select Service Inclusions:
+                        </label>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => setServiceOption('WITH_DRIVER')}
+                            className={`p-3 rounded-xl border text-left transition cursor-pointer ${
+                              serviceOption === 'WITH_DRIVER'
+                                ? 'bg-emerald-50 border-emerald-600 text-emerald-900 ring-1 ring-emerald-600'
+                                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                            }`}
+                          >
+                            <span className="font-bold block text-xs">Equipment + Driver</span>
+                            <span className="text-[10px] text-slate-500">Includes licensed operator</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setServiceOption('WITHOUT_DRIVER')}
+                            className={`p-3 rounded-xl border text-left transition cursor-pointer ${
+                              serviceOption === 'WITHOUT_DRIVER'
+                                ? 'bg-emerald-50 border-emerald-600 text-emerald-900 ring-1 ring-emerald-600'
+                                : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                            }`}
+                          >
+                            <span className="font-bold block text-xs">Equipment Only</span>
+                            <span className="text-[10px] text-slate-500">Self-operated machinery</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Assigned Driver Badge */}
+                    {serviceOption !== 'WITHOUT_DRIVER' && bookingEquipment.assignedDriver && (
+                      <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 text-xs flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <UserCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                          <div>
+                            <span className="font-bold text-emerald-900 block">Assigned Driver / Operator:</span>
+                            <span className="text-[11px] text-emerald-800">{bookingEquipment.assignedDriver}</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                          +Rs. {bookingEquipment.driverDailyRateLkr || OPERATOR_DAILY_RATE}/day
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Duration Picker */}
+                    <div className="space-y-2.5">
+                      <label className="block text-xs font-bold text-slate-700">
+                        Select Rental Dates:
+                      </label>
+                      
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <label className="block font-semibold text-slate-600 mb-1">Start Date</label>
+                          <input
+                            type="date"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold text-slate-800 text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold text-slate-600 mb-1">End Date</label>
+                          <input
+                            type="date"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold text-slate-800 text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Preset Buttons */}
+                      <div className="grid grid-cols-4 gap-2 pt-1 text-[11px]">
+                        {[
+                          { days: 1, label: '1 Day' },
+                          { days: 3, label: '3 Days (-5%)' },
+                          { days: 7, label: '7 Days (-10%)' },
+                          { days: 14, label: '14 Days (-15%)' }
+                        ].map((p) => (
+                          <button
+                            key={p.days}
+                            type="button"
+                            onClick={() => handlePresetDays(p.days)}
+                            className={`py-1.5 rounded-lg border font-bold text-center transition cursor-pointer ${
+                              totalDays === p.days
+                                ? 'bg-emerald-700 text-white border-emerald-700'
+                                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Delivery Slider */}
+                    {serviceOption !== 'DRIVER_ONLY' && (
+                      <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                            <Navigation className="w-4 h-4 text-emerald-600" /> Flatbed Transport Distance:
+                          </span>
+                          <span className="font-bold text-emerald-800">
+                            {deliveryDistanceKm} km ({deliveryDistanceKm === 0 ? 'Self Pickup' : `Rs. ${costCalc.deliveryCost.toLocaleString()}`})
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="60"
+                          step="5"
+                          value={deliveryDistanceKm}
+                          onChange={(e) => setDeliveryDistanceKm(parseInt(e.target.value, 10))}
+                          className="w-full accent-emerald-700 cursor-pointer"
+                        />
+                        <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
+                          <span>0 km (Pickup)</span>
+                          <span>30 km</span>
+                          <span>60 km (Farm Direct)</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Damage Waiver */}
+                    {serviceOption !== 'DRIVER_ONLY' && (
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-emerald-600" />
+                          <div>
+                            <span className="text-xs font-bold text-slate-900 block">Damage Protection Waiver</span>
+                            <span className="text-[10px] text-slate-500">+Rs. {DAMAGE_WAIVER_DAILY_RATE.toLocaleString()} / day (Zero breakdown liability)</span>
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={includeDamageWaiver}
+                          onChange={(e) => setIncludeDamageWaiver(e.target.checked)}
+                          className="w-4 h-4 accent-emerald-700 rounded cursor-pointer"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setBookingEquipment(null)}
+                        className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBookingStep('REVIEW')}
+                        className="w-1/2 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5"
+                      >
+                        <span>Review Booking</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── STEP 2: BOOKING REVIEW ── */}
+                {bookingStep === 'REVIEW' && (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+                      <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Booking Summary</h4>
+                      <div className="space-y-1 text-slate-700">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Service:</span>
+                          <span className="font-bold text-slate-900">
+                            {serviceOption === 'DRIVER_ONLY' ? 'Driver Service Only' : serviceOption === 'WITH_DRIVER' ? 'Equipment + Certified Driver' : 'Equipment Only'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Machinery:</span>
+                          <span className="font-bold text-slate-900">{bookingEquipment.name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Assigned Driver:</span>
+                          <span className="font-bold text-emerald-800">
+                            {serviceOption !== 'WITHOUT_DRIVER' ? bookingEquipment.assignedDriver : 'None (Self-Operated)'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Period:</span>
+                          <span>{startDate} → {endDate} ({totalDays} Days)</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500">Service Location:</span>
+                          <span>{bookingEquipment.location} District</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Cost Breakdown */}
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
+                      {serviceOption !== 'DRIVER_ONLY' && (
+                        <div className="flex justify-between text-slate-600">
+                          <span>Base Machinery ({totalDays} Days @ Rs. {bookingEquipment.dailyRateLkr.toLocaleString()}):</span>
+                          <span>Rs. {costCalc.baseRental.toLocaleString()}</span>
+                        </div>
+                      )}
+
+                      {costCalc.discountPct > 0 && (
+                        <div className="flex justify-between text-emerald-700 font-bold">
+                          <span>Duration Savings ({costCalc.discountPct}% Discount):</span>
+                          <span>- Rs. {costCalc.discountAmount.toLocaleString()}</span>
+                        </div>
+                      )}
+
+                      {serviceOption !== 'WITHOUT_DRIVER' && (
+                        <div className="flex justify-between text-slate-600">
+                          <span>Certified Driver Fee ({totalDays} Days):</span>
+                          <span>+ Rs. {costCalc.operatorCost.toLocaleString()}</span>
+                        </div>
+                      )}
+
+                      {deliveryDistanceKm > 0 && serviceOption !== 'DRIVER_ONLY' && (
+                        <div className="flex justify-between text-slate-600">
+                          <span>Flatbed Transport ({deliveryDistanceKm} km):</span>
+                          <span>+ Rs. {costCalc.deliveryCost.toLocaleString()}</span>
+                        </div>
+                      )}
+
+                      {includeDamageWaiver && serviceOption !== 'DRIVER_ONLY' && (
+                        <div className="flex justify-between text-slate-600">
+                          <span>Damage Protection Waiver:</span>
+                          <span>+ Rs. {costCalc.damageWaiverCost.toLocaleString()}</span>
+                        </div>
+                      )}
+
+                      <div className="pt-2 border-t border-slate-200 flex justify-between items-baseline font-bold">
+                        <span className="text-slate-900 text-sm">Guaranteed Total:</span>
+                        <span className="text-xl text-emerald-800">
+                          Rs. {costCalc.finalTotal.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setBookingStep('CONFIGURE')}
+                        className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl"
+                      >
+                        ← Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleConfirmBooking}
+                        disabled={processingBooking}
+                        className="w-1/2 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 disabled:opacity-50"
+                      >
+                        {processingBooking ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Booking'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── STEP 3: BOOKING CONFIRMED ── */}
+                {bookingStep === 'CONFIRMED' && bookingConfirmationData && (
+                  <div className="space-y-4 text-center py-2">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+
+                    <div className="space-y-1">
+                      <h4 className="text-base font-bold text-slate-900">Booking Confirmed!</h4>
+                      <p className="text-xs text-slate-500">
+                        Reference ID: <strong className="text-slate-800">{bookingConfirmationData.refId}</strong>
                       </p>
                     </div>
-                    <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-bold text-[10px] border border-emerald-200">
-                      ★ {bookingEquipment.rating || 4.9}
-                    </span>
-                  </div>
-                  <div className="pt-1 flex items-baseline justify-between border-t border-slate-200">
-                    <span className="text-slate-500">Standard Daily Rate:</span>
-                    <span className="text-slate-900 font-bold">Rs. {Number(bookingEquipment.dailyRateLkr).toLocaleString()} / day</span>
-                  </div>
-                </div>
 
-                {/* Duration Picker */}
-                <div className="space-y-2.5">
-                  <label className="block text-xs font-bold text-slate-700">
-                    1. Select Rental Dates:
-                  </label>
-                  
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <label className="block font-semibold text-slate-600 mb-1">Start Date</label>
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold text-slate-800 text-xs"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block font-semibold text-slate-600 mb-1">End Date</label>
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full p-2.5 rounded-xl border border-slate-200 font-semibold text-slate-800 text-xs"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Preset Buttons */}
-                  <div className="grid grid-cols-4 gap-2 pt-1 text-[11px]">
-                    {[
-                      { days: 1, label: '1 Day' },
-                      { days: 3, label: '3 Days (-5%)' },
-                      { days: 7, label: '7 Days (-10%)' },
-                      { days: 14, label: '14 Days (-15%)' }
-                    ].map((p) => (
-                      <button
-                        key={p.days}
-                        type="button"
-                        onClick={() => handlePresetDays(p.days)}
-                        className={`py-1.5 rounded-lg border font-bold text-center transition cursor-pointer ${
-                          totalDays === p.days
-                            ? 'bg-emerald-700 text-white border-emerald-700'
-                            : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Add-On: Driver / Operator */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <UserCheck className="w-4 h-4 text-emerald-600" />
-                      <div>
-                        <span className="text-xs font-bold text-slate-900 block">Include Certified Driver / Operator</span>
-                        <span className="text-[11px] text-slate-500">+Rs. {OPERATOR_DAILY_RATE.toLocaleString()} / day (Experienced licensed operator)</span>
+                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-left text-xs space-y-1 text-slate-700">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Service:</span>
+                        <span className="font-bold text-slate-900">{bookingConfirmationData.serviceTypeLabel}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Driver:</span>
+                        <span className="font-bold text-emerald-800">{bookingConfirmationData.driverName}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Dates:</span>
+                        <span>{bookingConfirmationData.startDate} → {bookingConfirmationData.endDate}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Total Paid:</span>
+                        <span className="font-bold text-slate-900">Rs. {bookingConfirmationData.totalCost.toLocaleString()}</span>
                       </div>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={includeOperator}
-                      onChange={(e) => setIncludeOperator(e.target.checked)}
-                      className="w-4 h-4 accent-emerald-700 rounded cursor-pointer"
-                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBookingEquipment(null);
+                        setBookingStep('CONFIGURE');
+                      }}
+                      className="w-full py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition"
+                    >
+                      Back to Equipment &amp; Services
+                    </button>
                   </div>
-                </div>
+                )}
 
-                {/* Add-On: Delivery Distance Slider */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
-                      <Navigation className="w-4 h-4 text-emerald-600" /> Flatbed Farmgate Delivery:
-                    </span>
-                    <span className="font-bold text-emerald-800">
-                      {deliveryDistanceKm} km ({deliveryDistanceKm === 0 ? 'Self Pickup' : `Rs. ${costCalc.deliveryCost.toLocaleString()}`})
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="60"
-                    step="5"
-                    value={deliveryDistanceKm}
-                    onChange={(e) => setDeliveryDistanceKm(parseInt(e.target.value, 10))}
-                    className="w-full accent-emerald-700 cursor-pointer"
-                  />
-                  <div className="flex justify-between text-[10px] text-slate-400 font-semibold">
-                    <span>0 km (Pickup)</span>
-                    <span>30 km</span>
-                    <span>60 km (Farmgate Direct)</span>
-                  </div>
-                </div>
-
-                {/* Add-On: Damage Protection Waiver */}
-                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-emerald-600" />
-                      <div>
-                        <span className="text-xs font-bold text-slate-900 block">Damage Protection Waiver</span>
-                        <span className="text-[11px] text-slate-500">+Rs. {DAMAGE_WAIVER_DAILY_RATE.toLocaleString()} / day (Zero breakdown liability)</span>
-                      </div>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={includeDamageWaiver}
-                      onChange={(e) => setIncludeDamageWaiver(e.target.checked)}
-                      className="w-4 h-4 accent-emerald-700 rounded cursor-pointer"
-                    />
-                  </div>
-                </div>
-
-                {/* Itemized Cost Breakdown */}
-                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Base Lease ({totalDays} Days @ Rs. {bookingEquipment.dailyRateLkr.toLocaleString()}):</span>
-                    <span>Rs. {costCalc.baseRental.toLocaleString()}</span>
-                  </div>
-
-                  {costCalc.discountPct > 0 && (
-                    <div className="flex justify-between text-emerald-700 font-bold">
-                      <span>Duration Savings ({costCalc.discountPct}% Discount):</span>
-                      <span>- Rs. {costCalc.discountAmount.toLocaleString()}</span>
-                    </div>
-                  )}
-
-                  {includeOperator && (
-                    <div className="flex justify-between text-slate-600">
-                      <span>Certified Operator ({totalDays} Days):</span>
-                      <span>+ Rs. {costCalc.operatorCost.toLocaleString()}</span>
-                    </div>
-                  )}
-
-                  {deliveryDistanceKm > 0 && (
-                    <div className="flex justify-between text-slate-600">
-                      <span>Flatbed Transport ({deliveryDistanceKm} km round-trip):</span>
-                      <span>+ Rs. {costCalc.deliveryCost.toLocaleString()}</span>
-                    </div>
-                  )}
-
-                  {includeDamageWaiver && (
-                    <div className="flex justify-between text-slate-600">
-                      <span>Damage Protection Waiver:</span>
-                      <span>+ Rs. {costCalc.damageWaiverCost.toLocaleString()}</span>
-                    </div>
-                  )}
-
-                  <div className="pt-2 border-t border-slate-200 flex justify-between items-baseline font-bold">
-                    <span className="text-slate-900 text-sm">Guaranteed Total:</span>
-                    <span className="text-xl text-emerald-800">
-                      Rs. {costCalc.finalTotal.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setBookingEquipment(null)}
-                    className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleConfirmBooking}
-                    disabled={processingBooking}
-                    className="w-1/2 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                  >
-                    {processingBooking ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Booking'}
-                  </button>
-                </div>
               </motion.div>
             </div>
           );
