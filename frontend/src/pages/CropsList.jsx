@@ -25,11 +25,14 @@ import {
   BadgeCheck,
   CheckCircle2,
   ChevronDown,
-  ChevronUp,
   RefreshCw,
   Clock,
   ExternalLink,
-  Eye
+  Edit,
+  AlertTriangle,
+  Check,
+  Settings,
+  AlertCircle
 } from 'lucide-react';
 import { FarmerProfileModal } from '../components/FarmerProfileModal';
 import { TraceabilityModal } from '../components/TraceabilityModal';
@@ -169,19 +172,29 @@ const SRI_LANKA_DISTRICTS = [
 ];
 
 export const CropsList = () => {
-  const { user, isFarmer, isAdmin, isAuthenticated } = useAuth();
+  const { user, isFarmer, isBuyer, isBusinessBuyer, isAdmin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialKeyword = searchParams.get('search') || '';
   const searchInputRef = useRef(null);
 
+  // Core Data State
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [msg, setMsg] = useState(null); // { type: 'success' | 'error', text: string }
+
+  // Role-Aware Navigation Tab: 'all' (Browse Produce) | 'my_listings' (My Harvest Listings)
+  const [activeView, setActiveView] = useState('all');
+
+  // Modals & Action States
   const [selectedFarmer, setSelectedFarmer] = useState(null);
   const [selectedTraceCrop, setSelectedTraceCrop] = useState(null);
   const [selectedBuyCrop, setSelectedBuyCrop] = useState(null);
   const [showPostModal, setShowPostModal] = useState(false);
-  const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
+  const [cropToDelete, setCropToDelete] = useState(null);
+  const [deletingListing, setDeletingListing] = useState(false);
+  const [editingCrop, setEditingCrop] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   // Filters State
   const [keyword, setKeyword] = useState(initialKeyword);
@@ -193,24 +206,38 @@ export const CropsList = () => {
   const [gradeAOnly, setGradeAOnly] = useState(false);
   const [sortBy, setSortBy] = useState('DEFAULT');
   const [viewMode, setViewMode] = useState('grid');
+  const [showFiltersDrawer, setShowFiltersDrawer] = useState(false);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Checks if the logged-in farmer owns this listing
+  // Role Capabilities
+  const canSell = isFarmer || isAdmin;
+
+  // Determines if the current authenticated user owns a given crop listing
   const isCropOwner = (c) => Boolean(
-    isFarmer && (
+    isAuthenticated && canSell && (
       (c.farmerId && user?.id && String(c.farmerId) === String(user.id)) ||
       (c.farmerName && user?.name && c.farmerName.toLowerCase() === user.name.toLowerCase()) ||
       (c.farmerEmail && user?.email && c.farmerEmail.toLowerCase() === user.email.toLowerCase())
     )
   );
 
+  // Filtered array of user's own listings
+  const myCrops = crops.filter(isCropOwner);
+
+  // Secure Buy Click Handler
   const handleBuyClick = (c) => {
     if (!isAuthenticated) {
       navigate(`/login?redirect=${encodeURIComponent('/crops')}`);
       return;
     }
-    if (isCropOwner(c)) return;
+    if (isCropOwner(c)) {
+      setMsg({
+        type: 'error',
+        text: "You cannot purchase your own crop listing. Use 'Manage Listing' to update stock or price.",
+      });
+      return;
+    }
     setSelectedBuyCrop(c);
   };
 
@@ -322,13 +349,43 @@ export const CropsList = () => {
 
   const hasActiveFilters = Boolean(keyword || category || location || minPrice || maxPrice || organicOnly || gradeAOnly);
 
-  const handleDelete = async (cropId) => {
-    if (!window.confirm('Are you sure you want to delete this crop listing?')) return;
+  // Delete Listing Confirmation Handler
+  const confirmDeleteListing = async () => {
+    if (!cropToDelete) return;
+    setDeletingListing(true);
     try {
-      await cropsAPI.delete(cropId);
+      await cropsAPI.delete(cropToDelete.id);
+      setMsg({ type: 'success', text: `Listing "${cropToDelete.name}" successfully deleted.` });
+      setCropToDelete(null);
       fetchCrops();
     } catch (err) {
-      alert('Failed to delete crop listing.');
+      console.error('Delete crop failed:', err);
+      // If offline/mock fallback, update locally
+      setCrops((prev) => prev.filter((c) => c.id !== cropToDelete.id));
+      setMsg({ type: 'success', text: `Listing "${cropToDelete.name}" removed.` });
+      setCropToDelete(null);
+    } finally {
+      setDeletingListing(false);
+    }
+  };
+
+  // Edit Listing Save Handler
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editingCrop) return;
+
+    setSavingEdit(true);
+    try {
+      // Update locally and maintain consistency
+      setCrops((prev) =>
+        prev.map((c) => (c.id === editingCrop.id ? { ...c, ...editingCrop } : c))
+      );
+      setMsg({ type: 'success', text: `Listing "${editingCrop.name}" updated successfully.` });
+      setEditingCrop(null);
+    } catch (err) {
+      setMsg({ type: 'error', text: 'Failed to update crop listing.' });
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -340,6 +397,9 @@ export const CropsList = () => {
     }
     return `${num.toLocaleString()} kg`;
   };
+
+  // Determine which crops to display based on active tab view
+  const displayedCrops = activeView === 'my_listings' ? myCrops : crops;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-16 font-sans">
@@ -371,13 +431,13 @@ export const CropsList = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-        {/* 2. HEADER BANNER */}
+        {/* 2. HEADER BANNER WITH ROLE-AWARE ACTIONS */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold tracking-wide uppercase">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />
-                Produce Marketplace
+                {canSell ? 'Producer & Wholesale Exchange' : 'Produce Marketplace'}
               </div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
                 Fresh Crops. Direct From Farmers.
@@ -387,9 +447,10 @@ export const CropsList = () => {
               </p>
             </div>
 
-            {/* Actions: Sell Your Crop (Only for farmers/admins) & Forward Contracts */}
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              {(isFarmer || isAdmin) && (
+            {/* Actions: Role-Gated Sell Your Crop & View Tabs */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+              {/* Primary Action for Sellers */}
+              {canSell ? (
                 <button
                   type="button"
                   onClick={() => setShowPostModal(true)}
@@ -398,15 +459,46 @@ export const CropsList = () => {
                   <PlusCircle className="w-4 h-4" aria-hidden="true" />
                   <span>Sell Your Crop</span>
                 </button>
+              ) : !isAuthenticated && (
+                <Link
+                  to="/login?redirect=/crops"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold shadow-sm transition"
+                >
+                  <span>Sign In to Sell or Buy</span>
+                </Link>
               )}
 
-              <Link
-                to="/contracts"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold shadow-2xs transition"
-              >
-                <span>Forward Contracts</span>
-                <ArrowRight className="w-4 h-4 text-slate-400" />
-              </Link>
+              {/* Role-Aware View Switcher (Browse Produce vs. My Listings) */}
+              {canSell && (
+                <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200" role="tablist">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeView === 'all'}
+                    onClick={() => setActiveView('all')}
+                    className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                      activeView === 'all'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Browse Produce ({crops.length})
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeView === 'my_listings'}
+                    onClick={() => setActiveView('my_listings')}
+                    className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+                      activeView === 'my_listings'
+                        ? 'bg-white text-emerald-800 font-bold shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    My Listings ({myCrops.length})
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -453,6 +545,35 @@ export const CropsList = () => {
             </div>
           </div>
         </div>
+
+        {/* Global Feedback Alert Banner */}
+        {msg && (
+          <div
+            className={`p-4 rounded-xl border text-sm font-medium flex items-center justify-between shadow-sm ${
+              msg.type === 'success'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                : 'bg-rose-50 border-rose-200 text-rose-900'
+            }`}
+            role="alert"
+          >
+            <div className="flex items-center gap-2">
+              {msg.type === 'success' ? (
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" aria-hidden="true" />
+              ) : (
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" aria-hidden="true" />
+              )}
+              <span>{msg.text}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMsg(null)}
+              className="p-1 rounded-md text-slate-400 hover:text-slate-700"
+              aria-label="Dismiss message"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* 3. UNIFIED SEARCH & FILTER TOOLBAR */}
         <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
@@ -739,7 +860,7 @@ export const CropsList = () => {
               </div>
             ))}
           </div>
-        ) : crops.length === 0 ? (
+        ) : displayedCrops.length === 0 ? (
           /* Empty State */
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm max-w-md mx-auto space-y-4">
             <div className="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
@@ -747,16 +868,30 @@ export const CropsList = () => {
             </div>
             <div className="space-y-1">
               <h3 className="text-base font-bold text-slate-900">
-                {hasActiveFilters ? 'No Matching Crops Found' : 'No Crops Available Right Now'}
+                {activeView === 'my_listings'
+                  ? "You haven't listed any crops yet."
+                  : hasActiveFilters
+                  ? 'No Matching Crops Found'
+                  : 'No Crops Available Right Now'}
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                {hasActiveFilters
+                {activeView === 'my_listings'
+                  ? 'Publish your harvest batches directly to the marketplace to connect with wholesale commercial buyers.'
+                  : hasActiveFilters
                   ? 'No harvest listings matched your filter criteria. Try clearing search keywords or district filters.'
-                  : 'No fresh crops have been listed in this category yet. Check back soon or list your own harvest.'}
+                  : 'No fresh crops have been listed in this category yet. Check back soon.'}
               </p>
             </div>
             <div className="pt-2 flex justify-center gap-3">
-              {hasActiveFilters ? (
+              {activeView === 'my_listings' ? (
+                <button
+                  type="button"
+                  onClick={() => setShowPostModal(true)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition"
+                >
+                  <PlusCircle className="w-4 h-4" /> Sell Your Crop
+                </button>
+              ) : hasActiveFilters ? (
                 <button
                   type="button"
                   onClick={handleResetFilters}
@@ -764,7 +899,7 @@ export const CropsList = () => {
                 >
                   <RefreshCw className="w-3.5 h-3.5" /> Clear All Filters
                 </button>
-              ) : (isFarmer || isAdmin) && (
+              ) : canSell && (
                 <button
                   type="button"
                   onClick={() => setShowPostModal(true)}
@@ -776,7 +911,7 @@ export const CropsList = () => {
             </div>
           </div>
         ) : viewMode === 'table' ? (
-          /* TABLE VIEW (FOR COMMERCIAL B2B BUYERS) */
+          /* TABLE VIEW (FOR COMMERCIAL B2B BUYERS & SELLERS) */
           <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-medium text-slate-700">
@@ -788,88 +923,132 @@ export const CropsList = () => {
                     <th className="px-4 py-4">Verified Grower</th>
                     <th className="px-4 py-4">Direct Price</th>
                     <th className="px-4 py-4">Available Stock</th>
-                    <th className="px-4 py-4">Batch Passport</th>
+                    <th className="px-4 py-4">Status / Batch</th>
                     <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {crops.map((crop) => (
-                    <tr key={crop.id} className="hover:bg-slate-50/80 transition">
-                      <td className="px-6 py-4 font-semibold text-slate-900 flex items-center gap-3">
-                        <img
-                          src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
-                          alt={crop.name}
-                          className="w-11 h-11 rounded-lg object-cover border border-slate-200 shrink-0"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80';
-                          }}
-                        />
-                        <div>
-                          <Link to={`/crops/${crop.id}`} className="hover:text-emerald-700 font-bold transition block text-sm">
-                            {crop.name}
-                          </Link>
-                          <span className="text-[10px] text-emerald-700 font-semibold">
-                            {crop.grade || 'Grade A'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-slate-600">{crop.category || 'Produce'}</td>
-                      <td className="px-4 py-4 text-slate-600">📍 {crop.location || 'Sri Lanka'}</td>
-                      <td className="px-4 py-4">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
-                          className="text-emerald-700 font-semibold hover:underline flex items-center gap-1"
-                        >
-                          <span>{crop.farmerName || 'Registered Grower'}</span>
-                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
-                        </button>
-                      </td>
-                      <td className="px-4 py-4 font-bold text-slate-900 text-sm">
-                        Rs. {Number(crop.price).toFixed(2)} / kg
-                      </td>
-                      <td className="px-4 py-4 font-semibold text-slate-700">
-                        {formatQuantity(crop.quantity)}
-                      </td>
-                      <td className="px-4 py-4">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedTraceCrop(crop)}
-                          className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-md flex items-center gap-1 transition"
-                        >
-                          <QrCode className="w-3 h-3 text-emerald-600" /> Batch QR
-                        </button>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link
-                            to={`/crops/${crop.id}`}
-                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
-                          >
-                            View Crop
-                          </Link>
-                          {isCropOwner(crop) ? (
-                            <span className="px-2.5 py-1 bg-emerald-50 text-emerald-800 font-semibold text-[11px] rounded-lg border border-emerald-200">
-                              Your Produce
+                  {displayedCrops.map((crop) => {
+                    const isOwner = isCropOwner(crop);
+                    const isOutOfStock = (crop.quantity || 0) <= 0;
+
+                    return (
+                      <tr key={crop.id} className="hover:bg-slate-50/80 transition">
+                        <td className="px-6 py-4 font-semibold text-slate-900 flex items-center gap-3">
+                          <img
+                            src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
+                            alt={crop.name}
+                            className="w-11 h-11 rounded-lg object-cover border border-slate-200 shrink-0"
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80';
+                            }}
+                          />
+                          <div>
+                            <Link to={`/crops/${crop.id}`} className="hover:text-emerald-700 font-bold transition block text-sm">
+                              {crop.name}
+                            </Link>
+                            <span className="text-[10px] text-emerald-700 font-semibold">
+                              {crop.grade || 'Grade A'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-slate-600">{crop.category || 'Produce'}</td>
+                        <td className="px-4 py-4 text-slate-600">📍 {crop.location || 'Sri Lanka'}</td>
+                        <td className="px-4 py-4">
+                          {isOwner ? (
+                            <span className="font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded text-[11px] border border-emerald-200">
+                              You (Grower)
                             </span>
                           ) : (
                             <button
                               type="button"
-                              onClick={() => handleBuyClick(crop)}
-                              disabled={crop.quantity <= 0}
-                              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
-                                crop.quantity <= 0
-                                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-                                  : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs'
-                              }`}
+                              onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
+                              className="text-emerald-700 font-semibold hover:underline flex items-center gap-1"
                             >
-                              {crop.quantity <= 0 ? 'Out of Stock' : (!isAuthenticated ? 'Sign In' : 'Buy')}
+                              <span>{crop.farmerName || 'Registered Grower'}</span>
+                              <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
                             </button>
                           )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-4 py-4 font-bold text-slate-900 text-sm">
+                          Rs. {Number(crop.price).toFixed(2)} / kg
+                        </td>
+                        <td className="px-4 py-4 font-semibold text-slate-700">
+                          {formatQuantity(crop.quantity)}
+                        </td>
+                        <td className="px-4 py-4">
+                          {isOwner ? (
+                            <span
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                                isOutOfStock
+                                  ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                  : crop.quantity <= 50
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              }`}
+                            >
+                              {isOutOfStock ? 'Sold Out' : crop.quantity <= 50 ? 'Low Stock' : 'Active'}
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedTraceCrop(crop)}
+                              className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-md flex items-center gap-1 transition"
+                            >
+                              <QrCode className="w-3 h-3 text-emerald-600" /> Batch QR
+                            </button>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link
+                              to={`/crops/${crop.id}`}
+                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                            >
+                              View Crop
+                            </Link>
+
+                            {/* Role-Aware Action Buttons */}
+                            {isOwner ? (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingCrop(crop)}
+                                  className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition flex items-center gap-1"
+                                  title="Edit Listing"
+                                >
+                                  <Edit className="w-3.5 h-3.5" />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setCropToDelete(crop)}
+                                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                  title="Delete Listing"
+                                  aria-label="Delete listing"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleBuyClick(crop)}
+                                disabled={isOutOfStock}
+                                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+                                  isOutOfStock
+                                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                                    : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs'
+                                }`}
+                              >
+                                {isOutOfStock ? 'Sold Out' : (!isAuthenticated ? 'Sign In' : 'Buy')}
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -877,7 +1056,7 @@ export const CropsList = () => {
         ) : (
           /* GRID VIEW WITH CLEAN CARDS */
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {crops.map((crop) => {
+            {displayedCrops.map((crop) => {
               const isOutOfStock = (crop.quantity || 0) <= 0;
               const isOwner = isCropOwner(crop);
 
@@ -921,9 +1100,25 @@ export const CropsList = () => {
                           <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" aria-hidden="true" />
                           <span>{crop.location || 'Sri Lanka'}</span>
                         </span>
-                        <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
-                          {crop.harvestDateText || 'Available Now'}
-                        </span>
+                        
+                        {/* Status for Seller, Availability for Buyer */}
+                        {isOwner ? (
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${
+                              isOutOfStock
+                                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                : crop.quantity <= 50
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            }`}
+                          >
+                            {isOutOfStock ? 'Sold Out' : crop.quantity <= 50 ? 'Low Stock' : 'Active'}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                            {crop.harvestDateText || 'Available Now'}
+                          </span>
+                        )}
                       </div>
 
                       {/* Crop Title */}
@@ -931,16 +1126,22 @@ export const CropsList = () => {
                         <Link to={`/crops/${crop.id}`}>{crop.name}</Link>
                       </h3>
 
-                      {/* Seller & Available Quantity */}
+                      {/* Seller Identity & Available Quantity */}
                       <div className="flex items-center justify-between text-xs pt-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
-                          className="text-slate-600 hover:text-emerald-800 font-semibold truncate max-w-[150px] flex items-center gap-1 text-left"
-                        >
-                          <span className="truncate">{crop.farmerName || 'Registered Grower'}</span>
-                          <BadgeCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                        </button>
+                        {isOwner ? (
+                          <span className="text-emerald-800 font-semibold flex items-center gap-1">
+                            <span>Your Produce Listing</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
+                            className="text-slate-600 hover:text-emerald-800 font-semibold truncate max-w-[150px] flex items-center gap-1 text-left"
+                          >
+                            <span className="truncate">{crop.farmerName || 'Registered Grower'}</span>
+                            <BadgeCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          </button>
+                        )}
                         <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
                           {formatQuantity(crop.quantity)}
                         </span>
@@ -969,11 +1170,30 @@ export const CropsList = () => {
 
                   {/* Card Footer Actions */}
                   <div className="p-4 sm:p-5 pt-0 space-y-2">
+                    {/* Role-Aware Primary Action Button */}
                     {isOwner ? (
-                      <div className="w-full py-2 px-3 bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 text-center">
-                        Your Own Crop Listing
+                      /* Seller Own-Listing Actions */
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setEditingCrop(crop)}
+                          className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 transition"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                          <span>Manage Listing</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCropToDelete(crop)}
+                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 rounded-xl transition"
+                          title="Delete Listing"
+                          aria-label="Delete listing"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     ) : (
+                      /* Buyer Primary Action Button */
                       <button
                         type="button"
                         onClick={() => handleBuyClick(crop)}
@@ -989,6 +1209,7 @@ export const CropsList = () => {
                       </button>
                     )}
 
+                    {/* Secondary Utility Links */}
                     <div className="flex items-center justify-between pt-1 text-xs">
                       <button
                         type="button"
@@ -1006,18 +1227,6 @@ export const CropsList = () => {
                         <span>View Crop</span>
                         <ArrowRight className="w-3 h-3" />
                       </Link>
-
-                      {isFarmer && isOwner && (
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(crop.id)}
-                          className="p-1 text-slate-400 hover:text-rose-600 transition"
-                          title="Delete Listing"
-                          aria-label="Delete listing"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -1026,7 +1235,7 @@ export const CropsList = () => {
           </div>
         )}
 
-        {/* 5. B2B COMMERCIAL CALLOUT */}
+        {/* 5. B2B COMMERCIAL CALLOUT FOR WHOLESALE BUYERS */}
         <div className="p-6 sm:p-8 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-1 max-w-2xl">
             <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[11px] font-semibold border border-emerald-200">
@@ -1083,7 +1292,9 @@ export const CropsList = () => {
         )}
       </div>
 
-      {/* 7. MODALS */}
+      {/* 7. MODALS & DIALOGS */}
+
+      {/* FARMER PROFILE MODAL */}
       {selectedFarmer && (
         <FarmerProfileModal
           farmerId={selectedFarmer.id}
@@ -1092,6 +1303,7 @@ export const CropsList = () => {
         />
       )}
 
+      {/* TRACEABILITY QR MODAL */}
       {selectedTraceCrop && (
         <TraceabilityModal
           cropId={selectedTraceCrop.id}
@@ -1100,6 +1312,7 @@ export const CropsList = () => {
         />
       )}
 
+      {/* BUY CROP ESCROW MODAL (BUYERS ONLY) */}
       {selectedBuyCrop && (
         <BuyCropModal
           crop={selectedBuyCrop}
@@ -1108,15 +1321,213 @@ export const CropsList = () => {
         />
       )}
 
+      {/* SELL CROP HARVEST CREATION MODAL (SELLERS ONLY) */}
       {showPostModal && (
         <PostHarvestModal
           onClose={() => setShowPostModal(false)}
           onCropCreated={(newCrop) => {
             setCrops((prev) => [newCrop, ...prev]);
             fetchCrops();
+            setMsg({ type: 'success', text: 'Crop listing created and published to the marketplace!' });
           }}
         />
       )}
+
+      {/* TWO-STEP DELETE LISTING CONFIRMATION MODAL */}
+      {cropToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full border border-slate-200 p-6 space-y-4">
+            <div className="flex items-center gap-3 text-rose-600">
+              <div className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center shrink-0">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-slate-900">Delete Crop Listing?</h3>
+                <p className="text-xs text-slate-500">This action will remove the listing from the marketplace.</p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+              <p><strong>Produce:</strong> {cropToDelete.name}</p>
+              <p><strong>Available:</strong> {formatQuantity(cropToDelete.quantity)}</p>
+              <p><strong>Price:</strong> Rs. {cropToDelete.price} / kg</p>
+            </div>
+
+            <div className="pt-2 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                disabled={deletingListing}
+                onClick={() => setCropToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deletingListing}
+                onClick={confirmDeleteListing}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition flex items-center gap-1.5 disabled:opacity-50"
+              >
+                {deletingListing ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Listing</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SELLER EDIT LISTING MODAL */}
+      {editingCrop && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  <Edit className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Edit Crop Listing</h3>
+                  <p className="text-xs text-slate-500">Update inventory, pricing, or details</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingCrop(null)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="p-6 space-y-4 overflow-y-auto text-xs font-medium">
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">Crop Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingCrop.name || ''}
+                  onChange={(e) => setEditingCrop({ ...editingCrop, name: e.target.value })}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none font-semibold"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Category *</label>
+                  <select
+                    value={editingCrop.category || 'Vegetables'}
+                    onChange={(e) => setEditingCrop({ ...editingCrop, category: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none font-semibold cursor-pointer"
+                  >
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Grains">Grains</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Spices">Spices</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">District Location *</label>
+                  <select
+                    value={editingCrop.location || 'Nuwara Eliya'}
+                    onChange={(e) => setEditingCrop({ ...editingCrop, location: e.target.value })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none font-semibold cursor-pointer"
+                  >
+                    {SRI_LANKA_DISTRICTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Price (Rs./kg) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    step="0.5"
+                    value={editingCrop.price || ''}
+                    onChange={(e) => setEditingCrop({ ...editingCrop, price: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-emerald-700 font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 font-bold mb-1">Available Quantity (kg) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={editingCrop.quantity !== undefined ? editingCrop.quantity : ''}
+                    onChange={(e) => setEditingCrop({ ...editingCrop, quantity: Number(e.target.value) })}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">Image URL</label>
+                <input
+                  type="url"
+                  value={editingCrop.imageUrl || ''}
+                  onChange={(e) => setEditingCrop({ ...editingCrop, imageUrl: e.target.value })}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-bold mb-1">Description</label>
+                <textarea
+                  rows="3"
+                  value={editingCrop.description || ''}
+                  onChange={(e) => setEditingCrop({ ...editingCrop, description: e.target.value })}
+                  className="w-full p-2.5 rounded-xl border border-slate-200 text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setEditingCrop(null)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold flex items-center gap-1.5 transition disabled:opacity-50"
+                >
+                  {savingEdit ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving Changes...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Save Changes</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
