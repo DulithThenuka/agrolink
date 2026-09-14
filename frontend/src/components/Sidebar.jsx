@@ -117,10 +117,10 @@ export const Sidebar = () => {
               <span>Forward Contracts</span>
             </Link>
           )}
-          {(isBuyer || isBusinessBuyer || isAdmin) && (
+          {(isBuyer || isBusinessBuyer || isFarmer || isSupplier || isAdmin) && (
             <Link to="/orders" className={linkClass('/orders')}>
               <ShoppingBag className="w-4 h-4 text-emerald-700 shrink-0" />
-              <span>Orders &amp; Escrow</span>
+              <span>Orders &amp; Bookings</span>
             </Link>
           )}
           {(isLogistics || isFarmer || isBuyer || isBusinessBuyer || isAdmin) && (

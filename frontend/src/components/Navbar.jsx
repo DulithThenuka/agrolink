@@ -74,7 +74,7 @@ export const Navbar = () => {
 
   const canContract  = isAdmin || isFarmer || isBuyer || isBusinessBuyer;
   const canSupply    = isAdmin || isFarmer || isSupplier;
-  const canOrder     = isAdmin || isBuyer  || isBusinessBuyer;
+  const canOrder     = isAdmin || isBuyer  || isBusinessBuyer || isFarmer || isSupplier;
   const canLogistics = isAdmin || isLogistics || isFarmer || isBuyer || isBusinessBuyer;
   const canAI        = isAdmin || isFarmer || isExpert;
 

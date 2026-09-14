@@ -170,7 +170,7 @@ function AppContent() {
             <Route
               path="/orders"
               element={
-                <ProtectedRoute allowedRoles={['BUYER', 'BUSINESS_BUYER']}>
+                <ProtectedRoute allowedRoles={['BUYER', 'BUSINESS_BUYER', 'FARMER', 'SUPPLIER', 'LOGISTICS', 'LOGISTICS_PROVIDER']}>
                   <Orders />
                 </ProtectedRoute>
               }
