@@ -123,10 +123,10 @@ export const Sidebar = () => {
               <span>Orders &amp; Escrow</span>
             </Link>
           )}
-          {(isLogistics || isAdmin) && (
+          {(isLogistics || isFarmer || isBuyer || isBusinessBuyer || isAdmin) && (
             <Link to="/logistics" className={linkClass('/logistics')}>
               <Truck className="w-4 h-4 text-emerald-700 shrink-0" />
-              <span>Logistics Fleet</span>
+              <span>Logistics &amp; Fleet</span>
             </Link>
           )}
         </nav>

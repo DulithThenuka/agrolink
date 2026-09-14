@@ -200,11 +200,11 @@ function AppContent() {
               }
             />
 
-            {/* ─── LOGISTICS-ONLY ───────────────────────────────── */}
+            {/* ─── LOGISTICS & TRANSPORT HUB ──────────────────── */}
             <Route
               path="/logistics"
               element={
-                <ProtectedRoute allowedRoles={['LOGISTICS', 'LOGISTICS_PROVIDER']}>
+                <ProtectedRoute allowedRoles={['LOGISTICS', 'LOGISTICS_PROVIDER', 'FARMER', 'BUYER', 'BUSINESS_BUYER']}>
                   <Logistics />
                 </ProtectedRoute>
               }
