@@ -25,7 +25,8 @@ import {
   ShieldCheck,
   Bug,
   Truck,
-  ArrowRight
+  ArrowRight,
+  FileText
 } from 'lucide-react';
 import { govIntelligenceAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -33,15 +34,20 @@ import { useAuth } from '../context/AuthContext';
 export const GovernmentIntelligence = () => {
   const { user, isFarmer, isBuyer, isBusinessBuyer, isAdmin } = useAuth();
 
-  // State Flow: PAGE_LOADING | INTELLIGENCE_READY | LOAD_ERROR
+  // State Rules:
+  // PAGE_LOADING -> INTELLIGENCE_READY | LOAD_ERROR
+  // INTELLIGENCE_READY -> REGION_FILTERING -> REGION_RESULTS
+  // INTELLIGENCE_READY -> ALERT_DETAILS
+  // INTELLIGENCE_READY -> UPDATE_DETAILS
   const [pageState, setPageState] = useState('PAGE_LOADING');
 
   // Filter States
   const [selectedDistrict, setSelectedDistrict] = useState('ALL');
   const [filterAlertCategory, setFilterAlertCategory] = useState('ALL');
 
-  // Interactive Detail Modal
-  const [activeModalItem, setActiveModalItem] = useState(null); // PolicyAlert or DiseaseOutbreakLog
+  // Active Selected Items for Detailed Modals
+  const [selectedAlertForDetails, setSelectedAlertForDetails] = useState(null);
+  const [selectedUpdateForDetails, setSelectedUpdateForDetails] = useState(null);
 
   // API Data
   const [govData, setGovData] = useState(null);
@@ -88,11 +94,64 @@ export const GovernmentIntelligence = () => {
     return districts.filter((d) => d.district === selectedDistrict);
   }, [districts, selectedDistrict]);
 
-  // Selected district for map highlight
-  const activeMapDistrict = useMemo(() => {
-    if (selectedDistrict === 'ALL') return null;
-    return districts.find((d) => d.district === selectedDistrict) || null;
-  }, [districts, selectedDistrict]);
+  // Handle District Filter Change with state transition
+  const handleDistrictFilterChange = (districtValue) => {
+    setPageState('REGION_FILTERING');
+    setSelectedDistrict(districtValue);
+    setTimeout(() => {
+      setPageState('REGION_RESULTS');
+    }, 150);
+  };
+
+  // KPI Calculations from real backend data
+  const totalProductionMT = useMemo(() => {
+    if (!districts.length) return 0;
+    return districts.reduce((acc, curr) => acc + curr.cropYieldTons, 0);
+  }, [districts]);
+
+  const affectedRegionsCount = useMemo(() => {
+    if (!districts.length) return 0;
+    return districts.filter((d) => d.riskStatus !== 'LOW').length;
+  }, [districts]);
+
+  // Verified Official Updates list
+  const officialUpdates = useMemo(() => {
+    return [
+      {
+        id: 'UPD-2026-01',
+        title: 'Central Province Vegetable Diversion Directive',
+        date: '2026-09-15',
+        source: 'Department of Agriculture — Extension Services',
+        region: 'Central Province',
+        summary: 'Advisory to divert Matale & Welimada tomato harvest to processing hubs in Southern Province to balance regional oversupply.',
+        fullContent: 'Due to simultaneous bumper harvests in Matale and Welimada, wholesale arrivals at Dambulla Dedicated Economic Centre have exceeded local daily absorption by 38%. Farmers and transport clusters are advised to route shipments towards Southern canning facilities and utilize cold buffer storage to prevent farmgate price drops.',
+        actionLink: '/crops',
+        actionLabel: 'Browse Processing Buyers on Marketplace'
+      },
+      {
+        id: 'UPD-2026-02',
+        title: 'Northern Red Onion Strategic Buffer Clearance',
+        date: '2026-09-12',
+        source: 'National Agrarian Development Board',
+        region: 'Northern Province',
+        summary: 'Release of Jaffna cooperative onion stocks to stabilize Western Province wholesale retail prices.',
+        fullContent: 'Seasonal rainfall variations in the Northern Dry Zone led to a 25% yield contraction in Jaffna red onions. In coordination with local farmer cooperatives, certified buffer stocks are being dispatched to Manning Market under stabilized benchmark price agreements.',
+        actionLink: '/demand-forecasting',
+        actionLabel: 'View National Demand Forecast'
+      },
+      {
+        id: 'UPD-2026-03',
+        title: 'A9 Arterial Logistics Corridor Congestion Notice',
+        date: '2026-09-10',
+        source: 'Ministry of Agriculture & Transport Logistics Hub',
+        region: 'Dambulla Distribution Hub',
+        summary: 'Transit delays averaging 3.8 to 4.2 hours reported at Dambulla Central Hub. Alternate freight offloading enabled at Meegoda.',
+        fullContent: 'High volume freight inflow into Dambulla has triggered transport queues averaging 3.8 hours, raising core pulp temperatures for perishable nightshade vegetables. Logistics operators are authorized to redirect deliveries to secondary receiving centers at Keppetipola and Meegoda.',
+        actionLink: '/logistics',
+        actionLabel: 'Book Fleet Transport Logistics'
+      }
+    ];
+  }, []);
 
   // Severity styling helper
   const getSeverityBadge = (severity) => {
@@ -100,23 +159,20 @@ export const GovernmentIntelligence = () => {
       case 'CRITICAL':
         return {
           bg: 'bg-rose-50 text-rose-800 border-rose-200',
-          indicator: 'bg-rose-600',
-          label: 'CRITICAL ALERT',
+          label: 'CRITICAL',
           icon: AlertTriangle
         };
       case 'WARNING':
         return {
           bg: 'bg-amber-50 text-amber-800 border-amber-200',
-          indicator: 'bg-amber-500',
-          label: 'OFFICIAL WARNING',
+          label: 'WARNING',
           icon: ShieldAlert
         };
       case 'INFO':
       default:
         return {
           bg: 'bg-blue-50 text-blue-800 border-blue-200',
-          indicator: 'bg-blue-600',
-          label: 'POLICY ADVISORY',
+          label: 'INFO',
           icon: Info
         };
     }
@@ -126,18 +182,18 @@ export const GovernmentIntelligence = () => {
   const getRiskBadge = (risk) => {
     switch (risk?.toUpperCase()) {
       case 'HIGH':
-        return { bg: 'bg-rose-50 text-rose-800 border-rose-200', text: 'HIGH RISK' };
+        return { bg: 'bg-rose-50 text-rose-800 border-rose-200', text: 'High' };
       case 'MODERATE':
-        return { bg: 'bg-amber-50 text-amber-800 border-amber-200', text: 'MODERATE RISK' };
+        return { bg: 'bg-amber-50 text-amber-800 border-amber-200', text: 'Moderate' };
       case 'LOW':
       default:
-        return { bg: 'bg-emerald-50 text-emerald-800 border-emerald-200', text: 'LOW RISK' };
+        return { bg: 'bg-emerald-50 text-emerald-800 border-emerald-200', text: 'Low' };
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 pb-16 print:bg-white print:text-black">
-      {/* ── 5. PAGE HEADER (Institutional Agricultural Styling) ── */}
+      {/* ── 5. PAGE HEADER ── */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 shadow-xs print:static">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -151,7 +207,7 @@ export const GovernmentIntelligence = () => {
                     National Agrarian Telemetry
                   </span>
                   <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-                    {isAdmin ? 'Authorized Institutional View' : 'Public Agricultural Briefing'}
+                    {isAdmin ? 'Official Institutional View' : 'Public Agricultural Briefing'}
                   </span>
                 </div>
                 <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
@@ -209,8 +265,8 @@ export const GovernmentIntelligence = () => {
         {/* ── 16. SKELETON LOADING STATE ── */}
         {pageState === 'PAGE_LOADING' && (
           <div className="space-y-6" aria-busy="true" aria-label="Loading agricultural intelligence">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2].map((i) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm animate-pulse space-y-3">
                   <div className="h-4 bg-slate-200 rounded w-1/3"></div>
                   <div className="h-6 bg-slate-200 rounded w-3/4"></div>
@@ -253,15 +309,15 @@ export const GovernmentIntelligence = () => {
         )}
 
         {/* ── INTELLIGENCE READY CONTENT ── */}
-        {pageState === 'INTELLIGENCE_READY' && govData && (
+        {pageState !== 'PAGE_LOADING' && pageState !== 'LOAD_ERROR' && govData && (
           <>
-            {/* ── 6. IMPORTANT OFFICIAL ALERTS ── */}
+            {/* ── 6. IMPORTANT ALERTS ── */}
             <section aria-labelledby="alerts-heading" className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-emerald-600" />
                   <h2 id="alerts-heading" className="text-base font-bold text-slate-900">
-                    Active Official Alerts ({filteredAlerts.length})
+                    Important Official Alerts ({filteredAlerts.length})
                   </h2>
                 </div>
 
@@ -294,35 +350,54 @@ export const GovernmentIntelligence = () => {
                       key={alert.id}
                       className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm hover:border-slate-300 transition flex flex-col justify-between space-y-3"
                     >
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
+                      <div className="space-y-2">
+                        {/* Severity Header */}
+                        <div className="flex items-center justify-between">
                           <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${badge.bg}`}>
                             <IconComponent className="w-3 h-3" />
                             {badge.label}
                           </span>
-                          <span className="text-[11px] text-slate-400 font-mono font-semibold">{alert.id}</span>
+                          <span className="text-[11px] text-slate-400 font-mono font-semibold">Issued: {alert.id}</span>
                         </div>
 
-                        <h3 className="text-sm font-bold text-slate-900 leading-snug">{alert.title}</h3>
-
-                        <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                          <span className="font-semibold text-slate-700 truncate">{alert.region}</span>
+                        {/* Region */}
+                        <div className="text-xs">
+                          <span className="text-slate-400 font-bold uppercase tracking-wider block text-[10px]">Region:</span>
+                          <span className="font-bold text-slate-800 flex items-center gap-1 mt-0.5">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                            {alert.region}
+                          </span>
                         </div>
 
-                        <p className="text-xs text-slate-600 mt-2 line-clamp-3 leading-relaxed">
-                          {alert.details}
-                        </p>
+                        {/* Issue */}
+                        <div className="text-xs">
+                          <span className="text-slate-400 font-bold uppercase tracking-wider block text-[10px]">Issue:</span>
+                          <h3 className="text-sm font-bold text-slate-900 leading-snug mt-0.5">{alert.title}</h3>
+                          <p className="text-xs text-slate-600 mt-1 line-clamp-2 leading-relaxed">
+                            {alert.details}
+                          </p>
+                        </div>
+
+                        {/* Action Guidance */}
+                        <div className="text-xs pt-1 border-t border-slate-100">
+                          <span className="text-slate-400 font-bold uppercase tracking-wider block text-[10px]">Action:</span>
+                          <p className="text-xs font-semibold text-emerald-900 mt-0.5 line-clamp-2">
+                            {alert.recommendedAction}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Official Action</span>
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Official Briefing</span>
                         <button
                           type="button"
-                          onClick={() => setActiveModalItem({ type: 'ALERT', data: alert })}
+                          onClick={() => {
+                            setSelectedAlertForDetails(alert);
+                            setPageState('ALERT_DETAILS');
+                          }}
                           className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
                         >
-                          View Details <ChevronRight className="w-3.5 h-3.5" />
+                          View Alert Details <ChevronRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </article>
@@ -337,221 +412,230 @@ export const GovernmentIntelligence = () => {
                 <div>
                   <h2 id="kpi-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
                     <Activity className="w-4 h-4 text-emerald-600" />
-                    National Agricultural Key Performance Indicators
+                    Agriculture Overview KPIs
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Verified real-time census metrics across participating production hubs.
+                    Verified agricultural indicators returned by the national reporting system.
                   </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {/* KPI 1: Tracked Farms */}
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-slate-400" />
-                    Tracked Farmers
+                    Tracked Farms
                   </span>
                   <div className="text-2xl font-black text-slate-900">
                     {govData.overviewStats?.activeFarmers?.toLocaleString() || '1,240'}
                   </div>
-                  <span className="text-[11px] text-emerald-700 font-semibold block">Registered agricultural growers</span>
+                  <span className="text-[11px] text-emerald-700 font-semibold block">Registered active growers</span>
                 </div>
 
+                {/* KPI 2: Active Alerts */}
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                    <Building className="w-3.5 h-3.5 text-slate-400" />
-                    Commercial Buyers
+                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                    Active Alerts
                   </span>
-                  <div className="text-2xl font-black text-slate-900">
-                    {govData.overviewStats?.activeBuyers?.toLocaleString() || '450'}
+                  <div className="text-2xl font-black text-amber-800">
+                    {alerts.length} <span className="text-sm font-semibold text-slate-500">Active</span>
                   </div>
-                  <span className="text-[11px] text-slate-600 font-medium block">Wholesale & retail buyers</span>
+                  <span className="text-[11px] text-slate-600 font-medium block">Policy advisories in effect</span>
                 </div>
 
+                {/* KPI 3: Affected Regions */}
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                    <Package className="w-3.5 h-3.5 text-slate-400" />
-                    Active Produce Batches
+                    <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                    Affected Regions
                   </span>
-                  <div className="text-2xl font-black text-slate-900">
-                    {govData.overviewStats?.currentListings?.toLocaleString() || '85'}
+                  <div className="text-2xl font-black text-rose-800">
+                    {affectedRegionsCount} <span className="text-sm font-semibold text-slate-500">Districts</span>
                   </div>
-                  <span className="text-[11px] text-slate-600 font-medium block">Verified farm listings</span>
+                  <span className="text-[11px] text-slate-600 font-medium block">High or Moderate risk zones</span>
                 </div>
 
+                {/* KPI 4: Production */}
                 <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-1">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    Food Security Index
+                    <Package className="w-3.5 h-3.5 text-emerald-600" />
+                    Production
                   </span>
                   <div className="text-2xl font-black text-emerald-800">
-                    {govData.overviewStats?.nationalFoodSecurityIndex || 84.5} <span className="text-sm font-semibold text-slate-500">/ 100</span>
+                    {totalProductionMT.toLocaleString()} <span className="text-sm font-semibold text-slate-500">MT</span>
                   </div>
-                  <span className="text-[11px] text-emerald-700 font-semibold block">Stable National Buffer</span>
+                  <span className="text-[11px] text-emerald-700 font-semibold block">Tracked regional crop yield</span>
                 </div>
               </div>
             </section>
 
-            {/* ── 8 & 9. REGIONAL INTELLIGENCE & SPATIAL RISK MAP ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Regional Data Table (2 cols) */}
-              <section aria-labelledby="regional-heading" className="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                  <div>
-                    <h2 id="regional-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-emerald-600" />
-                      Regional District Intelligence
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Production yields, farmer clusters, and risk ratings across agricultural zones.
-                    </p>
-                  </div>
-
-                  {/* District Quick Filter */}
-                  <div className="flex items-center gap-1.5">
-                    <label htmlFor="district-select" className="text-xs font-bold text-slate-500 uppercase sr-only">
-                      Select District
-                    </label>
-                    <select
-                      id="district-select"
-                      value={selectedDistrict}
-                      onChange={(e) => setSelectedDistrict(e.target.value)}
-                      className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
-                    >
-                      <option value="ALL">All Districts ({districts.length})</option>
-                      {districts.map((d) => (
-                        <option key={d.district} value={d.district}>
-                          {d.district} ({d.province})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
-                        <th scope="col" className="pb-2.5">District / Province</th>
-                        <th scope="col" className="pb-2.5">Primary Crops</th>
-                        <th scope="col" className="pb-2.5 text-right">Production Yield</th>
-                        <th scope="col" className="pb-2.5 text-right">Tracked Farmers</th>
-                        <th scope="col" className="pb-2.5 text-right">Risk Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredDistricts.map((dist) => {
-                        const risk = getRiskBadge(dist.riskStatus);
-                        return (
-                          <tr key={dist.district} className="hover:bg-slate-50 transition-colors">
-                            <td className="py-3 font-semibold text-slate-900">
-                              <div>{dist.district}</div>
-                              <span className="text-[11px] text-slate-500 font-normal">{dist.province} Province</span>
-                            </td>
-                            <td className="py-3 text-slate-700 font-medium">{dist.primaryCrop}</td>
-                            <td className="py-3 text-right font-bold text-slate-900">
-                              {dist.cropYieldTons.toLocaleString()} MT
-                            </td>
-                            <td className="py-3 text-right text-slate-600 font-medium">
-                              {dist.activeFarmers.toLocaleString()}
-                            </td>
-                            <td className="py-3 text-right">
-                              <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${risk.bg}`}>
-                                {risk.text}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              {/* 9. Spatial Intelligence Map & Choke Points (1 col) */}
-              <section aria-labelledby="map-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4 flex flex-col justify-between">
+            {/* ── 8. REGIONAL INTELLIGENCE ── */}
+            <section aria-labelledby="regional-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                 <div>
-                  <div className="border-b border-slate-100 pb-3">
-                    <h2 id="map-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-emerald-600" />
-                      Spatial Risk & Arterial Choke Points
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Geographic distribution of monitored agricultural zones.
-                    </p>
-                  </div>
-
-                  {/* Accessible SVG Map Representation */}
-                  <div className="mt-4 p-4 rounded-xl border border-slate-200 bg-slate-50/60 relative flex items-center justify-center min-h-[220px]">
-                    <svg viewBox="0 0 200 240" className="w-48 h-56 text-slate-200" fill="currentColor">
-                      {/* Simplified Island Geometry of Sri Lanka */}
-                      <path d="M 100,20 C 120,20 135,45 130,80 C 145,120 135,180 110,210 C 95,225 80,215 70,180 C 60,140 70,80 85,35 Z" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="2" />
-                      
-                      {/* District Pins matching real backend coordinates */}
-                      {/* Jaffna */}
-                      <circle cx="95" cy="35" r="5" fill="#F59E0B" />
-                      <text x="105" y="38" fontSize="8" fill="#1E293B" fontWeight="bold">Jaffna</text>
-
-                      {/* Kurunegala */}
-                      <circle cx="85" cy="115" r="5" fill="#10B981" />
-                      <text x="95" y="118" fontSize="8" fill="#1E293B" fontWeight="bold">Kurunegala</text>
-
-                      {/* Matale / Dambulla (High Risk) */}
-                      <circle cx="105" cy="100" r="6" fill="#E11D48" />
-                      <text x="115" y="103" fontSize="8" fill="#E11D48" fontWeight="bold">Matale / Dambulla</text>
-
-                      {/* Kandy */}
-                      <circle cx="105" cy="125" r="5" fill="#F59E0B" />
-                      <text x="115" y="128" fontSize="8" fill="#1E293B" fontWeight="bold">Kandy</text>
-
-                      {/* Gampaha / Western */}
-                      <circle cx="80" cy="140" r="5" fill="#10B981" />
-                      <text x="40" y="143" fontSize="8" fill="#1E293B" fontWeight="bold">Gampaha</text>
-
-                      {/* Hambantota */}
-                      <circle cx="115" cy="190" r="5" fill="#10B981" />
-                      <text x="125" y="193" fontSize="8" fill="#1E293B" fontWeight="bold">Hambantota</text>
-                    </svg>
-                  </div>
-
-                  {/* Choke point callout */}
-                  <div className="mt-3 p-3 rounded-xl border border-amber-200 bg-amber-50/70 text-xs text-amber-950 space-y-1">
-                    <div className="flex items-center gap-1.5 font-bold text-amber-900">
-                      <Truck className="w-3.5 h-3.5 text-amber-700" />
-                      <span>Key Arterial Choke Point</span>
-                    </div>
-                    <p className="text-[11px] leading-relaxed">
-                      {govData.supplyChainMetrics?.keyChokePoint || 'Dambulla Central Distribution Hub & A9 Northern Arterial Highway'}
-                    </p>
-                    <div className="pt-1 text-[11px] font-semibold text-amber-800">
-                      Avg. Transit Bottleneck Delay: {govData.supplyChainMetrics?.avgTransitDelayHours || 3.8} Hours
-                    </div>
-                  </div>
+                  <h2 id="regional-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-emerald-600" />
+                    Regional Intelligence
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Production yields, farmer clusters, and risk ratings across agricultural zones.
+                  </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-500">
+                {/* District Quick Filter */}
+                <div className="flex items-center gap-1.5">
+                  <label htmlFor="district-select" className="text-xs font-bold text-slate-500 uppercase sr-only">
+                    Select District
+                  </label>
+                  <select
+                    id="district-select"
+                    value={selectedDistrict}
+                    onChange={(e) => handleDistrictFilterChange(e.target.value)}
+                    className="px-2.5 py-1 text-xs border border-slate-300 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
+                  >
+                    <option value="ALL">All Districts ({districts.length})</option>
+                    {districts.map((d) => (
+                      <option key={d.district} value={d.district}>
+                        {d.district} ({d.province})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Table view for Desktop / Tablet */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                      <th scope="col" className="pb-2.5">Region / District</th>
+                      <th scope="col" className="pb-2.5">Primary Crop</th>
+                      <th scope="col" className="pb-2.5 text-right">Production (MT)</th>
+                      <th scope="col" className="pb-2.5 text-right">Tracked Farms</th>
+                      <th scope="col" className="pb-2.5 text-right">Risk Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredDistricts.map((dist) => {
+                      const risk = getRiskBadge(dist.riskStatus);
+                      return (
+                        <tr key={dist.district} className="hover:bg-slate-50 transition-colors">
+                          <td className="py-3 font-semibold text-slate-900">
+                            <div>{dist.district}</div>
+                            <span className="text-[11px] text-slate-500 font-normal">{dist.province} Province</span>
+                          </td>
+                          <td className="py-3 text-slate-700 font-medium">{dist.primaryCrop}</td>
+                          <td className="py-3 text-right font-bold text-slate-900">
+                            {dist.cropYieldTons.toLocaleString()} MT
+                          </td>
+                          <td className="py-3 text-right text-slate-600 font-medium">
+                            {dist.activeFarmers.toLocaleString()}
+                          </td>
+                          <td className="py-3 text-right">
+                            <span className={`inline-block px-2.5 py-0.5 rounded text-[11px] font-bold border ${risk.bg}`}>
+                              {risk.text}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {/* ── 9. RISK / ALERT MAP ── */}
+            <section aria-labelledby="map-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h2 id="map-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-emerald-600" />
+                    Regional Risk & Alert Map
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Secondary spatial distribution of monitored agrarian zones and critical choke points.
+                  </p>
+                </div>
+                <div className="text-[11px] text-slate-500">
                   <span>Legend: </span>
                   <span className="inline-flex items-center gap-1 ml-1 text-rose-700 font-bold"><span className="w-2 h-2 rounded-full bg-rose-600"></span> High Risk</span>
-                  <span className="inline-flex items-center gap-1 ml-2 text-amber-700 font-bold"><span className="w-2 h-2 rounded-full bg-amber-500"></span> Moderate</span>
-                  <span className="inline-flex items-center gap-1 ml-2 text-emerald-700 font-bold"><span className="w-2 h-2 rounded-full bg-emerald-600"></span> Low</span>
+                  <span className="inline-flex items-center gap-1 ml-2 text-amber-700 font-bold"><span className="w-2 h-2 rounded-full bg-amber-500"></span> Moderate Risk</span>
+                  <span className="inline-flex items-center gap-1 ml-2 text-emerald-700 font-bold"><span className="w-2 h-2 rounded-full bg-emerald-600"></span> Low Risk</span>
                 </div>
-              </section>
-            </div>
+              </div>
 
-            {/* ── 11. AGRICULTURAL MARKET & SUPPLY TRENDS ── */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
+                {/* SVG Spatial Map */}
+                <div className="md:col-span-1 p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center justify-center min-h-[220px]">
+                  <svg viewBox="0 0 200 240" className="w-44 h-52 text-slate-200" fill="currentColor">
+                    {/* Island Geometry */}
+                    <path d="M 100,20 C 120,20 135,45 130,80 C 145,120 135,180 110,210 C 95,225 80,215 70,180 C 60,140 70,80 85,35 Z" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="2" />
+                    
+                    {/* District Pins */}
+                    <circle cx="95" cy="35" r="5" fill="#F59E0B" />
+                    <text x="105" y="38" fontSize="8" fill="#1E293B" fontWeight="bold">Jaffna</text>
+
+                    <circle cx="85" cy="115" r="5" fill="#10B981" />
+                    <text x="95" y="118" fontSize="8" fill="#1E293B" fontWeight="bold">Kurunegala</text>
+
+                    <circle cx="105" cy="100" r="6" fill="#E11D48" />
+                    <text x="115" y="103" fontSize="8" fill="#E11D48" fontWeight="bold">Matale / Dambulla</text>
+
+                    <circle cx="105" cy="125" r="5" fill="#F59E0B" />
+                    <text x="115" y="128" fontSize="8" fill="#1E293B" fontWeight="bold">Kandy</text>
+
+                    <circle cx="80" cy="140" r="5" fill="#10B981" />
+                    <text x="40" y="143" fontSize="8" fill="#1E293B" fontWeight="bold">Gampaha</text>
+
+                    <circle cx="115" cy="190" r="5" fill="#10B981" />
+                    <text x="125" y="193" fontSize="8" fill="#1E293B" fontWeight="bold">Hambantota</text>
+                  </svg>
+                </div>
+
+                {/* Spatial Summary Cards */}
+                <div className="md:col-span-2 space-y-3">
+                  <div className="p-4 rounded-xl border border-amber-200 bg-amber-50/70 text-xs text-amber-950 space-y-1.5">
+                    <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                      <Truck className="w-4 h-4 text-amber-700" />
+                      <span>Primary Choke Point: {govData.supplyChainMetrics?.keyChokePoint || 'Dambulla Central Distribution Hub'}</span>
+                    </div>
+                    <p className="text-xs leading-relaxed text-slate-700">
+                      High-volume transit corridor currently experiencing an average bottleneck delay of {govData.supplyChainMetrics?.avgTransitDelayHours || 3.8} hours. Pre-cooling logistics and secondary market diversions are recommended.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3 rounded-xl border border-slate-200 bg-slate-50">
+                      <span className="text-slate-400 font-bold uppercase text-[10px] block">National Cold Storage Coverage:</span>
+                      <span className="text-base font-extrabold text-slate-900">
+                        {govData.supplyChainMetrics?.coldChainStorageUtilizationPct || 62.5}%
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-xl border border-slate-200 bg-slate-50">
+                      <span className="text-slate-400 font-bold uppercase text-[10px] block">Post-Harvest Perishable Loss:</span>
+                      <span className="text-base font-extrabold text-rose-700">
+                        {govData.supplyChainMetrics?.postHarvestLossPercentage || 18.4}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ── 11. TRENDS (Useful charts answering clear questions) ── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* National Crop Demand vs Supply Balance */}
               <section aria-labelledby="demand-supply-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-                <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-                  <div>
-                    <h2 id="demand-supply-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-emerald-600" />
-                      National Crop Demand vs. Supply Balance
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      National projected production tons vs. consumption requirements.
-                    </p>
-                  </div>
+                <div className="border-b border-slate-100 pb-3">
+                  <h2 id="demand-supply-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-emerald-600" />
+                    Crop Demand vs. Supply Balance
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Which crops are in surplus and which are facing national deficits?
+                  </p>
                 </div>
 
                 <div className="space-y-3 pt-1">
@@ -588,18 +672,16 @@ export const GovernmentIntelligence = () => {
                 </div>
               </section>
 
-              {/* Central Wholesale vs Retail Price Benchmark */}
+              {/* Wholesale Market Price & Inflation Trends */}
               <section aria-labelledby="prices-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-                <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-                  <div>
-                    <h2 id="prices-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <Building className="w-4 h-4 text-emerald-600" />
-                      Wholesale Market Price & Margin Index
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Benchmark pricing across dedicated economic centers.
-                    </p>
-                  </div>
+                <div className="border-b border-slate-100 pb-3">
+                  <h2 id="prices-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Building className="w-4 h-4 text-emerald-600" />
+                    Market Price & Inflation Index
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    How do wholesale benchmark spot prices compare to retail consumer prices?
+                  </p>
                 </div>
 
                 <div className="divide-y divide-slate-100">
@@ -627,65 +709,110 @@ export const GovernmentIntelligence = () => {
               </section>
             </div>
 
-            {/* ── BIOSECURITY & DISEASE OUTBREAK SURVEILLANCE ── */}
-            <section aria-labelledby="disease-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
-              <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            {/* ── BIOSECURITY DISEASE MONITORING (Admin/Authorized View) ── */}
+            {isAdmin && govData.diseaseOutbreakLogs && (
+              <section aria-labelledby="disease-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+                <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h2 id="disease-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <Bug className="w-4 h-4 text-emerald-600" />
+                      Biosecurity & Disease Outbreak Monitoring
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Field diagnostics reported through AgroLink's leaf pathology telemetry.
+                    </p>
+                  </div>
+                  <Link
+                    to="/disease-detection"
+                    className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+                  >
+                    Open Leaf Diagnostics <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {govData.diseaseOutbreakLogs.map((log) => {
+                    const isHigh = log.severity === 'HIGH';
+                    return (
+                      <div
+                        key={log.diseaseName}
+                        className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                              isHigh ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              {log.severity} SEVERITY
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-500">{log.status}</span>
+                          </div>
+                          <h3 className="text-xs font-bold text-slate-900">{log.diseaseName}</h3>
+                          <p className="text-[11px] text-slate-500">Crop: {log.cropAffected} ({log.locationDistrict})</p>
+                        </div>
+                        <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+                          <span className="text-slate-500">Confirmed Cases:</span>
+                          <span className="font-bold text-slate-900">{log.reportedCases}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* ── 12. OFFICIAL AGRICULTURAL UPDATES ── */}
+            <section aria-labelledby="official-updates-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
-                  <h2 id="disease-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
-                    <Bug className="w-4 h-4 text-emerald-600" />
-                    Biosecurity & Disease Outbreak Monitoring
+                  <h2 id="official-updates-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-emerald-600" />
+                    Official Agricultural Updates
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Field diagnostics reported through AgroLink's leaf pathology intelligence module.
+                    Verified announcements and policy advisories from agricultural authorities.
                   </p>
                 </div>
-                <Link
-                  to="/disease-detection"
-                  className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
-                >
-                  Open Leaf Diagnostics <ChevronRight className="w-3.5 h-3.5" />
-                </Link>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {govData.diseaseOutbreakLogs?.map((log) => {
-                  const isHigh = log.severity === 'HIGH';
-                  return (
-                    <div
-                      key={log.diseaseName}
-                      className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2 flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
-                            isHigh ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
-                          }`}>
-                            {log.severity} SEVERITY
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-500">{log.status}</span>
-                        </div>
-                        <h3 className="text-xs font-bold text-slate-900">{log.diseaseName}</h3>
-                        <p className="text-[11px] text-slate-500">Crop: {log.cropAffected} ({log.locationDistrict})</p>
+              <div className="divide-y divide-slate-100">
+                {officialUpdates.map((update) => (
+                  <article key={update.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 rounded-xl px-2 transition-colors">
+                    <div className="space-y-1 sm:w-3/4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                          {update.source}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-semibold">{update.date}</span>
                       </div>
-                      <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
-                        <span className="text-slate-500">Confirmed Cases:</span>
-                        <span className="font-bold text-slate-900">{log.reportedCases}</span>
-                      </div>
+                      <h3 className="text-sm font-bold text-slate-900">{update.title}</h3>
+                      <p className="text-xs text-slate-600 leading-relaxed">{update.summary}</p>
                     </div>
-                  );
-                })}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedUpdateForDetails(update);
+                        setPageState('UPDATE_DETAILS');
+                      }}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 self-start sm:self-center"
+                    >
+                      Read Advisory <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </article>
+                ))}
               </div>
             </section>
 
-            {/* ── 15. FARMER RELEVANCE: CONNECTED ACTIONS ── */}
+            {/* ── 15. ACTIONS / REPORTS & CONNECTED SERVICES ── */}
             <section aria-labelledby="connected-services-heading" className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
               <div className="border-b border-slate-100 pb-3">
                 <h2 id="connected-services-heading" className="text-base font-bold text-slate-900 flex items-center gap-2">
                   <ArrowRight className="w-4 h-4 text-emerald-600" />
-                  AgroLink Intelligence & Operational Workflows
+                  Connected AgroLink Services & Actions
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Translate national policy intelligence into immediate field and market actions.
+                  Direct pathways to execute field decisions based on national intelligence.
                 </p>
               </div>
 
@@ -763,56 +890,133 @@ export const GovernmentIntelligence = () => {
         )}
       </main>
 
-      {/* ── 13. OFFICIAL ALERT DETAIL MODAL ── */}
-      {activeModalItem && (
+      {/* ── 13. ALERT DETAIL MODAL (ALERT_DETAILS state) ── */}
+      {selectedAlertForDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 print:hidden">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-emerald-600" />
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Official Alert #{activeModalItem.data.id}
+                  Official Alert #{selectedAlertForDetails.id}
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => setActiveModalItem(null)}
+                onClick={() => {
+                  setSelectedAlertForDetails(null);
+                  setPageState('INTELLIGENCE_READY');
+                }}
                 className="text-slate-400 hover:text-slate-600 focus:outline-none"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900">{activeModalItem.data.title}</h3>
+            <div className="space-y-3 text-xs">
+              <h3 className="text-base font-bold text-slate-900">{selectedAlertForDetails.title}</h3>
 
-              <div className="flex flex-wrap gap-2 text-xs">
+              <div className="flex flex-wrap gap-2">
                 <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
-                  Category: {activeModalItem.data.category}
+                  Category: {selectedAlertForDetails.category}
                 </span>
                 <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
-                  Region: {activeModalItem.data.region}
+                  Region: {selectedAlertForDetails.region}
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 space-y-1">
                 <span className="font-bold text-slate-900 block">Verified Situation Report:</span>
-                <p className="leading-relaxed">{activeModalItem.data.details}</p>
+                <p className="leading-relaxed">{selectedAlertForDetails.details}</p>
               </div>
 
-              <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 text-xs text-emerald-950 space-y-1">
+              <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-200 text-emerald-950 space-y-1">
                 <span className="font-bold text-emerald-900 block">Government & Farm Recommended Action:</span>
-                <p className="leading-relaxed">{activeModalItem.data.recommendedAction}</p>
+                <p className="leading-relaxed">{selectedAlertForDetails.recommendedAction}</p>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setActiveModalItem(null)}
+                onClick={() => {
+                  setSelectedAlertForDetails(null);
+                  setPageState('INTELLIGENCE_READY');
+                }}
                 className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg transition"
               >
                 Close Advisory
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 13. UPDATE DETAIL MODAL (UPDATE_DETAILS state) ── */}
+      {selectedUpdateForDetails && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 print:hidden">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-emerald-600" />
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  Official Update #{selectedUpdateForDetails.id}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedUpdateForDetails(null);
+                  setPageState('INTELLIGENCE_READY');
+                }}
+                className="text-slate-400 hover:text-slate-600 focus:outline-none"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <h3 className="text-base font-bold text-slate-900">{selectedUpdateForDetails.title}</h3>
+
+              <div className="flex flex-wrap gap-2 text-[11px] text-slate-600">
+                <span className="px-2 py-0.5 rounded bg-slate-100 font-semibold">
+                  Source: {selectedUpdateForDetails.source}
+                </span>
+                <span className="px-2 py-0.5 rounded bg-slate-100 font-semibold">
+                  Date: {selectedUpdateForDetails.date}
+                </span>
+                <span className="px-2 py-0.5 rounded bg-slate-100 font-semibold">
+                  Region: {selectedUpdateForDetails.region}
+                </span>
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 space-y-1">
+                <span className="font-bold text-slate-900 block">Complete Official Notice:</span>
+                <p className="leading-relaxed">{selectedUpdateForDetails.fullContent}</p>
+              </div>
+
+              {selectedUpdateForDetails.actionLink && (
+                <div className="pt-2">
+                  <Link
+                    to={selectedUpdateForDetails.actionLink}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition"
+                  >
+                    {selectedUpdateForDetails.actionLabel} <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedUpdateForDetails(null);
+                  setPageState('INTELLIGENCE_READY');
+                }}
+                className="px-4 py-2 border border-slate-300 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-50 transition"
+              >
+                Dismiss
               </button>
             </div>
           </div>
