@@ -266,6 +266,16 @@ export const Navbar = () => {
                         ))
                       )}
                     </div>
+
+                    <div className="pt-2 border-t border-slate-100 text-center">
+                      <Link
+                        to="/notifications"
+                        onClick={() => setNotifDrawerOpen(false)}
+                        className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
+                      >
+                        View all alerts &amp; notifications →
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>

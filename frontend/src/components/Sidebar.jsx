@@ -18,7 +18,8 @@ import {
   User,
   LogOut,
   Sparkles,
-  Bot
+  Bot,
+  Bell
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -65,6 +66,10 @@ export const Sidebar = () => {
               <span>Add Harvest Batch</span>
             </Link>
           )}
+          <Link to="/notifications" className={linkClass('/notifications')}>
+            <Bell className="w-4 h-4 text-emerald-700 shrink-0" />
+            <span>Alerts &amp; Updates</span>
+          </Link>
         </nav>
       </div>
 
