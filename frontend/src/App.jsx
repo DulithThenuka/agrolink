@@ -31,6 +31,7 @@ import { AgroLinkAiAssistant } from './pages/AgroLinkAiAssistant';
 import { GovernmentIntelligence } from './pages/GovernmentIntelligence';
 import { WasteReductionModule } from './pages/WasteReductionModule';
 import { Notifications } from './pages/Notifications';
+import { Weather } from './pages/Weather';
 
 /**
  * ProtectedRoute — guards a route behind authentication and optional role restrictions.
@@ -109,6 +110,7 @@ function AppContent() {
             <Route path="/price-prediction" element={<ProtectedRoute><PricePrediction /></ProtectedRoute>} />
             <Route path="/demand-forecasting" element={<ProtectedRoute><DemandForecasting /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+            <Route path="/weather" element={<ProtectedRoute><Weather /></ProtectedRoute>} />
 
             {/* ─── FARMER-ONLY ─────────────────────────────────── */}
             <Route

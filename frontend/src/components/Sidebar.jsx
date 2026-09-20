@@ -19,7 +19,8 @@ import {
   LogOut,
   Sparkles,
   Bot,
-  Bell
+  Bell,
+  CloudSun
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -69,6 +70,10 @@ export const Sidebar = () => {
           <Link to="/notifications" className={linkClass('/notifications')}>
             <Bell className="w-4 h-4 text-emerald-700 shrink-0" />
             <span>Alerts &amp; Updates</span>
+          </Link>
+          <Link to="/weather" className={linkClass('/weather')}>
+            <CloudSun className="w-4 h-4 text-emerald-700 shrink-0" />
+            <span>Weather &amp; Conditions</span>
           </Link>
         </nav>
       </div>

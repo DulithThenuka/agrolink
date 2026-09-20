@@ -669,12 +669,13 @@ export const FarmerDashboard = () => {
             </div>
 
             <div className="pt-2 border-t border-slate-100">
-              <button
-                onClick={() => setShowWeatherModal(true)}
-                className="w-full py-2 bg-slate-100 hover:bg-slate-200/80 text-slate-800 font-bold text-xs rounded-lg transition cursor-pointer"
+              <Link
+                to="/weather"
+                className="w-full py-2 bg-slate-100 hover:bg-slate-200/80 text-slate-800 font-bold text-xs rounded-lg transition cursor-pointer flex items-center justify-center gap-1"
               >
-                View 7-Day Agricultural Forecast &rarr;
-              </button>
+                <span>View 7-Day Agricultural Forecast</span>
+                <span aria-hidden="true">&rarr;</span>
+              </Link>
             </div>
           </div>
 
