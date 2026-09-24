@@ -233,8 +233,8 @@ export const IoTFarmControlModal = ({ deviceId, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full border border-slate-100 overflow-hidden relative space-y-6 max-h-[92vh] overflow-y-auto">
+    <div className="agri-modal-backdrop">
+      <div className="agri-modal-content max-w-4xl relative">
         
         {/* CLOSE BUTTON */}
         <button
@@ -251,25 +251,25 @@ export const IoTFarmControlModal = ({ deviceId, onClose }) => {
           </div>
         ) : telemetry ? (
           <div className="p-6 md:p-8 space-y-6">
-            
+
             {/* HEADER CARD */}
-            <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="space-y-1 text-center sm:text-left">
-                <div className="flex items-center gap-2 justify-center sm:justify-start">
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                    <Wifi className="w-3.5 h-3.5 text-emerald-400 animate-pulse" /> ESP32 MQTT STREAM
+            <div className="p-5 rounded-xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-600/20 text-emerald-400 border border-emerald-600/30 text-[10px] font-bold uppercase tracking-wider">
+                    <Wifi className="w-3 h-3" /> MQTT Connected
                   </span>
-                  <span className="text-xs font-mono font-extrabold text-emerald-400">{telemetry.deviceId}</span>
+                  <span className="text-xs font-mono text-slate-400">{telemetry.deviceId}</span>
                 </div>
-                <h2 className="text-2xl font-black font-display tracking-tight text-white">Smart IoT Farm Telemetry Controller</h2>
-                <p className="text-xs text-slate-300 font-medium">{telemetry.mqttStatus}</p>
+                <h2 className="text-lg font-bold text-white">IoT Farm Telemetry &amp; Control</h2>
+                <p className="text-xs text-slate-400">{telemetry.mqttStatus}</p>
               </div>
 
               <button
                 onClick={fetchTelemetry}
-                className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl border border-white/20 transition flex items-center gap-1.5 shrink-0 cursor-pointer"
+                className="agri-btn-secondary text-xs py-1.5 px-3 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 bg-slate-800"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Refresh Telemetry
+                <RefreshCw className="w-3.5 h-3.5" /> Refresh
               </button>
             </div>
 
@@ -455,7 +455,7 @@ export const IoTFarmControlModal = ({ deviceId, onClose }) => {
               </div>
 
               {/* LIVE VALVE RELAY TRIGGER CARD (5 Cols) */}
-              <div className="lg:col-span-5 p-5 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white rounded-3xl border border-slate-800 shadow-xl flex flex-col justify-between space-y-4">
+              <div className="lg:col-span-5 p-5 bg-slate-900 text-white rounded-xl border border-slate-700 shadow-md flex flex-col justify-between space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -543,5 +543,6 @@ export const IoTFarmControlModal = ({ deviceId, onClose }) => {
 
       </div>
     </div>
+  
   );
 };

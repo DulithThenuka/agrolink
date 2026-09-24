@@ -57,8 +57,8 @@ export const WeatherIntelligenceModal = ({ location, onClose }) => {
   }, [location]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full border border-slate-100 overflow-hidden relative space-y-6 max-h-[90vh] overflow-y-auto">
+    <div className="agri-modal-backdrop">
+      <div className="agri-modal-content max-w-3xl relative max-h-[90vh] overflow-y-auto">
         
         {/* CLOSE BUTTON */}
         <button
@@ -76,31 +76,31 @@ export const WeatherIntelligenceModal = ({ location, onClose }) => {
         ) : data ? (
           <div className="p-6 md:p-8 space-y-6">
             
-            {/* SEVERE WEATHER ALERT BANNER */}
-            <div className="p-6 rounded-3xl bg-gradient-to-r from-red-900 via-amber-900 to-slate-900 text-white shadow-xl space-y-3">
+            {/* WEATHER ALERT BANNER */}
+            <div className="p-5 rounded-xl bg-rose-50 border border-rose-200 space-y-3">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="px-3 py-1 rounded-full bg-red-500/30 text-red-300 border border-red-400/40 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-400 animate-pulse" /> SEVERE CLIMATE RISK ALERT
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-800 border border-rose-200 text-[10px] font-bold uppercase tracking-wider">
+                  <AlertTriangle className="w-3.5 h-3.5" /> Climate Risk Alert
                 </span>
-                <span className="text-xs text-amber-200 font-bold font-mono">Location: {data.location}</span>
+                <span className="text-xs text-slate-600 font-medium">Region: {data.location}</span>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-3xl font-black font-display text-white">{data.alertTitle}</h2>
-                  <p className="text-xs text-red-100/90 font-medium">Expected Time: <strong>{data.expectedTime}</strong></p>
+                  <h2 className="text-xl font-bold text-rose-900">{data.alertTitle}</h2>
+                  <p className="text-xs text-slate-600 mt-0.5">Expected: <strong className="text-slate-800">{data.expectedTime}</strong></p>
                 </div>
-                <div className="bg-red-950/80 p-3 rounded-2xl border border-red-800/80 text-center shrink-0">
-                  <span className="text-[10px] font-extrabold uppercase text-red-300 tracking-wider block">Expected Rainfall</span>
-                  <span className="text-2xl font-black text-white">{data.rainfallMm} mm</span>
+                <div className="bg-rose-100 border border-rose-200 p-3 rounded-lg text-center shrink-0">
+                  <span className="text-[10px] font-semibold uppercase text-rose-700 tracking-wider block">Expected Rainfall</span>
+                  <span className="text-xl font-bold text-rose-900">{data.rainfallMm} mm</span>
                 </div>
               </div>
 
-              <div className="p-3 bg-red-950/60 rounded-2xl border border-red-800/50 space-y-1 text-xs">
-                <span className="font-extrabold text-amber-300 flex items-center gap-1">
+              <div className="p-3 bg-white border border-rose-200 rounded-lg space-y-1 text-xs">
+                <span className="font-semibold text-amber-800 flex items-center gap-1.5">
                   <Sprout className="w-3.5 h-3.5" /> Affected Crops: {data.affectedCrops.join(', ')}
                 </span>
-                <p className="text-slate-200 font-medium">
+                <p className="text-slate-700">
                   <strong>Recommendation:</strong> {data.recommendation}
                 </p>
               </div>

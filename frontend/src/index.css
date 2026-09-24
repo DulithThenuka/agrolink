@@ -4,57 +4,99 @@
 
 @layer base {
   body {
-    @apply bg-[#FBFBFA] text-slate-900 font-sans antialiased overflow-x-hidden selection:bg-emerald-700 selection:text-white;
+    @apply bg-[#FBFBFA] text-slate-800 font-sans antialiased overflow-x-hidden selection:bg-emerald-700 selection:text-white;
+  }
+
+  /* Consistent typography defaults */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-slate-900 tracking-tight font-bold;
   }
 }
 
-/* Restrained, Professional Surface & Card Language */
+/* ========================================================
+   AGROLINK DESIGN SYSTEM UTILITIES
+   ======================================================== */
+
+/* Surface & Card Standards */
 .agri-card {
-  background: #ffffff;
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  background-color: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .agri-card:hover {
   border-color: #CBD5E1;
-  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
 }
 
 .agri-card-interactive {
-  background: #ffffff;
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
+  background-color: #ffffff;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .agri-card-interactive:hover {
-  border-color: #15803D;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+  border-color: #10b981;
+  box-shadow: 0 6px 12px -2px rgba(16, 185, 129, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
 }
 
-/* Subtle badge styling */
-.agri-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.025em;
+/* Standard Buttons */
+.agri-btn-primary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm transition-colors shadow-xs disabled:opacity-60 disabled:cursor-not-allowed focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2;
 }
 
-/* Animations */
+.agri-btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 font-semibold text-xs sm:text-sm border border-slate-200 transition-colors shadow-xs disabled:opacity-60 disabled:cursor-not-allowed focus:outline-hidden focus:ring-2 focus:ring-slate-300;
+}
+
+.agri-btn-danger {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs sm:text-sm transition-colors shadow-xs disabled:opacity-60 disabled:cursor-not-allowed focus:outline-hidden focus:ring-2 focus:ring-rose-500 focus:ring-offset-2;
+}
+
+/* Standard Inputs & Controls */
+.agri-input {
+  @apply w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-600/30 focus:border-emerald-600 transition;
+}
+
+/* Standard Semantic Status Badges */
+.status-success {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200;
+}
+
+.status-pending {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200;
+}
+
+.status-info {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-200;
+}
+
+.status-danger {
+  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200;
+}
+
+/* Modal Surface Standard */
+.agri-modal-backdrop {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto;
+}
+
+.agri-modal-content {
+  @apply bg-white rounded-2xl shadow-xl border border-slate-200 w-full overflow-hidden my-auto;
+}
+
+/* Subtle, Restrained Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Scrollbars */
@@ -64,7 +106,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #F8FAFC;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -73,7 +115,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #166534;
+  background: #94A3B8;
 }
 
 /* Accessibility */

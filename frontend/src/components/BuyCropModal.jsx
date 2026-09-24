@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext';
 export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isAuthenticated, isFarmer, isBuyer, isBusinessBuyer, isAdmin } = useAuth();
+  const { user, isAuthenticated, isFarmer } = useAuth();
   
   const [quantity, setQuantity] = useState(Math.min(50, crop.quantity || 100));
   const [deliveryLocation, setDeliveryLocation] = useState('Colombo Wholesale Hub');
@@ -68,8 +68,8 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
         deliveryLocation: deliveryLocation,
       };
 
-      const res = await ordersAPI.place(payload);
-      setSuccessMsg('🎉 Order placed successfully! Escrow vault locked.');
+      await ordersAPI.place(payload);
+      setSuccessMsg('Order placed successfully! Purchase record submitted.');
       
       setTimeout(() => {
         if (onOrderPlaced) onOrderPlaced();
@@ -87,27 +87,27 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto min-h-screen">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[88vh] flex flex-col my-auto"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          className="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col my-auto font-sans"
         >
           {/* HEADER */}
-          <div className="p-5 sm:p-6 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between shrink-0">
+          <div className="p-5 border-b border-slate-200 flex items-center justify-between shrink-0 bg-white">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-400 flex items-center justify-center font-bold">
-                <ShoppingBag className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold">
+                <ShoppingBag className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-extrabold text-base font-display">Bulk Purchase Order</h3>
-                <p className="text-xs text-slate-300">Direct Escrow Trade with Verified Farmer</p>
+                <h3 className="font-bold text-base text-slate-900">Purchase Order</h3>
+                <p className="text-xs text-slate-500">Commercial Wholesale Produce Order</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700/50 transition"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
               title="Close modal"
             >
               <X className="w-5 h-5" />
@@ -117,185 +117,180 @@ export const BuyCropModal = ({ crop, onClose, onOrderPlaced }) => {
           {/* SCROLLABLE BODY CONTAINER */}
           <div className="overflow-y-auto flex-1 divide-y divide-slate-100">
             {/* CROP BRIEF CARD */}
-            <div className="p-5 bg-slate-50 flex items-center gap-4">
+            <div className="p-4 bg-slate-50 flex items-center gap-4">
               <img
                 src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
                 alt={crop.name}
-                className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shadow-sm"
+                className="w-14 h-14 rounded-xl object-cover border border-slate-200 bg-white shrink-0"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">
+                  <span className="text-[10px] font-bold uppercase text-emerald-700 tracking-wider">
                     {crop.category || 'Produce'}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-[10px]">
+                  <span className="px-2 py-0.5 rounded-md bg-emerald-100/70 text-emerald-800 font-semibold text-[11px]">
                     {maxStock} kg Stock
                   </span>
                 </div>
-                <h4 className="font-extrabold text-slate-900 text-sm font-display truncate mt-0.5">{crop.name}</h4>
-                <p className="text-xs text-slate-500 font-semibold">
-                  Unit Rate: <span className="text-emerald-600 font-extrabold">Rs. {unitPrice}/kg</span> • Location: {crop.location || 'Nuwara Eliya'}
+                <h4 className="font-bold text-slate-900 text-sm truncate mt-0.5">{crop.name}</h4>
+                <p className="text-xs text-slate-600">
+                  Rate: <span className="text-emerald-700 font-bold">Rs. {unitPrice}/kg</span> • Location: {crop.location || 'Sri Lanka'}
                 </p>
               </div>
             </div>
 
             {/* FORM & CALCULATOR */}
-            <form onSubmit={handleConfirmOrder} className="p-6 space-y-5">
-            {successMsg && (
-              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-fade-in">
-                <span>{successMsg}</span>
-              </div>
-            )}
+            <form onSubmit={handleConfirmOrder} className="p-5 space-y-4">
+              {successMsg && (
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                  <span>{successMsg}</span>
+                </div>
+              )}
 
-            {errorMsg && (
-              <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold flex items-center gap-2">
-                <span>{errorMsg}</span>
-              </div>
-            )}
+              {errorMsg && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+                  <span>{errorMsg}</span>
+                </div>
+              )}
 
-            {/* QUANTITY INPUT STEPPER */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs">
-                <label className="font-bold text-slate-700">Required Quantity (Kg)</label>
-                <span className="text-[11px] text-slate-400 font-semibold">Max Available: {maxStock} kg</span>
-              </div>
+              {/* QUANTITY INPUT STEPPER */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center text-xs">
+                  <label className="font-semibold text-slate-700">Required Quantity (kg)</label>
+                  <span className="text-slate-400">Available: {maxStock} kg</span>
+                </div>
 
-              <div className="flex items-center gap-3">
                 <input
                   type="number"
                   min="1"
                   max={maxStock}
                   value={quantity}
                   onChange={(e) => handleQuantityChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-200 text-base font-extrabold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 transition"
                 />
+
+                {/* QUICK PRESET BUTTONS */}
+                <div className="flex gap-2 pt-1">
+                  {[10, 50, 100, 250, maxStock].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => handleQuantityChange(preset)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition border ${
+                        quantity === preset
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {preset === maxStock ? 'Max Stock' : `${preset} kg`}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* QUICK PRESET BUTTONS */}
-              <div className="flex gap-2 pt-1">
-                {[10, 50, 100, 250, maxStock].map((preset) => (
+              {/* DELIVERY LOCATION */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-700">Delivery Destination Hub</label>
+                <div className="relative">
+                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={deliveryLocation}
+                    onChange={(e) => setDeliveryLocation(e.target.value)}
+                    placeholder="e.g. Colombo Wholesale Manning Market"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 transition"
+                  />
+                </div>
+              </div>
+
+              {/* PRICE BREAKDOWN BOX */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-700">
+                <div className="flex items-center justify-between font-bold text-slate-800 pb-2 border-b border-slate-200">
+                  <span className="flex items-center gap-1.5"><Calculator className="w-3.5 h-3.5 text-slate-500" /> Order Summary</span>
+                  <span className="text-emerald-700">Direct Purchase</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">Produce Cost ({quantity} kg × Rs. {unitPrice}):</span>
+                  <span className="font-semibold text-slate-800">Rs. {produceTotal.toLocaleString()}</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 flex items-center gap-1">
+                    <Truck className="w-3.5 h-3.5 text-slate-400" /> Estimated Freight Logistics:
+                  </span>
+                  <span className="font-semibold text-slate-800">Rs. {estimatedLogistics.toLocaleString()}</span>
+                </div>
+
+                <div className="pt-2 border-t border-slate-200 flex justify-between items-baseline">
+                  <span className="font-bold text-sm text-slate-900">Total Purchase Amount:</span>
+                  <span className="text-lg font-bold text-emerald-700">
+                    Rs. {totalEscrowAmount.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* AUTH / ROLE BANNER */}
+              {!isAuthenticated ? (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-2">
+                  <div className="flex items-center gap-2 font-bold">
+                    <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Sign In Required</span>
+                  </div>
+                  <p className="text-[11px] text-amber-700">
+                    Please sign in to confirm this purchase order.
+                  </p>
                   <button
-                    key={preset}
                     type="button"
-                    onClick={() => handleQuantityChange(preset)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition border ${
-                      quantity === preset
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                        : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:text-emerald-700'
-                    }`}
+                    onClick={() => navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`)}
+                    className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg text-xs transition inline-flex items-center gap-1"
                   >
-                    {preset === maxStock ? 'Max Stock' : `${preset} kg`}
+                    <span>Sign In to Continue</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </button>
-                ))}
-              </div>
-            </div>
-
-            {/* DELIVERY LOCATION */}
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-700">Delivery Destination Hub</label>
-              <div className="relative">
-                <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                <input
-                  type="text"
-                  required
-                  value={deliveryLocation}
-                  onChange={(e) => setDeliveryLocation(e.target.value)}
-                  placeholder="e.g. Colombo Wholesale Manning Market"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-emerald-500 transition"
-                />
-              </div>
-            </div>
-
-            {/* LIVE PRICE BREAKDOWN BOX */}
-            <div className="p-4 bg-slate-900 text-white rounded-2xl space-y-2.5 text-xs">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-800">
-                <span className="flex items-center gap-1"><Calculator className="w-3.5 h-3.5 text-emerald-400" /> Cost Breakdown</span>
-                <span className="text-emerald-400">Escrow Secured 🛡️</span>
-              </div>
-
-              <div className="flex justify-between items-center font-medium">
-                <span className="text-slate-300">Produce Cost ({quantity} kg × Rs. {unitPrice}):</span>
-                <span className="font-bold">Rs. {produceTotal.toLocaleString()}</span>
-              </div>
-
-              <div className="flex justify-between items-center font-medium">
-                <span className="text-slate-300 flex items-center gap-1">
-                  <Truck className="w-3.5 h-3.5 text-emerald-400" /> Smart Transport Fleet:
-                </span>
-                <span className="font-bold">Rs. {estimatedLogistics.toLocaleString()}</span>
-              </div>
-
-              <div className="flex justify-between items-center font-medium text-emerald-400">
-                <span>Platform Escrow Protection:</span>
-                <span className="font-extrabold text-[10px] bg-emerald-950 px-2 py-0.5 rounded-md border border-emerald-800">FREE (Waived)</span>
-              </div>
-
-              <div className="pt-2 border-t border-slate-800 flex justify-between items-baseline">
-                <span className="font-extrabold text-sm font-display text-white">Total Escrow Amount:</span>
-                <span className="text-xl font-black font-display text-emerald-400">
-                  Rs. {totalEscrowAmount.toLocaleString()}
-                </span>
-              </div>
-            </div>
-
-            {/* AUTH / ROLE BANNER */}
-            {!isAuthenticated ? (
-              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-2">
-                <div className="flex items-center gap-2 font-bold">
-                  <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Authentication Required</span>
                 </div>
-                <p className="text-[11px] text-amber-700">
-                  You must be signed into a verified Buyer or Business Buyer account to lock escrow contracts and order harvests.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`)}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs shadow-sm transition inline-flex items-center gap-1.5"
-                >
-                  <span>Sign In to Continue</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : isOwner ? (
-              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-1">
-                <div className="flex items-center gap-2 font-bold">
-                  <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span>Your Own Produce Listing</span>
-                </div>
-                <p className="text-[11px] text-rose-700">
-                  You are registered as the farmer who published this batch. Farmers cannot buy their own crop listings.
-                </p>
-              </div>
-            ) : null}
-
-            {/* SUBMIT BUTTON */}
-            <button
-              type="submit"
-              disabled={loading || !!successMsg || !isAuthenticated || isOwner}
-              className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Locking Escrow Vault...
-                </>
-              ) : successMsg ? (
-                'Order Locked Successfully!'
-              ) : !isAuthenticated ? (
-                'Sign In to Place Bulk Order'
               ) : isOwner ? (
-                'Cannot Buy Own Produce Listing'
-              ) : (
-                <>
-                  <span>Confirm Bulk Order (Lock Escrow)</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-        </div>
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-1">
+                  <div className="flex items-center gap-2 font-bold">
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>Your Own Produce Listing</span>
+                  </div>
+                  <p className="text-[11px] text-rose-700">
+                    You cannot purchase your own crop listing. Use 'Manage Listing' to update stock or price.
+                  </p>
+                </div>
+              ) : null}
+
+              {/* SUBMIT BUTTON */}
+              <button
+                type="submit"
+                disabled={loading || !!successMsg || !isAuthenticated || isOwner}
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm rounded-xl transition shadow-xs disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Processing Order...
+                  </>
+                ) : successMsg ? (
+                  'Order Submitted Successfully'
+                ) : !isAuthenticated ? (
+                  'Sign In to Place Order'
+                ) : isOwner ? (
+                  'Cannot Purchase Own Listing'
+                ) : (
+                  <>
+                    <span>Confirm Purchase Order</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
         </motion.div>
       </div>
     </AnimatePresence>
   );
 };
+
+export default BuyCropModal;
