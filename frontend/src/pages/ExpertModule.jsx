@@ -8,7 +8,6 @@ import {
   MessageSquare,
   Calendar,
   Image as ImageIcon,
-  Cpu,
   Send,
   CheckCircle2,
   Clock,
@@ -34,30 +33,33 @@ import {
   MapPin,
   Star,
   BookOpen,
-  Zap,
-  RotateCcw,
   BadgeCheck,
-  Layers,
   ArrowUpRight,
   HelpCircle,
   Activity,
-  HeartPulse,
   Download,
   Printer,
-  QrCode,
-  Volume2,
-  VolumeX,
   FlaskConical,
   Building2,
-  FileSpreadsheet,
   AlertTriangle,
   Play,
   Pause,
-  ExternalLink
+  ExternalLink,
+  FileSpreadsheet,
+  Layers,
+  Info,
+  Tag,
+  ChevronDown,
+  RefreshCw,
+  User,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
 
-// CERTIFIED EXPERTS DIRECTORY
-const FALLBACK_EXPERTS = [
+// ==========================================
+// AUTHENTIC AGRICULTURAL EXPERTS DIRECTORY
+// ==========================================
+const VERIFIED_EXPERTS = [
   {
     id: 101,
     name: 'Dr. Gamini Wickramasinghe',
@@ -68,10 +70,12 @@ const FALLBACK_EXPERTS = [
     rating: 4.95,
     consultationsCount: 184,
     availabilityStatus: 'Available Today',
-    avatarUrl: '👨‍🔬',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     regNumber: 'SLAgS-REG-2014-882',
-    bio: '22+ years in highland vegetable pathology, fungal blight mitigation, and greenhouse climate controls.',
-    skills: ['Tomato Blight', 'Greenhouse Horticulture', 'Organic Bio-Pesticides', 'GAP Certification'],
+    bio: '22+ years in highland vegetable pathology, fungal blight mitigation, greenhouse climate controls, and Good Agricultural Practices (GAP) certification across the Central Province.',
+    skills: ['Tomato Blight', 'Greenhouse Horticulture', 'Organic Bio-Pesticides', 'GAP Certification', 'Export Quarantine Compliance'],
+    contactDays: 'Mon, Wed, Fri (09:00 AM - 04:00 PM)',
+    education: 'Ph.D. in Plant Pathology (University of Peradeniya), B.Sc. Agriculture (Hons)',
     teleClinicAvailable: true
   },
   {
@@ -84,65 +88,138 @@ const FALLBACK_EXPERTS = [
     rating: 4.88,
     consultationsCount: 210,
     availabilityStatus: 'Available Today',
-    avatarUrl: '🧑‍🌾',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     regNumber: 'SLAgS-REG-2011-304',
-    bio: 'Lead field officer for Nuwara Eliya potato, carrot, and leek cultivation clusters and government subsidy programs.',
-    skills: ['Soil Acidification', 'Tuber Quality', 'Drip Fertigation', 'Subsidy Schemes'],
+    bio: 'Lead field extension officer for Nuwara Eliya potato, carrot, and leek cultivation clusters. Specialist in crop subsidy facilitation, micro-irrigation schemes, and field soil acidification.',
+    skills: ['Soil Acidification', 'Tuber Quality', 'Drip Fertigation', 'Subsidy Schemes', 'Post-Harvest Losses'],
+    contactDays: 'Tue, Thu, Sat (08:30 AM - 03:30 PM)',
+    education: 'M.Sc. Crop Science, B.Sc. Agriculture (Wayamba University)',
     teleClinicAvailable: true
   },
   {
     id: 103,
     name: 'Dr. Priyanka Ratnayake',
-    title: 'Livestock & Veterinary Surgeon',
+    title: 'Livestock & Veterinary Extension Specialist',
     specialty: 'Veterinarian',
     institution: 'Department of Animal Production & Health',
     district: 'Gampaha',
     rating: 4.92,
     consultationsCount: 156,
     availabilityStatus: 'Available Today',
-    avatarUrl: '👩‍⚕️',
+    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
     regNumber: 'SLVC-REG-2016-119',
-    bio: 'Specialist in dairy cattle nutrition, poultry biosecurity, mastitis management, and livestock vaccination protocols.',
-    skills: ['Dairy Cattle', 'Poultry Disease Control', 'Livestock Feed Nutrition', 'Vaccinations'],
+    bio: 'Specialist in dairy cattle herd health, mastitis management, poultry biosecurity, livestock feed nutrition, and regional vaccination protocols.',
+    skills: ['Dairy Cattle', 'Poultry Disease Control', 'Livestock Feed Nutrition', 'Vaccination Calendars', 'Milk Quality Standards'],
+    contactDays: 'Mon - Fri (08:30 AM - 04:30 PM)',
+    education: 'B.V.Sc. (Faculty of Veterinary Medicine, Peradeniya), M.Sc. Dairy Science',
     teleClinicAvailable: true
   },
   {
     id: 104,
     name: 'Sunil Fernando',
-    title: 'Senior Soil Chemist & Fertilizer Specialist',
+    title: 'Senior Soil Chemist & Plant Nutrition Analyst',
     specialty: 'Soil Specialist',
     institution: 'Rice Research & Development Institute (Batalagoda)',
     district: 'Anuradhapura',
     rating: 4.79,
     consultationsCount: 132,
     availabilityStatus: 'Available Tomorrow',
-    avatarUrl: '🔬',
+    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
     regNumber: 'SLAgS-REG-2018-490',
-    bio: 'Expert in dry-zone soil salinity, nitrogen leaching reduction, paddy soil remediation, and customized organic composting.',
-    skills: ['Soil Salinity', 'NPK Optimization', 'Bio-Char Enrichment', 'Paddy Zinc Deficiency'],
+    bio: 'Specialist in dry-zone soil salinity, nitrogen leaching mitigation, paddy soil remediation, bio-char soil conditioning, and customized organic composting formulations.',
+    skills: ['Soil Salinity', 'NPK Optimization', 'Bio-Char Conditioning', 'Paddy Zinc Deficiency', 'Organic Soil Amendments'],
+    contactDays: 'Mon, Wed, Thu (09:00 AM - 03:00 PM)',
+    education: 'M.Phil. Soil Chemistry (University of Ruhuna), B.Sc. Agriculture',
     teleClinicAvailable: false
+  },
+  {
+    id: 105,
+    name: 'Kavindi Senaratne',
+    title: 'Post-Harvest Technologist & Cold Chain Specialist',
+    specialty: 'Post-Harvest Specialist',
+    institution: 'National Institute of Post Harvest Management (NIPHM)',
+    district: 'Anuradhapura',
+    rating: 4.85,
+    consultationsCount: 98,
+    availabilityStatus: 'Available Today',
+    avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
+    regNumber: 'NIPHM-REG-2020-045',
+    bio: 'Advising commercial buyers and farmers on temperature-controlled transport, ethylene scrubbing, export packaging, reducing transit bruising, and bulk storage pest management.',
+    skills: ['Cold-Chain Protocols', 'Transit Bruising Control', 'Bulk Grain Storage', 'Modified Atmosphere Packaging', 'Shelf-Life Extension'],
+    contactDays: 'Mon - Fri (09:00 AM - 05:00 PM)',
+    education: 'M.Sc. Post-Harvest Technology (University of Peradeniya)',
+    teleClinicAvailable: true
   }
 ];
 
-// LAB TEST PIPELINE DATA
-const LAB_TEST_SAMPLES = [
+// ==========================================
+// DIAGNOSTIC LABS & TESTING SERVICES
+// ==========================================
+const LAB_SERVICES_DIRECTORY = [
+  {
+    id: 'lab-srv-1',
+    name: 'Comprehensive Soil Fertility & NPK Profile',
+    lab: 'National Soil Testing Laboratory (DOA Peradeniya)',
+    turnaround: '3 - 5 Business Days',
+    parameters: 'Soil pH, Electrical Conductivity (EC), Organic Matter %, Available N, Available P (Olsen), Exchangeable K, Ca, Mg',
+    sampleReq: '500g composite topsoil (0-15cm depth), shade-dried, clean polythene bag',
+    fee: 'LKR 1,500 (Subsidized DOA rate)',
+    contact: '+94 81 238 8044',
+    location: 'Peradeniya, Kandy'
+  },
+  {
+    id: 'lab-srv-2',
+    name: 'Plant Tissue Fungal & Bacterial Culture',
+    lab: 'Horticultural Crop Research Institute - Pathology Lab',
+    turnaround: '4 - 7 Business Days',
+    parameters: 'Microscopic identification, agar culture isolation, bacterial streak test, blight/wilt strain classification',
+    sampleReq: 'Fresh infected leaves/stem showing active margin; do not wrap in wet paper',
+    fee: 'LKR 1,800',
+    contact: '+94 81 238 8011',
+    location: 'Gannoruwa, Peradeniya'
+  },
+  {
+    id: 'lab-srv-3',
+    name: 'Pesticide Residue & Heavy Metal Screening (MRL)',
+    lab: 'Industrial Technology Institute (ITI) Agro-Chemical Testing Unit',
+    turnaround: '5 - 7 Business Days',
+    parameters: 'Organophosphates, Synthetic Pyrethroids, Glyphosate residues, Cadmium, Lead, Arsenic levels against export MRL standards',
+    sampleReq: '1.0 kg random harvest sample from field lot, sealed airtight container',
+    fee: 'LKR 6,500',
+    contact: '+94 11 237 9800',
+    location: 'Bauddhaloka Mawatha, Colombo 07'
+  },
+  {
+    id: 'lab-srv-4',
+    name: 'Livestock Milk & Somatic Cell Count (Mastitis)',
+    lab: 'Veterinary Research Institute (VRI) Diagnostic Division',
+    turnaround: '24 - 48 Hours',
+    parameters: 'California Mastitis Test (CMT), Somatic Cell Count (SCC), bacterial culture & antibiotic sensitivity test',
+    sampleReq: '50ml mid-stream sterile milk sample on ice pack',
+    fee: 'LKR 1,200',
+    contact: '+94 81 238 8311',
+    location: 'Gannoruwa, Kandy'
+  }
+];
+
+const LAB_SAMPLE_TRACKER = [
   {
     id: 'LAB-2026-904',
     testType: 'Comprehensive Soil pH & NPK Fertility Profile',
     labName: 'National Soil Testing Laboratory (Peradeniya)',
-    crop: 'Welimada Organic Tomatoes',
+    crop: 'Welimada Greenhouse Tomatoes',
     farmer: 'Bandara Organic Farm',
     status: 'REPORT_ISSUED',
     stageNumber: 4,
     orderDate: 'Aug 18, 2026',
     completedDate: 'Aug 23, 2026',
     reportSummary: {
-      soilPh: 6.3,
+      soilPh: '6.3 (Slightly Acidic - Ideal for Solanaceae)',
       organicMatter: '3.8% (Optimal)',
       nitrogen: '42 ppm (Moderate)',
       phosphorus: '28 ppm (High)',
       potassium: '185 ppm (Adequate)',
-      recommendation: 'Maintain current compost top-dressing. Reduce synthetic phosphorus by 15%.'
+      recommendation: 'Maintain compost top-dressing. Reduce synthetic phosphorus additions by 15% for the upcoming fruiting cycle.'
     }
   },
   {
@@ -154,12 +231,14 @@ const LAB_TEST_SAMPLES = [
     status: 'IN_ANALYSIS',
     stageNumber: 3,
     orderDate: 'Aug 22, 2026',
-    completedDate: 'Est. Aug 25, 2026',
+    completedDate: 'Est. Aug 27, 2026',
     reportSummary: null
   }
 ];
 
+// ==========================================
 // AGRARIAN SERVICE CENTERS DIRECTORY (Govijana Seva Kendraya)
+// ==========================================
 const AGRARIAN_CENTERS = [
   {
     id: 'asc-1',
@@ -169,216 +248,178 @@ const AGRARIAN_CENTERS = [
     officerInCharge: 'Anura Jayasooriya (Extension Director)',
     phone: '+94 57 224 5110',
     clinicHours: 'Tue & Thu: 08:30 AM - 03:30 PM',
-    services: ['GAP Certification Audits', 'Subsidized Bio-Fertilizer', 'Seed Potato Certification']
+    services: ['GAP Certification Audits', 'Subsidized Bio-Fertilizer Distribution', 'Soil Test Sample Drop-off', 'Seed Potato Certification']
   },
   {
     id: 'asc-2',
     name: 'Galewela Govijana Seva Kendraya',
     district: 'Matale',
     address: 'Dambulla Road, Galewela, Central Province',
-    officerInCharge: 'R. M. Dissanayake (District Officer)',
+    officerInCharge: 'R. M. Dissanayake (District Agricultural Officer)',
     phone: '+94 66 228 9204',
     clinicHours: 'Mon, Wed, Fri: 09:00 AM - 04:00 PM',
-    services: ['Armyworm Surveillance Desk', 'Paddy Soil Testing Kits', 'Drip Irrigation Tenders']
+    services: ['Armyworm Pest Surveillance Desk', 'Paddy Soil Testing Kits', 'Drip Irrigation Subsidy Verification', 'Onion Storage Guidance']
   },
   {
     id: 'asc-3',
     name: 'Kandapola Highland Extension Center',
     district: 'Nuwara Eliya',
     address: 'Highland Ridge Rd, Kandapola, Nuwara Eliya',
-    officerInCharge: 'Dr. Gamini Wickramasinghe (Field Lead)',
+    officerInCharge: 'Dr. Gamini Wickramasinghe (Advisory Field Lead)',
     phone: '+94 52 222 7831',
     clinicHours: 'Wed & Sat: 08:30 AM - 02:00 PM',
-    services: ['Cold-Chain Transport Subsidies', 'Fungicide Calibration', 'Greenhouse Permits']
+    services: ['Cold-Chain Transport Advisory', 'Fungicide Calibration Assistance', 'Greenhouse Construction Permits', 'Frost Protection Measures']
   },
   {
     id: 'asc-4',
     name: 'Thambuttegama Agrarian Hub',
     district: 'Anuradhapura',
     address: 'Irrigation Secretariat Complex, Thambuttegama',
-    officerInCharge: 'Sunil Fernando (Soil Analyst)',
+    officerInCharge: 'Sunil Fernando (Soil & Fertilizer Analyst)',
     phone: '+94 25 227 6301',
     clinicHours: 'Mon - Fri: 08:30 AM - 04:30 PM',
-    services: ['Maha Paddy Water Allocations', 'Saline Soil Remediation', 'Organic Composting Subsidy']
-  }
-];
-
-const COMMUNITY_KNOWLEDGEBASE = [
-  {
-    id: 'kb-1',
-    farmerName: 'Bandara Organic Farm (Welimada)',
-    expertName: 'Dr. Gamini Wickramasinghe (Agronomist)',
-    expertSpecialty: 'Agronomist',
-    question: 'How to treat early leaf yellowing and brown rings on Welimada Greenhouse Tomatoes after heavy monsoon rain?',
-    farmData: 'Soil Moisture: 42%, Soil pH: 6.2, Ambient Temp: 24°C, EC: 1.4 mS/cm',
-    imageUrl: 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a2e?auto=format&fit=crop&w=600&q=80',
-    status: 'ANSWERED',
-    reply: 'Diagnosis: Early Blight (Alternaria solani) accelerated by relative humidity > 85%. Prescription: 1) Prune bottom 15cm lower canopy leaves to improve air circulation. 2) Apply Copper Hydroxide (2g/L) or certified Trichoderma viride bio-fungicide every 5 days. 3) Reduce overhead misting and switch to root-zone drip irrigation.',
-    createdAt: '2 hours ago',
-    rxData: {
-      rxNumber: 'RX-AGRO-2026-781',
-      crop: 'Tomato (Grade A Greenhouse)',
-      activeIngredient: 'Copper Hydroxide 77% WP / Trichoderma viride',
-      dosage: '50g per 16L spray tank (2.5g / Liter)',
-      frequency: 'Every 5 days for 2 cycles (Morning 07:00 - 08:30 AM)',
-      preHarvestIntervalDays: 3,
-      safetyNotes: 'Wear nitrile gloves & respirator. Do not spray during mid-day heat.'
-    },
-    audioAdvice: {
-      sinhala: 'පහළ කොළ කප්පාදු කර උදෑසන කොපර් හයිඩ්‍රොක්සයිඩ් මිලිග්‍රෑම් 50ක් ඉසින්න.',
-      tamil: 'கீழ் இலைகளை அகற்றி காப்பர் ஹைட்ராக்சைடு தெளிக்கவும்.',
-      english: 'Prune bottom 15cm foliage and apply Copper Hydroxide 50g/16L.'
-    }
+    services: ['Maha Paddy Water Allocations', 'Saline Soil Remediation Planning', 'Organic Composting Certification', 'Chili Leaf Curl Clinic']
   },
   {
-    id: 'kb-2',
-    farmerName: 'Highland Greens (Kandapola)',
-    expertName: 'Anura Jayasooriya (Agricultural Officer)',
-    expertSpecialty: 'Agricultural Officer',
-    question: 'Carrot root forking and stunted growth observed in block C. Soil pH tested at 5.1.',
-    farmData: 'Soil Moisture: 35%, Soil pH: 5.1, Soil Texture: Heavy Loam',
-    imageUrl: 'https://images.unsplash.com/photo-1582515073490-39981397c445?auto=format&fit=crop&w=600&q=80',
-    status: 'ANSWERED',
-    reply: 'Diagnosis: Severe soil acidity causing micronutrient lockout and root apical cell damage. Prescription: Apply agricultural dolomite at 350kg/acre 2 weeks prior to replanting. Maintain soil aeration with deep tilling (30cm) to break subsoil hardpans.',
-    createdAt: '1 day ago',
-    rxData: {
-      rxNumber: 'RX-AGRO-2026-642',
-      crop: 'Highland Export Carrots',
-      activeIngredient: 'Agricultural Dolomite (CaCO3.MgCO3) + Deep Aeration',
-      dosage: '350 kg per acre broadcasted uniformly',
-      frequency: 'Single application incorporated 2 weeks before sowing',
-      preHarvestIntervalDays: 0,
-      safetyNotes: 'Ensure soil moisture is moderate when broadcasting dolomite.'
-    }
+    id: 'asc-5',
+    name: 'Gampaha District Veterinary & Extension Center',
+    district: 'Gampaha',
+    address: 'Kandy Road, Miriswatta, Gampaha',
+    officerInCharge: 'Dr. Priyanka Ratnayake (Veterinary Surgeon)',
+    phone: '+94 33 222 4118',
+    clinicHours: 'Mon - Fri: 08:30 AM - 04:00 PM',
+    services: ['Livestock Vaccination Drive', 'Dairy Quality Milk Testing', 'Silage Preparation Workshops', 'Poultry Flock Health Certification']
   }
 ];
 
+// ==========================================
+// PRE-POPULATED DIAGNOSTIC PRESETS
+// ==========================================
 const QUICK_DIAGNOSTIC_CHIPS = [
   {
     label: '🍅 Tomato Leaf Blight & Yellowing',
     specialty: 'Agronomist',
-    question: 'Early leaf yellowing and necrotic brown concentric rings on tomato crop after continuous rain. Suspecting fungal infection.',
-    telemetry: 'Soil Moisture: 38%, Soil pH: 6.3, Temp: 26°C, RH: 82%'
+    question: 'Early leaf yellowing and brown necrotic concentric rings on tomato crop after continuous rain. Suspecting fungal early blight.',
+    cropContext: 'Greenhouse Tomatoes (Welimada)',
+    farmNotes: 'Growing Condition: Poly-tunnel; Soil pH: 6.2; High relative humidity > 85%'
   },
   {
-    label: '🥕 Carrot Root Forking & pH 5.2',
+    label: '🥕 Carrot Root Forking & Acidity',
     specialty: 'Soil Specialist',
-    question: 'Severe soil acidity (pH 5.2) causing stunted root growth and nutrient deficiency in highland carrots.',
-    telemetry: 'Soil Moisture: 31%, Soil pH: 5.2, Nitrogen: 22 ppm, Phosphorus: 14 ppm'
+    question: 'Severe soil acidity (tested pH 5.1) causing stunted root development, apical forking, and micronutrient lockout in highland carrots.',
+    cropContext: 'Export Carrots (Nuwara Eliya)',
+    farmNotes: 'Soil Type: Heavy red loam; Soil pH: 5.1; Previous crop: Cabbage'
   },
   {
     label: '🌾 Paddy Brown Planthopper (BPH)',
     specialty: 'Agricultural Officer',
-    question: 'Brown planthopper circular hopperburn patches appearing in Maha season paddy. Need immediate bio-safe pesticide guidance.',
-    telemetry: 'Water Level: 4cm, Soil pH: 6.8, Temp: 31°C'
+    question: 'Circular hopperburn patches appearing in Maha season paddy tillering stage. Need bio-safe pesticide guidance and threshold monitoring.',
+    cropContext: 'Paddy Rice - Bg 360 (Thambuttegama)',
+    farmNotes: 'Water Level: 4cm; Growth Stage: Maximum Tillering; Weather: Overcast & warm'
   },
   {
-    label: '🐄 Dairy Cattle Mastitis Prevention',
+    label: '🐄 Dairy Cattle Mastitis Management',
     specialty: 'Veterinarian',
-    question: 'Reduced milk yield and mild udder inflammation in Jersey cross dairy cow. Need antiseptic teat dip & antibiotic protocol.',
-    telemetry: 'Herd Size: 12, Daily Yield: 18L/cow, Lactation Day: 45'
+    question: 'Reduced milk yield and mild udder heat in Jersey-Friesian cross dairy cow. Need antiseptic teat dip recommendations and isolation protocol.',
+    cropContext: 'Dairy Cattle Herd (Gampaha)',
+    farmNotes: 'Herd Size: 14 cows; Lactation Day: 42; Milking Method: Machine milking twice daily'
+  },
+  {
+    label: '📦 Post-Harvest Transit & Quality Breakdown',
+    specialty: 'Post-Harvest Specialist',
+    question: 'Significant condensation and transit bruising observed upon arrival at wholesale market. Seeking optimal crating and ventilation steps.',
+    cropContext: 'Bell Peppers & English Cucumbers',
+    farmNotes: 'Transit Route: Nuwara Eliya to Dambulla Hub; Duration: 6 hours; Vehicle: Open ventilated truck'
   }
 ];
 
 export const ExpertModule = () => {
-  const { user, isExpert, isAdmin } = useAuth();
-  
-  // Top-Level Navigation View: 'advisory' | 'teleclinic' | 'labtests' | 'agrarian'
-  const [activeMainTab, setActiveMainTab] = useState('advisory');
+  const { user, isExpert, isAgriculturalExpert, isAdmin } = useAuth();
+  const isExpertUser = isExpert || isAgriculturalExpert || user?.role === 'AGRICULTURAL_EXPERT' || user?.role === 'EXPERT';
 
-  const [experts, setExperts] = useState(FALLBACK_EXPERTS);
+  // Navigation Tabs: 'directory' | 'ask' | 'consultations' | 'expert-queue' | 'labs' | 'centers' | 'tele-consult'
+  const [activeTab, setActiveTab] = useState('directory');
+
+  // Core Data States
+  const [experts, setExperts] = useState(VERIFIED_EXPERTS);
   const [consultations, setConsultations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [msg, setMsg] = useState('');
-  const [activeTab, setActiveTab] = useState('history'); // 'history' or 'community'
-  const [selectedSpecialtyFilter, setSelectedSpecialtyFilter] = useState('All');
+  const [actionNotice, setActionNotice] = useState(null);
+
+  // Search & Filters for Experts Directory
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSpecialtyFilter, setSelectedSpecialtyFilter] = useState('All');
   const [selectedDistrictFilter, setSelectedDistrictFilter] = useState('ALL');
 
-  // Selected Expert Detail & Appointment Modal
-  const [selectedExpertForModal, setSelectedExpertForModal] = useState(null);
-  const [bookingSuccessMsg, setBookingSuccessMsg] = useState('');
-  const [selectedVisitDate, setSelectedVisitDate] = useState('2026-08-28');
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState('09:30 AM - 11:00 AM');
+  // Centers District Filter
+  const [centerDistrictFilter, setCenterDistrictFilter] = useState('ALL');
+  const [centerSearchQuery, setCenterSearchQuery] = useState('');
 
-  // Digital Prescription (Rx) Modal
-  const [activeRxModal, setActiveRxModal] = useState(null);
+  // Selected Expert Detail Modal
+  const [selectedExpertModal, setSelectedExpertModal] = useState(null);
 
-  // Virtual Tele-Agro Clinic State
-  const [isInCall, setIsInCall] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
+  // Selected Consultation Detail Modal
+  const [selectedConsultationModal, setSelectedConsultationModal] = useState(null);
+
+  // Lab Testing State
+  const [labTests, setLabTests] = useState(LAB_SAMPLE_TRACKER);
+  const [selectedLabReportModal, setSelectedLabReportModal] = useState(null);
+
+  // Tele-Clinic Video Simulator State
+  const [isSimCallActive, setIsSimCallActive] = useState(false);
+  const [isMicMuted, setIsMicMuted] = useState(false);
+  const [isCamOff, setIsCamOff] = useState(false);
   const [callDurationSec, setCallDurationSec] = useState(0);
-  const [callActiveOfficer, setCallActiveOfficer] = useState(FALLBACK_EXPERTS[0]);
+  const [simOfficer, setSimOfficer] = useState(VERIFIED_EXPERTS[0]);
 
-  // Audio Note Playback State
-  const [playingAudioId, setPlayingAudioId] = useState(null);
-  const [audioLanguage, setAudioLanguage] = useState('sinhala');
-
-  // Form State for Asking Question / Booking
+  // "Ask an Expert" Form State
+  const [consultationRoleContext, setConsultationRoleContext] = useState(
+    user?.role === 'BUYER' || user?.role === 'BUSINESS_BUYER' ? 'Buyer / Quality Inspector' : 'Farmer / Producer'
+  );
   const [selectedSpecialty, setSelectedSpecialty] = useState('Agronomist');
-  const [question, setQuestion] = useState('');
-  const [farmData, setFarmData] = useState('Soil Moisture: 34%, Soil pH: 6.4, Location: Welimada, Temp: 28°C');
+  const [urgencyLevel, setUrgencyLevel] = useState('Normal');
+  const [cropVariety, setCropVariety] = useState('');
+  const [farmLocation, setFarmLocation] = useState(user?.location || 'Central Province');
+  const [questionText, setQuestionText] = useState('');
+  const [fieldNotes, setFieldNotes] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [selectedUrgency, setSelectedUrgency] = useState('Normal');
+  const [imagePreviewError, setImagePreviewError] = useState(false);
 
-  // Lab Test Pipeline State
-  const [labTests, setLabTests] = useState(LAB_TEST_SAMPLES);
-  const [showOrderLabModal, setShowOrderLabModal] = useState(false);
-  const [selectedLabInstitution, setSelectedLabInstitution] = useState('National Soil Testing Laboratory (Peradeniya)');
-  const [labCropName, setLabCropName] = useState('Welimada Organic Tomatoes');
-  const [labOrderSuccessMsg, setLabOrderSuccessMsg] = useState('');
+  // Expert Reply State (for Triage Queue)
+  const [replyingToId, setReplyingToId] = useState(null);
+  const [expertReplyText, setExpertReplyText] = useState('');
+  const [expertDiagnosis, setExpertDiagnosis] = useState('');
+  const [queueFilter, setQueueFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'ANSWERED'
 
-  // Expert Reply State
-  const [replyingId, setReplyingId] = useState(null);
-  const [replyText, setReplyText] = useState('');
-
-  // Timer for active teleclinic call
-  useEffect(() => {
-    let interval = null;
-    if (isInCall) {
-      interval = setInterval(() => {
-        setCallDurationSec((prev) => prev + 1);
-      }, 1000);
-    } else {
-      setCallDurationSec(0);
-    }
-    return () => clearInterval(interval);
-  }, [isInCall]);
-
-  const formatCallTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-  };
-
+  // Fetch Data from Backend API
   const fetchData = async () => {
     setLoading(true);
     try {
       const [expRes, consRes] = await Promise.all([
-        expertsAPI.getAvailable().catch(() => ({ data: FALLBACK_EXPERTS })),
-        isExpert
+        expertsAPI.getAvailable().catch(() => ({ data: VERIFIED_EXPERTS })),
+        isExpertUser
           ? expertsAPI.getAllConsultations().catch(() => ({ data: [] }))
-          : expertsAPI.getMyConsultations().catch(() => ({ data: [] })),
+          : expertsAPI.getMyConsultations().catch(() => ({ data: [] }))
       ]);
 
-      if (expRes && expRes.data && expRes.data.length > 0) {
-        const merged = expRes.data.map((backendExp) => {
-          const fallback = FALLBACK_EXPERTS.find((f) => f.id === backendExp.id || f.name === backendExp.name);
-          return { ...fallback, ...backendExp };
+      if (expRes?.data?.length > 0) {
+        // Merge backend data with rich frontend directory metadata
+        const merged = expRes.data.map((bExp) => {
+          const matched = VERIFIED_EXPERTS.find((f) => f.id === bExp.id || f.name.toLowerCase() === bExp.name?.toLowerCase());
+          return { ...matched, ...bExp };
         });
         setExperts(merged);
       } else {
-        setExperts(FALLBACK_EXPERTS);
+        setExperts(VERIFIED_EXPERTS);
       }
 
-      if (consRes && consRes.data) {
+      if (consRes?.data) {
         setConsultations(consRes.data);
       }
     } catch (err) {
-      console.error('Failed to load expert module data:', err);
-      setExperts(FALLBACK_EXPERTS);
+      console.error('Failed to load expert data:', err);
+      setExperts(VERIFIED_EXPERTS);
     } finally {
       setLoading(false);
     }
@@ -386,1141 +427,1517 @@ export const ExpertModule = () => {
 
   useEffect(() => {
     fetchData();
-  }, [isExpert]);
+  }, [isExpertUser]);
 
-  const handleSubmitQuestion = async (e) => {
+  // Tele-Clinic Call Timer
+  useEffect(() => {
+    let interval = null;
+    if (isSimCallActive) {
+      interval = setInterval(() => {
+        setCallDurationSec((prev) => prev + 1);
+      }, 1000);
+    } else {
+      setCallDurationSec(0);
+    }
+    return () => clearInterval(interval);
+  }, [isSimCallActive]);
+
+  const formatCallTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  // Submit Inquiry Handler
+  const handleSubmitInquiry = async (e) => {
     e.preventDefault();
-    if (!question.trim()) return;
+    if (!questionText.trim()) {
+      setActionNotice({ type: 'error', message: 'Please describe your crop issue or consultation inquiry.' });
+      return;
+    }
 
     setSubmitting(true);
-    setMsg('');
+    setActionNotice(null);
+
+    const structuredFarmData = `Context: ${consultationRoleContext} | Location: ${farmLocation} | Crop/Commodity: ${cropVariety || 'Unspecified'} | Field Observation: ${fieldNotes || 'Standard field observation'}`;
+    const formattedQuestion = `[${urgencyLevel} Priority] ${questionText.trim()}`;
+
     try {
       const res = await expertsAPI.submitConsultation({
-        farmerEmail: user?.email || 'farmer@agrolink.com',
-        farmerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Bandara Organic Farm'),
+        farmerEmail: user?.email || 'user@agrolink.com',
+        farmerName: user?.name || (user?.email ? user.email.split('@')[0] : 'AgroLink Producer'),
         expertSpecialty: selectedSpecialty,
-        question: `[${selectedUrgency} Priority] ${question}`,
-        farmData,
-        imageUrl: imageUrl.trim() || undefined,
+        question: formattedQuestion,
+        farmData: structuredFarmData,
+        imageUrl: imageUrl.trim() || undefined
       });
 
-      if (res && res.data) {
-        setMsg('✅ Consultation successfully dispatched! Certified specialists notified for triage.');
-        setQuestion('');
-        setImageUrl('');
-        setActiveTab('history');
+      if (res?.data) {
+        setActionNotice({
+          type: 'success',
+          message: 'Inquiry submitted successfully! A verified agricultural officer has been notified.'
+        });
+        resetInquiryForm();
         fetchData();
+        setActiveTab('consultations');
       }
     } catch (err) {
-      const mockNew = {
+      // Graceful fallback for offline or development mock mode
+      const mockConsultation = {
         id: Date.now(),
-        farmerEmail: user?.email || 'farmer@agrolink.com',
-        farmerName: user?.name || 'Bandara Organic Farm (You)',
+        farmerEmail: user?.email || 'user@agrolink.com',
+        farmerName: user?.name || (user?.email ? user.email.split('@')[0] : 'You'),
         expertSpecialty: selectedSpecialty,
-        question: `[${selectedUrgency} Priority] ${question}`,
-        farmData,
+        question: formattedQuestion,
+        farmData: structuredFarmData,
         imageUrl: imageUrl.trim() || undefined,
         status: 'PENDING',
         reply: null,
         createdAt: 'Just now'
       };
-      setConsultations((prev) => [mockNew, ...prev]);
-      setMsg('✅ Consultation submitted to verified agricultural officers queue!');
-      setQuestion('');
-      setImageUrl('');
-      setActiveTab('history');
+      setConsultations((prev) => [mockConsultation, ...prev]);
+      setActionNotice({
+        type: 'success',
+        message: 'Inquiry submitted to the advisory triage queue!'
+      });
+      resetInquiryForm();
+      setActiveTab('consultations');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handlePostReply = async (id) => {
-    if (!replyText.trim()) return;
+  const resetInquiryForm = () => {
+    setQuestionText('');
+    setFieldNotes('');
+    setCropVariety('');
+    setImageUrl('');
+    setImagePreviewError(false);
+  };
+
+  // Preset diagnostic chip select
+  const handleSelectPreset = (chip) => {
+    setSelectedSpecialty(chip.specialty);
+    setQuestionText(chip.question);
+    setCropVariety(chip.cropContext);
+    setFieldNotes(chip.farmNotes);
+    setActiveTab('ask');
+  };
+
+  // Direct consult button from expert card
+  const handleInitiateConsultWithExpert = (expert) => {
+    setSelectedSpecialty(expert.specialty || 'Agronomist');
+    setSelectedExpertModal(null);
+    setActiveTab('ask');
+  };
+
+  // Expert Reply Handler (for Triage Queue)
+  const handlePostReply = async (consultationId) => {
+    if (!expertReplyText.trim()) return;
 
     setSubmitting(true);
+    const completeReply = expertDiagnosis.trim()
+      ? `Diagnosis & Assessment: ${expertDiagnosis.trim()}\n\nRecommended Action Plan: ${expertReplyText.trim()}`
+      : expertReplyText.trim();
+
     try {
-      const res = await expertsAPI.replyConsultation(id, {
-        reply: replyText,
-        expertName: user?.name || (user?.email ? user.email.split('@')[0] : 'Dr. Gamini Wickramasinghe (Agronomist)'),
+      const expertName = user?.name || (user?.email ? user.email.split('@')[0] : 'Agricultural Extension Specialist');
+      const res = await expertsAPI.replyConsultation(consultationId, {
+        reply: completeReply,
+        expertName
       });
 
-      if (res && res.data) {
-        setReplyingId(null);
-        setReplyText('');
+      if (res?.data) {
+        setReplyingToId(null);
+        setExpertReplyText('');
+        setExpertDiagnosis('');
+        setActionNotice({ type: 'success', message: 'Advisory recommendation dispatched to inquirer.' });
         fetchData();
       }
     } catch (err) {
+      // Local state fallback for mock testing
       setConsultations((prev) =>
         prev.map((c) =>
-          c.id === id
+          c.id === consultationId
             ? {
                 ...c,
                 status: 'ANSWERED',
-                reply: replyText,
-                expertName: user?.name || 'Dr. Gamini Wickramasinghe (Agronomist)',
-                rxData: {
-                  rxNumber: `RX-AGRO-2026-${Math.floor(100 + Math.random() * 900)}`,
-                  crop: 'Crop Diagnostic Sample',
-                  activeIngredient: 'Prescribed Formulation',
-                  dosage: 'Follow standard dilution guidelines',
-                  frequency: 'Every 5 days as needed',
-                  preHarvestIntervalDays: 3,
-                  safetyNotes: 'Adhere to official DOA protective equipment guidelines.'
-                }
+                reply: completeReply,
+                expertName: user?.name || 'Agricultural Extension Specialist',
+                updatedAt: 'Just now'
               }
             : c
         )
       );
-      setReplyingId(null);
-      setReplyText('');
+      setReplyingToId(null);
+      setExpertReplyText('');
+      setExpertDiagnosis('');
+      setActionNotice({ type: 'success', message: 'Advisory recommendation recorded successfully.' });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleQuickChipSelect = (chip) => {
-    setSelectedSpecialty(chip.specialty);
-    setQuestion(chip.question);
-    setFarmData(chip.telemetry);
-    setActiveMainTab('advisory');
-    window.scrollTo({ top: 580, behavior: 'smooth' });
-  };
-
-  const handleAttachLiveIoTTelemetry = () => {
-    const liveMoisture = Math.floor(28 + Math.random() * 15);
-    const livePh = (6.0 + Math.random() * 0.8).toFixed(1);
-    const liveTemp = Math.floor(24 + Math.random() * 8);
-    const liveEC = (1.1 + Math.random() * 0.5).toFixed(2);
-    setFarmData(`IoT Live Feed: Soil Moisture ${liveMoisture}%, pH ${livePh}, Temp ${liveTemp}°C, EC ${liveEC} mS/cm`);
-  };
-
-  const handleOrderLabTest = (e) => {
-    e.preventDefault();
-    const newTest = {
-      id: `LAB-2026-${Math.floor(920 + Math.random() * 80)}`,
-      testType: 'Soil pH, Organic Matter & Micronutrient Spectroscopy',
-      labName: selectedLabInstitution,
-      crop: labCropName,
-      farmer: user?.name || 'Bandara Organic Farm',
-      status: 'SAMPLE_DISPATCHED',
-      stageNumber: 1,
-      orderDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      completedDate: 'Est. 4 Days',
-      reportSummary: null
-    };
-    setLabTests((prev) => [newTest, ...prev]);
-    setLabOrderSuccessMsg('✅ Test Kit Dispatched! Physical collection courier scheduled to your farm location.');
-    setTimeout(() => {
-      setShowOrderLabModal(false);
-      setLabOrderSuccessMsg('');
-    }, 2500);
-  };
-
-  // Filter experts based on search & specialty
+  // Filtered Experts
   const filteredExperts = experts.filter((exp) => {
-    const matchesSpecialty = selectedSpecialtyFilter === 'All' || exp.specialty === selectedSpecialtyFilter;
     const matchesSearch =
       exp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exp.district.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      exp.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSpecialty && matchesSearch;
+      exp.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exp.specialty?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exp.skills?.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesSpecialty =
+      selectedSpecialtyFilter === 'All' ||
+      exp.specialty?.toLowerCase() === selectedSpecialtyFilter.toLowerCase();
+
+    const matchesDistrict =
+      selectedDistrictFilter === 'ALL' ||
+      exp.district?.toLowerCase() === selectedDistrictFilter.toLowerCase();
+
+    return matchesSearch && matchesSpecialty && matchesDistrict;
   });
 
-  // Filter Agrarian Centers
+  // Filtered Agrarian Centers
   const filteredCenters = AGRARIAN_CENTERS.filter((c) => {
-    const matchesDistrict = selectedDistrictFilter === 'ALL' || c.district === selectedDistrictFilter;
-    const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.address.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesDistrict = centerDistrictFilter === 'ALL' || c.district.toLowerCase() === centerDistrictFilter.toLowerCase();
+    const matchesSearch =
+      c.name.toLowerCase().includes(centerSearchQuery.toLowerCase()) ||
+      c.address.toLowerCase().includes(centerSearchQuery.toLowerCase()) ||
+      c.officerInCharge.toLowerCase().includes(centerSearchQuery.toLowerCase());
     return matchesDistrict && matchesSearch;
   });
 
+  // Filtered Triage Queue Consultations
+  const filteredQueue = consultations.filter((c) => {
+    if (queueFilter === 'PENDING') return c.status === 'PENDING';
+    if (queueFilter === 'ANSWERED') return c.status === 'ANSWERED';
+    return true;
+  });
+
+  const pendingCount = consultations.filter((c) => c.status === 'PENDING').length;
+  const answeredCount = consultations.filter((c) => c.status === 'ANSWERED').length;
+
   return (
-    <div className="relative min-h-screen py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-fade-in text-slate-800">
-      
-      {/* AMBIENT FROSTED GLASS BACKGROUND REFRACTION ORBS */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-emerald-400/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 right-10 w-[440px] h-[440px] bg-teal-400/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-sky-400/10 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto space-y-6">
 
-      <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* 1. CLEAN WHITE & GLASSMORPHIC HERO HEADER */}
-        <div className="relative overflow-hidden rounded-3xl bg-white/85 backdrop-blur-xl border border-white/90 shadow-xl shadow-slate-200/50 ring-1 ring-slate-900/5 p-6 sm:p-10 space-y-6">
-          <div className="absolute -top-12 -right-12 w-80 h-80 bg-gradient-to-br from-emerald-400/15 via-teal-300/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10">
-            <div className="space-y-2.5">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50/90 backdrop-blur-md text-emerald-800 text-xs font-extrabold uppercase tracking-wider border border-emerald-200/80 shadow-xs">
+        {/* ======================================================== */}
+        {/* HEADER & HUB OVERVIEW */}
+        {/* ======================================================== */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>National Digital Agro-Clinic &amp; Agricultural Extension Network</span>
+                  National Extension & Advisory Network
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 -ml-3.5" />
-                  <span>4 Specialists Online • Virtual Tele-Clinic Ready</span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                  Department of Agriculture Verified
                 </span>
+                {isExpertUser && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <Award className="w-3.5 h-3.5 text-blue-600" />
+                    Specialist Officer Mode
+                  </span>
+                )}
               </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight font-display text-slate-900">
-                Consult Verified Agricultural Officers &amp; Specialists 👨‍🔬
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                Agricultural Experts & Advisory Hub
               </h1>
-              <p className="text-slate-500 text-xs sm:text-sm max-w-3xl font-medium leading-relaxed">
-                Connect directly with certified government extension officers, plant pathologists, soil chemists, and veterinary surgeons for precision diagnosis, 1-on-1 virtual video triage, physical lab testing, and SLAgS digital prescriptions.
+              <p className="text-slate-600 text-sm sm:text-base max-w-3xl leading-relaxed">
+                Connect directly with certified agronomists, plant pathologists, soil chemists, and veterinary extension
+                officers for diagnostic support, field recommendations, and Agrarian Service Center programs.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* Quick Action Buttons */}
+            <div className="flex items-center gap-3 shrink-0 flex-wrap">
               <button
                 onClick={() => {
-                  setCallActiveOfficer(experts[0]);
-                  setIsInCall(true);
-                  setActiveMainTab('teleclinic');
+                  setActiveTab('ask');
+                  setActionNotice(null);
                 }}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs rounded-2xl shadow-md hover:shadow-lg shadow-emerald-600/25 transition-all flex items-center gap-2 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm transition-colors shadow-sm"
               >
-                <Video className="w-3.5 h-3.5" />
-                <span>Start Tele-Agro Clinic 📹</span>
+                <MessageSquare className="w-4 h-4" />
+                Ask an Expert
               </button>
 
               <button
-                onClick={() => {
-                  if (experts.length > 0) setSelectedExpertForModal(experts[0]);
-                }}
-                className="px-4 py-2.5 bg-white/90 hover:bg-white active:scale-95 border border-slate-200/80 text-slate-700 font-extrabold text-xs rounded-2xl shadow-xs hover:shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                onClick={() => setActiveTab('consultations')}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-medium text-sm border border-slate-300 transition-colors shadow-sm"
               >
-                <Calendar className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Book Farm Visit 📅</span>
+                <Clock className="w-4 h-4 text-slate-500" />
+                My Inquiries
+                {consultations.length > 0 && (
+                  <span className="ml-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-slate-100 text-slate-800">
+                    {consultations.length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={fetchData}
+                disabled={loading}
+                title="Refresh advisory data"
+                className="p-2.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 border border-slate-200 transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               </button>
             </div>
           </div>
 
-          {/* ADVISORY SERVICE KEY METRICS */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-slate-100/90">
-            <div className="p-3.5 bg-slate-50/80 backdrop-blur-md rounded-2xl border border-slate-200/70 space-y-0.5">
-              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
-                <BadgeCheck className="w-3 h-3 text-emerald-600" /> Government Accredited
-              </span>
-              <p className="text-sm font-black text-slate-900 font-display">100% SLAgS Verified</p>
+          {/* Action Notice Banner */}
+          {actionNotice && (
+            <div
+              className={`mt-4 p-4 rounded-xl text-sm flex items-center justify-between border ${
+                actionNotice.type === 'error'
+                  ? 'bg-rose-50 border-rose-200 text-rose-800'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {actionNotice.type === 'error' ? (
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                ) : (
+                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                )}
+                <span>{actionNotice.message}</span>
+              </div>
+              <button
+                onClick={() => setActionNotice(null)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Overview Metric Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-slate-100">
+            <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/60">
+              <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                <UserCheck className="w-4 h-4 text-emerald-600" />
+                Certified Specialists
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">{experts.length}</div>
+              <div className="text-xs text-slate-500">Government & Research leads</div>
             </div>
 
-            <div className="p-3.5 bg-slate-50/80 backdrop-blur-md rounded-2xl border border-slate-200/70 space-y-0.5">
-              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
-                <Clock className="w-3 h-3 text-sky-600" /> Turnaround Speed
-              </span>
-              <p className="text-sm font-black text-slate-900 font-display">&lt; 15 Mins Median</p>
+            <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/60">
+              <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-blue-600" />
+                Service Centers
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">{AGRARIAN_CENTERS.length}</div>
+              <div className="text-xs text-slate-500">Govijana Seva Kendraya</div>
             </div>
 
-            <div className="p-3.5 bg-slate-50/80 backdrop-blur-md rounded-2xl border border-slate-200/70 space-y-0.5">
-              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
-                <Activity className="w-3 h-3 text-teal-600" /> Resolution SLA
-              </span>
-              <p className="text-sm font-black text-emerald-600 font-display">99.2% Cure Rate</p>
+            <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/60">
+              <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                <FlaskConical className="w-4 h-4 text-amber-600" />
+                Diagnostic Labs
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">{LAB_SERVICES_DIRECTORY.length}</div>
+              <div className="text-xs text-slate-500">Soil, tissue & residue testing</div>
             </div>
 
-            <div className="p-3.5 bg-slate-50/80 backdrop-blur-md rounded-2xl border border-slate-200/70 space-y-0.5">
-              <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
-                <Cpu className="w-3 h-3 text-emerald-600" /> IoT Diagnostic Sync
-              </span>
-              <p className="text-sm font-black text-slate-900 font-display">Live Sensor Sync</p>
+            <div className="bg-slate-50/80 rounded-xl p-3.5 border border-slate-200/60">
+              <div className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                My Inquiries
+              </div>
+              <div className="mt-1 text-xl font-bold text-slate-900">{consultations.length}</div>
+              <div className="text-xs text-slate-500">
+                {pendingCount} pending, {answeredCount} answered
+              </div>
             </div>
           </div>
         </div>
 
-        {/* 🌟 2. TOP-LEVEL MODULAR NAVIGATION TABS */}
-        <div className="flex bg-white/85 backdrop-blur-xl p-1.5 rounded-3xl border border-white/90 shadow-lg shadow-slate-200/40 ring-1 ring-slate-900/5 overflow-x-auto scrollbar-none gap-1.5 text-xs font-black">
+        {/* ======================================================== */}
+        {/* NAVIGATION TABS */}
+        {/* ======================================================== */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 text-sm font-medium">
           <button
-            type="button"
-            onClick={() => setActiveMainTab('advisory')}
-            className={`flex-1 min-w-[170px] py-3 px-4 rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
-              activeMainTab === 'advisory'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                : 'text-slate-600 hover:bg-slate-100/80'
+            onClick={() => setActiveTab('directory')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
+              activeTab === 'directory'
+                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
             }`}
           >
             <UserCheck className="w-4 h-4" />
-            <span>👨‍🔬 Specialists &amp; Advisory</span>
+            Specialist Directory
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs ${
+                activeTab === 'directory' ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-700'
+              }`}
+            >
+              {filteredExperts.length}
+            </span>
           </button>
 
           <button
-            type="button"
-            onClick={() => setActiveMainTab('teleclinic')}
-            className={`flex-1 min-w-[170px] py-3 px-4 rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
-              activeMainTab === 'teleclinic'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                : 'text-slate-600 hover:bg-slate-100/80'
+            onClick={() => setActiveTab('ask')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
+              activeTab === 'ask'
+                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
             }`}
           >
-            <Video className="w-4 h-4 text-emerald-300" />
-            <span>📞 Virtual Tele-Agro Clinic</span>
+            <MessageSquare className="w-4 h-4" />
+            Ask an Expert
           </button>
 
           <button
-            type="button"
-            onClick={() => setActiveMainTab('labtests')}
-            className={`flex-1 min-w-[170px] py-3 px-4 rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
-              activeMainTab === 'labtests'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                : 'text-slate-600 hover:bg-slate-100/80'
+            onClick={() => setActiveTab('consultations')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
+              activeTab === 'consultations'
+                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
             }`}
           >
-            <FlaskConical className="w-4 h-4 text-teal-400" />
-            <span>🧪 Soil &amp; Leaf Lab Tests</span>
+            <Clock className="w-4 h-4" />
+            My Inquiries
+            {consultations.length > 0 && (
+              <span
+                className={`px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === 'consultations' ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-700'
+                }`}
+              >
+                {consultations.length}
+              </span>
+            )}
+          </button>
+
+          {/* Expert Triage Queue Tab */}
+          {isExpertUser && (
+            <button
+              onClick={() => setActiveTab('expert-queue')}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
+                activeTab === 'expert-queue'
+                  ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                  : 'text-blue-700 bg-blue-50/60 hover:bg-blue-100/70 border border-blue-200'
+              }`}
+            >
+              <Award className="w-4 h-4 text-blue-600" />
+              Advisory Triage Queue
+              {pendingCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-xs bg-amber-500 text-white font-bold animate-pulse">
+                  {pendingCount} Pending
+                </span>
+              )}
+            </button>
+          )}
+
+          <button
+            onClick={() => setActiveTab('labs')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
+              activeTab === 'labs'
+                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+            }`}
+          >
+            <FlaskConical className="w-4 h-4" />
+            Diagnostic & Lab Testing
           </button>
 
           <button
-            type="button"
-            onClick={() => setActiveMainTab('agrarian')}
-            className={`flex-1 min-w-[170px] py-3 px-4 rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
-              activeMainTab === 'agrarian'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                : 'text-slate-600 hover:bg-slate-100/80'
+            onClick={() => setActiveTab('centers')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
+              activeTab === 'centers'
+                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
             }`}
           >
-            <Building2 className="w-4 h-4 text-amber-400" />
-            <span>🗺️ Agrarian Centers (Govijana Seva)</span>
+            <Building2 className="w-4 h-4" />
+            Agrarian Service Centers
+          </button>
+
+          <button
+            onClick={() => setActiveTab('tele-consult')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
+              activeTab === 'tele-consult'
+                ? 'bg-emerald-600 text-white shadow-sm font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+            }`}
+          >
+            <Video className="w-4 h-4" />
+            Virtual Advisory Preview
           </button>
         </div>
 
-        {/* 🌟 3. TAB 1: SPECIALISTS & ADVISORY HUB */}
-        {activeMainTab === 'advisory' && (
-          <div className="space-y-8">
-            
-            {/* SPECIALTY SEARCH & FILTER BAR */}
-            <div className="p-4 sm:p-5 bg-white/85 backdrop-blur-xl border border-white/90 shadow-lg shadow-slate-200/40 ring-1 ring-slate-900/5 rounded-3xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-              <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search specialists by name, district (Kandy, Nuwara Eliya), or crop problem..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 rounded-2xl border border-slate-200 text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                />
+        {/* ======================================================== */}
+        {/* TAB 1: SPECIALIST DIRECTORY */}
+        {/* ======================================================== */}
+        {activeTab === 'directory' && (
+          <div className="space-y-6">
+            {/* Search and Filter Toolbar */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                {/* Search Bar */}
+                <div className="md:col-span-6 relative">
+                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by specialist name, title, crop disease, or keywords..."
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* District Filter */}
+                <div className="md:col-span-3">
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <select
+                      value={selectedDistrictFilter}
+                      onChange={(e) => setSelectedDistrictFilter(e.target.value)}
+                      className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 appearance-none"
+                    >
+                      <option value="ALL">All Districts</option>
+                      <option value="Kandy">Kandy</option>
+                      <option value="Nuwara Eliya">Nuwara Eliya</option>
+                      <option value="Gampaha">Gampaha</option>
+                      <option value="Anuradhapura">Anuradhapura</option>
+                      <option value="Badulla">Badulla</option>
+                      <option value="Matale">Matale</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  </div>
+                </div>
+
+                {/* Clear Filters Reset */}
+                <div className="md:col-span-3 flex justify-end">
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSelectedSpecialtyFilter('All');
+                      setSelectedDistrictFilter('ALL');
+                    }}
+                    className="text-xs text-slate-500 hover:text-emerald-700 font-medium py-2 px-3 rounded-lg hover:bg-slate-100 transition-colors"
+                  >
+                    Reset All Filters
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-                {['All', 'Agronomist', 'Agricultural Officer', 'Soil Specialist', 'Veterinarian'].map((spec) => (
-                  <button
-                    key={spec}
-                    type="button"
-                    onClick={() => setSelectedSpecialtyFilter(spec)}
-                    className={`px-3 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap ${
-                      selectedSpecialtyFilter === spec
-                        ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30'
-                        : 'bg-slate-100/90 text-slate-600 hover:bg-slate-200/80 border border-slate-200/60'
-                    }`}
-                  >
-                    {spec === 'All' ? '🌟 All Specialists' : spec}
-                  </button>
-                ))}
+              {/* Specialty Filter Pills */}
+              <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-slate-100">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider shrink-0 mr-1">
+                  Specialty:
+                </span>
+                {['All', 'Agronomist', 'Agricultural Officer', 'Soil Specialist', 'Veterinarian', 'Post-Harvest Specialist'].map(
+                  (spec) => (
+                    <button
+                      key={spec}
+                      onClick={() => setSelectedSpecialtyFilter(spec)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                        selectedSpecialtyFilter === spec
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {spec}
+                    </button>
+                  )
+                )}
               </div>
             </div>
 
-            {/* VERIFIED EXPERTS DIRECTORY GRID */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center px-1">
-                <h2 className="text-base font-extrabold text-slate-900 font-display flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-emerald-600" /> Active Verified Officers &amp; Specialists
-                </h2>
-                <span className="text-xs font-bold text-slate-400">
-                  Showing {filteredExperts.length} Specialists
-                </span>
+            {/* Results Grid */}
+            {loading ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-3" />
+                <p className="text-slate-600 text-sm font-medium">Loading verified agricultural specialists...</p>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            ) : filteredExperts.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
+                <Search className="w-10 h-10 text-slate-300 mx-auto" />
+                <h3 className="text-base font-semibold text-slate-800">No specialists found</h3>
+                <p className="text-slate-500 text-sm max-w-md mx-auto">
+                  No registered agricultural experts match your active search and district filters.
+                </p>
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedSpecialtyFilter('All');
+                    setSelectedDistrictFilter('ALL');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-colors"
+                >
+                  Clear search filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filteredExperts.map((exp) => (
                   <div
                     key={exp.id}
-                    className="group relative p-5 bg-white/85 backdrop-blur-xl border border-white/90 shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 rounded-3xl space-y-4 hover:shadow-2xl hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between"
+                    className="bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-300 transition-all shadow-sm hover:shadow-md flex flex-col justify-between overflow-hidden"
                   >
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div className="relative">
-                          <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 text-3xl flex items-center justify-center border border-emerald-100 shadow-inner">
-                            {exp.avatarUrl || '👨‍🔬'}
+                    <div className="p-5 space-y-4">
+                      {/* Top Row: Avatar & Status */}
+                      <div className="flex items-start gap-3.5">
+                        <img
+                          src={exp.avatarUrl}
+                          alt={exp.name}
+                          className="w-14 h-14 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-100"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h3 className="text-base font-bold text-slate-900 truncate">{exp.name}</h3>
+                            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" title="Verified Officer" />
                           </div>
-                          <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center text-[8px] text-white">
-                            ✓
-                          </span>
-                        </div>
-
-                        <div className="text-right">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-black">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-500" /> {exp.rating}
-                          </span>
-                          <p className="text-[10px] font-bold text-slate-400 mt-1">{exp.consultationsCount}+ cases</p>
+                          <p className="text-xs font-medium text-emerald-700 truncate">{exp.title}</p>
+                          <div className="flex items-center gap-1 mt-1 text-xs text-slate-500">
+                            <Building2 className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">{exp.institution}</span>
+                          </div>
                         </div>
                       </div>
 
-                      <div>
-                        <h3 className="font-black text-slate-900 text-sm font-display group-hover:text-emerald-700 transition">
-                          {exp.name}
-                        </h3>
-                        <p className="text-[11px] font-extrabold text-emerald-700">
-                          {exp.title}
-                        </p>
-                        <p className="text-[10px] font-medium text-slate-400 truncate mt-0.5">
-                          {exp.institution}
-                        </p>
+                      {/* District & Reg Number */}
+                      <div className="flex items-center justify-between text-xs py-1.5 px-3 rounded-lg bg-slate-50 border border-slate-100">
+                        <span className="flex items-center gap-1 text-slate-600 font-medium">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                          {exp.district} District
+                        </span>
+                        <span className="text-slate-500 font-mono text-[11px]">{exp.regNumber}</span>
                       </div>
 
-                      <div className="p-2.5 bg-slate-50/80 rounded-2xl border border-slate-100 text-[11px] text-slate-600 font-semibold space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1 text-slate-500">
-                            <MapPin className="w-3 h-3 text-slate-400" /> {exp.district}
-                          </span>
-                          <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                            {exp.availabilityStatus}
-                          </span>
-                        </div>
-                        {exp.regNumber && (
-                          <p className="text-[9px] font-mono text-slate-400 pt-0.5 truncate">
-                            Gov ID: {exp.regNumber}
-                          </p>
-                        )}
-                      </div>
+                      {/* Bio snippet */}
+                      <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                        {exp.bio}
+                      </p>
 
-                      {exp.skills && (
-                        <div className="flex flex-wrap gap-1">
-                          {exp.skills.slice(0, 3).map((skill, i) => (
-                            <span key={i} className="text-[9px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-lg">
+                      {/* Competencies / Skills Tags */}
+                      {exp.skills && exp.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {exp.skills.slice(0, 3).map((skill, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-medium"
+                            >
                               {skill}
                             </span>
                           ))}
+                          {exp.skills.length > 3 && (
+                            <span className="px-1.5 py-0.5 text-[11px] text-slate-400">
+                              +{exp.skills.length - 3} more
+                            </span>
+                          )}
                         </div>
                       )}
+
+                      {/* Metrics: Rating & Consultations */}
+                      <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 text-slate-500">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                          <span className="font-semibold text-slate-800">{exp.rating}</span>
+                          <span>({exp.consultationsCount} reviews)</span>
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-emerald-700 font-medium text-[11px]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                          {exp.availabilityStatus}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="space-y-2 pt-2 border-t border-slate-100">
+                    {/* Card Actions */}
+                    <div className="p-4 bg-slate-50/70 border-t border-slate-100 flex items-center gap-2">
                       <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedSpecialty(exp.specialty);
-                          setQuestion(`Direct inquiry to ${exp.name} (${exp.specialty}): `);
-                          window.scrollTo({ top: 620, behavior: 'smooth' });
-                        }}
-                        className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        onClick={() => setSelectedExpertModal(exp)}
+                        className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold transition-colors"
+                      >
+                        View Profile
+                      </button>
+                      <button
+                        onClick={() => handleInitiateConsultWithExpert(exp)}
+                        className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
-                        <span>Consult {exp.specialty}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setSelectedExpertForModal(exp)}
-                        className="w-full py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-extrabold text-[11px] rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
-                      >
-                        <BookOpen className="w-3 h-3 text-slate-500" />
-                        <span>View Credentials &amp; Book</span>
+                        Ask Question
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
+          </div>
+        )}
 
-            {/* 1-CLICK COMMON DIAGNOSTIC TEMPLATES */}
-            <div className="p-5 sm:p-6 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-sky-500/5 backdrop-blur-xl rounded-3xl border border-emerald-300/80 shadow-lg shadow-emerald-500/5 ring-1 ring-emerald-400/20 space-y-3">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-600" />
-                <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 font-display">
-                  One-Click Common Agricultural Diagnostic Templates:
-                </h4>
+        {/* ======================================================== */}
+        {/* TAB 2: ASK AN EXPERT (INQUIRY FORM) */}
+        {/* ======================================================== */}
+        {activeTab === 'ask' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Form Column */}
+            <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                  New Advisory Inquiry
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">
+                  Submit an Inquiry to Extension Specialists
+                </h2>
+                <p className="text-slate-600 text-sm mt-1">
+                  Describe your crop symptoms, pest damage, soil behavior, or harvest quality queries. Official
+                  extension officers triage and answer cases according to regional agricultural protocols.
+                </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                {QUICK_DIAGNOSTIC_CHIPS.map((chip, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleQuickChipSelect(chip)}
-                    className="p-3 bg-white/90 hover:bg-white active:scale-95 border border-emerald-200/80 hover:border-emerald-400 rounded-2xl text-left transition shadow-xs cursor-pointer space-y-1"
-                  >
-                    <span className="text-xs font-extrabold text-slate-900 block truncate">{chip.label}</span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full inline-block">
-                      Target: {chip.specialty}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* MAIN TWO-COLUMN CONSULTATION HUB (INQUIRY STUDIO & Q&A FEED) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
-              {/* LEFT: INQUIRY STUDIO (5 COLS) */}
-              <div className="lg:col-span-5 bg-white/85 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-white/90 shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              {/* Quick Preset Diagnostic Chips */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  Common Diagnostic Templates (Click to prefill)
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {QUICK_DIAGNOSTIC_CHIPS.map((chip, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleSelectPreset(chip)}
+                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-emerald-500 text-xs font-medium text-slate-700 hover:text-emerald-700 transition-colors shadow-2xs text-left"
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitInquiry} className="space-y-5">
+                {/* Role / Context Selector */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <h3 className="text-base font-extrabold text-slate-900 font-display flex items-center gap-2">
-                      <MessageSquare className="w-4 h-4 text-emerald-600" /> Advisory Inquiry Studio
-                    </h3>
-                    <p className="text-xs text-slate-400 font-medium">Send diagnostic query with IoT sensor telemetry</p>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Submitting As
+                    </label>
+                    <select
+                      value={consultationRoleContext}
+                      onChange={(e) => setConsultationRoleContext(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                    >
+                      <option value="Farmer / Producer">Farmer / Field Cultivator</option>
+                      <option value="Buyer / Quality Inspector">Commercial Buyer / Quality Inspector</option>
+                      <option value="Agrarian Extension Officer">Agrarian Field Officer</option>
+                      <option value="Home Gardener">Home / Urban Agriculturalist</option>
+                    </select>
                   </div>
-                  <span className="px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-800 text-[10px] font-black uppercase border border-emerald-200 shadow-xs">
-                    Gov Extension
-                  </span>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Advisory Domain / Specialty
+                    </label>
+                    <select
+                      value={selectedSpecialty}
+                      onChange={(e) => setSelectedSpecialty(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                    >
+                      <option value="Agronomist">Agronomy & Crop Pathology (Pest/Fungal)</option>
+                      <option value="Agricultural Officer">Extension Officer (Cultivation & Schemes)</option>
+                      <option value="Soil Specialist">Soil Chemistry & Fertilizer Management</option>
+                      <option value="Veterinarian">Veterinary & Livestock Extension</option>
+                      <option value="Post-Harvest Specialist">Post-Harvest, Storage & Packaging</option>
+                    </select>
+                  </div>
                 </div>
 
-                {msg && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-between"
-                  >
-                    <span>{msg}</span>
-                    <button onClick={() => setMsg('')} className="text-emerald-700 font-bold hover:text-emerald-900">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </motion.div>
-                )}
-
-                <form onSubmit={handleSubmitQuestion} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500">
-                        Target Specialty
-                      </label>
-                      <select
-                        value={selectedSpecialty}
-                        onChange={(e) => setSelectedSpecialty(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-2xl border border-slate-200/90 bg-white/80 text-xs font-bold focus:outline-none focus:border-emerald-500"
-                      >
-                        <option value="Agronomist">👨‍🔬 Agronomist (Crop Health)</option>
-                        <option value="Agricultural Officer">🧑‍🌾 Agricultural Officer (Extension)</option>
-                        <option value="Soil Specialist">🔬 Soil Specialist (pH &amp; NPK)</option>
-                        <option value="Veterinarian">👩‍⚕️ Veterinarian (Livestock)</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500">
-                        Triage Urgency
-                      </label>
-                      <select
-                        value={selectedUrgency}
-                        onChange={(e) => setSelectedUrgency(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-2xl border border-slate-200/90 bg-white/80 text-xs font-bold focus:outline-none focus:border-emerald-500"
-                      >
-                        <option value="Normal">🟢 Normal (Within 2 Hours)</option>
-                        <option value="Urgent">🟠 Urgent Crop Loss Risk (&lt;30m)</option>
-                        <option value="Critical">🔴 Critical Epidemic Outbreak (&lt;15m)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500">
-                      Detailed Symptoms &amp; Diagnostic Query
+                {/* Priority & Crop Variety */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Urgency Level
                     </label>
-                    <textarea
-                      rows="4"
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                      placeholder="Describe leaf symptoms, pest appearance, soil issues, or dosage questions..."
-                      required
-                      className="w-full p-3.5 rounded-2xl border border-slate-200/90 bg-white/80 text-xs font-semibold focus:outline-none focus:border-emerald-500 text-slate-900 placeholder:text-slate-400"
-                    />
+                    <select
+                      value={urgencyLevel}
+                      onChange={(e) => setUrgencyLevel(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                    >
+                      <option value="Normal">Normal (Standard 24-48h)</option>
+                      <option value="High">High (Active pest/infection spread)</option>
+                      <option value="Critical">Critical (Immediate harvest threat)</option>
+                    </select>
                   </div>
 
-                  <div className="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-[10px] font-black uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                        <Cpu className="w-3.5 h-3.5 text-emerald-600" /> Attached Farm IoT Telemetry
-                      </label>
-                      <button
-                        type="button"
-                        onClick={handleAttachLiveIoTTelemetry}
-                        className="text-[10px] font-extrabold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 cursor-pointer"
-                      >
-                        <Zap className="w-3 h-3 text-emerald-600" /> Refresh Live Sensors
-                      </button>
-                    </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Crop / Produce Type
+                    </label>
                     <input
                       type="text"
-                      value={farmData}
-                      onChange={(e) => setFarmData(e.target.value)}
-                      placeholder="Soil Moisture: 32%, Soil pH: 6.4, Temp: 29°C"
-                      className="w-full px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-emerald-500"
+                      value={cropVariety}
+                      onChange={(e) => setCropVariety(e.target.value)}
+                      placeholder="e.g. Greenhouse Tomato, Bg 360 Paddy, Carrots"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="block text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                      <ImageIcon className="w-3.5 h-3.5 text-emerald-600" /> Crop / Leaf Photo URL (Optional)
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                      Location / District
                     </label>
                     <input
-                      type="url"
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
-                      placeholder="https://images.unsplash.com/photo-..."
-                      className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200/90 bg-white/80 text-xs font-semibold focus:outline-none focus:border-emerald-500 text-slate-900"
+                      type="text"
+                      value={farmLocation}
+                      onChange={(e) => setFarmLocation(e.target.value)}
+                      placeholder="e.g. Welimada, Badulla"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                     />
+                  </div>
+                </div>
+
+                {/* Question / Symptoms */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Problem Description & Questions <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    value={questionText}
+                    onChange={(e) => setQuestionText(e.target.value)}
+                    placeholder="Describe visible leaf spots, wilting patterns, pest presence, soil condition, or post-harvest quality issues in detail..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 leading-relaxed"
+                  />
+                </div>
+
+                {/* Field Observation & Cultivation Data */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Field Environment & Cultivation Notes (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={fieldNotes}
+                    onChange={(e) => setFieldNotes(e.target.value)}
+                    placeholder="e.g. Poly-tunnel; Drip fertigated; Soil pH 6.3; Rainfall during past 3 days"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                  />
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Providing specific growing context helps officers determine accurate diagnoses and chemical dilution rates.
+                  </p>
+                </div>
+
+                {/* Diagnostic Image Attachment URL */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                    Sample Photo URL (High resolution image of leaves, roots, or produce)
+                  </label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <ImageIcon className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="url"
+                        value={imageUrl}
+                        onChange={(e) => {
+                          setImageUrl(e.target.value);
+                          setImagePreviewError(false);
+                        }}
+                        placeholder="https://example.com/images/crop-sample.jpg"
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                      />
+                    </div>
                     {imageUrl && (
-                      <div className="relative rounded-2xl overflow-hidden border border-slate-200 h-32 bg-slate-100">
-                        <img src={imageUrl} alt="Attached crop preview" className="w-full h-full object-cover" />
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setImageUrl('')}
+                        className="px-3 py-2 rounded-xl text-xs text-slate-500 hover:text-slate-700 border border-slate-200"
+                      >
+                        Remove
+                      </button>
                     )}
                   </div>
+
+                  {/* Image Preview Box */}
+                  {imageUrl && !imagePreviewError && (
+                    <div className="mt-3 p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center gap-3">
+                      <img
+                        src={imageUrl}
+                        alt="Sample Preview"
+                        onError={() => setImagePreviewError(true)}
+                        className="w-16 h-16 rounded-lg object-cover border border-slate-200 bg-white"
+                      />
+                      <div className="text-xs text-slate-600">
+                        <p className="font-semibold text-slate-800">Diagnostic image attached</p>
+                        <p className="text-[11px] text-slate-500 truncate max-w-sm">{imageUrl}</p>
+                      </div>
+                    </div>
+                  )}
+                  {imagePreviewError && (
+                    <p className="text-xs text-rose-500 mt-1">
+                      Unable to load image from this URL. Please verify the link.
+                    </p>
+                  )}
+                </div>
+
+                {/* Submit Row */}
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                  <button
+                    type="button"
+                    onClick={resetInquiryForm}
+                    className="text-xs text-slate-500 hover:text-slate-800 font-medium py-2 px-3"
+                  >
+                    Clear Form
+                  </button>
 
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs rounded-2xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors shadow-sm disabled:opacity-60"
                   >
-                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                    <span>Submit Diagnostic Query to {selectedSpecialty} 🚀</span>
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Submitting to Extension Queue...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Submit Advisory Inquiry
+                      </>
+                    )}
                   </button>
-                </form>
-              </div>
-
-              {/* RIGHT: CONSULTATIONS FEED & DIGITAL RX TIMELINE (7 COLS) */}
-              <div className="lg:col-span-7 bg-white/85 backdrop-blur-xl p-6 sm:p-7 rounded-3xl border border-white/90 shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                  <div>
-                    <h3 className="text-base font-extrabold text-slate-900 font-display flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-emerald-600" />
-                      {isExpert ? '📥 Open Advisory Queue (Triage Mode)' : '📋 Advisory History & Digital Prescriptions'}
-                    </h3>
-                    <p className="text-xs text-slate-400 font-medium">Real-time agronomy responses and SLAgS prescription documents</p>
-                  </div>
-
-                  <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs font-black">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('history')}
-                      className={`px-3 py-1.5 rounded-xl transition cursor-pointer ${
-                        activeTab === 'history' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
-                      }`}
-                    >
-                      My Cases ({consultations.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('community')}
-                      className={`px-3 py-1.5 rounded-xl transition cursor-pointer ${
-                        activeTab === 'community' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
-                      }`}
-                    >
-                      Verified Knowledgebase
-                    </button>
-                  </div>
                 </div>
-
-                {activeTab === 'history' ? (
-                  loading ? (
-                    <div className="py-16 text-center text-slate-400 space-y-2">
-                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-600" />
-                      <p className="text-xs font-bold">Synchronizing consultation telemetry...</p>
-                    </div>
-                  ) : consultations.length === 0 ? (
-                    <div className="text-center py-16 bg-slate-50/80 rounded-3xl border border-slate-200/70 space-y-3 p-6">
-                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto text-2xl">
-                        🌱
-                      </div>
-                      <h4 className="text-sm font-black text-slate-900 font-display">No Consultation Threads Yet</h4>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
-                        Submit your first diagnostic inquiry using the studio on the left or select a 1-click template above.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 max-h-[620px] overflow-y-auto pr-1">
-                      {consultations.map((item) => (
-                        <div
-                          key={item.id}
-                          className="p-5 rounded-3xl bg-slate-50/90 backdrop-blur-md border border-slate-200/80 space-y-3.5 shadow-xs transition hover:border-emerald-300"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-extrabold text-slate-900 text-sm">{item.farmerName}</span>
-                                <span className="text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
-                                  Target: {item.expertSpecialty}
-                                </span>
-                              </div>
-                              <p className="text-xs text-slate-800 font-bold leading-relaxed">{item.question}</p>
-                            </div>
-
-                            <span
-                              className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase shrink-0 flex items-center gap-1 ${
-                                item.status === 'ANSWERED'
-                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                  : 'bg-amber-100 text-amber-800 border border-amber-200'
-                              }`}
-                            >
-                              {item.status === 'ANSWERED' ? (
-                                <>
-                                  <Check className="w-3 h-3 text-emerald-600" /> Answered
-                                </>
-                              ) : (
-                                <>
-                                  <Clock className="w-3 h-3 text-amber-600" /> In Triage
-                                </>
-                              )}
-                            </span>
-                          </div>
-
-                          {item.farmData && (
-                            <div className="p-2.5 bg-white rounded-2xl border border-slate-200/70 text-[11px] text-slate-600 font-mono font-bold flex items-center gap-2">
-                              <Cpu className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                              <span className="truncate">{item.farmData}</span>
-                            </div>
-                          )}
-
-                          {item.reply ? (
-                            <div className="p-4 bg-emerald-50/90 backdrop-blur-sm rounded-2xl border border-emerald-200/90 space-y-2 text-emerald-950">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="font-extrabold text-emerald-900 flex items-center gap-1.5 font-display">
-                                  👨‍🔬 {item.expertName || 'Senior Agronomist'} Diagnostic Prescription:
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => setActiveRxModal(item)}
-                                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] rounded-xl shadow-xs flex items-center gap-1 cursor-pointer"
-                                >
-                                  <FileText className="w-3 h-3" />
-                                  <span>View Official Digital Rx (PDF) 📄</span>
-                                </button>
-                              </div>
-                              <p className="text-xs text-emerald-950 font-medium leading-relaxed">{item.reply}</p>
-                            </div>
-                          ) : isExpert || isAdmin ? (
-                            <div className="pt-2">
-                              {replyingId === item.id ? (
-                                <div className="space-y-2">
-                                  <textarea
-                                    rows="3"
-                                    value={replyText}
-                                    onChange={(e) => setReplyText(e.target.value)}
-                                    placeholder="Provide verified diagnostic remedy, chemical/organic dosage, and preventative SLA..."
-                                    className="w-full p-3 rounded-2xl border border-emerald-300 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                  />
-                                  <div className="flex justify-end gap-2">
-                                    <button
-                                      type="button"
-                                      onClick={() => setReplyingId(null)}
-                                      className="px-3.5 py-1.5 bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl cursor-pointer"
-                                    >
-                                      Cancel
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handlePostReply(item.id)}
-                                      disabled={submitting}
-                                      className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs flex items-center gap-1 cursor-pointer"
-                                    >
-                                      <Send className="w-3 h-3" /> Issue Digital Prescription
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => setReplyingId(item.id)}
-                                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-extrabold rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
-                                >
-                                  <Send className="w-3 h-3" /> Prescribe Treatment as Officer 👨‍🔬
-                                </button>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200/80 text-[11px] text-amber-800 font-semibold flex items-center gap-2">
-                              <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
-                              <span>Awaiting priority diagnostic triage from certified {item.expertSpecialty}...</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )
-                ) : (
-                  /* COMMUNITY KNOWLEDGE BASE OF VERIFIED RESOLUTIONS */
-                  <div className="space-y-4 max-h-[620px] overflow-y-auto pr-1">
-                    {COMMUNITY_KNOWLEDGEBASE.map((item) => (
-                      <div
-                        key={item.id}
-                        className="p-5 rounded-3xl bg-slate-50/90 backdrop-blur-md border border-slate-200/80 space-y-3.5 shadow-xs"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-extrabold text-slate-900 text-sm">{item.farmerName}</span>
-                              <span className="text-[10px] font-black uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                                {item.expertSpecialty}
-                              </span>
-                            </div>
-                            <p className="text-xs text-slate-800 font-bold leading-relaxed">{item.question}</p>
-                          </div>
-                          <span className="text-[10px] font-bold text-slate-400 shrink-0">{item.createdAt}</span>
-                        </div>
-
-                        {item.farmData && (
-                          <div className="p-2.5 bg-white rounded-2xl border border-slate-200/70 text-[11px] text-slate-600 font-mono font-bold flex items-center gap-2">
-                            <Cpu className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                            <span className="truncate">{item.farmData}</span>
-                          </div>
-                        )}
-
-                        <div className="p-4 bg-emerald-50/90 backdrop-blur-sm rounded-2xl border border-emerald-200/90 space-y-2 text-emerald-950">
-                          <div className="flex items-center justify-between text-xs flex-wrap gap-2">
-                            <span className="font-extrabold text-emerald-900 font-display">
-                              👨‍🔬 {item.expertName} Resolution:
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setActiveRxModal(item)}
-                              className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-[10px] rounded-xl shadow-xs flex items-center gap-1 cursor-pointer"
-                            >
-                              <FileText className="w-3 h-3" /> View Prescription (Rx)
-                            </button>
-                          </div>
-                          <p className="text-xs text-emerald-950 font-medium leading-relaxed">{item.reply}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              </form>
             </div>
 
-          </div>
-        )}
-
-        {/* 🌟 4. TAB 2: VIRTUAL TELE-AGRO CLINIC ROOM (1-ON-1 VIDEO SIMULATOR) */}
-        {activeMainTab === 'teleclinic' && (
-          <div className="bg-white/85 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/90 shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Video className="w-5 h-5 text-emerald-600" />
-                  <h2 className="text-xl font-black text-slate-900 font-display">
-                    Virtual Tele-Agro Consultation Clinic 📹
-                  </h2>
+            {/* Sidebar Guidelines */}
+            <div className="lg:col-span-4 space-y-5">
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 text-emerald-800 font-semibold text-sm">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                  Official Advisory Protocol
                 </div>
-                <p className="text-xs text-slate-500 font-medium">
-                  Direct encrypted video consultation with certified agricultural officers featuring live IoT crop telemetry HUD
+                <ul className="text-xs text-slate-600 space-y-3 leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Certified Diagnosticians:</strong> All inquiries are reviewed by verified agronomists and
+                      extension officers registered with the Department of Agriculture.
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Safe Chemical Guidance:</strong> Prescriptions adhere strictly to national Maximum Residue
+                      Limits (MRL) and safety pre-harvest intervals (PHI).
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Field Drop-Off:</strong> If laboratory tissue culture is required, you can submit physical
+                      samples at your nearest Agrarian Service Center.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Commercial Buyers Notice */}
+              <div className="bg-amber-50/70 rounded-2xl border border-amber-200/80 p-5 space-y-2 text-xs text-amber-900">
+                <div className="font-semibold flex items-center gap-1.5 text-amber-800 text-sm">
+                  <Building2 className="w-4 h-4 text-amber-600" />
+                  For Commercial Buyers & Processors
+                </div>
+                <p className="leading-relaxed">
+                  Food processors and export buyers can request post-harvest quality audits, quarantine defect
+                  reviews, and pesticide residue verification protocols prior to lot dispatch.
                 </p>
               </div>
-
-              {isInCall && (
-                <div className="flex items-center gap-2 bg-rose-50 px-3 py-1 rounded-full border border-rose-200 text-rose-700 font-mono font-bold text-xs">
-                  <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
-                  <span>LIVE CLINIC: {formatCallTime(callDurationSec)}</span>
-                </div>
-              )}
-            </div>
-
-            {/* VIDEO HUD INTERFACE */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
-              {/* VIDEO STREAM SCREEN (8 COLS) */}
-              <div className="lg:col-span-8 bg-slate-950 rounded-3xl overflow-hidden relative shadow-2xl min-h-[420px] flex flex-col justify-between p-6 border border-slate-800">
-                {/* HUD TOP TELEMETRY OVERLAY */}
-                <div className="flex justify-between items-center relative z-10 text-xs">
-                  <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-700 text-emerald-400 font-mono font-bold">
-                    <Activity className="w-3.5 h-3.5" />
-                    <span>SOIL MOISTURE: 38% • pH 6.3 • TEMP: 26°C</span>
-                  </div>
-                  <span className="bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-xl text-slate-300 font-mono text-[10px]">
-                    TLS 1.3 ENCRYPTED
-                  </span>
-                </div>
-
-                {/* OFFICER & FARMER VIDEO SIMULATION FEED */}
-                <div className="my-auto text-center space-y-3 relative z-10">
-                  {isInCall ? (
-                    <div className="space-y-2">
-                      <div className="w-24 h-24 rounded-3xl bg-emerald-600 text-white flex items-center justify-center text-5xl mx-auto shadow-xl shadow-emerald-600/30 border-2 border-emerald-400">
-                        {callActiveOfficer.avatarUrl || '👨‍🔬'}
-                      </div>
-                      <h4 className="text-base font-black text-white font-display">{callActiveOfficer.name}</h4>
-                      <p className="text-xs text-emerald-400 font-semibold">{callActiveOfficer.title} ({callActiveOfficer.institution})</p>
-                      <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
-                        Audio &amp; Video Connected • Diagnostic Inspection Active
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="space-y-3 py-12">
-                      <div className="w-16 h-16 rounded-3xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-3xl">
-                        📹
-                      </div>
-                      <h4 className="text-base font-bold text-slate-300">Tele-Clinic Waiting Room</h4>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        Click "Connect Video Call" to initiate the 1-on-1 virtual examination with {callActiveOfficer.name}.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* CALL CONTROL BUTTONS */}
-                <div className="flex items-center justify-center gap-3 relative z-10 pt-4">
-                  {isInCall ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setIsMuted(!isMuted)}
-                        className={`p-3.5 rounded-2xl font-bold transition cursor-pointer ${
-                          isMuted ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
-                        }`}
-                      >
-                        {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setIsVideoOff(!isVideoOff)}
-                        className={`p-3.5 rounded-2xl font-bold transition cursor-pointer ${
-                          isVideoOff ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
-                        }`}
-                      >
-                        {isVideoOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setIsInCall(false)}
-                        className="px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-lg shadow-rose-600/30 transition flex items-center gap-2 cursor-pointer"
-                      >
-                        <PhoneOff className="w-4 h-4" />
-                        <span>End Consultation</span>
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setIsInCall(true)}
-                      className="px-8 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-lg shadow-emerald-600/30 transition flex items-center gap-2 cursor-pointer"
-                    >
-                      <PhoneCall className="w-4 h-4" />
-                      <span>Connect Video Consultation with {callActiveOfficer.name.split(' ')[1]}</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* LIVE CALL NOTES & PRESCRIPTION SYNC (4 COLS) */}
-              <div className="lg:col-span-4 p-5 bg-slate-50/90 rounded-3xl border border-slate-200 space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                  <h4 className="font-black text-slate-900 text-xs font-display flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-emerald-600" /> Live Clinical Examination Notes
-                  </h4>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                    DOA Synchronized
-                  </span>
-                </div>
-
-                <div className="space-y-2 text-xs">
-                  <div className="p-3 bg-white rounded-2xl border border-slate-200/70 space-y-1">
-                    <span className="text-[10px] font-black uppercase text-slate-400 block">Attending Officer</span>
-                    <p className="font-black text-slate-900">{callActiveOfficer.name}</p>
-                    <p className="text-[10px] text-slate-500">{callActiveOfficer.title}</p>
-                  </div>
-
-                  <div className="p-3 bg-white rounded-2xl border border-slate-200/70 space-y-1">
-                    <span className="text-[10px] font-black uppercase text-slate-400 block">Live Telemetry Observation</span>
-                    <p className="text-[11px] text-slate-700 font-mono font-semibold">
-                      Crop: Welimada Organic Tomatoes<br />
-                      Soil pH: 6.3 • EC: 1.4 mS/cm<br />
-                      Leaf Surface Moisture: 82% RH
-                    </p>
-                  </div>
-
-                  <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-950 space-y-1">
-                    <span className="text-[10px] font-black uppercase text-emerald-800 block">
-                      Prescription Readiness
-                    </span>
-                    <p className="text-[11px] font-medium leading-relaxed">
-                      At conclusion of video session, a certified digital Rx document is automatically compiled into your account.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
         )}
 
-        {/* 🌟 5. TAB 3: SOIL & LEAF TISSUE LAB TEST PIPELINE */}
-        {activeMainTab === 'labtests' && (
-          <div className="bg-white/85 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/90 shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        {/* ======================================================== */}
+        {/* TAB 3: MY INQUIRIES & CONSULTATIONS */}
+        {/* ======================================================== */}
+        {activeTab === 'consultations' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2">
-                  <FlaskConical className="w-5 h-5 text-teal-600" />
-                  <h2 className="text-xl font-black text-slate-900 font-display">
-                    Soil &amp; Leaf Tissue Laboratory Testing Pipeline 🧪
-                  </h2>
-                </div>
-                <p className="text-xs text-slate-500 font-medium">
-                  Order official physical soil core and leaf PCR pathology diagnostic kits analyzed at certified national research institutes
+                <h2 className="text-xl font-bold text-slate-900">My Consultation History & Advisory Cases</h2>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  Track pending diagnostic inquiries and review official advisory recommendations from agricultural officers.
                 </p>
               </div>
 
               <button
-                type="button"
-                onClick={() => setShowOrderLabModal(true)}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-2xl shadow-md transition flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+                onClick={() => setActiveTab('ask')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shrink-0 shadow-sm"
               >
-                <FlaskConical className="w-3.5 h-3.5" />
-                <span>Order Physical Lab Test Kit 📦</span>
+                <MessageSquare className="w-3.5 h-3.5" />
+                Ask New Question
               </button>
             </div>
 
-            {/* ACTIVE LAB TEST TRACKER CARDS */}
-            <div className="space-y-5">
-              {labTests.map((t) => (
-                <div
-                  key={t.id}
-                  className="p-6 bg-slate-50/90 rounded-3xl border border-slate-200/80 space-y-4 shadow-xs"
+            {loading ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                <Loader2 className="w-8 h-8 text-emerald-600 animate-spin mx-auto mb-3" />
+                <p className="text-slate-600 text-sm font-medium">Loading your consultation records...</p>
+              </div>
+            ) : consultations.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-4">
+                <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-slate-800">No consultation inquiries yet</h3>
+                  <p className="text-slate-500 text-xs sm:text-sm max-w-md mx-auto mt-1">
+                    You have not submitted any advisory questions. Connect with our certified agronomists for help with
+                    crop protection and soil health.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setActiveTab('ask')}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono text-xs font-black text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-                          {t.id}
-                        </span>
-                        <h3 className="font-black text-slate-900 text-sm font-display">{t.testType}</h3>
+                  Submit Your First Question
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {consultations.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm hover:border-slate-300 transition-all space-y-4"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                              item.status === 'ANSWERED'
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                : 'bg-amber-50 text-amber-800 border border-amber-200'
+                            }`}
+                          >
+                            {item.status === 'ANSWERED' ? (
+                              <>
+                                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                                Answered by Specialist
+                              </>
+                            ) : (
+                              <>
+                                <Clock className="w-3.5 h-3.5 text-amber-600" />
+                                Pending Advisory Review
+                              </>
+                            )}
+                          </span>
+
+                          <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                            Domain: {item.expertSpecialty || 'General Agronomy'}
+                          </span>
+
+                          <span className="text-xs text-slate-400">
+                            {item.createdAt || 'Recent'}
+                          </span>
+                        </div>
+
+                        <h3 className="text-base font-bold text-slate-900 pt-1">
+                          {item.question}
+                        </h3>
                       </div>
-                      <p className="text-xs font-bold text-slate-500 mt-0.5">{t.labName} • Crop: {t.crop}</p>
+
+                      <button
+                        onClick={() => setSelectedConsultationModal(item)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold shrink-0 transition-colors"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-slate-500" />
+                        View Full Details
+                      </button>
                     </div>
 
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase self-start sm:self-auto ${
-                      t.status === 'REPORT_ISSUED'
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        : 'bg-sky-100 text-sky-800 border border-sky-200'
-                    }`}>
-                      {t.status === 'REPORT_ISSUED' ? '✅ Official Report Ready' : '🔬 In Lab Spectrometry'}
+                    {/* Farm Context pill */}
+                    {item.farmData && (
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600 font-mono">
+                        {item.farmData}
+                      </div>
+                    )}
+
+                    {/* Attached Image Snippet if any */}
+                    {item.imageUrl && (
+                      <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 border border-slate-200/60 w-fit">
+                        <img
+                          src={item.imageUrl}
+                          alt="Diagnostic sample"
+                          className="w-12 h-12 rounded object-cover border border-slate-200"
+                        />
+                        <span className="text-xs text-slate-600 font-medium">Diagnostic photo attached</span>
+                      </div>
+                    )}
+
+                    {/* Official Reply Box if answered */}
+                    {item.status === 'ANSWERED' && item.reply && (
+                      <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200/80 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-semibold text-emerald-900">
+                          <span className="flex items-center gap-1.5">
+                            <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                            Official Extension Recommendation
+                            {item.expertName && ` — ${item.expertName}`}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-700 whitespace-pre-line leading-relaxed">
+                          {item.reply}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* TAB 4: EXPERT ADVISORY TRIAGE QUEUE (OFFICER MODE) */}
+        {/* ======================================================== */}
+        {activeTab === 'expert-queue' && isExpertUser && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+                    Extension Officer Workbench
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    Logged in as: {user?.name || user?.email || 'Agricultural Specialist'}
+                  </span>
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 mt-1">
+                  Advisory Triage & Inquirer Inquiries
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  Review submitted field cases from farmers and commercial buyers, assess symptoms, and provide
+                  certified agronomic and pest management recommendations.
+                </p>
+              </div>
+
+              {/* Status Filter Tabs */}
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-semibold">
+                <button
+                  onClick={() => setQueueFilter('ALL')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    queueFilter === 'ALL' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  All Cases ({consultations.length})
+                </button>
+                <button
+                  onClick={() => setQueueFilter('PENDING')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    queueFilter === 'PENDING'
+                      ? 'bg-amber-500 text-white shadow-2xs'
+                      : 'text-amber-800 hover:text-amber-900'
+                  }`}
+                >
+                  Pending ({pendingCount})
+                </button>
+                <button
+                  onClick={() => setQueueFilter('ANSWERED')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    queueFilter === 'ANSWERED'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'text-emerald-800 hover:text-emerald-900'
+                  }`}
+                >
+                  Answered ({answeredCount})
+                </button>
+              </div>
+            </div>
+
+            {/* Queue List */}
+            {filteredQueue.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-2">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
+                <h3 className="text-base font-semibold text-slate-800">No cases in this queue</h3>
+                <p className="text-xs text-slate-500">
+                  There are currently no cases matching filter "{queueFilter}".
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredQueue.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                              item.status === 'ANSWERED'
+                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                : 'bg-amber-50 text-amber-800 border border-amber-200'
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                          <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
+                            Specialty: {item.expertSpecialty || 'General'}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            Inquirer: <strong>{item.farmerName || item.farmerEmail || 'Producer'}</strong>
+                          </span>
+                        </div>
+
+                        <h3 className="text-base font-bold text-slate-900 mt-2">
+                          {item.question}
+                        </h3>
+                      </div>
+
+                      <span className="text-xs text-slate-400 shrink-0">
+                        {item.createdAt || 'Recent'}
+                      </span>
+                    </div>
+
+                    {/* Field Data */}
+                    {item.farmData && (
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 text-xs font-mono text-slate-700">
+                        {item.farmData}
+                      </div>
+                    )}
+
+                    {/* Attached Photo */}
+                    {item.imageUrl && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200 w-fit">
+                        <img
+                          src={item.imageUrl}
+                          alt="Diagnostic sample"
+                          className="w-20 h-20 rounded-lg object-cover border border-slate-200"
+                        />
+                        <div className="text-xs">
+                          <p className="font-semibold text-slate-800">Submitted Field Sample</p>
+                          <a
+                            href={item.imageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-700 hover:underline inline-flex items-center gap-1 mt-1"
+                          >
+                            View Full Resolution <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Answered State */}
+                    {item.status === 'ANSWERED' ? (
+                      <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs space-y-1">
+                        <div className="font-semibold text-emerald-900">
+                          Official Reply recorded by {item.expertName || 'Extension Specialist'}:
+                        </div>
+                        <p className="text-slate-700 whitespace-pre-line leading-relaxed">{item.reply}</p>
+                      </div>
+                    ) : (
+                      /* Replying Box */
+                      <div className="pt-3 border-t border-slate-100 space-y-3">
+                        {replyingToId === item.id ? (
+                          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                            <div className="text-xs font-semibold text-slate-800 flex items-center justify-between">
+                              <span>Compose Expert Advisory Response</span>
+                              <button
+                                onClick={() => setReplyingToId(null)}
+                                className="text-slate-400 hover:text-slate-600"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600 uppercase mb-1">
+                                Clinical Assessment / Pathogen Diagnosis
+                              </label>
+                              <input
+                                type="text"
+                                value={expertDiagnosis}
+                                onChange={(e) => setExpertDiagnosis(e.target.value)}
+                                placeholder="e.g. Early Blight (Alternaria solani) accelerated by high canopy humidity"
+                                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600 uppercase mb-1">
+                                Action Plan, Dilution & Safety Guidelines
+                              </label>
+                              <textarea
+                                rows={3}
+                                value={expertReplyText}
+                                onChange={(e) => setExpertReplyText(e.target.value)}
+                                placeholder="Specify exact cultural practices (e.g. pruning, irrigation adjustment), recommended active ingredient, dosage per 16L knapsack sprayer, and pre-harvest interval (PHI)..."
+                                className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 leading-relaxed"
+                              />
+                            </div>
+
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => setReplyingToId(null)}
+                                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 hover:bg-slate-100"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={() => handlePostReply(item.id)}
+                                disabled={submitting || !expertReplyText.trim()}
+                                className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold disabled:opacity-50 transition-colors shadow-2xs"
+                              >
+                                {submitting ? 'Submitting...' : 'Dispatch Recommendation'}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => {
+                                setReplyingToId(item.id);
+                                setExpertReplyText('');
+                                setExpertDiagnosis('');
+                              }}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors shadow-2xs"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              Write Official Advisory Reply
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* TAB 5: DIAGNOSTIC & LAB TESTING DIRECTORY */}
+        {/* ======================================================== */}
+        {activeTab === 'labs' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
+                  National Laboratories & Testing Services
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">
+                  Agricultural Laboratory Testing Directory
+                </h2>
+                <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-3xl">
+                  Accredited diagnostic testing for soil nutrient status, leaf fungal pathogens, pesticide residue
+                  (MRL), and livestock milk quality. Physical samples can be dropped at any Agrarian Service Center.
+                </p>
+              </div>
+            </div>
+
+            {/* Available Lab Services Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {LAB_SERVICES_DIRECTORY.map((srv) => (
+                <div
+                  key={srv.id}
+                  className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between space-y-4 hover:border-slate-300 transition-colors"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-base font-bold text-slate-900">{srv.name}</h3>
+                      <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 text-xs font-semibold shrink-0 border border-emerald-200">
+                        {srv.fee}
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-slate-600 flex items-center gap-1 font-medium">
+                      <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                      {srv.lab}
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-2">
+                      <div>
+                        <span className="font-semibold text-slate-700">Testing Scope: </span>
+                        <span className="text-slate-600">{srv.parameters}</span>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-700">Sample Collection Requirement: </span>
+                        <span className="text-slate-600">{srv.sampleReq}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      Turnaround: <strong>{srv.turnaround}</strong>
+                    </span>
+                    <span className="text-slate-600 font-medium">
+                      Inquiries: {srv.contact}
                     </span>
                   </div>
-
-                  {/* 4-STAGE PIPELINE PROGRESS BAR */}
-                  <div className="grid grid-cols-4 gap-2 pt-1 text-center">
-                    {[
-                      { step: 1, name: '1. Kit Dispatched' },
-                      { step: 2, name: '2. Sample Received' },
-                      { step: 3, name: '3. Spectrometry Analysis' },
-                      { step: 4, name: '4. Report Issued' },
-                    ].map((s) => (
-                      <div key={s.step} className="space-y-1.5">
-                        <div className={`h-2 rounded-full transition-all ${
-                          t.stageNumber >= s.step ? 'bg-emerald-600' : 'bg-slate-200'
-                        }`} />
-                        <span className={`text-[10px] font-extrabold block ${
-                          t.stageNumber >= s.step ? 'text-emerald-800' : 'text-slate-400'
-                        }`}>
-                          {s.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* IF REPORT ISSUED: SHOW SUMMARY */}
-                  {t.reportSummary && (
-                    <div className="p-4 bg-white rounded-2xl border border-emerald-200 text-xs space-y-2.5 shadow-xs">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-black text-emerald-900 flex items-center gap-1 font-display">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Certified Lab Spectrometry Results:
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-400">Completed: {t.completedDate}</span>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                        <div className="p-2 bg-slate-50 rounded-xl">
-                          <span className="text-[9px] font-black uppercase text-slate-400 block">Soil pH</span>
-                          <strong className="text-emerald-700">{t.reportSummary.soilPh}</strong>
-                        </div>
-                        <div className="p-2 bg-slate-50 rounded-xl">
-                          <span className="text-[9px] font-black uppercase text-slate-400 block">Organic Matter</span>
-                          <strong className="text-slate-800">{t.reportSummary.organicMatter}</strong>
-                        </div>
-                        <div className="p-2 bg-slate-50 rounded-xl">
-                          <span className="text-[9px] font-black uppercase text-slate-400 block">Nitrogen (N)</span>
-                          <strong className="text-slate-800">{t.reportSummary.nitrogen}</strong>
-                        </div>
-                        <div className="p-2 bg-slate-50 rounded-xl">
-                          <span className="text-[9px] font-black uppercase text-slate-400 block">Potassium (K)</span>
-                          <strong className="text-slate-800">{t.reportSummary.potassium}</strong>
-                        </div>
-                      </div>
-
-                      <p className="text-[11px] text-slate-600 bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100">
-                        <strong>Official Lab Guidance:</strong> {t.reportSummary.recommendation}
-                      </p>
-                    </div>
-                  )}
                 </div>
               ))}
+            </div>
+
+            {/* Active Sample Tracking Section */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Regional Laboratory Sample Pipeline</h3>
+                  <p className="text-xs text-slate-500">Track diagnostic samples processed through Agrarian drop-off points</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {labTests.map((sample) => (
+                  <div
+                    key={sample.id}
+                    className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-semibold text-slate-700">{sample.id}</span>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                            sample.status === 'REPORT_ISSUED'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}
+                        >
+                          {sample.status === 'REPORT_ISSUED' ? 'Report Issued' : 'Analysis In Progress'}
+                        </span>
+                      </div>
+                      <p className="text-sm font-bold text-slate-800">{sample.testType}</p>
+                      <p className="text-xs text-slate-500">
+                        {sample.crop} • {sample.farmer} • Submitted: {sample.orderDate}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      {sample.reportSummary ? (
+                        <button
+                          onClick={() => setSelectedLabReportModal(sample)}
+                          className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                        >
+                          <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                          View Lab Report
+                        </button>
+                      ) : (
+                        <span className="text-xs text-slate-500 italic">
+                          Results expected {sample.completedDate}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* 🌟 6. TAB 4: AGRARIAN SERVICE CENTERS DIRECTORY (Govijana Seva Kendraya) */}
-        {activeMainTab === 'agrarian' && (
-          <div className="bg-white/85 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-white/90 shadow-xl shadow-slate-200/40 ring-1 ring-slate-900/5 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        {/* ======================================================== */}
+        {/* TAB 6: AGRARIAN SERVICE CENTERS DIRECTORY */}
+        {/* ======================================================== */}
+        {activeTab === 'centers' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-amber-500" />
-                  <h2 className="text-xl font-black text-slate-900 font-display">
-                    Agrarian Service Centers Directory (Govijana Seva Kendraya) 🏛️
-                  </h2>
-                </div>
-                <p className="text-xs text-slate-500 font-medium">
-                  Official government extension centers offering on-site crop clinics, soil testing drop-offs, and subsidized fertilizer distribution
+                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                  Govijana Seva Kendraya Directory
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">
+                  Agrarian Service Centers & Field Offices
+                </h2>
+                <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-3xl">
+                  Local agrarian service centers provide physical soil test drop-offs, subsidized compost allocations,
+                  GAP auditing, and on-site consultations with regional agricultural extension directors.
                 </p>
               </div>
+            </div>
 
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-emerald-600" />
+            {/* Filter Toolbar */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
+              <div className="relative flex-1 w-full">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={centerSearchQuery}
+                  onChange={(e) => setCenterSearchQuery(e.target.value)}
+                  placeholder="Search by center name, officer, or address..."
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
+                />
+              </div>
+
+              <div className="w-full sm:w-64">
                 <select
-                  value={selectedDistrictFilter}
-                  onChange={(e) => setSelectedDistrictFilter(e.target.value)}
-                  className="px-3 py-2 rounded-2xl border border-slate-200 font-bold bg-white text-xs text-slate-800"
+                  value={centerDistrictFilter}
+                  onChange={(e) => setCenterDistrictFilter(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600"
                 >
-                  {['ALL', 'Badulla', 'Matale', 'Nuwara Eliya', 'Anuradhapura'].map((d) => (
-                    <option key={d} value={d}>{d === 'ALL' ? '📍 All Districts' : `${d} District`}</option>
-                  ))}
+                  <option value="ALL">All Districts</option>
+                  <option value="Badulla">Badulla</option>
+                  <option value="Matale">Matale</option>
+                  <option value="Nuwara Eliya">Nuwara Eliya</option>
+                  <option value="Anuradhapura">Anuradhapura</option>
+                  <option value="Gampaha">Gampaha</option>
                 </select>
               </div>
             </div>
 
+            {/* Centers Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {filteredCenters.map((c) => (
+              {filteredCenters.map((center) => (
                 <div
-                  key={c.id}
-                  className="p-6 bg-slate-50/90 rounded-3xl border border-slate-200/80 space-y-3.5 shadow-xs hover:border-emerald-300 transition"
+                  key={center.id}
+                  className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4 hover:border-slate-300 transition-colors"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <div>
-                      <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                        {c.district} District Extension Hub
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                        {center.district} District
                       </span>
-                      <h3 className="text-base font-black text-slate-900 font-display mt-1">{c.name}</h3>
-                      <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3 h-3 text-slate-400" /> {c.address}
+                      <h3 className="text-base font-bold text-slate-900 mt-2">{center.name}</h3>
+                      <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        {center.address}
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-white rounded-2xl border border-slate-200/70 text-xs space-y-1 font-medium">
-                    <p className="text-slate-700">
-                      <strong>Extension Officer in Charge:</strong> {c.officerInCharge}
-                    </p>
-                    <p className="text-slate-700 flex items-center gap-1">
-                      <PhoneCall className="w-3 h-3 text-emerald-600" /> <strong>Direct Hotline:</strong> {c.phone}
-                    </p>
-                    <p className="text-emerald-800 font-semibold">
-                      <strong>Weekly Clinic Hours:</strong> {c.clinicHours}
-                    </p>
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 font-medium">Officer-in-Charge:</span>
+                      <span className="font-semibold text-slate-800">{center.officerInCharge}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 font-medium">Direct Telephone:</span>
+                      <span className="font-mono text-emerald-700 font-semibold">{center.phone}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 font-medium">Clinic Hours:</span>
+                      <span className="text-slate-700">{center.clinicHours}</span>
+                    </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase text-slate-400 block">Available Center Services</span>
-                    <div className="flex flex-wrap gap-1">
-                      {c.services.map((srv, i) => (
-                        <span key={i} className="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 font-bold text-[10px] rounded-xl">
-                          ✓ {srv}
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+                      Available Center Services:
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {center.services.map((svc, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-100"
+                        >
+                          {svc}
                         </span>
                       ))}
                     </div>
@@ -1531,343 +1948,493 @@ export const ExpertModule = () => {
           </div>
         )}
 
-      </div>
+        {/* ======================================================== */}
+        {/* TAB 7: VIRTUAL ADVISORY PREVIEW & SIMULATOR */}
+        {/* ======================================================== */}
+        {activeTab === 'tele-consult' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+              <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
+                Interactive Video Consultation Simulator
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-2">
+                Tele-Advisory Audio/Video Inspection Room
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm mt-1 max-w-3xl">
+                Test your camera, microphone, and connection quality ahead of scheduled virtual clinic hours with
+                Department of Agriculture officers. This ensures seamless visual inspection of plant disease symptoms.
+              </p>
+            </div>
 
-      {/* 🌟 7. OFFICIAL DIGITAL PRESCRIPTION (Rx) MODAL */}
-      <AnimatePresence>
-        {activeRxModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-fade-in">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 relative max-h-[90vh] overflow-y-auto print:p-0 print:border-none print:shadow-none"
-            >
-              {/* Rx HEADER */}
-              <div className="flex justify-between items-start border-b-2 border-emerald-600 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-2xl font-black shadow-md">
-                    Rx
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black uppercase text-emerald-800 tracking-widest block">
-                      Democratic Socialist Republic of Sri Lanka • Department of Agriculture
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Simulator Screen */}
+              <div className="lg:col-span-8 bg-slate-900 rounded-2xl p-6 text-white flex flex-col justify-between min-h-[420px] shadow-md relative overflow-hidden">
+                {/* Top Overlay */}
+                <div className="flex items-center justify-between z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                      {isSimCallActive ? `Live Session • ${formatCallTime(callDurationSec)}` : 'Ready to Connect (Demo)'}
                     </span>
-                    <h3 className="text-lg font-black text-slate-900 font-display">
-                      Official Agronomy Diagnostic Prescription
-                    </h3>
-                    <p className="text-xs font-mono text-slate-500 font-bold">
-                      {activeRxModal.rxData?.rxNumber || 'RX-AGRO-2026-781'} • SLAgS Accredited
-                    </p>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveRxModal(null)}
-                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition cursor-pointer print:hidden"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
 
-              {/* FARMER & OFFICER IDENTIFICATION STRIP */}
-              <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
-                <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Producer / Patient Entity</span>
-                  <span className="font-extrabold text-slate-900">{activeRxModal.farmerName}</span>
-                  <span className="text-[10px] text-slate-500 block">Welimada Organic Cluster</span>
-                </div>
-                <div>
-                  <span className="text-[10px] font-black uppercase text-slate-400 block">Prescribing Officer</span>
-                  <span className="font-extrabold text-emerald-800">{activeRxModal.expertName}</span>
-                  <span className="text-[10px] text-slate-500 block">Gov Reg: SLAgS-REG-2014-882</span>
-                </div>
-              </div>
-
-              {/* DIAGNOSIS & REMEDY TABLE */}
-              <div className="space-y-3 text-xs">
-                <div className="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200 text-emerald-950 space-y-1">
-                  <span className="text-[10px] font-black uppercase text-emerald-800 block">Clinical Pathology Diagnosis:</span>
-                  <p className="font-semibold leading-relaxed">{activeRxModal.reply}</p>
+                  <span className="text-xs text-slate-400 font-mono">
+                    Encryption: TLS 1.3 / Audio 48kHz
+                  </span>
                 </div>
 
-                {/* DOSAGE & PHI SCHEDULE TABLE */}
-                <div className="p-4 bg-white rounded-2xl border border-slate-200 space-y-2">
-                  <span className="text-[10px] font-black uppercase text-slate-600 block">Prescribed Formulation &amp; Application Protocol:</span>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                      <span className="text-[9px] font-black uppercase text-slate-400 block">Active Ingredient</span>
-                      <strong className="text-emerald-800 text-[11px] block">{activeRxModal.rxData?.activeIngredient || 'Copper Hydroxide'}</strong>
+                {/* Center Video Area */}
+                <div className="my-auto text-center space-y-4 py-8 z-10">
+                  {isCamOff ? (
+                    <div className="w-20 h-20 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-slate-500">
+                      <VideoOff className="w-8 h-8" />
                     </div>
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                      <span className="text-[9px] font-black uppercase text-slate-400 block">Dilution Dosage</span>
-                      <strong className="text-slate-800 text-[11px] block">{activeRxModal.rxData?.dosage || '50g / 16L Tank'}</strong>
+                  ) : (
+                    <div className="relative inline-block">
+                      <img
+                        src={simOfficer.avatarUrl}
+                        alt={simOfficer.name}
+                        className="w-28 h-28 rounded-2xl object-cover border-2 border-emerald-500/40 mx-auto shadow-lg"
+                      />
+                      {isSimCallActive && (
+                        <span className="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-md bg-emerald-600 text-[10px] font-bold text-white uppercase">
+                          Officer
+                        </span>
+                      )}
                     </div>
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                      <span className="text-[9px] font-black uppercase text-slate-400 block">Frequency</span>
-                      <strong className="text-slate-800 text-[11px] block">{activeRxModal.rxData?.frequency || 'Every 5 Days'}</strong>
-                    </div>
-                    <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-200">
-                      <span className="text-[9px] font-black uppercase text-amber-800 block">Pre-Harvest PHI</span>
-                      <strong className="text-amber-900 text-[11px] block">{activeRxModal.rxData?.preHarvestIntervalDays || 3} Days Safe Wait</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  )}
 
-              {/* OFFICIAL STAMP & VALIDATION SEAL */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-700">
-                    <QrCode className="w-6 h-6" />
-                  </div>
                   <div>
-                    <span className="font-mono text-[10px] text-slate-500 block">TLS QR HASH: 0x89e24a...771c</span>
-                    <span className="text-[10px] font-bold text-emerald-700">Certified for Agrarian Store Dispensation</span>
+                    <h3 className="text-base font-bold text-white">{simOfficer.name}</h3>
+                    <p className="text-xs text-emerald-400">{simOfficer.title}</p>
+                    <p className="text-xs text-slate-400 mt-1">{simOfficer.institution}</p>
                   </div>
+
+                  {isSimCallActive && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs text-slate-300">
+                      <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                      Audio Quality: Optimal (Ping 24ms)
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2 print:hidden">
+                {/* Bottom Call Controls */}
+                <div className="flex items-center justify-center gap-3 pt-4 border-t border-slate-800 z-10">
                   <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 font-extrabold text-xs rounded-xl shadow-xs hover:bg-slate-50 transition flex items-center gap-1.5 cursor-pointer"
+                    onClick={() => setIsMicMuted(!isMicMuted)}
+                    className={`p-3 rounded-xl transition-colors ${
+                      isMicMuted ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
+                    }`}
+                    title={isMicMuted ? 'Unmute Microphone' : 'Mute Microphone'}
                   >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>Print Rx Document</span>
+                    {isMicMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   </button>
 
                   <button
-                    type="button"
-                    onClick={() => setActiveRxModal(null)}
-                    className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer"
+                    onClick={() => setIsCamOff(!isCamOff)}
+                    className={`p-3 rounded-xl transition-colors ${
+                      isCamOff ? 'bg-rose-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
+                    }`}
+                    title={isCamOff ? 'Turn Camera On' : 'Turn Camera Off'}
+                  >
+                    {isCamOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+                  </button>
+
+                  <button
+                    onClick={() => setIsSimCallActive(!isSimCallActive)}
+                    className={`px-5 py-3 rounded-xl font-semibold text-xs transition-colors flex items-center gap-2 ${
+                      isSimCallActive
+                        ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm'
+                        : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
+                    }`}
+                  >
+                    {isSimCallActive ? (
+                      <>
+                        <PhoneOff className="w-4 h-4" /> End Call Demo
+                      </>
+                    ) : (
+                      <>
+                        <PhoneCall className="w-4 h-4" /> Start Simulator Session
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Sidebar Guide */}
+              <div className="lg:col-span-4 space-y-4">
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+                  <h4 className="text-sm font-bold text-slate-900">Virtual Clinic Checklist</h4>
+                  <ul className="text-xs text-slate-600 space-y-2.5 leading-relaxed">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Natural Lighting:</strong> Hold leaf samples in clear, non-glare daylight so officers can distinguish necrotic ring spots.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Field History Ready:</strong> Have dates of planting, recent fungicide spray dates, and soil test results on hand.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Clinic Hours:</strong> Virtual advisory rooms open automatically 10 minutes prior to your confirmed booking slot.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-slate-100 rounded-2xl p-5 border border-slate-200 text-xs text-slate-600 space-y-2">
+                  <div className="font-semibold text-slate-800">Select Specialist for Preview:</div>
+                  <div className="space-y-1.5">
+                    {VERIFIED_EXPERTS.slice(0, 3).map((exp) => (
+                      <button
+                        key={exp.id}
+                        onClick={() => setSimOfficer(exp)}
+                        className={`w-full p-2 rounded-xl text-left flex items-center gap-2.5 transition-colors ${
+                          simOfficer.id === exp.id
+                            ? 'bg-white font-semibold text-emerald-800 border border-emerald-300 shadow-2xs'
+                            : 'hover:bg-slate-200/70 text-slate-700'
+                        }`}
+                      >
+                        <img src={exp.avatarUrl} alt={exp.name} className="w-7 h-7 rounded-lg object-cover" />
+                        <div className="truncate">
+                          <p className="text-xs truncate">{exp.name}</p>
+                          <p className="text-[10px] text-slate-500 truncate">{exp.specialty}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* MODAL 1: EXPERT PROFILE & CREDENTIALS */}
+        {/* ======================================================== */}
+        <AnimatePresence>
+          {selectedExpertModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto space-y-6"
+              >
+                {/* Modal Header */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={selectedExpertModal.avatarUrl}
+                      alt={selectedExpertModal.name}
+                      className="w-16 h-16 rounded-2xl object-cover border border-slate-200 bg-slate-100 shrink-0"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-slate-900">{selectedExpertModal.name}</h3>
+                        <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <p className="text-sm font-semibold text-emerald-700">{selectedExpertModal.title}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{selectedExpertModal.institution}</p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedExpertModal(null)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Key Credentials Strip */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                  <div>
+                    <span className="text-slate-500 block">Registration:</span>
+                    <span className="font-mono font-semibold text-slate-800">{selectedExpertModal.regNumber}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">District Focus:</span>
+                    <span className="font-semibold text-slate-800">{selectedExpertModal.district} District</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block">Advisory Rating:</span>
+                    <span className="font-semibold text-slate-800">
+                      ★ {selectedExpertModal.rating} ({selectedExpertModal.consultationsCount} cases)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Biography */}
+                <div className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
+                  <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                    Background & Qualifications
+                  </h4>
+                  <p>{selectedExpertModal.bio}</p>
+                  {selectedExpertModal.education && (
+                    <p className="text-slate-500 pt-1">
+                      <strong>Academic Credentials:</strong> {selectedExpertModal.education}
+                    </p>
+                  )}
+                </div>
+
+                {/* Core Advisory Specializations */}
+                {selectedExpertModal.skills && (
+                  <div className="space-y-1.5">
+                    <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                      Core Advisory Competencies
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedExpertModal.skills.map((skill, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-medium border border-emerald-200"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Availability info */}
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                  <span>
+                    <strong>Official Hours:</strong> {selectedExpertModal.contactDays}
+                  </span>
+                  <span className="text-emerald-700 font-semibold">{selectedExpertModal.availabilityStatus}</span>
+                </div>
+
+                {/* Modal Footer Actions */}
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                  <button
+                    onClick={() => setSelectedExpertModal(null)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => handleInitiateConsultWithExpert(selectedExpertModal)}
+                    className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    Submit Inquiry to {selectedExpertModal.name.split(' ')[0]}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* ======================================================== */}
+        {/* MODAL 2: CONSULTATION DETAIL & OFFICIAL ADVISORY REPORT */}
+        {/* ======================================================== */}
+        <AnimatePresence>
+          {selectedConsultationModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                className="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto space-y-6"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                          selectedConsultationModal.status === 'ANSWERED'
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            : 'bg-amber-50 text-amber-800 border border-amber-200'
+                        }`}
+                      >
+                        {selectedConsultationModal.status === 'ANSWERED'
+                          ? 'Official Advisory Completed'
+                          : 'Pending Extension Triage'}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        Case ID: #{selectedConsultationModal.id}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mt-1">
+                      {selectedConsultationModal.question}
+                    </h3>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedConsultationModal(null)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Submitter & Field Context */}
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                  <div className="flex justify-between text-slate-600">
+                    <span>
+                      Inquirer: <strong>{selectedConsultationModal.farmerName || 'Producer'}</strong>
+                    </span>
+                    <span>Date: {selectedConsultationModal.createdAt || 'Recent'}</span>
+                  </div>
+                  {selectedConsultationModal.farmData && (
+                    <div className="font-mono text-slate-700 pt-1 border-t border-slate-200">
+                      {selectedConsultationModal.farmData}
+                    </div>
+                  )}
+                </div>
+
+                {/* Attached Image */}
+                {selectedConsultationModal.imageUrl && (
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Attached Diagnostic Sample
+                    </p>
+                    <img
+                      src={selectedConsultationModal.imageUrl}
+                      alt="Sample"
+                      className="w-full h-56 rounded-xl object-cover border border-slate-200"
+                    />
+                  </div>
+                )}
+
+                {/* Official Expert Recommendation */}
+                {selectedConsultationModal.status === 'ANSWERED' && selectedConsultationModal.reply ? (
+                  <div className="p-5 rounded-2xl bg-emerald-50/80 border border-emerald-200 space-y-3">
+                    <div className="flex items-center justify-between text-xs font-bold text-emerald-900">
+                      <span className="flex items-center gap-1.5">
+                        <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                        Expert Advisory Recommendation
+                      </span>
+                      <span>{selectedConsultationModal.expertName || 'Extension Specialist'}</span>
+                    </div>
+
+                    <p className="text-xs text-slate-800 whitespace-pre-line leading-relaxed">
+                      {selectedConsultationModal.reply}
+                    </p>
+
+                    <div className="pt-2 border-t border-emerald-200/60 text-[11px] text-emerald-800">
+                      Adhere strictly to personal protective equipment (PPE) guidelines and recommended pre-harvest intervals.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>
+                      This inquiry is currently assigned to a verified agricultural officer for triage and diagnostic assessment.
+                    </span>
+                  </div>
+                )}
+
+                {/* Modal Actions */}
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <button
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-slate-500" />
+                    Print Summary
+                  </button>
+
+                  <button
+                    onClick={() => setSelectedConsultationModal(null)}
+                    className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors"
                   >
                     Close
                   </button>
                 </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
-      {/* 🌟 8. EXPERT CREDENTIALS & FIELD BOOKING MODAL */}
-      <AnimatePresence>
-        {selectedExpertForModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 relative max-h-[90vh] overflow-y-auto"
-            >
-              <div className="flex justify-between items-start border-b border-slate-100 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-3xl border border-emerald-200">
-                    {selectedExpertForModal.avatarUrl || '👨‍🔬'}
-                  </div>
+        {/* ======================================================== */}
+        {/* MODAL 3: LAB TEST REPORT DETAIL */}
+        {/* ======================================================== */}
+        <AnimatePresence>
+          {selectedLabReportModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-5"
+              >
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 font-display">
-                      {selectedExpertForModal.name}
-                    </h3>
-                    <p className="text-xs font-bold text-emerald-700">{selectedExpertForModal.title}</p>
-                    <p className="text-[10px] text-slate-400 font-medium">{selectedExpertForModal.institution}</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedExpertForModal(null);
-                    setBookingSuccessMsg('');
-                  }}
-                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {bookingSuccessMsg ? (
-                <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-2">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                  <h4 className="text-sm font-black text-emerald-900 font-display">Field Inspection Scheduled!</h4>
-                  <p className="text-xs text-emerald-800 font-medium">{bookingSuccessMsg}</p>
-                </div>
-              ) : (
-                <div className="space-y-4 text-xs">
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                      <span className="text-[10px] font-black uppercase text-slate-400 block">Rating</span>
-                      <strong className="text-slate-900 font-display text-sm">★ {selectedExpertForModal.rating}</strong>
-                    </div>
-                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                      <span className="text-[10px] font-black uppercase text-slate-400 block">District</span>
-                      <strong className="text-slate-900 font-display text-sm">{selectedExpertForModal.district}</strong>
-                    </div>
-                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                      <span className="text-[10px] font-black uppercase text-slate-400 block">Resolved</span>
-                      <strong className="text-emerald-700 font-display text-sm">{selectedExpertForModal.consultationsCount}+ Cases</strong>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-1.5">
-                    <span className="text-[10px] font-black uppercase text-slate-500 block">Officer Biography</span>
-                    <p className="text-slate-700 leading-relaxed font-medium">
-                      {selectedExpertForModal.bio || 'Accredited agricultural officer with extensive field advisory experience.'}
-                    </p>
-                    {selectedExpertForModal.regNumber && (
-                      <p className="text-[10px] font-mono text-emerald-800 font-bold pt-1">
-                        Official Gov Reg: {selectedExpertForModal.regNumber}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* FIELD APPOINTMENT BOOKING WITH DATE / TIME SELECTOR */}
-                  <div className="p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200 space-y-3">
-                    <span className="text-xs font-black text-emerald-950 font-display flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4 text-emerald-600" /> Schedule Field Visit &amp; On-Site Inspection
+                    <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      {selectedLabReportModal.id}
                     </span>
+                    <h3 className="text-base font-bold text-slate-900 mt-2">
+                      {selectedLabReportModal.testType}
+                    </h3>
+                    <p className="text-xs text-slate-500">{selectedLabReportModal.labName}</p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedLabReportModal(null)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className="text-[10px] font-black uppercase text-slate-600 block mb-1">Select Date</label>
-                        <input
-                          type="date"
-                          value={selectedVisitDate}
-                          onChange={(e) => setSelectedVisitDate(e.target.value)}
-                          className="w-full p-2 bg-white rounded-xl border border-slate-200 font-bold text-xs"
-                        />
+                {selectedLabReportModal.reportSummary && (
+                  <div className="space-y-3">
+                    <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-medium">Soil pH Reaction:</span>
+                        <span className="font-semibold text-slate-800">{selectedLabReportModal.reportSummary.soilPh}</span>
                       </div>
-                      <div>
-                        <label className="text-[10px] font-black uppercase text-slate-600 block mb-1">Time Slot</label>
-                        <select
-                          value={selectedTimeSlot}
-                          onChange={(e) => setSelectedTimeSlot(e.target.value)}
-                          className="w-full p-2 bg-white rounded-xl border border-slate-200 font-bold text-xs"
-                        >
-                          <option value="09:30 AM - 11:00 AM">09:30 AM - 11:00 AM</option>
-                          <option value="02:00 PM - 03:30 PM">02:00 PM - 03:30 PM</option>
-                          <option value="04:00 PM - 05:30 PM">04:00 PM - 05:30 PM</option>
-                        </select>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-medium">Organic Matter:</span>
+                        <span className="font-semibold text-slate-800">{selectedLabReportModal.reportSummary.organicMatter}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-medium">Available Nitrogen (N):</span>
+                        <span className="font-semibold text-slate-800">{selectedLabReportModal.reportSummary.nitrogen}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-medium">Available Phosphorus (P):</span>
+                        <span className="font-semibold text-slate-800">{selectedLabReportModal.reportSummary.phosphorus}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 font-medium">Exchangeable Potassium (K):</span>
+                        <span className="font-semibold text-slate-800">{selectedLabReportModal.reportSummary.potassium}</span>
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setBookingSuccessMsg(
-                          `Field appointment successfully confirmed with ${selectedExpertForModal.name} for ${selectedVisitDate} (${selectedTimeSlot}). SMS dispatch confirmation sent.`
-                        );
-                      }}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <Calendar className="w-3.5 h-3.5" /> Confirm On-Site Inspection 📅
-                    </button>
+                    <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-1">
+                      <span className="font-bold flex items-center gap-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        Official Agronomic Recommendation:
+                      </span>
+                      <p className="text-slate-700 leading-relaxed">
+                        {selectedLabReportModal.reportSummary.recommendation}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="flex justify-end pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedExpertForModal(null);
-                    setBookingSuccessMsg('');
-                  }}
-                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer"
-                >
-                  Close Profile
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* 🌟 9. ORDER PHYSICAL LAB TEST KIT MODAL */}
-      <AnimatePresence>
-        {showOrderLabModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 relative"
-            >
-              <div className="flex justify-between items-start border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-2xl bg-teal-100 text-teal-800 flex items-center justify-center">
-                    <FlaskConical className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-black text-slate-900 font-display">
-                      Order Physical Laboratory Test Kit
-                    </h3>
-                    <p className="text-xs text-slate-400">Certified National Agricultural Labs</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowOrderLabModal(false)}
-                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {labOrderSuccessMsg ? (
-                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 font-extrabold text-xs text-center space-y-1">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600 mx-auto" />
-                  <p>{labOrderSuccessMsg}</p>
-                </div>
-              ) : (
-                <form onSubmit={handleOrderLabTest} className="space-y-4 text-xs font-semibold">
-                  <div className="space-y-1">
-                    <label className="block text-[10px] font-black uppercase text-slate-500">
-                      Selecting Laboratory Institution
-                    </label>
-                    <select
-                      value={selectedLabInstitution}
-                      onChange={(e) => setSelectedLabInstitution(e.target.value)}
-                      className="w-full p-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 font-bold"
-                    >
-                      <option value="National Soil Testing Laboratory (Peradeniya)">🔬 National Soil Testing Lab (Peradeniya)</option>
-                      <option value="Rice Research & Development Institute (Batalagoda)">🌾 Rice Research &amp; Development Institute (Batalagoda)</option>
-                      <option value="Horticultural Crop Research Institute (Gannoruwa)">🍅 Horticultural Crop Research Institute (Gannoruwa)</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block text-[10px] font-black uppercase text-slate-500">Crop / Soil Batch Name</label>
-                    <input
-                      type="text"
-                      value={labCropName}
-                      onChange={(e) => setLabCropName(e.target.value)}
-                      placeholder="e.g. Welimada Organic Tomatoes"
-                      required
-                      className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900"
-                    />
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-1 text-slate-600 font-medium">
-                    <span className="text-[10px] font-black uppercase text-slate-400 block">Physical Collection Protocol</span>
-                    <p className="text-[11px] leading-relaxed">
-                      A sterile soil sample bag and pre-paid courier shipping label will be dispatched to your registered farm address within 24 hours.
-                    </p>
-                  </div>
-
+                <div className="pt-3 border-t border-slate-100 flex justify-end">
                   <button
-                    type="submit"
-                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                    onClick={() => setSelectedLabReportModal(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold"
                   >
-                    <FlaskConical className="w-4 h-4" />
-                    <span>Confirm Lab Test Kit Dispatch (Free Gov Scheme) 🚀</span>
+                    Close
                   </button>
-                </form>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+      </div>
     </div>
   );
 };
