@@ -12,7 +12,6 @@ import {
   EyeOff,
   ShieldCheck,
   ShieldAlert,
-  CloudSun
 } from 'lucide-react';
 
 export const Login = () => {
@@ -243,23 +242,15 @@ export const Login = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
 
-              {/* SINGLE SUBTLE OVERLAY PANEL */}
+              {/* PLATFORM VALUE PROPOSITION OVERLAY */}
               <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm rounded-xl border border-slate-200/90 p-4 shadow-sm flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    AgroLink AI Insight
+                    AgroLink Platform
                   </span>
-                  <div className="flex items-center gap-3 mt-1 text-xs font-semibold text-slate-800">
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
-                      Crop Risk: <strong className="text-emerald-800 font-bold">LOW</strong>
-                    </span>
-                    <span className="text-slate-300">&bull;</span>
-                    <span className="flex items-center gap-1 text-slate-600">
-                      <CloudSun className="w-3.5 h-3.5 text-emerald-700" />
-                      Weather: Favorable
-                    </span>
-                  </div>
+                  <p className="text-xs font-semibold text-slate-800 mt-1 max-w-xs">
+                    Connecting farmers, buyers, experts and suppliers across Sri Lanka
+                  </p>
                 </div>
 
                 <div className="hidden sm:block text-right">

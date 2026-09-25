@@ -2,10 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* shadow-xs custom utility — Tailwind v3 compatibility alias for v4's shadow-xs */
+/* shadow-xs and shadow-2xs — Tailwind v3 compatibility aliases for v4's shadow-xs/shadow-2xs */
 @layer utilities {
   .shadow-xs {
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  .shadow-2xs {
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.04);
   }
 }
 
@@ -132,5 +135,18 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================================
+   PRINT STYLES — hides navigation when printing farm plans
+   ======================================================== */
+@media print {
+  header, nav, aside, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
   }
 }

@@ -48,6 +48,7 @@ export const ExpertDashboard = () => {
 
   // Selected image preview modal
   const [previewImage, setPreviewImage] = useState(null);
+  const [isUsingDemoData, setIsUsingDemoData] = useState(false);
 
   // Load consultations from backend with fallback support for dev environment
   const loadConsultations = useCallback(async () => {
@@ -57,10 +58,13 @@ export const ExpertDashboard = () => {
       const res = await expertsAPI.getAllConsultations();
       if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
         setConsultations(res.data);
+        setIsUsingDemoData(false);
       } else if (res && Array.isArray(res)) {
         setConsultations(res);
+        setIsUsingDemoData(false);
       } else {
-        // Fallback default consultations for development when database has no records
+        // Fallback example consultations shown when the database has no records yet
+        setIsUsingDemoData(true);
         setConsultations([
           {
             id: 101,
@@ -101,7 +105,8 @@ export const ExpertDashboard = () => {
       }
     } catch (err) {
       console.error('Failed to load consultations:', err);
-      // Fallback for development if API is offline
+      // Fallback example data when API is offline
+      setIsUsingDemoData(true);
       setConsultations([
         {
           id: 101,
@@ -375,6 +380,16 @@ export const ExpertDashboard = () => {
             </div>
           </div>
         </section>
+
+        {/* Demo data notice — shown only when backend has no consultations or is offline */}
+        {isUsingDemoData && (
+          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" aria-hidden="true" />
+            <span>
+              <strong>Example data shown:</strong> The consultation queue below contains illustrative sample records — the live consultation database has not returned any records or the backend service is currently unavailable. Real farmer consultations will appear here once the system is connected.
+            </span>
+          </div>
+        )}
 
         {/* ── 3. QUICK WORKBENCH TOOLS ── */}
         <section aria-label="Diagnostic Tools" className="bg-white rounded-xl border border-slate-200/80 p-5 shadow-2xs space-y-3.5">
