@@ -28,13 +28,9 @@ import {
 } from 'lucide-react';
 
 export const Home = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('All');
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [featuredCrops, setFeaturedCrops] = useState([]);
   const [loadingCrops, setLoadingCrops] = useState(true);
   const [selectedCropForPurchase, setSelectedCropForPurchase] = useState(null);
-  const [activeAiTab, setActiveAiTab] = useState('risk'); // 'risk', 'disease', 'price'
   const [openFaq, setOpenFaq] = useState(0);
 
   const navigate = useNavigate();
@@ -126,14 +122,6 @@ export const Home = () => {
     fetchCrops();
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (searchTerm.trim()) params.set('search', searchTerm.trim());
-    if (selectedDistrict !== 'All') params.set('location', selectedDistrict);
-    if (selectedCategory !== 'All') params.set('category', selectedCategory);
-    navigate(`/crops?${params.toString()}`);
-  };
 
   const FAQS = [
     {
@@ -869,7 +857,7 @@ export const Home = () => {
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-4 sm:px-5 pb-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                  <div className="px-4 sm:px-5 pb-5 pt-3 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100">
                     {faq.answer}
                   </div>
                 )}

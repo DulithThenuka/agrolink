@@ -88,49 +88,49 @@ public class AuthController {
     // ================== JWT LOGIN ==================
 
     @PostMapping("/api/login")
-@ResponseBody
-public ResponseEntity<?> apiLogin(@Valid @RequestBody LoginRequestDTO request) {
+    @ResponseBody
+    public ResponseEntity<?> apiLogin(@Valid @RequestBody LoginRequestDTO request) {
 
-    try {
-        String email = normalizeEmail(request.getEmail());
+        try {
+            String email = normalizeEmail(request.getEmail());
 
-        User user = userService.findByEmail(email);
+            User user = userService.findByEmail(email);
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                return unauthorizedResponse();
+            }
+
+            String role = user.getRole().name(); // ✅ FIX
+
+            String token = jwtUtil.generateToken(
+                    user.getEmail(),
+                    role
+            );
+
+            long expiresIn = 3600;
+
+            logger.info("User logged in: {}", user.getEmail());
+
+            return ResponseEntity.ok(
+                    ApiResponse.success(
+                            "Login successful",
+                            new AuthResponseDTO(
+                                    token,
+                                    user.getId(),
+                                    user.getName(),
+                                    user.getEmail(),
+                                    user.getLocation(),
+                                    role,
+                                    expiresIn
+                            )
+                    )
+            );
+
+        } catch (Exception ex) {
+            logger.warn("Login failed: {}", ex.getMessage());
             return unauthorizedResponse();
         }
-
-        String role = user.getRole().name(); // ✅ FIX
-
-        String token = jwtUtil.generateToken(
-                user.getEmail(),
-                role
-        );
-
-        long expiresIn = 3600;
-
-        logger.info("User logged in: {}", user.getEmail());
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        "Login successful",
-                        new AuthResponseDTO(
-                                token,
-                                user.getId(),
-                                user.getName(),
-                                user.getEmail(),
-                                user.getLocation(),
-                                role,
-                                expiresIn
-                        )
-                )
-        );
-
-    } catch (Exception ex) {
-        logger.warn("Login failed: {}", ex.getMessage());
-        return unauthorizedResponse();
     }
-}
 
     // ================== HELPERS ==================
 

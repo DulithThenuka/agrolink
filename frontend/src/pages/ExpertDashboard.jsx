@@ -168,11 +168,11 @@ export const ExpertDashboard = () => {
   // KPI Calculations derived solely from real data
   const pendingCount = useMemo(() => {
     return consultations.filter((c) => !isCaseResolved(c)).length;
-  }, [consultations]);
+  }, [consultations, isCaseResolved]);
 
   const resolvedCount = useMemo(() => {
     return consultations.filter((c) => isCaseResolved(c)).length;
-  }, [consultations]);
+  }, [consultations, isCaseResolved]);
 
   const totalCount = consultations.length;
 
