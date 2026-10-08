@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.agrolink.dto.CropDTO;
 import com.example.agrolink.dto.CropRequestDTO;
 import com.example.agrolink.service.CropService;
+import com.example.agrolink.service.FileStorageService;
 
 import jakarta.validation.Valid;
 
@@ -36,15 +37,17 @@ public class CropController {
             );
 
     private final CropService cropService;
+    private final FileStorageService fileStorageService;
 
     @Value("${app.page.size:5}")
     private int pageSize;
 
     public CropController(
-            CropService cropService) {
+            CropService cropService,
+            FileStorageService fileStorageService) {
 
-        this.cropService =
-                cropService;
+        this.cropService = cropService;
+        this.fileStorageService = fileStorageService;
     }
 
     // ================== LIST CROPS ==================
@@ -199,6 +202,8 @@ public class CropController {
         }
 
         try {
+            String imageUrl = fileStorageService.saveFile(file);
+            dto.setImageUrl(imageUrl);
 
             cropService.createCrop(
                     dto,
@@ -209,9 +214,7 @@ public class CropController {
                     "Crop created successfully"
             );
 
-        } catch (
-                IllegalArgumentException ex
-        ) {
+        } catch (IllegalArgumentException | IllegalStateException ex) {
 
             logger.warn(
                     "Crop creation failed: {}",

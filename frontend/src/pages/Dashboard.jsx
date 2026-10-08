@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAPI, cropsAPI, ordersAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -55,7 +55,7 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     // Roles with dedicated dashboards skip default buyer/admin data fetching
     if (isFarmer || isLogistics || isExpert || isSupplier || isBusinessBuyer) return;
 
@@ -107,11 +107,11 @@ export const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin, isBuyer, isFarmer, isLogistics, isExpert, isSupplier, isBusinessBuyer]);
 
   useEffect(() => {
     loadDashboardData();
-  }, [isAdmin, isBuyer, isFarmer, isLogistics, isExpert, isSupplier, isBusinessBuyer]);
+  }, [loadDashboardData]);
 
   // Compute active orders count for Buyer view
   const activeOrdersCount = useMemo(() => {

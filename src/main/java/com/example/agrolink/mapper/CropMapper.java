@@ -93,6 +93,10 @@ public final class CropMapper {
         crop.setLocation(dto.getLocation());
         crop.setPrice(dto.getPrice());
         crop.setQuantity(dto.getQuantity());
+
+        if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
+            crop.setImageUrl(dto.getImageUrl());
+        }
     }
 
     // ================== HELPERS ==================

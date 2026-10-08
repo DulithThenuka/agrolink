@@ -34,6 +34,8 @@ public class CropRequestDTO {
     @Max(value = 100000, message = "Quantity is too large")
     private Integer quantity;
 
+    private String imageUrl;
+
     // ================== CONSTRUCTORS ==================
 
     public CropRequestDTO() {
@@ -53,6 +55,10 @@ public class CropRequestDTO {
 
         if (location != null) {
             location = location.trim();
+        }
+
+        if (imageUrl != null) {
+            imageUrl = imageUrl.trim();
         }
     }
 
@@ -96,5 +102,13 @@ public class CropRequestDTO {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl == null ? null : imageUrl.trim();
     }
 }
