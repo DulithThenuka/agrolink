@@ -283,7 +283,8 @@ export const Logistics = () => {
     if (isLogistics) return 'DRIVER';
     if (isFarmer) return 'FARMER';
     if (isBuyer || isBusinessBuyer) return 'BUYER';
-    return 'ADMIN';
+    if (isAdmin) return 'ADMIN';
+    return 'BUYER';
   }, [isFarmer, isBuyer, isBusinessBuyer, isLogistics, isAdmin]);
 
   // Tab navigation

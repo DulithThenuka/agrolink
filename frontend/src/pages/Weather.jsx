@@ -45,8 +45,8 @@ export const Weather = () => {
 
   // Location state
   const initialLocation = user?.location
-    ? (SUPPORTED_LOCATIONS.find(loc => loc.toLowerCase().includes(user.location.toLowerCase())) || user.location)
-    : 'Nuwara Eliya / Kandy';
+    ? (SUPPORTED_LOCATIONS.find(loc => loc.toLowerCase().includes(user.location.toLowerCase())) || SUPPORTED_LOCATIONS[0])
+    : SUPPORTED_LOCATIONS[0];
 
   const [selectedLocation, setSelectedLocation] = useState(initialLocation);
   const [selectedCrop, setSelectedCrop] = useState('ALL');
@@ -67,11 +67,11 @@ export const Weather = () => {
     setError(null);
     try {
       const res = await weatherAPI.getIntelligence(loc);
-      if (res && res.data) {
-        setWeatherData(res.data);
+      const data = res?.data || res;
+      if (data) {
+        setWeatherData(data);
       } else {
-        // Fallback default structure from service
-        setWeatherData(res);
+        setError('No telemetry received for this location.');
       }
     } catch (err) {
       console.error('Failed to fetch weather intelligence:', err);
@@ -446,14 +446,14 @@ export const Weather = () => {
               <div key={idx} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3 w-40">
                   <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-sm">
-                    {day.condition.includes('☀️') ? '☀️' :
-                     day.condition.includes('🌧️') ? '🌧️' :
-                     day.condition.includes('⛈️') ? '⛈️' :
-                     day.condition.includes('🌦️') ? '🌦️' : '⛅'}
+                    {day.condition?.includes('☀️') ? '☀️' :
+                     day.condition?.includes('🌧️') ? '🌧️' :
+                     day.condition?.includes('⛈️') ? '⛈️' :
+                     day.condition?.includes('🌦️') ? '🌦️' : '⛅'}
                   </div>
                   <div>
                     <span className="font-bold text-slate-900 block">{day.dayName}</span>
-                    <span className="text-[11px] text-slate-500">{day.condition.replace(/[^\w\s&]/gi, '')}</span>
+                    <span className="text-[11px] text-slate-500">{day.condition ? day.condition.replace(/[^\w\s&]/gi, '') : 'Partly Cloudy'}</span>
                   </div>
                 </div>
 
@@ -527,7 +527,7 @@ export const Weather = () => {
 
                 return (
                   <div key={i} className="flex flex-col items-center gap-1 h-full justify-end">
-                    <span className="text-[9px] font-bold text-slate-600">{d.rainfallMm}m</span>
+                    <span className="text-[9px] font-bold text-slate-600">{d.rainfallMm}mm</span>
                     <div
                       style={{ height: `${heightPercent}%` }}
                       className={`w-full rounded-t-md transition-all ${

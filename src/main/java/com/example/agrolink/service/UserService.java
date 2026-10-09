@@ -159,7 +159,7 @@ public class UserService {
                 buyer.isVerifiedBuyer(),
                 buyerLocation,
                 memberSince,
-                342,
+                buyer.getCompletedOrdersCount(),
                 buyer.getOrderCancellationRate(),
                 buyer.getOnTimePaymentRate(),
                 buyer.getBuyerTrustScore(),

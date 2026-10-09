@@ -24,7 +24,7 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @GetMapping("/dashboard")
+    @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) {
 
         logger.info("Loading admin dashboard");

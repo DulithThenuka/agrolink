@@ -92,6 +92,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers(
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/v1/admin/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/admin/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/admin/**")
                         ).hasRole("ADMIN")
@@ -100,17 +101,18 @@ public class SecurityConfig {
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/v1/farmer/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/farmer/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/farmer/**")
-                        ).hasRole("FARMER")
+                        ).hasAnyRole("FARMER", "ADMIN")
 
                         .requestMatchers(
+                                org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/v1/buyer/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/buyer/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/buyer/**")
-                        ).hasRole("BUYER")
+                        ).hasAnyRole("BUYER", "BUSINESS_BUYER", "ADMIN")
 
                         .requestMatchers(
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/api/v1/logistics/**"),
                                 org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher("/logistics/**")
-                        ).hasAnyRole("LOGISTICS", "ADMIN", "FARMER", "BUYER")
+                        ).hasAnyRole("LOGISTICS", "LOGISTICS_PROVIDER", "ADMIN", "FARMER", "BUYER", "BUSINESS_BUYER")
 
                         .anyRequest()
                         .authenticated()

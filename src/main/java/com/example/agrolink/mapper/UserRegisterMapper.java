@@ -39,11 +39,14 @@ public final class UserRegisterMapper {
 
         user.setPassword(dto.getPassword());
 
-        // Map requested role if valid, else default to BUYER
+        // Map requested role if valid, else default to BUYER (disallow self-registering as ADMIN)
         Role requestedRole = Role.BUYER;
         if (dto.getRole() != null && !dto.getRole().isBlank()) {
             try {
-                requestedRole = Role.valueOf(dto.getRole().trim().toUpperCase());
+                Role parsedRole = Role.valueOf(dto.getRole().trim().toUpperCase());
+                if (parsedRole != Role.ADMIN) {
+                    requestedRole = parsedRole;
+                }
             } catch (Exception ignored) {}
         }
         user.setRole(requestedRole);
