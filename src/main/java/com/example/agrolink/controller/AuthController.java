@@ -100,6 +100,10 @@ public class AuthController {
                 return unauthorizedResponse();
             }
 
+            if (!user.isEnabled() || !user.isAccountNonLocked()) {
+                return unauthorizedResponse();
+            }
+
             String role = user.getRole().name(); // ✅ FIX
 
             String token = jwtUtil.generateToken(

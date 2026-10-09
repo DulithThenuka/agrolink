@@ -39,6 +39,10 @@ public class RestAuthController {
             throw new org.springframework.security.authentication.BadCredentialsException("Invalid credentials");
         }
 
+        if (!user.isEnabled() || !user.isAccountNonLocked()) {
+            throw new org.springframework.security.authentication.DisabledException("Account is disabled or locked");
+        }
+
         String role = user.getRole().name();
         String token = jwtUtil.generateToken(user.getEmail(), role);
         long expiresIn = 3600;

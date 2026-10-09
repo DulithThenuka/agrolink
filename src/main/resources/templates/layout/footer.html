@@ -27,8 +27,10 @@
                     <ul class="space-y-2 text-xs font-medium">
                         <li><a th:href="@{/}" class="hover:text-emerald-400 transition">Marketplace Home</a></li>
                         <li><a th:href="@{/crops}" class="hover:text-emerald-400 transition">Browse Harvests</a></li>
-                        <li><a sec:authorize="hasRole('BUYER')" th:href="@{/orders/my}" class="hover:text-emerald-400 transition">Order History</a></li>
-                        <li><a sec:authorize="isAuthenticated()" th:href="@{/dashboard}" class="hover:text-emerald-400 transition">Farmer Dashboard</a></li>
+                        <li><a sec:authorize="hasAnyRole('BUYER', 'BUSINESS_BUYER')" th:href="@{/orders/my}" class="hover:text-emerald-400 transition">Order History</a></li>
+                        <li><a sec:authorize="hasAnyRole('FARMER', 'ADMIN')" th:href="@{/dashboard}" class="hover:text-emerald-400 transition">Farmer Dashboard</a></li>
+                        <li><a sec:authorize="hasAnyRole('LOGISTICS', 'LOGISTICS_PROVIDER')" th:href="@{/logistics}" class="hover:text-emerald-400 transition">Logistics Hub</a></li>
+                        <li><a sec:authorize="hasRole('SUPPLIER')" th:href="@{/supplier-marketplace}" class="hover:text-emerald-400 transition">Supplier Marketplace</a></li>
                     </ul>
                 </div>
 

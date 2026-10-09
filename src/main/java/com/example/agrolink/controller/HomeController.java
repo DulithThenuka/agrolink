@@ -37,13 +37,24 @@ public class HomeController {
             return "redirect:/farmer/dashboard";
         }
 
-
-        if (hasRole(auth, Role.BUYER)) {
+        if (hasRole(auth, Role.BUYER) || hasRole(auth, Role.BUSINESS_BUYER)) {
             return "redirect:/crops";
         }
 
-        logger.error("Unknown role for user: {}", email);
-        throw new IllegalStateException("Unknown role for user");
+        if (hasRole(auth, Role.LOGISTICS) || hasRole(auth, Role.LOGISTICS_PROVIDER)) {
+            return "redirect:/logistics";
+        }
+
+        if (hasRole(auth, Role.SUPPLIER)) {
+            return "redirect:/supplier-marketplace";
+        }
+
+        if (hasRole(auth, Role.EXPERT) || hasRole(auth, Role.AGRICULTURAL_EXPERT)) {
+            return "redirect:/experts";
+        }
+
+        logger.warn("Unmapped role for user: {}, redirecting to crops", email);
+        return "redirect:/crops";
     }
 
     // ================== HELPERS ==================

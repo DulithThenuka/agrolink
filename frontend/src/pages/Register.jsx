@@ -98,6 +98,8 @@ export const Register = () => {
           res.role === 'ROLE_LOGISTICS_PROVIDER'
         ) {
           navigate('/logistics', { replace: true });
+        } else if (res.role === 'SUPPLIER' || res.role === 'ROLE_SUPPLIER') {
+          navigate('/supplier-marketplace', { replace: true });
         } else {
           navigate('/dashboard', { replace: true });
         }

@@ -245,10 +245,10 @@ public class CropService {
             );
         }
 
-        if (dto.getQuantity() < 0) {
+        if (dto.getQuantity() == null || dto.getQuantity() <= 0) {
 
             throw new IllegalArgumentException(
-                    "Quantity cannot be negative"
+                    "Quantity must be at least 1"
             );
         }
     }
