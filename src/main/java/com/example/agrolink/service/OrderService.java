@@ -15,6 +15,7 @@ import com.example.agrolink.entity.Crop;
 import com.example.agrolink.entity.EscrowStatus;
 import com.example.agrolink.entity.Order;
 import com.example.agrolink.entity.OrderStatus;
+import com.example.agrolink.entity.Role;
 import com.example.agrolink.entity.User;
 import com.example.agrolink.mapper.OrderMapper;
 import com.example.agrolink.repository.CropRepository;
