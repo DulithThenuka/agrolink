@@ -90,7 +90,7 @@
                         </div>
                     </div>
 
-                    <div sec:authorize="hasRole('BUYER')" class="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-100">
+                    <div sec:authorize="hasAnyRole('BUYER', 'BUSINESS_BUYER')" class="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-100">
                         <div class="text-emerald-800 text-[10px] font-extrabold uppercase tracking-wider">Estimated Total</div>
                         <div class="text-2xl font-extrabold text-emerald-700 font-display mt-0.5" x-text="'Rs. ' + total">
                             Rs. 0.00
@@ -111,7 +111,7 @@
             <div class="pt-6 border-t border-slate-100 space-y-5">
                 
                 <!-- BUYER ACTION FORM -->
-                <div sec:authorize="hasRole('BUYER')">
+                <div sec:authorize="hasAnyRole('BUYER', 'BUSINESS_BUYER')">
                     <form th:action="@{/orders/place}" method="post" class="flex gap-3 items-center">
                         <input type="hidden" name="cropId" th:value="${crop.id}"/>
                         

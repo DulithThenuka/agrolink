@@ -131,7 +131,13 @@ public class OrderService {
             String email) {
 
         Order order = getOrderOrThrow(id);
-        if (order.getBuyer() == null || !order.getBuyer().getEmail().equalsIgnoreCase(email)) {
+        User requestingUser = userRepository.findByEmailIgnoreCase(email).orElse(null);
+        boolean isAdmin = requestingUser != null && requestingUser.getRole() == Role.ADMIN;
+        boolean isBuyer = order.getBuyer() != null && order.getBuyer().getEmail().equalsIgnoreCase(email);
+        boolean isFarmer = order.getCrop() != null && order.getCrop().getFarmer() != null && order.getCrop().getFarmer().getEmail().equalsIgnoreCase(email);
+        boolean isDriver = order.getDriver() != null && order.getDriver().getEmail().equalsIgnoreCase(email);
+
+        if (!isAdmin && !isBuyer && !isFarmer && !isDriver) {
             throw new IllegalArgumentException("Unauthorized access to order");
         }
         return OrderMapper.toDTO(order);

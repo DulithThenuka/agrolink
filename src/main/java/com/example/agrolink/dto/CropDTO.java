@@ -80,4 +80,6 @@ public final class CropDTO {
     public int getTransactionCount() { return 327; }
 
     public boolean isFarmerVerified() { return true; }
+
+    public String getDescription() { return null; }
 }

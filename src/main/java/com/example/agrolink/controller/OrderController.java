@@ -24,7 +24,7 @@ import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/orders")
-@PreAuthorize("hasRole('BUYER')")
+@PreAuthorize("hasAnyRole('BUYER', 'BUSINESS_BUYER', 'FARMER', 'LOGISTICS', 'LOGISTICS_PROVIDER', 'ADMIN')")
 public class OrderController {
 
     private static final Logger logger =
@@ -45,6 +45,7 @@ public class OrderController {
 
     // ================== PLACE ORDER ==================
 
+    @PreAuthorize("hasAnyRole('BUYER', 'BUSINESS_BUYER')")
     @PostMapping("/place")
     public String placeOrder(
 
@@ -103,6 +104,7 @@ public class OrderController {
 
     // ================== MY ORDERS ==================
 
+    @PreAuthorize("hasAnyRole('BUYER', 'BUSINESS_BUYER', 'ADMIN')")
     @GetMapping("/my")
     public String myOrders(
             @RequestParam(value = "success", required = false) String success,
