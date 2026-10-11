@@ -24,6 +24,8 @@ public interface CropRepository
 
     java.util.List<Crop> findByFarmerIdAndActiveTrue(Long farmerId);
 
+    java.util.Optional<Crop> findByBatchCodeIgnoreCase(String batchCode);
+
     // ================== SEARCH ==================
 
     @EntityGraph(attributePaths = {"farmer"})

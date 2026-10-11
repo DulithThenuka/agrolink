@@ -36,6 +36,9 @@ public class CropRequestDTO {
 
     private String imageUrl;
 
+    @Size(max = 1000, message = "Description must be less than 1000 characters")
+    private String description;
+
     // ================== CONSTRUCTORS ==================
 
     public CropRequestDTO() {
@@ -59,6 +62,10 @@ public class CropRequestDTO {
 
         if (imageUrl != null) {
             imageUrl = imageUrl.trim();
+        }
+
+        if (description != null) {
+            description = description.trim();
         }
     }
 
@@ -110,5 +117,13 @@ public class CropRequestDTO {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl == null ? null : imageUrl.trim();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 }

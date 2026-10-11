@@ -35,7 +35,8 @@ public final class CropMapper {
                 getFarmerName(crop),
                 getFarmerId(crop),
                 crop.isActive(),
-                crop.getBatchCode()
+                crop.getBatchCode(),
+                crop.getDescription()
         );
     }
 
@@ -96,6 +97,10 @@ public final class CropMapper {
 
         if (dto.getImageUrl() != null && !dto.getImageUrl().isBlank()) {
             crop.setImageUrl(dto.getImageUrl());
+        }
+
+        if (dto.getDescription() != null && !dto.getDescription().isBlank()) {
+            crop.setDescription(dto.getDescription());
         }
     }
 

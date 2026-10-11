@@ -13,6 +13,7 @@ import com.example.agrolink.dto.CropBatchTraceDTO;
 import com.example.agrolink.dto.CropDTO;
 import com.example.agrolink.dto.CropRequestDTO;
 import com.example.agrolink.entity.Crop;
+import com.example.agrolink.entity.Role;
 import com.example.agrolink.entity.User;
 import com.example.agrolink.mapper.CropMapper;
 import com.example.agrolink.repository.CropRepository;
@@ -60,6 +61,9 @@ public class CropService {
 
         crop.setFarmer(farmer);
         crop.setActive(true);
+        if (crop.getBatchCode() == null || crop.getBatchCode().isBlank()) {
+            crop.setBatchCode("BATCH-2026-NWR-" + String.format("%04d", (int)(Math.random() * 9000 + 1000)));
+        }
 
         Crop savedCrop =
                 cropRepository.save(crop);
@@ -144,16 +148,42 @@ public class CropService {
 
     @Transactional(readOnly = true)
     public CropBatchTraceDTO getBatchTraceability(String batchCode) {
-        Crop crop = cropRepository.findAll().stream()
-                .filter(c -> c.getBatchCode().equalsIgnoreCase(batchCode))
-                .findFirst()
-                .orElse(null);
+        if (batchCode == null || batchCode.isBlank()) {
+            return getDefaultBatchTraceability("BATCH-DEFAULT");
+        }
+
+        String targetCode = batchCode.trim();
+
+        // 1. Direct query in database
+        Crop crop = cropRepository.findByBatchCodeIgnoreCase(targetCode).orElse(null);
+
+        // 2. Search by matching id pattern if code is dynamic BATCH-*-{id}
+        if (crop == null) {
+            try {
+                if (targetCode.matches("(?i).*NWR-(\\d+)")) {
+                    String idStr = targetCode.replaceAll("(?i).*NWR-(\\d+)", "$1");
+                    Long possibleId = Long.parseLong(idStr);
+                    crop = cropRepository.findById(possibleId).orElse(null);
+                }
+            } catch (Exception ignored) {}
+        }
+
+        // 3. In-memory safe check avoiding NullPointerException
+        if (crop == null) {
+            crop = cropRepository.findAll().stream()
+                    .filter(c -> c.getBatchCode() != null && c.getBatchCode().equalsIgnoreCase(targetCode))
+                    .findFirst()
+                    .orElse(null);
+        }
 
         if (crop != null) {
             return getCropTraceability(crop.getId());
         }
 
-        // Default fallback batch if code is generated dynamically
+        return getDefaultBatchTraceability(targetCode);
+    }
+
+    private CropBatchTraceDTO getDefaultBatchTraceability(String batchCode) {
         return new CropBatchTraceDTO(
                 batchCode,
                 1L,
@@ -182,8 +212,10 @@ public class CropService {
         );
 
         Crop crop = getCropOrThrow(id);
+        User requestingUser = getUserByEmail(email);
+        boolean isAdmin = requestingUser.getRole() == Role.ADMIN;
 
-        if (!isOwner(crop, email)) {
+        if (!isOwner(crop, email) && !isAdmin) {
 
             throw new IllegalArgumentException(
                     "Unauthorized action"

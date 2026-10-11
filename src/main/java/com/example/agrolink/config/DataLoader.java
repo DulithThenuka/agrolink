@@ -167,6 +167,7 @@ public class DataLoader implements CommandLineRunner {
         crop.setPrice(price);
         crop.setQuantity(quantity);
         crop.setImageUrl(imageUrl);
+        crop.setDescription(description);
         crop.setActive(true);
         crop.setBatchCode(batchCode);
         crop.setFarmer(farmer);

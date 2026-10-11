@@ -81,6 +81,9 @@ public class Crop {
     @Column(length = 100)
     private String blockchainHash = "0x7f8a92b4c19e81d763a1290f";
 
+    @Column(length = 1000)
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "farmer_id", nullable = false)
     private User farmer;
@@ -99,6 +102,10 @@ public class Crop {
 
         this.createdAt = now;
         this.updatedAt = now;
+
+        if (this.batchCode == null || this.batchCode.isBlank()) {
+            this.batchCode = "BATCH-2026-NWR-" + String.format("%04d", (int)(Math.random() * 9000 + 1000));
+        }
     }
 
     @PreUpdate
@@ -290,5 +297,13 @@ public class Crop {
 
     public void setBlockchainHash(String blockchainHash) {
         this.blockchainHash = blockchainHash;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 }

@@ -82,6 +82,13 @@
             }">
             </div>
 
+            <!-- DESCRIPTION -->
+            <div th:replace="~{
+                components/forms/textarea ::
+                textarea('Harvest Description', 'description', 'Provide harvest details, organic certifications, soil and growing conditions...', *{description}, 3, null)
+            }">
+            </div>
+
             <!-- IMAGE -->
             <div class="space-y-1.5">
                 <label class="label-premium">Crop Image</label>
