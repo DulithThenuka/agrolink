@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payments")
-@PreAuthorize("hasRole('BUYER')")
+@PreAuthorize("hasAnyRole('BUYER', 'BUSINESS_BUYER', 'ADMIN')")
 public class RestPaymentController {
 
     private static final Logger logger = LoggerFactory.getLogger(RestPaymentController.class);

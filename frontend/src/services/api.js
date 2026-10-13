@@ -72,11 +72,12 @@ api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     if (error.response && error.response.status === 401) {
+      const hadToken = Boolean(localStorage.getItem('token'));
       localStorage.removeItem('token');
       localStorage.removeItem('user');
 
       const isLoginRequest = error.config?.url?.includes('/auth/login');
-      if (!isLoginRequest) {
+      if (!isLoginRequest && hadToken) {
         window.dispatchEvent(new CustomEvent('auth:unauthorized'));
         redirectToLoginExpired();
       }

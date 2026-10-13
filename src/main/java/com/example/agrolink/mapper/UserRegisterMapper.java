@@ -73,6 +73,14 @@ public final class UserRegisterMapper {
     private static void validate(
             UserRegisterDTO dto) {
 
+        if (dto.getName() == null ||
+                dto.getName().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Name is required"
+            );
+        }
+
         if (dto.getEmail() == null ||
                 dto.getEmail().isBlank()) {
 

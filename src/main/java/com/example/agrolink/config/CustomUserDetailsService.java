@@ -65,10 +65,9 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new IllegalStateException("User role is not assigned");
         }
 
-        // ✅ FIX: Assign role properly
-        return List.of(
-                new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
-        );
+        return user.getRole().getAccessibleRoles().stream()
+                .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
+                .toList();
     }
 
     private String normalizeEmail(String email) {

@@ -53,7 +53,7 @@ public enum Role {
         return getAccessibleRoles().contains(requiredRole);
     }
 
-    private Set<Role> getAccessibleRoles() {
+    public Set<Role> getAccessibleRoles() {
         switch (this) {
             case ADMIN:
                 return EnumSet.allOf(Role.class);

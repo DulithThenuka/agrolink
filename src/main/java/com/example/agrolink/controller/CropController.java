@@ -234,7 +234,7 @@ public class CropController {
 
     // ================== DELETE ==================
 
-    @PreAuthorize("hasRole('FARMER')")
+    @PreAuthorize("hasAnyRole('FARMER', 'ADMIN')")
     @PostMapping("/delete/{id}")
     public String deleteCrop(
             @PathVariable Long id,

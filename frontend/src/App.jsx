@@ -61,7 +61,11 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   if (isAdmin) return children;
 
   // 4. Build a set of the current user's role strings for O(1) lookup
-  const userRoles = new Set([user?.role, user?.role?.replace('ROLE_', '')]);
+  const rawRole = user?.role?.replace('ROLE_', '') || '';
+  const userRoles = new Set([user?.role, rawRole]);
+  if (rawRole === 'BUSINESS_BUYER') userRoles.add('BUYER');
+  if (rawRole === 'LOGISTICS_PROVIDER') userRoles.add('LOGISTICS');
+  if (rawRole === 'AGRICULTURAL_EXPERT') userRoles.add('EXPERT');
 
   // 5. Check if the user's role is in the allowed list
   const hasAccess = allowedRoles.some((r) => userRoles.has(r));

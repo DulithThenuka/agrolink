@@ -1,5 +1,6 @@
 package com.example.agrolink.config;
 
+import com.example.agrolink.entity.Role;
 import com.example.agrolink.util.JwtUtil;
 
 import jakarta.servlet.*;
@@ -75,14 +76,21 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private void setAuthentication(String email, String role, HttpServletRequest request) {
 
-        String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-
-        var authority = new SimpleGrantedAuthority(authorityRole);
+        List<SimpleGrantedAuthority> authorities;
+        try {
+            Role roleEnum = Role.valueOf(role.replace("ROLE_", ""));
+            authorities = roleEnum.getAccessibleRoles().stream()
+                    .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
+                    .toList();
+        } catch (Exception e) {
+            String authorityRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+            authorities = List.of(new SimpleGrantedAuthority(authorityRole));
+        }
 
         var authToken = new UsernamePasswordAuthenticationToken(
                 email,
                 null,
-                List.of(authority)
+                authorities
         );
 
         authToken.setDetails(

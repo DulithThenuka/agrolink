@@ -66,7 +66,7 @@ public class RestCropController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('FARMER')")
+    @PreAuthorize("hasAnyRole('FARMER', 'ADMIN')")
     public ApiResponse<Void> deleteCrop(@PathVariable Long id, Principal principal) {
         if (principal == null) {
             throw new org.springframework.security.authentication.BadCredentialsException("Not authenticated");

@@ -13,7 +13,7 @@ import java.security.Principal;
 
 @Controller
 @RequestMapping("/payment")
-@PreAuthorize("hasRole('BUYER')")
+@PreAuthorize("hasAnyRole('BUYER', 'BUSINESS_BUYER', 'ADMIN')")
 public class PaymentController {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);

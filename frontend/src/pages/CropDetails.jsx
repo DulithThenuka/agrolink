@@ -227,6 +227,11 @@ export const CropDetails = () => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
+    if (!isAuthenticated) {
+      navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
+
     setSubmittingReview(true);
     setReviewMsg(null);
     try {

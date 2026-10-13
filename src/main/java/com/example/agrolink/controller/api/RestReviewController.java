@@ -45,7 +45,10 @@ public class RestReviewController {
 
     @PostMapping
     public ApiResponse<ReviewDTO> createReview(@RequestBody CreateReviewRequest request, Principal principal) {
-        String buyerEmail = principal != null ? principal.getName() : "verified.buyer@agrolink.lk";
+        if (principal == null) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Not authenticated");
+        }
+        String buyerEmail = principal.getName();
         logger.info("REST request by {} to create review for crop {}", buyerEmail, request.getCropId());
         ReviewDTO created = reviewService.createReview(buyerEmail, request.getCropId(), request.getRating(), request.getComment());
         return ApiResponse.success("Review submitted successfully!", created);

@@ -33,7 +33,12 @@ public class RestAuthController {
     public ApiResponse<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
         logger.info("REST Login attempt for email: {}", request.getEmail());
         String email = normalizeEmail(request.getEmail());
-        User user = userService.findByEmail(email);
+        User user;
+        try {
+            user = userService.findByEmail(email);
+        } catch (IllegalArgumentException ex) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Invalid credentials");
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new org.springframework.security.authentication.BadCredentialsException("Invalid credentials");
