@@ -13,12 +13,12 @@ export const isTokenExpired = (token) => {
   if (!token) return true;
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return false;
+    if (parts.length !== 3) return true;
     const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
     if (!payload.exp) return false;
     return Date.now() >= payload.exp * 1000;
   } catch (e) {
-    return false;
+    return true;
   }
 };
 

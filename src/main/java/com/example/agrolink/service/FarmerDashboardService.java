@@ -105,7 +105,7 @@ public class FarmerDashboardService {
             double marketAvg = crop.getPrice() != null
                     ? crop.getPrice().multiply(new BigDecimal("1.07")).doubleValue()
                     : (currentPrice * 1.07);
-            String demand = currentPrice <= marketAvg ? "High 🔥" : "Moderate";
+            String demand = currentPrice >= marketAvg ? "High 🔥" : "Moderate";
             benchmarks.add(new FarmerDashboardDTO.CropBenchmark(
                     crop.getName(),
                     currentPrice,

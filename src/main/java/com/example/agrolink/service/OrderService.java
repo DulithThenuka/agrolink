@@ -153,17 +153,17 @@ public class OrderService {
                 getOrderOrThrow(orderId);
 
         if (order.getStatus()
-                == OrderStatus.CONFIRMED) {
+                == OrderStatus.PAID) {
 
             logger.warn(
-                    "Order {} already confirmed",
+                    "Order {} already paid",
                     orderId
             );
 
             return;
         }
 
-        order.markAsConfirmed();
+        order.setStatus(OrderStatus.PAID);
 
         orderRepository.save(order);
 

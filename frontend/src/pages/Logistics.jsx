@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { logisticsAPI, ordersAPI } from '../services/api';
@@ -333,7 +333,7 @@ export const Logistics = () => {
   // ==========================================
   // DATA FETCHING
   // ==========================================
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setNotification(null);
 
@@ -424,11 +424,11 @@ export const Logistics = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userRole]);
 
   useEffect(() => {
     loadData();
-  }, [userRole]);
+  }, [loadData]);
 
   // Set default selected shipment if none chosen
   useEffect(() => {
@@ -508,6 +508,9 @@ export const Logistics = () => {
       });
     }
 
+    // Build the updated item first so we can reuse it
+    let updatedDeliveredItem = null;
+
     setActiveShipments((prev) =>
       prev.map((item) => {
         if (item.id === orderId) {
@@ -520,18 +523,18 @@ export const Logistics = () => {
           if (selectedShipment?.id === orderId) {
             setSelectedShipment(updated);
           }
+          if (nextStatus === 'DELIVERED') {
+            updatedDeliveredItem = updated;
+          }
           return updated;
         }
         return item;
       })
     );
 
-    // If marked delivered, update list
-    if (nextStatus === 'DELIVERED') {
-      const deliveredItem = activeShipments.find((s) => s.id === orderId);
-      if (deliveredItem) {
-        setCompletedDeliveries((prev) => [{ ...deliveredItem, status: 'DELIVERED', statusLabel: 'Delivered' }, ...prev]);
-      }
+    // If marked delivered, add the correctly updated item to completed list
+    if (nextStatus === 'DELIVERED' && updatedDeliveredItem) {
+      setCompletedDeliveries((prev) => [updatedDeliveredItem, ...prev]);
     }
 
     setActionLoading(null);
@@ -645,7 +648,8 @@ export const Logistics = () => {
 
   // 6. Cancellation with Confirmation Dialog
   const handleConfirmCancellation = (orderId) => {
-    setActiveShipments((prev) => prev.filter((s) => s.id !== orderId));
+    const remaining = activeShipments.filter((s) => s.id !== orderId);
+    setActiveShipments(remaining);
     setAvailableRequests((prev) => prev.filter((s) => s.id !== orderId));
     setCancelModalOrder(null);
     setNotification({
@@ -653,7 +657,7 @@ export const Logistics = () => {
       message: `Transport request #${orderId} has been safely cancelled.`
     });
     if (selectedShipment?.id === orderId) {
-      setSelectedShipment(activeShipments[0] || null);
+      setSelectedShipment(remaining[0] || null);
     }
   };
 
