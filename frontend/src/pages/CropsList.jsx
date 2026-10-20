@@ -423,35 +423,39 @@ export const CropsList = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
         {/* 1. COMPACT MARKETPLACE HEADER */}
-        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 shadow-xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
-            <div className="space-y-1.5 max-w-2xl">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
+        <div className="relative bg-gradient-to-br from-white via-emerald-50/20 to-slate-50/60 rounded-2xl border border-slate-200/80 p-6 sm:p-7 shadow-xs overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-100/30 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 relative z-10">
+            <div className="space-y-2 max-w-2xl">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50/90 text-emerald-800 text-xs font-bold uppercase tracking-wider border border-emerald-200/80 shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   <Package className="w-3.5 h-3.5 text-emerald-700" />
-                  Wholesale & Retail Directory
+                  Produce Directory
                 </span>
                 {canSell && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200 shadow-2xs">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                     Producer Mode
                   </span>
                 )}
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                Crop Marketplace
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Crop <span className="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-900 bg-clip-text text-transparent">Marketplace</span>
               </h1>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Find available farm harvests from producers across Sri Lanka.
+              <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-2xl">
+                Source verified farm harvests directly from certified growers across Sri Lanka's 25 agrarian districts with end-to-end batch traceability.
               </p>
             </div>
 
             {/* Actions: Post Harvest Listing & Forward Contracts */}
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0 relative z-10">
               {canSell && (
                 <button
                   type="button"
                   onClick={() => setShowPostModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-xs transition-colors focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-sm transition-all focus:outline-hidden focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Post Harvest Listing</span>
@@ -460,7 +464,7 @@ export const CropsList = () => {
 
               <Link
                 to="/contracts"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-sm font-semibold border border-slate-200 transition-colors shadow-xs"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs sm:text-sm font-semibold border border-slate-200 shadow-2xs transition"
               >
                 <span>Forward Contracts</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
@@ -468,7 +472,7 @@ export const CropsList = () => {
 
               {/* Farmer View Switcher (All Produce vs My Listings) */}
               {canSell && (
-                <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200" role="tablist">
+                <div className="inline-flex rounded-xl bg-slate-100/90 p-1 border border-slate-200 shadow-2xs" role="tablist">
                   <button
                     type="button"
                     role="tab"
@@ -476,7 +480,7 @@ export const CropsList = () => {
                     onClick={() => setActiveView('all')}
                     className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                       activeView === 'all'
-                        ? 'bg-white text-slate-900 shadow-xs'
+                        ? 'bg-white text-slate-900 shadow-xs font-bold'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -504,14 +508,14 @@ export const CropsList = () => {
         {/* Global Feedback Alert Banner */}
         {msg && (
           <div
-            className={`p-4 rounded-xl border text-sm font-medium flex items-center justify-between shadow-xs ${
+            className={`p-4 rounded-xl border text-xs sm:text-sm font-medium flex items-center justify-between shadow-xs ${
               msg.type === 'success'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : 'bg-rose-50 border-rose-200 text-rose-900'
             }`}
             role="alert"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               {msg.type === 'success' ? (
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
               ) : (
@@ -522,7 +526,7 @@ export const CropsList = () => {
             <button
               type="button"
               onClick={() => setMsg(null)}
-              className="p-1 rounded-md text-slate-400 hover:text-slate-700"
+              className="p-1 rounded-md text-slate-400 hover:text-slate-700 cursor-pointer"
               aria-label="Dismiss message"
             >
               <X className="w-4 h-4" />
@@ -531,7 +535,7 @@ export const CropsList = () => {
         )}
 
         {/* 2. SEARCH & FILTERS BAR (PRIMARY CONTROL AREA) */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-4">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs space-y-4">
           
           {/* Top Row: Search Input + District Selector + Sort Dropdown + Price Filter + View Mode */}
           <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
@@ -548,10 +552,11 @@ export const CropsList = () => {
                 type="text"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder="Search crops by name, variety, or farmer (press '/' to focus)..."
-                className="w-full pl-10 pr-24 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
+                placeholder="Search crops by name, variety, or farmer..."
+                className="w-full pl-10 pr-28 py-2.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white text-sm font-medium text-slate-900 placeholder-slate-400 focus:outline-hidden focus:bg-white focus:ring-2 focus:ring-emerald-600 focus:border-transparent transition"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                <span className="hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 bg-slate-200/70 text-slate-500 rounded border border-slate-300/60 font-semibold">/</span>
                 {keyword && (
                   <button
                     type="button"
@@ -567,7 +572,7 @@ export const CropsList = () => {
                 )}
                 <button
                   type="submit"
-                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg transition shadow-2xs"
+                  className="px-3.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-lg transition shadow-2xs cursor-pointer"
                 >
                   Search
                 </button>
@@ -588,9 +593,9 @@ export const CropsList = () => {
                     setLocation(e.target.value);
                     setPage(0);
                   }}
-                  className="w-full pl-8 pr-8 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 appearance-none cursor-pointer hover:bg-slate-100 transition"
+                  className="w-full pl-8 pr-8 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 appearance-none cursor-pointer transition shadow-2xs"
                 >
-                  <option value="">All Sri Lanka Districts</option>
+                  <option value="">All Districts</option>
                   {SRI_LANKA_DISTRICTS.map((dist) => (
                     <option key={dist} value={dist}>{dist}</option>
                   ))}
@@ -608,9 +613,9 @@ export const CropsList = () => {
                     setSortBy(e.target.value);
                     setPage(0);
                   }}
-                  className="w-full pl-3 pr-8 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 appearance-none cursor-pointer hover:bg-slate-100 transition"
+                  className="w-full pl-3 pr-8 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-600 appearance-none cursor-pointer transition shadow-2xs"
                 >
-                  <option value="DEFAULT">Featured / Default</option>
+                  <option value="DEFAULT">Featured Sort</option>
                   <option value="PRICE_LOW">Price: Low to High</option>
                   <option value="PRICE_HIGH">Price: High to Low</option>
                   <option value="QTY_HIGH">Stock: High to Low</option>
@@ -623,7 +628,7 @@ export const CropsList = () => {
               <button
                 type="button"
                 onClick={() => setShowFiltersDrawer(!showFiltersDrawer)}
-                className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs cursor-pointer ${
                   showFiltersDrawer || minPrice || maxPrice
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -639,13 +644,13 @@ export const CropsList = () => {
               </button>
 
               {/* View Mode Switcher (Grid vs Table) */}
-              <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200" role="group" aria-label="View mode">
+              <div className="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 shadow-2xs" role="group" aria-label="View mode">
                 <button
                   type="button"
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-lg text-xs transition ${
+                  className={`p-1.5 rounded-lg text-xs transition cursor-pointer ${
                     viewMode === 'grid'
-                      ? 'bg-white text-emerald-800 shadow-2xs font-semibold'
+                      ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                   title="Grid View"
@@ -657,9 +662,9 @@ export const CropsList = () => {
                 <button
                   type="button"
                   onClick={() => setViewMode('table')}
-                  className={`p-1.5 rounded-lg text-xs transition ${
+                  className={`p-1.5 rounded-lg text-xs transition cursor-pointer ${
                     viewMode === 'table'
-                      ? 'bg-white text-emerald-800 shadow-2xs font-semibold'
+                      ? 'bg-white text-emerald-800 shadow-2xs font-bold'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                   title="Table View"
@@ -681,8 +686,8 @@ export const CropsList = () => {
                 exit={{ height: 0, opacity: 0 }}
                 className="pt-3 border-t border-slate-100 overflow-hidden"
               >
-                <div className="flex flex-wrap items-center gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
-                  <span className="font-semibold text-slate-700">Price Range (Rs./kg):</span>
+                <div className="flex flex-wrap items-center gap-3 bg-slate-50/80 p-3.5 rounded-xl border border-slate-200 text-xs shadow-2xs">
+                  <span className="font-bold text-slate-700 uppercase tracking-wide text-[11px]">Price Filter (Rs./kg):</span>
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
@@ -697,7 +702,7 @@ export const CropsList = () => {
                       type="number"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
-                      placeholder="Max (Rs. 2000)"
+                      placeholder="Max (Rs. 2500)"
                       aria-label="Maximum price in Rupees"
                       className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-medium text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-emerald-600"
                     />
@@ -708,7 +713,7 @@ export const CropsList = () => {
                       setPage(0);
                       fetchCrops();
                     }}
-                    className="px-4 py-1.5 bg-slate-900 text-white font-semibold rounded-lg text-xs hover:bg-slate-800 transition"
+                    className="px-4 py-1.5 bg-emerald-700 text-white font-semibold rounded-lg text-xs hover:bg-emerald-800 transition shadow-2xs cursor-pointer"
                   >
                     Apply Price
                   </button>
@@ -720,7 +725,7 @@ export const CropsList = () => {
                         setMaxPrice('');
                         setPage(0);
                       }}
-                      className="text-xs font-semibold text-rose-600 hover:underline"
+                      className="text-xs font-semibold text-rose-600 hover:underline cursor-pointer"
                     >
                       Clear Price
                     </button>
@@ -732,7 +737,7 @@ export const CropsList = () => {
 
           {/* Category Shortcuts & Quality Toggles */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100">
-            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none" role="tablist" aria-label="Filter by produce category">
+            <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-1 scrollbar-none" role="tablist" aria-label="Filter by produce category">
               {[
                 { label: 'All Produce', value: '' },
                 { label: 'Vegetables', value: 'Vegetables' },
@@ -751,10 +756,10 @@ export const CropsList = () => {
                       setCategory(tab.value);
                       setPage(0);
                     }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'bg-emerald-700 text-white shadow-2xs scale-[1.02]'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
                     }`}
                   >
                     {tab.label}
@@ -771,7 +776,7 @@ export const CropsList = () => {
                   setOrganicOnly(!organicOnly);
                   setPage(0);
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition border flex items-center gap-1.5 shadow-2xs cursor-pointer ${
                   organicOnly
                     ? 'bg-emerald-700 text-white border-emerald-700'
                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -787,9 +792,9 @@ export const CropsList = () => {
                   setGradeAOnly(!gradeAOnly);
                   setPage(0);
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition border flex items-center gap-1.5 shadow-2xs cursor-pointer ${
                   gradeAOnly
-                    ? 'bg-amber-700 text-white border-amber-700'
+                    ? 'bg-amber-600 text-white border-amber-600'
                     : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                 }`}
                 aria-pressed={gradeAOnly}
@@ -802,9 +807,9 @@ export const CropsList = () => {
           {/* Active Filter Chips Summary */}
           {hasActiveFilters && (
             <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
-              <span className="font-semibold text-slate-500">Active Filters:</span>
+              <span className="font-bold text-slate-400 uppercase text-[11px] tracking-wider">Active:</span>
               {keyword && (
-                <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold flex items-center gap-1.5 border border-slate-200">
                   "{keyword}"
                   <button
                     onClick={() => {
@@ -812,13 +817,14 @@ export const CropsList = () => {
                       setPage(0);
                     }}
                     aria-label="Remove keyword filter"
+                    className="cursor-pointer"
                   >
                     <X className="w-3 h-3 text-slate-400 hover:text-slate-600" />
                   </button>
                 </span>
               )}
               {category && (
-                <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-medium border border-emerald-200 flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200 flex items-center gap-1.5">
                   Category: {category}
                   <button
                     onClick={() => {
@@ -826,13 +832,14 @@ export const CropsList = () => {
                       setPage(0);
                     }}
                     aria-label="Remove category filter"
+                    className="cursor-pointer"
                   >
                     <X className="w-3 h-3 text-emerald-600 hover:text-emerald-800" />
                   </button>
                 </span>
               )}
               {location && (
-                <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium border border-slate-200 flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200 flex items-center gap-1.5">
                   District: {location}
                   <button
                     onClick={() => {
@@ -840,13 +847,14 @@ export const CropsList = () => {
                       setPage(0);
                     }}
                     aria-label="Remove location filter"
+                    className="cursor-pointer"
                   >
                     <X className="w-3 h-3 text-slate-500 hover:text-slate-800" />
                   </button>
                 </span>
               )}
               {organicOnly && (
-                <span className="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-900 font-medium flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 font-semibold flex items-center gap-1.5">
                   Organic
                   <button
                     onClick={() => {
@@ -854,13 +862,14 @@ export const CropsList = () => {
                       setPage(0);
                     }}
                     aria-label="Remove organic filter"
+                    className="cursor-pointer"
                   >
                     <X className="w-3 h-3 text-emerald-700 hover:text-emerald-900" />
                   </button>
                 </span>
               )}
               {gradeAOnly && (
-                <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-900 font-medium flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 font-semibold flex items-center gap-1.5">
                   Grade A
                   <button
                     onClick={() => {
@@ -868,13 +877,14 @@ export const CropsList = () => {
                       setPage(0);
                     }}
                     aria-label="Remove grade A filter"
+                    className="cursor-pointer"
                   >
                     <X className="w-3 h-3 text-amber-700 hover:text-amber-900" />
                   </button>
                 </span>
               )}
               {(minPrice || maxPrice) && (
-                <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium border border-slate-200 flex items-center gap-1">
+                <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200 flex items-center gap-1.5">
                   Price: Rs. {minPrice || '0'} - {maxPrice || 'Any'}
                   <button
                     onClick={() => {
@@ -883,6 +893,7 @@ export const CropsList = () => {
                       setPage(0);
                     }}
                     aria-label="Remove price filter"
+                    className="cursor-pointer"
                   >
                     <X className="w-3 h-3 text-slate-500 hover:text-slate-800" />
                   </button>
@@ -891,9 +902,9 @@ export const CropsList = () => {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="text-xs font-semibold text-rose-600 hover:underline ml-2"
+                className="text-xs font-bold text-rose-600 hover:underline ml-2 cursor-pointer"
               >
-                Clear all ✕
+                Reset All ✕
               </button>
             </div>
           )}
@@ -902,13 +913,13 @@ export const CropsList = () => {
         {/* 3. CROP CATALOG DISPLAY (GRID vs TABLE VIEW) */}
         {loading ? (
           /* SKELETON LOADING STATE */
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((sk) => (
               <div
                 key={sk}
                 className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs animate-pulse"
               >
-                <div className="h-44 bg-slate-200" />
+                <div className="h-48 bg-slate-200" />
                 <div className="p-4 space-y-3">
                   <div className="h-3 bg-slate-200 rounded w-1/3" />
                   <div className="h-5 bg-slate-200 rounded w-3/4" />
@@ -928,15 +939,15 @@ export const CropsList = () => {
               <AlertCircle className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-slate-900">Unable to load crop listings</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <h3 className="font-display text-base font-bold text-slate-900">Unable to load crop listings</h3>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">
                 There was a problem reaching the marketplace service.
               </p>
             </div>
             <button
               type="button"
               onClick={fetchCrops}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition shadow-xs cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Retry</span>
@@ -944,13 +955,13 @@ export const CropsList = () => {
           </div>
         ) : displayedCrops.length === 0 ? (
           /* EMPTY STATE */
-          <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs max-w-md mx-auto space-y-4">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-12 text-center shadow-xs max-w-md mx-auto space-y-4">
             <div className="w-12 h-12 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
               <Package className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-slate-900">No crop listings found</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <h3 className="font-display text-base font-bold text-slate-900">No crop listings found</h3>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">
                 {activeView === 'my_listings'
                   ? "You haven't posted any harvest listings yet. Use 'Post Harvest Listing' to publish crops."
                   : 'Try changing your search or filters.'}
@@ -961,7 +972,7 @@ export const CropsList = () => {
                 <button
                   type="button"
                   onClick={() => setShowPostModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition shadow-xs cursor-pointer"
                 >
                   <PlusCircle className="w-4 h-4" /> Post Harvest Listing
                 </button>
@@ -969,7 +980,7 @@ export const CropsList = () => {
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition shadow-xs cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" /> Clear Filters
                 </button>
@@ -978,12 +989,12 @@ export const CropsList = () => {
           </div>
         ) : viewMode === 'table' ? (
           /* TABLE VIEW */
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+          <div className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs font-medium text-slate-700">
-                <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase text-slate-500 tracking-wider">
+                <thead className="bg-slate-50/90 border-b border-slate-200 text-[11px] font-bold uppercase text-slate-600 tracking-wider">
                   <tr>
-                    <th className="px-5 py-3.5">Produce</th>
+                    <th className="px-5 py-3.5">Produce & Grade</th>
                     <th className="px-4 py-3.5">Category</th>
                     <th className="px-4 py-3.5">District</th>
                     <th className="px-4 py-3.5">Seller</th>
@@ -999,7 +1010,7 @@ export const CropsList = () => {
                     const isOutOfStock = (crop.quantity || 0) <= 0;
 
                     return (
-                      <tr key={crop.id} className="hover:bg-slate-50/80 transition">
+                      <tr key={crop.id} className="hover:bg-emerald-50/30 transition-colors">
                         <td className="px-5 py-3.5 font-semibold text-slate-900 flex items-center gap-3">
                           <img
                             src={
@@ -1007,7 +1018,7 @@ export const CropsList = () => {
                               'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'
                             }
                             alt={crop.name}
-                            className="w-10 h-10 rounded-lg object-cover border border-slate-200 shrink-0 bg-slate-100"
+                            className="w-11 h-11 rounded-xl object-cover border border-slate-200/80 shrink-0 bg-slate-100 shadow-2xs"
                             onError={(e) => {
                               e.currentTarget.src =
                                 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80';
@@ -1016,29 +1027,34 @@ export const CropsList = () => {
                           <div>
                             <Link
                               to={`/crops/${crop.id}`}
-                              className="hover:text-emerald-700 font-bold transition block text-sm"
+                              className="font-display font-bold text-slate-900 hover:text-emerald-700 transition block text-sm"
                             >
                               {crop.name}
                             </Link>
                             {crop.grade && (
-                              <span className="text-[10px] text-emerald-700 font-semibold">
+                              <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">
                                 {crop.grade}
                               </span>
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3.5 text-slate-600">{crop.category || 'Produce'}</td>
-                        <td className="px-4 py-3.5 text-slate-600">{crop.location || 'Sri Lanka'}</td>
+                        <td className="px-4 py-3.5 text-slate-600 font-medium">{crop.category || 'Produce'}</td>
+                        <td className="px-4 py-3.5 text-slate-600 font-medium">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>{crop.location || 'Sri Lanka'}</span>
+                          </div>
+                        </td>
                         <td className="px-4 py-3.5">
                           {isOwner ? (
-                            <span className="font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded text-[11px] border border-emerald-200">
+                            <span className="font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full text-[11px] border border-emerald-200">
                               Your Listing
                             </span>
                           ) : crop.farmerName ? (
                             <button
                               type="button"
                               onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
-                              className="text-slate-700 hover:text-emerald-700 font-semibold flex items-center gap-1 text-left"
+                              className="text-slate-800 hover:text-emerald-700 font-semibold flex items-center gap-1 text-left cursor-pointer"
                             >
                               <span>{crop.farmerName}</span>
                             </button>
@@ -1046,24 +1062,28 @@ export const CropsList = () => {
                             <span className="text-slate-400">Producer</span>
                           )}
                         </td>
-                        <td className="px-4 py-3.5 font-bold text-slate-900 text-sm">
-                          Rs. {Number(crop.price).toFixed(2)} / kg
+                        <td className="px-4 py-3.5">
+                          <span className="font-display font-bold text-slate-900 text-sm">
+                            <span className="text-xs font-semibold text-slate-400 mr-1 font-sans">Rs.</span>
+                            {Number(crop.price).toFixed(2)}
+                          </span>
+                          <span className="text-[11px] text-slate-500 font-normal"> / kg</span>
                         </td>
-                        <td className="px-4 py-3.5 font-semibold text-slate-700">
+                        <td className="px-4 py-3.5 font-display font-bold text-slate-800 text-xs">
                           {formatQuantity(crop.quantity)}
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {crop.isOrganic && (
-                              <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                Organic
+                              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                🌱 Organic
                               </span>
                             )}
                             {crop.batchCode && (
                               <button
                                 type="button"
                                 onClick={() => setSelectedTraceCrop(crop)}
-                                className="text-[10px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded flex items-center gap-1 transition"
+                                className="text-[10px] font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded-md flex items-center gap-1 transition cursor-pointer"
                                 title="Inspect Batch Traceability"
                               >
                                 <QrCode className="w-3 h-3 text-slate-500" />
@@ -1078,7 +1098,7 @@ export const CropsList = () => {
                               to={`/crops/${crop.id}`}
                               className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
                             >
-                              View Details
+                              Details
                             </Link>
 
                             {/* Role-Aware Action Buttons */}
@@ -1087,7 +1107,7 @@ export const CropsList = () => {
                                 <button
                                   type="button"
                                   onClick={() => setEditingCrop(crop)}
-                                  className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition flex items-center gap-1"
+                                  className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition flex items-center gap-1 cursor-pointer"
                                   title="Manage Listing"
                                 >
                                   <Edit className="w-3.5 h-3.5" />
@@ -1096,7 +1116,7 @@ export const CropsList = () => {
                                 <button
                                   type="button"
                                   onClick={() => setCropToDelete(crop)}
-                                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
                                   title="Delete Listing"
                                   aria-label="Delete listing"
                                 >
@@ -1108,10 +1128,10 @@ export const CropsList = () => {
                                 type="button"
                                 onClick={() => handleBuyClick(crop)}
                                 disabled={isOutOfStock}
-                                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+                                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                                   isOutOfStock
                                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-                                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs'
+                                    : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs'
                                 }`}
                               >
                                 {isOutOfStock ? 'Sold Out' : (!isAuthenticated ? 'Sign In to Buy' : 'Buy')}
@@ -1127,7 +1147,7 @@ export const CropsList = () => {
             </div>
           </div>
         ) : (
-          /* GRID VIEW (CLEAN PRODUCT CARDS) */
+          /* GRID VIEW (ELEVATED PRODUCT CARDS) */
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {displayedCrops.map((crop) => {
               const isOutOfStock = (crop.quantity || 0) <= 0;
@@ -1136,18 +1156,18 @@ export const CropsList = () => {
               return (
                 <div
                   key={crop.id}
-                  className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between"
+                  className="agri-card bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:border-emerald-300 hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
                 >
                   <div>
                     {/* Media Container */}
-                    <div className="h-44 overflow-hidden bg-slate-100 relative">
+                    <div className="h-48 overflow-hidden bg-slate-100 relative">
                       <img
                         src={
                           crop.imageUrl ||
                           'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'
                         }
                         alt={crop.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
                           e.currentTarget.src =
                             'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80';
@@ -1155,14 +1175,23 @@ export const CropsList = () => {
                       />
 
                       {/* Top-Left Category Tag */}
-                      <div className="absolute top-2.5 left-2.5 px-2 py-0.5 bg-slate-900/80 text-white text-[10px] font-semibold rounded-md">
+                      <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-2xs">
                         {crop.category || 'Produce'}
                       </div>
 
                       {/* Top-Right Grade Badge if provided */}
                       {crop.grade && (
-                        <div className="absolute top-2.5 right-2.5 px-2 py-0.5 bg-emerald-700 text-white text-[10px] font-semibold rounded-md">
+                        <div className="absolute top-2.5 right-2.5 px-2.5 py-0.5 bg-emerald-700/90 backdrop-blur-xs text-white text-[10px] font-bold rounded-full shadow-2xs">
                           {crop.grade}
+                        </div>
+                      )}
+
+                      {/* Out of stock overlay badge if applicable */}
+                      {isOutOfStock && (
+                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-2xs flex items-center justify-center">
+                          <span className="px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-bold shadow-sm">
+                            Sold Out
+                          </span>
                         </div>
                       )}
                     </div>
@@ -1173,33 +1202,33 @@ export const CropsList = () => {
                       {/* Location & Organic Status */}
                       <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
                         <span className="flex items-center gap-1 truncate text-slate-600">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+                          <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" aria-hidden="true" />
                           <span>{crop.location || 'Sri Lanka'}</span>
                         </span>
                         
                         {crop.isOrganic && (
-                          <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
-                            Organic
+                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs shrink-0">
+                            🌱 Organic
                           </span>
                         )}
                       </div>
 
                       {/* Crop Title */}
-                      <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-1 hover:text-emerald-700 transition">
+                      <h3 className="font-display text-base font-bold text-slate-900 leading-snug line-clamp-1 group-hover:text-emerald-700 transition-colors">
                         <Link to={`/crops/${crop.id}`}>{crop.name}</Link>
                       </h3>
 
                       {/* Seller & Available Quantity */}
                       <div className="flex items-center justify-between text-xs">
                         {isOwner ? (
-                          <span className="text-emerald-800 font-semibold text-[11px]">
+                          <span className="text-emerald-800 font-semibold text-[11px] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                             Your Listing
                           </span>
                         ) : crop.farmerName ? (
                           <button
                             type="button"
                             onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
-                            className="text-slate-600 hover:text-emerald-700 font-medium truncate max-w-[140px] text-left text-[11px]"
+                            className="text-slate-600 hover:text-emerald-700 font-medium truncate max-w-[140px] text-left text-[11px] cursor-pointer"
                           >
                             <span className="truncate">{crop.farmerName}</span>
                           </button>
@@ -1207,7 +1236,7 @@ export const CropsList = () => {
                           <span className="text-slate-400 text-[11px]">Registered Producer</span>
                         )}
 
-                        <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
+                        <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md shrink-0 font-display">
                           {formatQuantity(crop.quantity)}
                         </span>
                       </div>
@@ -1215,20 +1244,21 @@ export const CropsList = () => {
                       {/* Price Section */}
                       <div className="pt-2 border-t border-slate-100 flex items-baseline justify-between">
                         <div>
-                          <span className="text-base font-bold text-slate-900">
-                            Rs. {Number(crop.price).toFixed(2)}
+                          <span className="font-display text-lg font-extrabold text-slate-900 tracking-tight">
+                            <span className="text-xs font-semibold text-slate-400 mr-1 font-sans">Rs.</span>
+                            {Number(crop.price).toFixed(2)}
                           </span>
-                          <span className="text-xs text-slate-500 font-normal"> / kg</span>
+                          <span className="text-xs text-slate-500 font-medium"> / kg</span>
                         </div>
 
                         {crop.batchCode && (
                           <button
                             type="button"
                             onClick={() => setSelectedTraceCrop(crop)}
-                            className="text-[10px] font-semibold text-slate-500 hover:text-emerald-700 flex items-center gap-1 transition"
+                            className="text-[11px] font-semibold text-slate-500 hover:text-emerald-700 flex items-center gap-1 transition cursor-pointer bg-slate-50 hover:bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60"
                             title="Inspect Batch Traceability"
                           >
-                            <QrCode className="w-3 h-3 text-slate-400" />
+                            <QrCode className="w-3 h-3 text-emerald-600" />
                             <span>Trace</span>
                           </button>
                         )}
@@ -1245,15 +1275,15 @@ export const CropsList = () => {
                         <button
                           type="button"
                           onClick={() => setEditingCrop(crop)}
-                          className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 transition"
+                          className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 transition cursor-pointer"
                         >
                           <Edit className="w-3.5 h-3.5" />
-                          <span>Manage Listing</span>
+                          <span>Manage</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setCropToDelete(crop)}
-                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 rounded-xl transition"
+                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 rounded-xl transition cursor-pointer"
                           title="Delete Listing"
                           aria-label="Delete listing"
                         >
@@ -1266,14 +1296,14 @@ export const CropsList = () => {
                         type="button"
                         onClick={() => handleBuyClick(crop)}
                         disabled={isOutOfStock}
-                        className={`w-full py-2 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+                        className={`w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${
                           isOutOfStock
                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
-                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs'
+                            : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs hover:shadow-sm'
                         }`}
                       >
                         <ShoppingBag className="w-3.5 h-3.5" aria-hidden="true" />
-                        <span>{isOutOfStock ? 'Sold Out' : (!isAuthenticated ? 'Sign In to Buy' : 'Buy')}</span>
+                        <span>{isOutOfStock ? 'Sold Out' : (!isAuthenticated ? 'Sign In to Buy' : 'Buy Now')}</span>
                       </button>
                     )}
 
@@ -1281,9 +1311,9 @@ export const CropsList = () => {
                     <div className="flex justify-end pt-0.5">
                       <Link
                         to={`/crops/${crop.id}`}
-                        className="text-[11px] font-semibold text-slate-600 hover:text-emerald-700 flex items-center gap-1 transition"
+                        className="text-[11px] font-semibold text-slate-500 hover:text-emerald-700 flex items-center gap-1 transition"
                       >
-                        <span>View Details</span>
+                        <span>View Full Details</span>
                         <ArrowRight className="w-3 h-3" />
                       </Link>
                     </div>
@@ -1301,18 +1331,18 @@ export const CropsList = () => {
               type="button"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={page === 0}
-              className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl disabled:opacity-50 shadow-2xs hover:bg-slate-50 transition"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl disabled:opacity-50 shadow-2xs hover:bg-slate-50 transition cursor-pointer"
             >
               Previous
             </button>
-            <span className="px-3.5 py-1.5 bg-slate-100 text-slate-800 font-semibold text-xs rounded-xl border border-slate-200">
+            <span className="px-4 py-2 bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-2xs font-display">
               Page {page + 1} of {totalPages}
             </span>
             <button
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1}
-              className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl disabled:opacity-50 shadow-2xs hover:bg-slate-50 transition"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl disabled:opacity-50 shadow-2xs hover:bg-slate-50 transition cursor-pointer"
             >
               Next
             </button>
