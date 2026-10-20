@@ -329,22 +329,22 @@ export const CropDetails = () => {
     <div className="min-h-screen bg-slate-50 text-slate-900 pb-16 font-sans">
       
       {/* 1. TOP ANNOUNCEMENT & TRUST STRIP */}
-      <div className="bg-emerald-800 text-emerald-50 px-4 py-2.5 text-xs font-medium border-b border-emerald-900/30">
+      <div className="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-emerald-100 px-4 py-2.5 text-xs font-semibold border-b border-emerald-950/40 shadow-xs">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 font-semibold text-emerald-200">
-              <ShieldCheck className="w-4 h-4 text-emerald-300" aria-hidden="true" />
-              Verified Agricultural Produce Exchange
+            <span className="inline-flex items-center gap-1.5 font-bold text-white tracking-wide">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" aria-hidden="true" />
+              AGROLINK VERIFIED PRODUCE EXCHANGE
             </span>
-            <span className="hidden sm:inline text-emerald-300/60">•</span>
-            <span className="hidden sm:inline text-emerald-100">
+            <span className="hidden sm:inline text-emerald-400/50">•</span>
+            <span className="hidden sm:inline text-emerald-200 font-medium">
               100% Escrow Protection • Origin Passport Guarantee
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-emerald-200 text-xs">
-            <span className="inline-flex items-center gap-1">
-              <Truck className="w-3.5 h-3.5" aria-hidden="true" /> Farmgate &amp; Logistics Hub Dispatch
+          <div className="flex items-center gap-4 text-emerald-200 text-xs font-medium">
+            <span className="inline-flex items-center gap-1.5">
+              <Truck className="w-3.5 h-3.5 text-emerald-300" aria-hidden="true" /> Direct Farmgate Dispatch &amp; Cold-Chain Logged
             </span>
           </div>
         </div>
@@ -355,17 +355,19 @@ export const CropDetails = () => {
         {/* 2. BREADCRUMB & BACK NAVIGATION */}
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-slate-500 font-medium">
-            <Link to="/crops" className="hover:text-emerald-800 transition flex items-center gap-1">
+            <Link to="/crops" className="hover:text-emerald-800 transition flex items-center gap-1 font-semibold text-slate-600">
               <ArrowLeft className="w-3.5 h-3.5" /> Produce Catalog
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-slate-400">{crop.category || 'Produce'}</span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-900 font-semibold truncate max-w-[200px]">{crop.name}</span>
+            <span className="text-slate-900 font-bold truncate max-w-[200px]">{crop.name}</span>
           </nav>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200 text-xs">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" /> Verified Direct Farm Harvest
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 text-xs shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Verified Farm Harvest</span>
           </span>
         </div>
 
@@ -374,7 +376,7 @@ export const CropDetails = () => {
           
           {/* LEFT COLUMN: PRODUCT IMAGE & CERTIFICATIONS */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm relative group">
+            <div className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs relative group">
               <div className="h-[380px] sm:h-[460px] overflow-hidden bg-slate-100 relative">
                 <img
                   src={crop.imageUrl || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=800&auto=format&fit=crop&q=80'}
@@ -386,20 +388,20 @@ export const CropDetails = () => {
                 />
 
                 {/* Category Badge */}
-                <div className="absolute top-4 left-4 px-3 py-1 bg-slate-900/80 backdrop-blur-sm text-white text-xs font-semibold rounded-lg shadow-sm">
+                <div className="absolute top-4 left-4 px-3 py-1 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-2xs">
                   {crop.category || 'Produce'}
                 </div>
 
                 {/* Quality / Organic Badges */}
                 <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5">
                   {crop.grade && (
-                    <span className="px-2.5 py-1 bg-emerald-700/95 backdrop-blur-sm text-white text-xs font-semibold rounded-lg shadow-sm flex items-center gap-1">
+                    <span className="px-3 py-1 bg-emerald-700/90 backdrop-blur-md text-white text-xs font-bold rounded-full shadow-2xs flex items-center gap-1.5">
                       <BadgeCheck className="w-3.5 h-3.5 text-emerald-200" aria-hidden="true" />
                       {crop.grade}
                     </span>
                   )}
                   {crop.isOrganic && (
-                    <span className="px-2.5 py-1 bg-teal-800/90 backdrop-blur-sm text-teal-100 text-xs font-semibold rounded-lg shadow-sm">
+                    <span className="px-3 py-1 bg-teal-800/90 backdrop-blur-md text-teal-100 text-xs font-bold rounded-full shadow-2xs">
                       🌱 Organic Certified
                     </span>
                   )}
@@ -407,10 +409,10 @@ export const CropDetails = () => {
 
                 {/* Location & Batch Code Overlay Strip */}
                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-semibold">
-                  <span className="px-3 py-1.5 rounded-lg bg-slate-900/80 backdrop-blur-sm border border-white/20 flex items-center gap-1.5">
+                  <span className="px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 flex items-center gap-1.5 shadow-2xs">
                     <MapPin className="w-3.5 h-3.5 text-emerald-400" /> {crop.location || 'Sri Lanka'}
                   </span>
-                  <span className="px-3 py-1.5 rounded-lg bg-slate-900/80 backdrop-blur-sm border border-white/20 font-mono text-[11px]">
+                  <span className="px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 font-mono text-[11px] shadow-2xs">
                     {crop.batchCode || 'BATCH-2026-NWR'}
                   </span>
                 </div>
@@ -421,20 +423,20 @@ export const CropDetails = () => {
             <button
               type="button"
               onClick={() => setShowTraceModal(true)}
-              className="w-full py-3 px-4 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 shadow-2xs transition flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 bg-white hover:bg-slate-50 text-slate-700 hover:text-emerald-800 font-semibold text-xs rounded-xl border border-slate-200/90 shadow-2xs transition flex items-center justify-center gap-2 cursor-pointer group"
             >
-              <QrCode className="w-4 h-4 text-emerald-700" />
+              <QrCode className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition-transform" />
               <span>Inspect AGROLINK TRACE™ Batch Passport</span>
             </button>
           </div>
 
           {/* RIGHT COLUMN: SCANNABLE CROP SUMMARY & PURCHASE ACTIONS */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
               
               {/* Header Info */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 uppercase tracking-wide">
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 uppercase tracking-wider">
                   <Tag className="w-3.5 h-3.5 text-emerald-700" />
                   <span>{crop.category || 'Produce'}</span>
                   <span className="text-slate-300">•</span>
@@ -442,18 +444,18 @@ export const CropDetails = () => {
                   <span>{crop.location || 'Sri Lanka'}</span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
                   {crop.name}
                 </h1>
 
                 {/* Stock & Rating Status */}
                 <div className="flex flex-wrap items-center gap-3 pt-1">
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border ${
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border shadow-2xs ${
                       isOutOfStock
                         ? 'bg-rose-50 text-rose-700 border-rose-200'
                         : crop.quantity <= 50
-                        ? 'bg-amber-50 text-amber-700 border-amber-200'
+                        ? 'bg-amber-50 text-amber-900 border-amber-200'
                         : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                     }`}
                   >
@@ -470,7 +472,7 @@ export const CropDetails = () => {
                     )}
                   </span>
 
-                  <span className="text-slate-500 font-medium text-xs flex items-center gap-1">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs text-xs font-medium">
                     <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                     <strong className="text-slate-900">4.9</strong> ({reviews.length} buyer ratings)
                   </span>
@@ -478,19 +480,20 @@ export const CropDetails = () => {
               </div>
 
               {/* Price Display Card */}
-              <div className="p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <div className="p-5 bg-gradient-to-br from-emerald-50/40 via-white to-slate-50/60 rounded-2xl border border-emerald-100/90 shadow-2xs space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   <span>Direct Farmgate Price</span>
                   {savingsPct > 0 && (
-                    <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 text-[10px]">
-                      -{savingsPct}% vs Retail Market
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 text-[11px] shadow-2xs">
+                      -{savingsPct}% vs National Baseline
                     </span>
                   )}
                 </div>
 
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-extrabold text-slate-900">
-                    Rs. {unitPrice.toLocaleString()}
+                  <span className="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                    <span className="text-sm font-semibold text-slate-400 mr-1 font-sans">Rs.</span>
+                    {unitPrice.toLocaleString()}
                   </span>
                   <span className="text-sm font-semibold text-slate-600">/ kg</span>
                   {crop.marketPrice && crop.marketPrice > unitPrice && (
@@ -500,20 +503,21 @@ export const CropDetails = () => {
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 pt-1">
-                  100% Escrow security. Payment remains locked until delivery quality sign-off.
+                <p className="text-[11px] text-slate-500 font-medium pt-1 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>100% Escrow security. Payment remains protected until delivery quality sign-off.</span>
                 </p>
               </div>
 
               {/* Quantity Stepper & Calculation (Only for Buyers) */}
               {!isCropOwner && !isOutOfStock && (
-                <div className="space-y-3 pt-1">
+                <div className="space-y-3.5 pt-1">
                   <div className="flex justify-between items-center text-xs">
-                    <label htmlFor="crop-details-quantity" className="font-bold text-slate-700">
+                    <label htmlFor="crop-details-quantity" className="font-bold text-slate-700 uppercase tracking-wide text-[11px]">
                       Select Order Quantity (kg):
                     </label>
-                    <span className="text-slate-500">
-                      Max: <strong className="text-slate-900">{crop.quantity?.toLocaleString()} kg</strong>
+                    <span className="text-slate-500 text-xs">
+                      Max: <strong className="text-slate-900 font-bold">{crop.quantity?.toLocaleString()} kg</strong>
                     </span>
                   </div>
 
@@ -522,7 +526,7 @@ export const CropDetails = () => {
                       type="button"
                       onClick={() => handleQuantityChange(quantity - 10)}
                       disabled={quantity <= 1}
-                      className="w-10 h-10 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-base flex items-center justify-center transition disabled:opacity-40"
+                      className="w-11 h-11 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-lg flex items-center justify-center transition disabled:opacity-40 shadow-2xs cursor-pointer"
                       aria-label="Decrease quantity by 10"
                     >
                       -
@@ -534,13 +538,13 @@ export const CropDetails = () => {
                       max={crop.quantity || 1}
                       value={quantity}
                       onChange={(e) => handleQuantityChange(e.target.value)}
-                      className="flex-1 py-2 px-3 rounded-xl border border-slate-200 text-center font-bold text-slate-900 text-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                      className="flex-1 py-2.5 px-3 rounded-xl border border-slate-200 text-center font-display font-bold text-slate-900 text-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-2xs"
                     />
                     <button
                       type="button"
                       onClick={() => handleQuantityChange(quantity + 10)}
                       disabled={quantity >= (crop.quantity || 1)}
-                      className="w-10 h-10 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-base flex items-center justify-center transition disabled:opacity-40"
+                      className="w-11 h-11 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-lg flex items-center justify-center transition disabled:opacity-40 shadow-2xs cursor-pointer"
                       aria-label="Increase quantity by 10"
                     >
                       +
@@ -549,7 +553,7 @@ export const CropDetails = () => {
 
                   {/* Inline Warning If Requested Quantity Exceeds Available */}
                   {quantityWarning && (
-                    <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium flex items-center gap-2">
+                    <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                       <span>{quantityWarning}</span>
                     </div>
@@ -565,7 +569,7 @@ export const CropDetails = () => {
                           type="button"
                           disabled={!isEligible}
                           onClick={() => handleQuantityChange(preset)}
-                          className={`py-1.5 rounded-lg border font-semibold text-center transition ${
+                          className={`py-2 rounded-xl border font-bold text-center transition cursor-pointer shadow-2xs ${
                             quantity === preset
                               ? 'bg-emerald-700 text-white border-emerald-700'
                               : isEligible
@@ -580,13 +584,14 @@ export const CropDetails = () => {
                   </div>
 
                   {/* Transparent Calculation Breakdown */}
-                  <div className="pt-3 border-t border-slate-100 flex items-baseline justify-between">
+                  <div className="pt-3 border-t border-slate-100 flex items-baseline justify-between bg-slate-50/60 p-3 rounded-xl border border-slate-100">
                     <div>
-                      <span className="text-xs text-slate-500 font-medium block">
-                        Estimated Produce Total ({quantity} kg × Rs. {unitPrice.toLocaleString()}):
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                        Estimated Outlay ({quantity} kg × Rs. {unitPrice.toLocaleString()}):
                       </span>
-                      <span className="text-2xl font-extrabold text-slate-900">
-                        Rs. {estimatedTotal.toLocaleString()}
+                      <span className="font-display text-2xl font-extrabold text-emerald-800 tracking-tight">
+                        <span className="text-sm font-semibold text-slate-400 mr-1 font-sans">Rs.</span>
+                        {estimatedTotal.toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -600,7 +605,7 @@ export const CropDetails = () => {
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
                     <div className="flex items-center gap-2 text-slate-800 font-semibold text-xs">
                       <Package className="w-4 h-4 text-emerald-700" />
-                      <span>You are the grower and owner of this produce listing.</span>
+                      <span>You are the registered grower and manager of this harvest listing.</span>
                     </div>
                     <div className="flex gap-2">
                       <Link
@@ -618,7 +623,7 @@ export const CropDetails = () => {
                     disabled
                     className="w-full py-3.5 px-4 bg-slate-100 text-slate-400 text-sm font-semibold rounded-xl border border-slate-200 cursor-not-allowed text-center"
                   >
-                    Sold Out (Currently Unavailable)
+                    Sold Out (Harvest Fully Allocated)
                   </button>
                 ) : (
                   /* Buyer Action */
@@ -631,7 +636,7 @@ export const CropDetails = () => {
                       }
                       setShowBuyModal(true);
                     }}
-                    className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2 focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
+                    className="w-full py-3.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm rounded-xl shadow-xs hover:shadow-sm transition flex items-center justify-center gap-2 focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 cursor-pointer"
                   >
                     <ShoppingBag className="w-4 h-4" />
                     <span>
@@ -646,7 +651,7 @@ export const CropDetails = () => {
                 {!isCropOwner && (
                   <Link
                     to="/negotiation"
-                    className="w-full py-2.5 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition flex items-center justify-center gap-1.5 text-center"
+                    className="w-full py-2.5 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition flex items-center justify-center gap-1.5 text-center shadow-2xs"
                   >
                     <span>Need Custom Terms? Make Trade Negotiation Offer</span>
                     <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
@@ -659,26 +664,26 @@ export const CropDetails = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedFarmer({ id: crop.farmerId, name: crop.farmerName })}
-                  className="w-full p-3.5 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition flex items-center justify-between text-left group"
+                  className="w-full p-4 bg-slate-50/80 hover:bg-slate-100 rounded-2xl border border-slate-200 transition flex items-center justify-between text-left group cursor-pointer shadow-2xs"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm shrink-0">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-base shrink-0 shadow-2xs">
                       🧑‍🌾
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-slate-900 text-xs group-hover:text-emerald-800 transition">
+                        <span className="font-display font-bold text-slate-900 text-sm group-hover:text-emerald-800 transition">
                           {crop.farmerName || 'Sunil Perera (Green Valley)'}
                         </span>
-                        <BadgeCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <BadgeCheck className="w-4 h-4 text-emerald-600" />
                       </div>
-                      <p className="text-[11px] text-slate-500 font-medium">
-                        Location: {crop.location || 'Nuwara Eliya'} • Verified Grower
+                      <p className="text-xs text-slate-500 font-medium">
+                        Location: {crop.location || 'Nuwara Eliya'} • Certified Farmgate Producer
                       </p>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-emerald-700 group-hover:translate-x-0.5 transition-transform">
-                    View Profile →
+                  <span className="text-xs font-bold text-emerald-700 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                    Profile <ArrowRight className="w-3 h-3" />
                   </span>
                 </button>
               </div>
@@ -691,33 +696,33 @@ export const CropDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Specifications Grid & Notes */}
-          <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
             <div className="space-y-1">
-              <h2 className="text-lg font-bold text-slate-900">
-                Harvest Specifications &amp; Quality
+              <h2 className="font-display text-lg font-bold text-slate-900 tracking-tight">
+                Harvest Specifications &amp; Quality Parameters
               </h2>
-              <p className="text-xs text-slate-500">
-                Verified batch parameters recorded directly at the farm packing facility.
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                Verified batch metrics recorded directly at the agrarian packing facility.
               </p>
             </div>
 
             {/* 4-Item Parameter Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-              <div>
-                <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Batch Ref</span>
-                <span className="font-mono font-bold text-slate-900 text-xs">{crop.batchCode || 'BATCH-2026-NWR'}</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 space-y-1">
+                <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Batch Reference</span>
+                <span className="font-mono font-bold text-slate-900 text-xs block">{crop.batchCode || 'BATCH-2026-NWR'}</span>
               </div>
-              <div>
+              <div className="bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 space-y-1">
                 <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Harvest Status</span>
-                <span className="font-bold text-slate-900 text-xs">{crop.harvestDateText || 'Available Fresh'}</span>
+                <span className="font-display font-bold text-slate-900 text-xs block">{crop.harvestDateText || 'Available Fresh'}</span>
               </div>
-              <div>
+              <div className="bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 space-y-1">
                 <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Quality Grade</span>
-                <span className="font-bold text-emerald-800 text-xs">{crop.grade || 'Grade A Quality'}</span>
+                <span className="font-display font-bold text-emerald-800 text-xs block">{crop.grade || 'Grade A Quality'}</span>
               </div>
-              <div>
-                <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Storage Spec</span>
-                <span className="font-bold text-slate-900 text-xs">18°C Cold Chain</span>
+              <div className="bg-slate-50/80 p-3.5 rounded-xl border border-slate-100 space-y-1">
+                <span className="text-[10px] font-bold uppercase text-slate-400 block tracking-wider">Storage Protocol</span>
+                <span className="font-display font-bold text-slate-900 text-xs block">18°C Cold Chain</span>
               </div>
             </div>
 
@@ -733,56 +738,56 @@ export const CropDetails = () => {
           </div>
 
           {/* Traceability Progression Card */}
-          <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+          <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h3 className="font-display text-sm font-bold text-slate-900 flex items-center gap-2">
                 <QrCode className="w-4 h-4 text-emerald-700" />
                 Origin Traceability
               </h3>
-              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
                 Blockchain Verified
               </span>
             </div>
 
             {/* Vertical Lifecycle Stepper */}
-            <div className="space-y-3 text-xs pt-1">
+            <div className="space-y-4 text-xs pt-1">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[10px] shrink-0">
+                <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                   1
                 </div>
                 <div>
                   <span className="font-bold text-slate-900 block">Cultivation &amp; Soil Prep</span>
-                  <span className="text-slate-500 text-[11px]">Organic inputs certified</span>
+                  <span className="text-slate-500 text-[11px] font-medium">Organic agricultural inputs verified</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[10px] shrink-0">
+                <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                   2
                 </div>
                 <div>
                   <span className="font-bold text-slate-900 block">Field Harvesting</span>
-                  <span className="text-slate-500 text-[11px]">Hand-picked at peak ripeness</span>
+                  <span className="text-slate-500 text-[11px] font-medium">Hand-picked at peak ripeness window</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[10px] shrink-0">
+                <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                   3
                 </div>
                 <div>
-                  <span className="font-bold text-slate-900 block">Quality Grading</span>
-                  <span className="text-slate-500 text-[11px]">{crop.grade || 'Grade A'} sorted</span>
+                  <span className="font-bold text-slate-900 block">Quality Sorting &amp; Grading</span>
+                  <span className="text-slate-500 text-[11px] font-medium">{crop.grade || 'Grade A'} benchmarked</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[10px] shrink-0">
+                <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
                   4
                 </div>
                 <div>
                   <span className="font-bold text-slate-900 block">Ready for Farmgate Dispatch</span>
-                  <span className="text-slate-500 text-[11px]">Escrow lock on checkout</span>
+                  <span className="text-slate-500 text-[11px] font-medium">Instant Escrow lock on order</span>
                 </div>
               </div>
             </div>
@@ -790,7 +795,7 @@ export const CropDetails = () => {
             <button
               type="button"
               onClick={() => setShowTraceModal(true)}
-              className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-emerald-800 font-semibold text-xs border border-slate-200 transition text-center"
+              className="w-full py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-emerald-800 font-semibold text-xs border border-slate-200 transition text-center cursor-pointer shadow-2xs"
             >
               View Full Traceability Passport →
             </button>
@@ -799,18 +804,18 @@ export const CropDetails = () => {
         </div>
 
         {/* 5. VERIFIED COMMERCIAL BUYER REVIEWS & FEEDBACK */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <h2 className="font-display text-lg font-bold text-slate-900 flex items-center gap-2 tracking-tight">
                 <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
                 Verified Commercial Buyer Reviews
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Authentic feedback from wholesale traders, supermarkets, and institutional purchasers.
+              <p className="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">
+                Authentic feedback from wholesale traders, supermarkets, and institutional buyers.
               </p>
             </div>
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold self-start sm:self-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold self-start sm:self-auto shadow-2xs">
               ⭐ 4.9 Average Rating
             </span>
           </div>
@@ -818,7 +823,7 @@ export const CropDetails = () => {
           {/* Feedback Message */}
           {reviewMsg && (
             <div
-              className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+              className={`p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 shadow-2xs ${
                 reviewMsg.type === 'success'
                   ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
                   : 'bg-rose-50 text-rose-900 border border-rose-200'
@@ -830,7 +835,7 @@ export const CropDetails = () => {
           )}
 
           {/* Submit Review Form */}
-          <form onSubmit={handleReviewSubmit} className="p-4 sm:p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+          <form onSubmit={handleReviewSubmit} className="p-5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-3.5 shadow-2xs">
             <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
               Write a Verified Buyer Review
             </h3>
@@ -843,7 +848,7 @@ export const CropDetails = () => {
                     key={star}
                     type="button"
                     onClick={() => setNewRating(star)}
-                    className="p-1 hover:scale-110 transition"
+                    className="p-1 hover:scale-110 transition cursor-pointer"
                     aria-label={`Rate ${star} star`}
                   >
                     <Star
@@ -862,13 +867,13 @@ export const CropDetails = () => {
               placeholder="Share details regarding harvest quality, freshness, packaging, and delivery experience..."
               required
               rows={2}
-              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 shadow-2xs"
             />
 
             <button
               type="submit"
               disabled={submittingReview}
-              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-xl shadow-2xs transition flex items-center gap-2 disabled:opacity-50"
+              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs rounded-xl shadow-2xs transition flex items-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {submittingReview ? (
                 <>
@@ -887,18 +892,18 @@ export const CropDetails = () => {
           {/* Reviews List */}
           <div className="space-y-3">
             {reviews.length === 0 ? (
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 text-center text-xs text-slate-500">
+              <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-100 text-center text-xs text-slate-500 font-medium">
                 No buyer reviews recorded yet. Be the first to leave feedback after order completion!
               </div>
             ) : (
               reviews.map((rev) => (
-                <div key={rev.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200/70 space-y-1.5">
+                <div key={rev.id} className="p-4 bg-slate-50/70 rounded-xl border border-slate-200/70 space-y-1.5 shadow-2xs">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-900">
                         {rev.buyerEmail || 'Colombo Wholesale Hub'}
                       </span>
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">
+                      <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
                         Verified Buyer ✓
                       </span>
                     </div>
