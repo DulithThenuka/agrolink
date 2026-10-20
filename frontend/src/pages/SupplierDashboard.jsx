@@ -889,18 +889,25 @@ export const SupplierDashboard = () => {
         {/* ADD PRODUCT MODAL */}
         {showAddItemModal && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
           >
-            <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-150">
-              <div className="flex justify-between items-center border-b border-slate-200 pb-3">
-                <div className="flex items-center gap-2">
-                  <Package className="w-5 h-5 text-emerald-700" />
-                  <h3 id="modal-title" className="text-base font-bold text-slate-900">
-                    Add Catalog Product
-                  </h3>
+            <div className="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200/90 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex justify-between items-start border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center shrink-0">
+                    <Package className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 id="modal-title" className="font-display font-bold text-lg text-slate-900">
+                      Add Catalog Product
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Publish agricultural input to verified growers
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowAddItemModal(false)}
@@ -912,14 +919,14 @@ export const SupplierDashboard = () => {
               </div>
 
               {formSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-2">
+                <div className="p-3.5 bg-emerald-50 border border-emerald-200/90 text-emerald-900 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-2xs">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>{formSuccess}</span>
                 </div>
               )}
 
               {formError && (
-                <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-lg text-xs font-semibold flex items-center gap-2">
+                <div className="p-3.5 bg-red-50 border border-red-200/90 text-red-900 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-2xs">
                   <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
                   <span>{formError}</span>
                 </div>
@@ -927,7 +934,7 @@ export const SupplierDashboard = () => {
 
               <form onSubmit={handleCreateItem} className="space-y-4">
                 <div>
-                  <label htmlFor="product-name" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  <label htmlFor="product-name" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                     Product Title *
                   </label>
                   <input
@@ -937,30 +944,30 @@ export const SupplierDashboard = () => {
                     onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                     placeholder="e.g. Certified Keeri Samba Seed Paddy (20kg)"
                     required
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-all shadow-2xs"
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label htmlFor="product-category" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    <label htmlFor="product-category" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                       Category *
                     </label>
                     <select
                       id="product-category"
                       value={newItem.category}
                       onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none bg-white transition-all shadow-2xs"
                     >
-                      <option value="Seeds">Seeds</option>
-                      <option value="Fertilizer">Bio-Fertilizer</option>
-                      <option value="PestControl">Crop Protection</option>
-                      <option value="Equipment">Tools &amp; Irrigation</option>
+                      <option value="Seeds">🌱 Certified Seeds</option>
+                      <option value="Fertilizer">🧪 Bio-Fertilizer</option>
+                      <option value="PestControl">🛡️ Crop Protection</option>
+                      <option value="Equipment">⚙️ Tools &amp; Irrigation</option>
                     </select>
                   </div>
 
                   <div>
-                    <label htmlFor="product-brand" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    <label htmlFor="product-brand" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                       Manufacturer / Brand
                     </label>
                     <input
@@ -969,30 +976,35 @@ export const SupplierDashboard = () => {
                       value={newItem.brand}
                       onChange={(e) => setNewItem({ ...newItem, brand: e.target.value })}
                       placeholder="e.g. CIC / Hayleys / DOA"
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label htmlFor="product-price" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                      Price (LKR) *
+                    <label htmlFor="product-price" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                      Price per Unit *
                     </label>
-                    <input
-                      id="product-price"
-                      type="number"
-                      min="1"
-                      value={newItem.price}
-                      onChange={(e) => setNewItem({ ...newItem, price: Number(e.target.value) })}
-                      required
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none"
-                    />
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                        Rs.
+                      </span>
+                      <input
+                        id="product-price"
+                        type="number"
+                        min="1"
+                        value={newItem.price}
+                        onChange={(e) => setNewItem({ ...newItem, price: Number(e.target.value) })}
+                        required
+                        className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-display font-bold text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-all shadow-2xs"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label htmlFor="product-quantity" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                      Available Stock *
+                    <label htmlFor="product-quantity" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                      Available Stock (Units) *
                     </label>
                     <input
                       id="product-quantity"
@@ -1001,41 +1013,41 @@ export const SupplierDashboard = () => {
                       value={newItem.quantity}
                       onChange={(e) => setNewItem({ ...newItem, quantity: Number(e.target.value) })}
                       required
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-display font-bold text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-all shadow-2xs"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="product-badge" className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                    Quality Badge / Tag
+                  <label htmlFor="product-badge" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Quality Badge / Compliance Tag
                   </label>
                   <input
                     id="product-badge"
                     type="text"
                     value={newItem.badge}
                     onChange={(e) => setNewItem({ ...newItem, badge: e.target.value })}
-                    placeholder="e.g. 🌱 DOA Certified, ⚡ High Yield"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none"
+                    placeholder="e.g. 🌱 DOA Certified, ⚡ High Germination"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 outline-none transition-all shadow-2xs"
                   />
                 </div>
 
-                <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-200">
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                   <button
                     type="button"
                     onClick={() => setShowAddItemModal(false)}
                     disabled={submittingItem}
-                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium text-xs hover:bg-slate-50 transition-colors"
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submittingItem || !newItem.name.trim()}
-                    className="px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs transition-colors inline-flex items-center gap-2 shadow-sm disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-colors inline-flex items-center gap-2 shadow-sm disabled:opacity-50"
                   >
                     {submittingItem && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                    <span>{submittingItem ? 'Publishing...' : 'Publish Product'}</span>
+                    <span>{submittingItem ? 'Publishing Product...' : 'Publish to Catalog'}</span>
                   </button>
                 </div>
               </form>
